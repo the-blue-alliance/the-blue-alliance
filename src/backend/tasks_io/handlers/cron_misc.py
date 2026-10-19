@@ -34,12 +34,14 @@ def nag_pending_suggestions() -> str:
         return ""
 
     total = sum(count for _, count in pending)
+    # Slack posts are prod-only, where these resolve to the PWA's beta host.
+    # The review home links every queue plus the media and offseason tools.
+    review_home = PwaUrlHelper.suggestion_review_url()
     headline = (
-        "1 suggestion needs review"
+        f"1 suggestion {slack_link(review_home, 'needs review')}"
         if total == 1
-        else f"{total} suggestions need review"
+        else f"{total} suggestions {slack_link(review_home, 'need review')}"
     )
-    # Slack posts are prod-only, where this resolves to the PWA's beta host
     bullets = [
         f"• {slack_link(PwaUrlHelper.suggestion_review_url(t), TYPE_NAMES[t])}: {count}"
         for t, count in pending

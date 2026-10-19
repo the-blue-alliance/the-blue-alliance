@@ -66,7 +66,7 @@ def test_nag_single_suggestion(
     channel_url, nag_text = notif_mock.call_args.args
     assert channel_url == "http://foo.bar/nag"
     assert nag_text.split("\n") == [
-        "*:inbox_tray: 1 suggestion needs review*",
+        "*:inbox_tray: 1 suggestion <https://beta.thebluealliance.com/suggest/review|needs review>*",
         "• <https://beta.thebluealliance.com/suggest/review/media|Team Media>: 1",
     ]
 
@@ -90,7 +90,7 @@ def test_nag_totals_and_sorts_types_by_count(
     _, nag_text = notif_mock.call_args.args
     base = "https://beta.thebluealliance.com/suggest/review"
     assert nag_text.split("\n") == [
-        "*:inbox_tray: 6 suggestions need review*",
+        f"*:inbox_tray: 6 suggestions <{base}|need review>*",
         f"• <{base}/api_auth_access|API Write Key Requests>: 3",
         f"• <{base}/event|Webcasts>: 2",
         f"• <{base}/match|Match Videos>: 1",
