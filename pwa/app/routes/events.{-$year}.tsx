@@ -149,6 +149,7 @@ function YearEventsPage() {
   // registered on Select.Root, so provide value -> label pairs there too.
   const districtItems = [
     { value: 'all', label: 'All Events' },
+    ...(year >= 2025 ? [{ value: 'regional', label: 'Regional Events' }] : []),
     ...districts
       .slice()
       .sort((a, b) => a.display_name.localeCompare(b.display_name))
@@ -174,7 +175,9 @@ function YearEventsPage() {
           items={districtItems}
           defaultValue="all"
           onValueChange={(value) => {
-            if (value !== 'all') {
+            if (value === 'regional') {
+              void navigate({ to: `/events/regional/${year}` });
+            } else if (value !== 'all') {
               void navigate({ to: `/district/${value}/${year}` });
             }
           }}

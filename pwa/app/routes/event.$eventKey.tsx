@@ -1295,7 +1295,18 @@ function ChampsQualPointsTab({
         : parseInt(a.teamKey.substring(3)) - parseInt(b.teamKey.substring(3)),
     );
 
-  return <DataTable columns={columns} data={data} />;
+  return (
+    <>
+      {year >= 2025 && (
+        <div className="mb-2 text-right text-sm">
+          <Link to="/events/regional/{-$year}" params={{ year: String(year) }}>
+            Full regional pool rankings
+          </Link>
+        </div>
+      )}
+      <DataTable columns={columns} data={data} />
+    </>
+  );
 }
 
 function MediaTab({
