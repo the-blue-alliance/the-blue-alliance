@@ -1607,6 +1607,7 @@ export const zRegionalRanking = z.object({
       }),
     )
     .optional(),
+  adjustments: z.int().optional(),
 });
 
 export const zRobotAuto2016WithUnknown = z.enum([

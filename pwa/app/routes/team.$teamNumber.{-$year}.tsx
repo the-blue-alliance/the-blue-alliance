@@ -733,10 +733,16 @@ function StatsSection({
         {!district && regionalRanking && (
           <>
             {' '}
-            In the regional pool, they ranked{' '}
-            <span className="font-semibold">
-              #{regionalRanking.rank}
-            </span> with{' '}
+            In the{' '}
+            <Link
+              to="/events/regional/{-$year}"
+              params={{ year: String(year) }}
+              className="underline"
+            >
+              regional pool
+            </Link>
+            , they ranked{' '}
+            <span className="font-semibold">#{regionalRanking.rank}</span> with{' '}
             <span className="font-semibold">{regionalRanking.point_total}</span>{' '}
             points.
           </>

@@ -3357,6 +3357,10 @@ export type RegionalRanking = {
      */
     qual_points: number;
   }>;
+  /**
+   * Any points adjustments applied to the team.
+   */
+  adjustments?: number;
 };
 
 export enum RobotAuto2016WithUnknown {

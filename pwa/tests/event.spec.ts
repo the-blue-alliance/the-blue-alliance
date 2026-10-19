@@ -539,3 +539,15 @@ test.describe('/event/2024mil tabs and the URL hash', () => {
     );
   });
 });
+
+test.describe('/event/2025camb Champs Qual Points tab', () => {
+  test('links to the full regional pool rankings', async ({ page }) => {
+    await page.goto('/event/2025camb');
+    await page.locator('body[data-hydrated]').waitFor();
+    await page.getByRole('tab', { name: 'Champs Qual Points' }).click();
+
+    await expect(
+      page.getByRole('link', { name: 'Full regional pool rankings' }),
+    ).toHaveAttribute('href', '/events/regional/2025');
+  });
+});

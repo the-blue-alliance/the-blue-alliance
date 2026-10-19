@@ -44,6 +44,27 @@ test.describe('/events/2025', () => {
       '/api/v3/event/2025cmptx/teams',
     );
   });
+
+  test('opens the regional rankings from the district selector', async ({
+    page,
+  }) => {
+    await page.getByRole('combobox').filter({ hasText: 'All Events' }).click();
+    await page.getByRole('option', { name: 'Regional Events' }).click();
+
+    await expect(page).toHaveURL('/events/regional/2025');
+  });
+});
+
+test('/events/2024 leaves Regional Events out of the district selector', async ({
+  page,
+}) => {
+  await page.goto('/events/2024');
+  await page.locator('body[data-hydrated]').waitFor();
+  await page.getByRole('combobox').filter({ hasText: 'All Events' }).click();
+
+  await expect(
+    page.getByRole('option', { name: 'Regional Events' }),
+  ).toHaveCount(0);
 });
 
 test.describe('/events', () => {

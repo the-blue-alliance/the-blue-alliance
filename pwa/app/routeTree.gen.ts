@@ -36,6 +36,7 @@ import { Route as TeamsChar123PgNumChar125RouteImport } from './routes/teams.{-$
 import { Route as DistrictDistrictAbbreviationInsightsRouteImport } from './routes/district.$districtAbbreviation.insights'
 import { Route as DistrictDistrictAbbreviationChar123YearChar125RouteImport } from './routes/district.$districtAbbreviation.{-$year}'
 import { Route as EventsDistrictAbbreviationYearRouteImport } from './routes/events.$districtAbbreviation.$year'
+import { Route as EventsRegionalChar123YearChar125RouteImport } from './routes/events.regional.{-$year}'
 import { Route as SuggestEventMediaRouteImport } from './routes/suggest.event.media'
 import { Route as SuggestReviewIndexRouteImport } from './routes/suggest.review.index'
 import { Route as SuggestReviewSuggestionTypeRouteImport } from './routes/suggest.review.$suggestionType'
@@ -187,6 +188,12 @@ const EventsDistrictAbbreviationYearRoute =
     path: '/events/$districtAbbreviation/$year',
     getParentRoute: () => rootRouteImport,
   } as any)
+const EventsRegionalChar123YearChar125Route =
+  EventsRegionalChar123YearChar125RouteImport.update({
+    id: '/events/regional/{-$year}',
+    path: '/events/regional/{-$year}',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SuggestEventMediaRoute = SuggestEventMediaRouteImport.update({
   id: '/suggest/event/media',
   path: '/suggest/event/media',
@@ -258,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
+  '/events/regional/{-$year}': typeof EventsRegionalChar123YearChar125Route
   '/suggest/event/media': typeof SuggestEventMediaRoute
   '/suggest/review/$suggestionType': typeof SuggestReviewSuggestionTypeRoute
   '/suggest/team/media': typeof SuggestTeamMediaRoute
@@ -295,6 +303,7 @@ export interface FileRoutesByTo {
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
+  '/events/regional/{-$year}': typeof EventsRegionalChar123YearChar125Route
   '/suggest/event/media': typeof SuggestEventMediaRoute
   '/suggest/review/$suggestionType': typeof SuggestReviewSuggestionTypeRoute
   '/suggest/team/media': typeof SuggestTeamMediaRoute
@@ -333,6 +342,7 @@ export interface FileRoutesById {
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
+  '/events/regional/{-$year}': typeof EventsRegionalChar123YearChar125Route
   '/suggest/event/media': typeof SuggestEventMediaRoute
   '/suggest/review/$suggestionType': typeof SuggestReviewSuggestionTypeRoute
   '/suggest/team/media': typeof SuggestTeamMediaRoute
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
     | '/events/$districtAbbreviation/$year'
+    | '/events/regional/{-$year}'
     | '/suggest/event/media'
     | '/suggest/review/$suggestionType'
     | '/suggest/team/media'
@@ -409,6 +420,7 @@ export interface FileRouteTypes {
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
     | '/events/$districtAbbreviation/$year'
+    | '/events/regional/{-$year}'
     | '/suggest/event/media'
     | '/suggest/review/$suggestionType'
     | '/suggest/team/media'
@@ -446,6 +458,7 @@ export interface FileRouteTypes {
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
     | '/events/$districtAbbreviation/$year'
+    | '/events/regional/{-$year}'
     | '/suggest/event/media'
     | '/suggest/review/$suggestionType'
     | '/suggest/team/media'
@@ -483,6 +496,7 @@ export interface RootRouteChildren {
   DistrictDistrictAbbreviationInsightsRoute: typeof DistrictDistrictAbbreviationInsightsRoute
   DistrictDistrictAbbreviationChar123YearChar125Route: typeof DistrictDistrictAbbreviationChar123YearChar125Route
   EventsDistrictAbbreviationYearRoute: typeof EventsDistrictAbbreviationYearRoute
+  EventsRegionalChar123YearChar125Route: typeof EventsRegionalChar123YearChar125Route
   SuggestEventMediaRoute: typeof SuggestEventMediaRoute
   SuggestReviewSuggestionTypeRoute: typeof SuggestReviewSuggestionTypeRoute
   SuggestTeamMediaRoute: typeof SuggestTeamMediaRoute
@@ -684,6 +698,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsDistrictAbbreviationYearRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events/regional/{-$year}': {
+      id: '/events/regional/{-$year}'
+      path: '/events/regional/{-$year}'
+      fullPath: '/events/regional/{-$year}'
+      preLoaderRoute: typeof EventsRegionalChar123YearChar125RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/suggest/event/media': {
       id: '/suggest/event/media'
       path: '/suggest/event/media'
@@ -783,6 +804,7 @@ const rootRouteChildren: RootRouteChildren = {
   DistrictDistrictAbbreviationChar123YearChar125Route:
     DistrictDistrictAbbreviationChar123YearChar125Route,
   EventsDistrictAbbreviationYearRoute: EventsDistrictAbbreviationYearRoute,
+  EventsRegionalChar123YearChar125Route: EventsRegionalChar123YearChar125Route,
   SuggestEventMediaRoute: SuggestEventMediaRoute,
   SuggestReviewSuggestionTypeRoute: SuggestReviewSuggestionTypeRoute,
   SuggestTeamMediaRoute: SuggestTeamMediaRoute,

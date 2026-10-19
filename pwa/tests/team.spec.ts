@@ -570,3 +570,16 @@ test.describe('/team/254/2026', () => {
     expect(imgurRequestUrls.every((url) => !isImgurOriginal(url))).toBe(true);
   });
 });
+
+test.describe('/team/604/2025', () => {
+  test('links the regional pool ranking to the regional rankings page', async ({
+    page,
+  }) => {
+    await page.goto('/team/604/2025');
+    await page.locator('body[data-hydrated]').waitFor();
+
+    await expect(
+      page.getByRole('link', { name: 'regional pool', exact: true }),
+    ).toHaveAttribute('href', '/events/regional/2025');
+  });
+});

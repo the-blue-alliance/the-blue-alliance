@@ -185,3 +185,31 @@ def test_regional_advancement(ndb_stub, api_client: Client) -> None:
         },
         "frc1": {"cmp": False, "cmp_status": "NotInvited"},
     }
+
+
+def test_regional_rankings_includes_adjustments(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    RegionalChampsPool(
+        id="2025",
+        year=2025,
+        rankings=[
+            RegionalPoolRanking(
+                rank=1,
+                team_key="frc604",
+                point_total=51,
+                rookie_bonus=0,
+                single_event_bonus=0,
+                adjustments=1,
+                event_points=[],
+            )
+        ],
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/regional_advancement/2025/rankings",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.json[0]["adjustments"] == 1
