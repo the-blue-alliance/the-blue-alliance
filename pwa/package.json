@@ -69,7 +69,7 @@
     "@hey-api/openapi-ts": "0.99.0",
     "@iconify/json": "2.2.543",
     "@julr/vite-plugin-validate-env": "2.2.2",
-    "@playwright/test": "1.64.0",
+    "@playwright/test": "1.64.1",
     "@sentry/vite-plugin": "5.4.1",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
