@@ -67,7 +67,7 @@ def test_nag_single_suggestion(
     assert channel_url == "http://foo.bar/nag"
     assert nag_text.split("\n") == [
         "*:inbox_tray: 1 suggestion <https://beta.thebluealliance.com/suggest/review|needs review>*",
-        "• <https://beta.thebluealliance.com/suggest/review/media|Team Media>: 1",
+        "• 1 <https://beta.thebluealliance.com/suggest/review/media|Team Media>",
     ]
 
 
@@ -91,9 +91,9 @@ def test_nag_totals_and_sorts_types_by_count(
     base = "https://beta.thebluealliance.com/suggest/review"
     assert nag_text.split("\n") == [
         f"*:inbox_tray: 6 suggestions <{base}|need review>*",
-        f"• <{base}/api_auth_access|API Write Key Requests>: 3",
-        f"• <{base}/event|Webcasts>: 2",
-        f"• <{base}/match|Match Videos>: 1",
+        f"• 3 <{base}/api_auth_access|API Write Key Requests>",
+        f"• 2 <{base}/event|Webcasts>",
+        f"• 1 <{base}/match|Match Videos>",
     ]
     # The Jinja review page is gone; never send moderators to www
     assert "www.thebluealliance.com" not in nag_text

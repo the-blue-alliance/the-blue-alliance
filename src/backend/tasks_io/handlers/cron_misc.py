@@ -43,7 +43,7 @@ def nag_pending_suggestions() -> str:
         else f"{total} suggestions {slack_link(review_home, 'need review')}"
     )
     bullets = [
-        f"• {slack_link(PwaUrlHelper.suggestion_review_url(t), TYPE_NAMES[t])}: {count}"
+        f"• {count} {slack_link(PwaUrlHelper.suggestion_review_url(t), TYPE_NAMES[t])}"
         for t, count in pending
     ]
     OutgoingNotificationHelper.send_slack_alert(
