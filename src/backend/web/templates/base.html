@@ -13,7 +13,7 @@
   <link rel="shortcut icon" href="/icons/favicon.ico">
   <meta name="msapplication-config" content="/icons/browserconfig.xml">
 
-  {% block main_style %}<link rel="stylesheet" href="/py3_css/tba_combined_style.main.min.css">{% endblock %}
+  {% block main_style %}<link rel="stylesheet" href="{{ static_asset_url("css/tba_combined_style.main.min.css") }}">{% endblock %}
   {% block font_awesome_css %}{% endblock %}
   {% block featherlight_css %}
   <link href="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.css" rel="stylesheet" integrity="sha384-uzlgVcPV+7wgXFrJO376orjagw3FRgWi06rOgntvNUJ61cbHqAV1r809t1/cTBNG" crossorigin="anonymous">
@@ -187,7 +187,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.gallery.min.js" integrity="sha384-CDEqRvHYY7LDoUlhLAlplgXcQFXM4DXPdCHecWjompIhgQ4hrlF53sOcqUJENG+u" crossorigin="anonymous"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/js/bootstrap-select.min.js" integrity="sha384-OzJdDv654hax+usN0gaTeDPTkzSbqoFB4ktJVOH0OjXxbwYHS7UPyk1d80c0nabG" crossorigin="anonymous"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/vis/4.19.1/vis.min.js" integrity="sha384-hBrV4jNV5IXr7qI1FRqoXh1CcuGKG7pUkHEzGdc3CPNfsBqZXsMHFob790BH3Rdd" crossorigin="anonymous"></script>
-<script src="/py3_javascript/tba_combined_js.main.min.js"></script>
+<script src="{{ static_asset_url("javascript/tba_combined_js.main.min.js") }}"></script>
 {% endblock %}
 
 {% block inline_javascript %}{% endblock %}
