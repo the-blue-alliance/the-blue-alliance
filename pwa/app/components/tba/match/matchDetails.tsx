@@ -1,8 +1,11 @@
+import { useQuery } from '@tanstack/react-query';
 import { Suspense, lazy, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
 import { Event, Match } from '~/api/tba/read';
+import { getMatchZebraOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { SimpleMatchRow } from '~/components/tba/match/matchRows';
+import ZebraMotionWorks from '~/components/tba/match/zebraMotionWorks';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Checkbox } from '~/components/ui/checkbox';
 import { formatMatchTime } from '~/lib/matchUtils';
@@ -128,6 +131,13 @@ export default function MatchDetails({
   event: Event;
 }) {
   const [showUserTimezone, setShowUserTimezone] = useState(false);
+
+  // Zebra MotionWorks data only exists for some 2019-2020 matches.
+  const { data: zebraData } = useQuery({
+    ...getMatchZebraOptions({ path: { match_key: match.key } }),
+    enabled: event.year >= 2019 && event.year <= 2020,
+    retry: false,
+  });
 
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const eventTimezone = event.timezone ?? 'UTC';
@@ -310,6 +320,7 @@ export default function MatchDetails({
               )}
             </div>
           </div>
+          {zebraData && <ZebraMotionWorks zebra={zebraData} />}
         </div>
       </div>
       <div className="order-1 flex w-full flex-col gap-2 md:order-2 md:w-xl">
