@@ -6,7 +6,6 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import Paper from "@mui/material/Paper";
 import HomeIcon from "@mui/icons-material/Home";
 import CheckIcon from "@mui/icons-material/Check";
@@ -43,7 +42,7 @@ export default class ChatSelector extends React.Component {
       }
 
       chatItems.push(
-        <ListItem key={chat.channel} disablePadding>
+        <ListItem key={chat.channel} disablePadding secondaryAction={icon}>
           <ListItemButton onClick={(e) => this.setTwitchChat(e, chat.channel)}>
             {isDefault && (
               <ListItemIcon>
@@ -52,7 +51,6 @@ export default class ChatSelector extends React.Component {
             )}
             <ListItemText primary={chatName} />
           </ListItemButton>
-          {icon && <ListItemSecondaryAction>{icon}</ListItemSecondaryAction>}
         </ListItem>
       );
     });
