@@ -29,12 +29,13 @@ wheels = [
 
 [[package]]
 name = "appengine-python-standard"
-version = "3.0.2"
+version = "3.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
     { name = "frozendict" },
     { name = "google-auth" },
+    { name = "google-cloud-tasks" },
     { name = "grpcio" },
     { name = "grpcio-tools" },
     { name = "legacy-cgi" },
@@ -48,9 +49,9 @@ dependencies = [
     { name = "six" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f5/76/32cefff5be539f55ded549f07760fc2453f9b3d1259a777c6a3313d9cd34/appengine_python_standard-3.0.2.tar.gz", hash = "sha256:48f74ed7cdd68d35a67b86b11ec6806d908019bd99db0e1d3c5849165b3241e4", size = 843427, upload-time = "2026-08-12T10:09:15.744Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/29/4f/2d58233f4361fb5ec55ef0dd3e24937e7b817f2b703a69a18312db021e88/appengine_python_standard-3.1.0.tar.gz", hash = "sha256:942733114d67c56e0d7a7279010b835b843f40bbbdc4cf47b03bc2926b2ea346", size = 856514, upload-time = "2026-10-16T15:46:48.438Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fe/57/e2492ad1e89afdf5d63cd8fdea15d5cced9aa5ed146b9309d3cfe2c6d166/appengine_python_standard-3.0.2-py3-none-any.whl", hash = "sha256:5841d9642a7a67f8b991e54689bc280342575a81964af95f16ebbad95ef6c018", size = 1001664, upload-time = "2026-08-12T10:09:13.986Z" },
+    { url = "https://files.pythonhosted.org/packages/06/e9/13c7a4c404a2176e41dc94b64f607a54b897c1cf75132ea8755d18a0b0e5/appengine_python_standard-3.1.0-py3-none-any.whl", hash = "sha256:ad8fa1d4d159bdf04647a2477cf954ef52a8c3c0795d185435ae1a043ed43e99", size = 1016805, upload-time = "2026-10-16T15:46:46.797Z" },
 ]
 
 [[package]]
@@ -739,6 +740,23 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f7/b1/4f0798e88285b50dfc60ed3a7de071def538b358db2da468c2e0deecbb40/google_cloud_storage-3.9.0.tar.gz", hash = "sha256:f2d8ca7db2f652be757e92573b2196e10fbc09649b5c016f8b422ad593c641cc", size = 17298544, upload-time = "2026-02-02T13:36:34.119Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/46/0b/816a6ae3c9fd096937d2e5f9670558908811d57d59ddf69dd4b83b326fd1/google_cloud_storage-3.9.0-py3-none-any.whl", hash = "sha256:2dce75a9e8b3387078cbbdad44757d410ecdb916101f8ba308abf202b6968066", size = 321324, upload-time = "2026-02-02T13:36:32.271Z" },
+]
+
+[[package]]
+name = "google-cloud-tasks"
+version = "2.26.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "google-api-core", extra = ["grpc"] },
+    { name = "google-auth" },
+    { name = "grpc-google-iam-v1" },
+    { name = "grpcio" },
+    { name = "proto-plus" },
+    { name = "protobuf" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/98/cc/3ff6a7bfd00ba892a32713dd1d28c0d8287040017e4eadb23338b95c7cda/google_cloud_tasks-2.26.0.tar.gz", hash = "sha256:df33be57411c57bd791461d0bbcd6d04b4e0e55f9c65b68682706cad247c5b06", size = 390489, upload-time = "2026-10-01T18:18:28.118Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0f/a6/8dda4fbb4f6a2312a4f1e3d3b6f049c55e446993d29e1c80d2caeb9b53f5/google_cloud_tasks-2.26.0-py3-none-any.whl", hash = "sha256:b020be5ca494907accd9ea7372d9963f747cd09e6370458511fc126d3f18525e", size = 325078, upload-time = "2026-10-01T18:12:41.099Z" },
 ]
 
 [[package]]
@@ -2162,7 +2180,7 @@ webpack = [
 
 [package.metadata]
 requires-dist = [
-    { name = "appengine-python-standard", specifier = "==3.0.2" },
+    { name = "appengine-python-standard", specifier = "==3.1.0" },
     { name = "beautifulsoup4", specifier = "==4.15.0" },
     { name = "firebase-admin", specifier = "==7.4.0" },
     { name = "flask", specifier = "==3.1.3" },
