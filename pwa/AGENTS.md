@@ -7,7 +7,7 @@ Progressive Web App for The Blue Alliance, a data archive site for the FIRST Rob
 ## Tech Stack
 
 - **Framework**: TanStack Start / Router
-- **Styling**: Tailwind CSS v4, Shadcn UI, Radix UI
+- **Styling**: Tailwind CSS v4, Shadcn UI, Base UI (`@base-ui/react`)
 - **API**: Auto-generated OpenAPI clients in `app/api/tba/{read,mobile}/`
 - **Data Fetching**: TanStack Query
 - **Analytics**: Firebase Analytics (via `firebase/analytics`)
@@ -19,7 +19,7 @@ Progressive Web App for The Blue Alliance, a data archive site for the FIRST Rob
 app/
   ├── routes/           # File-based routing
   ├── components/
-  │   ├── ui/          # Shadcn/Radix components
+  │   ├── ui/          # Shadcn/Base UI components
   │   └── tba/         # TBA-specific components
   ├── lib/             # Utilities and helpers
   ├── api/             # Generated API clients
