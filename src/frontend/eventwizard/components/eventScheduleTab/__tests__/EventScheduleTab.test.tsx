@@ -334,7 +334,7 @@ describe("EventScheduleTab interactions", () => {
         await screen.findByText("Successfully uploaded 1 matches to TBA!")
       ).toBeInTheDocument();
       expect(mockMakeTrustedRequest).toHaveBeenCalledWith(
-        "event/2025nysu/matches/update",
+        "/api/trusted/v1/event/2025nysu/matches/update",
         JSON.stringify([
           {
             comp_level: "qm",
