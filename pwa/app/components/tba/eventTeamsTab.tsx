@@ -35,6 +35,7 @@ import {
   DialogTrigger,
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
+import { getRemappedRobots } from '~/lib/eventUtils';
 import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
 import { sortTeamsComparator } from '~/lib/teamUtils';
 import { STATE_TO_ABBREVIATION, splitIntoNChunks } from '~/lib/utils';
@@ -51,10 +52,10 @@ const ROW_TARGET_CLASS = `block text-sm wrap-break-word after:absolute
   after:inset-0 hover:underline focus-visible:[outline:2px_solid_transparent]
   focus-visible:after:outline-2 focus-visible:after:outline-ring`;
 
-function TeamLabel({ team }: { team: Team }) {
+function TeamLabel({ team, robotNumber }: { team: Team; robotNumber: string }) {
   return (
     <>
-      <span className="font-bold tabular-nums">{team.team_number}</span>
+      <span className="font-bold tabular-nums">{robotNumber}</span>
       {team.nickname && (
         <>
           {' '}
@@ -83,36 +84,53 @@ export default function EventTeamsTab({
         byTeam.set(key, items);
       }
     }
-    return [...teams].sort(sortTeamsComparator).map((team) => {
-      const teamMedia = byTeam.get(team.key) ?? [];
-      const pit = statuses?.[team.key]?.pit_location;
-      return {
-        team,
-        pit,
-        teamMatches: matches.filter(
-          (match) =>
-            match.alliances.red.team_keys.includes(team.key) ||
-            match.alliances.blue.team_keys.includes(team.key),
-        ),
-        avatar: teamMedia.find(
-          (item) => item.type === 'avatar' && item.details?.base64Image,
-        ),
-        photo: getTeamPreferredRobotPicMedium(teamMedia),
-        searchable: [
-          team.team_number,
-          team.nickname,
-          team.city,
-          team.state_prov,
-          STATE_TO_ABBREVIATION.get(team.state_prov ?? ''),
-          team.country,
-          pit,
-        ]
-          .filter((value) => value != null)
-          .join(' ')
-          .toLowerCase(),
-      };
-    });
-  }, [teams, matches, media, statuses]);
+    const placeholderKeys = new Set(Object.keys(event.remap_teams ?? {}));
+    return teams
+      .filter((team) => !placeholderKeys.has(team.key))
+      .sort(sortTeamsComparator)
+      .flatMap((team) =>
+        [
+          { robotKey: team.key, sourceTeamKey: team.key },
+          ...getRemappedRobots(event, team.key),
+        ].map(({ robotKey, sourceTeamKey }) => {
+          const robotNumber = robotKey.substring(3);
+          const status = statuses?.[sourceTeamKey] ?? null;
+          const pit = status?.pit_location;
+          return {
+            team,
+            robotKey,
+            robotNumber,
+            status,
+            pit,
+            teamMatches: matches.filter(
+              (match) =>
+                match.alliances.red.team_keys.includes(robotKey) ||
+                match.alliances.blue.team_keys.includes(robotKey),
+            ),
+            avatar: byTeam
+              .get(team.key)
+              ?.find(
+                (item) => item.type === 'avatar' && item.details?.base64Image,
+              ),
+            photo: getTeamPreferredRobotPicMedium(
+              byTeam.get(sourceTeamKey) ?? [],
+            ),
+            searchable: [
+              robotNumber,
+              team.nickname,
+              team.city,
+              team.state_prov,
+              STATE_TO_ABBREVIATION.get(team.state_prov ?? ''),
+              team.country,
+              pit,
+            ]
+              .filter((value) => value != null)
+              .join(' ')
+              .toLowerCase(),
+          };
+        }),
+      );
+  }, [event, teams, matches, media, statuses]);
   const hasAvatars = entries.some((entry) => entry.avatar);
   const hasPits = entries.some((entry) => entry.pit);
   const query = search.trim().toLowerCase();
@@ -149,13 +167,13 @@ export default function EventTeamsTab({
         </div>
         <output className="text-xs text-muted-foreground tabular-nums">
           {query
-            ? `${filtered.length} of ${teams.length} teams`
-            : `${teams.length} teams`}
+            ? `${filtered.length} of ${entries.length} teams`
+            : `${entries.length} teams`}
         </output>
       </div>
       {filtered.length === 0 ? (
         <p className="border-y py-8 text-center text-sm text-muted-foreground">
-          {teams.length === 0
+          {entries.length === 0
             ? 'No teams listed'
             : 'No teams match your search'}
         </p>
@@ -166,139 +184,151 @@ export default function EventTeamsTab({
         >
           {splitIntoNChunks(filtered, 2).map((chunk, index) => (
             <ul key={index} className="divide-y border-b lg:border-t">
-              {chunk.map(({ team, pit, teamMatches, avatar, photo }) => (
-                <li
-                  key={team.key}
-                  className="relative isolate flex min-h-14 items-center gap-2
-                    py-1 hover:bg-muted/50"
-                >
-                  {hasAvatars && (
-                    <div className="size-12 shrink-0">
-                      <TeamAvatar
-                        media={avatar?.type === 'avatar' ? avatar : undefined}
-                        className="relative z-10"
-                      />
+              {chunk.map(
+                ({
+                  team,
+                  robotKey,
+                  robotNumber,
+                  status,
+                  pit,
+                  teamMatches,
+                  avatar,
+                  photo,
+                }) => (
+                  <li
+                    key={robotKey}
+                    className="relative isolate flex min-h-14 items-center gap-2
+                      py-1 hover:bg-muted/50"
+                  >
+                    {hasAvatars && (
+                      <div className="size-12 shrink-0">
+                        <TeamAvatar
+                          media={avatar?.type === 'avatar' ? avatar : undefined}
+                          className="relative z-10"
+                        />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1 py-1">
+                      {teamMatches.length > 0 ? (
+                        <Dialog>
+                          <DialogTrigger
+                            className={`${ROW_TARGET_CLASS} cursor-pointer
+                              text-left`}
+                          >
+                            <TeamLabel team={team} robotNumber={robotNumber} />
+                          </DialogTrigger>
+                          <DialogContent
+                            aria-describedby={undefined}
+                            className="max-h-[90vh] overflow-y-auto
+                              sm:max-w-3xl"
+                          >
+                            <DialogHeader>
+                              <DialogTitle>
+                                <TeamLink teamOrKey={team.key} year={year}>
+                                  Team {robotNumber}
+                                  {team.nickname ? ` — ${team.nickname}` : ''}
+                                </TeamLink>
+                              </DialogTitle>
+                            </DialogHeader>
+                            <TeamEventRecord
+                              event={event}
+                              teamKey={robotKey}
+                              status={status}
+                              record={getTeamEventRecord(
+                                event,
+                                robotKey,
+                                teamMatches,
+                              )}
+                            />
+                            <SimpleMatchRowsWithBreaks
+                              matches={teamMatches}
+                              event={event}
+                              breakers={[
+                                START_OF_QUALS_BREAKER,
+                                END_OF_DAY_BREAKER,
+                                CHANGE_IN_COMP_LEVEL_BREAKER,
+                              ]}
+                              focusTeamKeys={[robotKey]}
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      ) : (
+                        <TeamLink
+                          teamOrKey={team.key}
+                          year={year}
+                          className={ROW_TARGET_CLASS}
+                        >
+                          <TeamLabel team={team} robotNumber={robotNumber} />
+                        </TeamLink>
+                      )}
+                      <div
+                        className="flex flex-wrap items-baseline gap-x-3 text-xs
+                          text-muted-foreground"
+                      >
+                        {(team.city || team.state_prov || team.country) && (
+                          <span className="relative z-10">
+                            <TeamLocationLink team={team} />
+                          </span>
+                        )}
+                        {hasPits && (
+                          <span
+                            className={
+                              pit && firstEventCode
+                                ? 'relative z-10 shrink-0'
+                                : 'shrink-0'
+                            }
+                          >
+                            Pit{' '}
+                            {pit && firstEventCode ? (
+                              <PitLocationLink
+                                teamNumber={team.team_number}
+                                year={year}
+                                firstEventCode={firstEventCode}
+                                pitLocation={pit}
+                              />
+                            ) : (
+                              pit || '—'
+                            )}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  )}
-                  <div className="min-w-0 flex-1 py-1">
-                    {teamMatches.length > 0 ? (
+                    {photo && (
                       <Dialog>
                         <DialogTrigger
-                          className={`${ROW_TARGET_CLASS} cursor-pointer
-                            text-left`}
+                          aria-label={`View robot photo for team ${robotNumber}`}
+                          className="relative z-10 shrink-0 cursor-pointer
+                            rounded-md focus-visible:outline-2
+                            focus-visible:outline-ring"
                         >
-                          <TeamLabel team={team} />
+                          <img
+                            src={photo}
+                            alt={`Team ${robotNumber} robot`}
+                            loading="lazy"
+                            className="size-12 rounded-md object-cover"
+                          />
                         </DialogTrigger>
-                        <DialogContent
-                          aria-describedby={undefined}
-                          className="max-h-[90vh] overflow-y-auto sm:max-w-3xl"
-                        >
+                        <DialogContent aria-describedby={undefined}>
                           <DialogHeader>
                             <DialogTitle>
                               <TeamLink teamOrKey={team.key} year={year}>
-                                Team {team.team_number}
+                                Team {robotNumber}
                                 {team.nickname ? ` — ${team.nickname}` : ''}
                               </TeamLink>
                             </DialogTitle>
                           </DialogHeader>
-                          <TeamEventRecord
-                            event={event}
-                            teamKey={team.key}
-                            status={statuses?.[team.key] ?? null}
-                            record={getTeamEventRecord(
-                              event,
-                              team.key,
-                              teamMatches,
-                            )}
-                          />
-                          <SimpleMatchRowsWithBreaks
-                            matches={teamMatches}
-                            event={event}
-                            breakers={[
-                              START_OF_QUALS_BREAKER,
-                              END_OF_DAY_BREAKER,
-                              CHANGE_IN_COMP_LEVEL_BREAKER,
-                            ]}
-                            focusTeamKeys={[team.key]}
+                          <img
+                            src={photo}
+                            alt={`Team ${robotNumber} robot`}
+                            className="max-h-[80vh] w-full rounded-md
+                              object-contain"
                           />
                         </DialogContent>
                       </Dialog>
-                    ) : (
-                      <TeamLink
-                        teamOrKey={team.key}
-                        year={year}
-                        className={ROW_TARGET_CLASS}
-                      >
-                        <TeamLabel team={team} />
-                      </TeamLink>
                     )}
-                    <div
-                      className="flex flex-wrap items-baseline gap-x-3 text-xs
-                        text-muted-foreground"
-                    >
-                      {(team.city || team.state_prov || team.country) && (
-                        <span className="relative z-10">
-                          <TeamLocationLink team={team} />
-                        </span>
-                      )}
-                      {hasPits && (
-                        <span
-                          className={
-                            pit && firstEventCode
-                              ? 'relative z-10 shrink-0'
-                              : 'shrink-0'
-                          }
-                        >
-                          Pit{' '}
-                          {pit && firstEventCode ? (
-                            <PitLocationLink
-                              teamNumber={team.team_number}
-                              year={year}
-                              firstEventCode={firstEventCode}
-                              pitLocation={pit}
-                            />
-                          ) : (
-                            pit || '—'
-                          )}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {photo && (
-                    <Dialog>
-                      <DialogTrigger
-                        aria-label={`View robot photo for team ${team.team_number}`}
-                        className="relative z-10 shrink-0 cursor-pointer
-                          rounded-md focus-visible:outline-2
-                          focus-visible:outline-ring"
-                      >
-                        <img
-                          src={photo}
-                          alt={`Team ${team.team_number} robot`}
-                          loading="lazy"
-                          className="size-12 rounded-md object-cover"
-                        />
-                      </DialogTrigger>
-                      <DialogContent aria-describedby={undefined}>
-                        <DialogHeader>
-                          <DialogTitle>
-                            <TeamLink teamOrKey={team.key} year={year}>
-                              Team {team.team_number}
-                              {team.nickname ? ` — ${team.nickname}` : ''}
-                            </TeamLink>
-                          </DialogTitle>
-                        </DialogHeader>
-                        <img
-                          src={photo}
-                          alt={`Team ${team.team_number} robot`}
-                          className="max-h-[80vh] w-full rounded-md
-                            object-contain"
-                        />
-                      </DialogContent>
-                    </Dialog>
-                  )}
-                </li>
-              ))}
+                  </li>
+                ),
+              )}
             </ul>
           ))}
         </div>

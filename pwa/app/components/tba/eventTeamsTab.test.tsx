@@ -355,4 +355,107 @@ describe('EventTeamsTab', () => {
         .getAttribute('src'),
     ).toBe('https://example.com/robot.png');
   });
+
+  describe('with remapped teams', () => {
+    const remapEvent = {
+      ...event,
+      remap_teams: { frc9990: 'frc254B' },
+    } as Event;
+    const placeholderTeam: Team = {
+      ...team,
+      key: 'frc9990',
+      team_number: 9990,
+      nickname: 'Off-Season Demo Team 9990',
+    };
+
+    test('lists a remapped robot under its real key', () => {
+      renderTeams({
+        event: remapEvent,
+        teams: [otherTeam, team, placeholderTeam],
+      });
+      expect(
+        screen.getByRole('link', { name: '254B - The Cheesy Poofs' }),
+      ).toBeTruthy();
+    });
+
+    test('hides the placeholder team for a remapped robot', () => {
+      renderTeams({
+        event: remapEvent,
+        teams: [otherTeam, team, placeholderTeam],
+      });
+      expect(screen.queryByRole('link', { name: /9990/ })).toBeNull();
+    });
+
+    test('lists a remapped robot after its main team', () => {
+      renderTeams({
+        event: remapEvent,
+        teams: [otherTeam, team, placeholderTeam],
+      });
+      expect(
+        screen
+          .getAllByRole('listitem')
+          .map((item) => within(item).getAllByRole('link')[0].textContent),
+      ).toEqual([
+        '254 - The Cheesy Poofs',
+        '254B - The Cheesy Poofs',
+        '604 - Quixilver',
+      ]);
+    });
+
+    test('links a remapped robot to its main team page', () => {
+      renderTeams({
+        event: remapEvent,
+        teams: [otherTeam, team, placeholderTeam],
+      });
+      expect(
+        screen
+          .getByRole('link', { name: '254B - The Cheesy Poofs' })
+          .getAttribute('href'),
+      ).toBe('/team/254/2024');
+    });
+
+    test("shows the remapped robot's matches in its dialog", async () => {
+      renderTeams({
+        event: remapEvent,
+        teams: [otherTeam, team, placeholderTeam],
+        matches: [
+          match('2024casj_qm1', ['frc254'], ['frc604']),
+          match('2024casj_qm2', ['frc254B'], []),
+        ],
+      });
+      fireEvent.click(
+        screen.getByRole('button', { name: '254B - The Cheesy Poofs' }),
+      );
+      const dialog = await screen.findByRole('dialog');
+      expect(
+        within(dialog)
+          .getAllByRole('listitem')
+          .map((item) => item.textContent),
+      ).toEqual(['2024casj_qm2']);
+    });
+
+    test("shows the remapped robot's status from the placeholder key", async () => {
+      renderTeams({
+        event: remapEvent,
+        teams: [otherTeam, team, placeholderTeam],
+        matches: [match('2024casj_qm1', ['frc254B'], [])],
+        statuses: {
+          frc9990: {
+            qual: {
+              ranking: {
+                rank: 12,
+                record: { wins: 1, losses: 0, ties: 0 },
+                sort_orders: [],
+              },
+            },
+          },
+        },
+      });
+      fireEvent.click(
+        screen.getByRole('button', { name: '254B - The Cheesy Poofs' }),
+      );
+      const dialog = await screen.findByRole('dialog');
+      expect(within(dialog).getByText('Rank 12')).toBeTruthy();
+    });
+  });
 });
