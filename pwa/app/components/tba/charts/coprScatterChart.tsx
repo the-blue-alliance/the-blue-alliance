@@ -15,10 +15,12 @@ import {
   NameType,
   ValueType,
 } from 'recharts/types/component/DefaultTooltipContent';
+import { Props as LabelProps } from 'recharts/types/component/Label';
+import { ScatterShapeProps } from 'recharts/types/util/ScatterUtils';
 
 import HelpCircleIcon from '~icons/lucide/help-circle';
 
-import { EventColors } from '~/api/colors';
+import { EventColors, TeamColors } from '~/api/colors';
 import { EventCoprs } from '~/api/tba/read';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { ChartContainer } from '~/components/ui/chart';
@@ -36,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
+import { nudgeLightness, parseColor, wcagContrast } from '~/lib/colorContrast';
 import { useMediaQuery } from '~/lib/hooks';
 import { camelCaseToHumanReadable } from '~/lib/utils';
 
@@ -87,11 +90,167 @@ function generateDomain(dataMin: number, dataMax: number): [number, number] {
   return [-0.1, 1 + DOMAIN_PADDING_RATIO];
 }
 
-// Teams with no colors on record get a neutral theme color.
-function getTeamFill(colors: EventColors, teamKey: string): string {
+const TREATMENTS = {
+  current: 'Current',
+  adaptive: 'Adaptive ring',
+  casing: 'Double ring',
+  nudge: 'Lightness nudge',
+  secondary: 'Secondary ring',
+  chip: 'Team chips',
+} as const;
+
+type Treatment = keyof typeof TREATMENTS;
+
+const treatmentItems = Object.entries(TREATMENTS).map(([value, label]) => ({
+  value,
+  label,
+}));
+
+const CARD_LIGHT = 'oklch(1 0 0)';
+const CARD_DARK = 'oklch(0.287 0.004 286.09)';
+const MIN_CONTRAST = 3;
+const RING = 'var(--card-foreground)';
+const GAP = 'var(--card)';
+const NEUTRAL = 'var(--muted-foreground)';
+
+interface DotStyle {
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+}
+
+function themed(light: string, dark: string): string {
+  return light === dark ? light : `light-dark(${light}, ${dark})`;
+}
+
+function ringFor(fill: string, card: string): string {
+  return wcagContrast(fill, card) < MIN_CONTRAST ? RING : GAP;
+}
+
+function getTeamColors(
+  colors: EventColors,
+  teamKey: string,
+): TeamColors | null {
+  return colors.teams[teamKey.substring(3)]?.colors ?? null;
+}
+
+function getDotStyle(treatment: Treatment, team: TeamColors | null): DotStyle {
+  const primary = team ? parseColor(team.primaryHex) : null;
+  if (treatment === 'current') {
+    return { fill: primary ?? NEUTRAL, stroke: RING, strokeWidth: 1 };
+  }
+  if (!primary) return { fill: NEUTRAL, stroke: GAP, strokeWidth: 1.5 };
+  switch (treatment) {
+    case 'casing':
+      return { fill: primary, stroke: GAP, strokeWidth: 1.5 };
+    case 'nudge': {
+      const light = nudgeLightness(primary, CARD_LIGHT);
+      const dark = nudgeLightness(primary, CARD_DARK);
+      return {
+        fill: themed(light, dark),
+        stroke: themed(ringFor(light, CARD_LIGHT), ringFor(dark, CARD_DARK)),
+        strokeWidth: 1.5,
+      };
+    }
+    case 'secondary': {
+      const secondary = parseColor(team?.secondaryHex ?? '');
+      const ring = (card: string) =>
+        secondary && wcagContrast(secondary, card) >= MIN_CONTRAST
+          ? secondary
+          : RING;
+      return {
+        fill: primary,
+        stroke: themed(ring(CARD_LIGHT), ring(CARD_DARK)),
+        strokeWidth: 2,
+      };
+    }
+    default:
+      return {
+        fill: primary,
+        stroke: themed(
+          ringFor(primary, CARD_LIGHT),
+          ringFor(primary, CARD_DARK),
+        ),
+        strokeWidth: 1.5,
+      };
+  }
+}
+
+function TeamDot({
+  cx,
+  cy,
+  size,
+  fill,
+  stroke,
+  strokeWidth,
+  casing,
+}: ScatterShapeProps & Partial<DotStyle> & { casing: boolean }) {
+  const r = Math.sqrt(size / Math.PI);
   return (
-    colors.teams[teamKey.substring(3)]?.colors?.primaryHex ??
-    'var(--muted-foreground)'
+    <g>
+      {casing && <circle cx={cx} cy={cy} r={r + 2.5} style={{ fill: RING }} />}
+      <circle
+        cx={cx}
+        cy={cy}
+        r={casing ? r + 0.75 : r}
+        style={{ fill, stroke, strokeWidth }}
+      />
+    </g>
+  );
+}
+
+function TeamChip({
+  viewBox,
+  teamKey,
+  team,
+}: {
+  viewBox: LabelProps['viewBox'];
+  teamKey: string;
+  team: TeamColors | null;
+}) {
+  if (!viewBox || !('width' in viewBox)) return null;
+  const { x, y, width } = viewBox;
+  const number = teamKey.substring(3);
+  const primary = team ? parseColor(team.primaryHex) : null;
+  const chipWidth = number.length * 6.5 + 8;
+  const chipHeight = 14;
+  const centerX = x + width / 2;
+  const top = y - chipHeight - 3;
+  const outline = (card: string) =>
+    primary && wcagContrast(primary, card) < MIN_CONTRAST
+      ? RING
+      : 'transparent';
+  const textColor = primary
+    ? wcagContrast(primary, '#000000') >= wcagContrast(primary, '#ffffff')
+      ? '#000000'
+      : '#ffffff'
+    : GAP;
+  return (
+    <g>
+      <rect
+        x={centerX - chipWidth / 2}
+        y={top}
+        width={chipWidth}
+        height={chipHeight}
+        rx={4}
+        style={{
+          fill: primary ?? NEUTRAL,
+          stroke: themed(outline(CARD_LIGHT), outline(CARD_DARK)),
+          strokeWidth: 1,
+        }}
+      />
+      <text
+        x={centerX}
+        y={top + chipHeight / 2}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={11}
+        fontWeight={600}
+        style={{ fill: textColor }}
+      >
+        {number}
+      </text>
+    </g>
   );
 }
 
@@ -108,6 +267,7 @@ export default function CoprScatterChart({
 }) {
   const [selectedXCopr, setSelectedXCopr] = useState(defaultXCopr);
   const [selectedYCopr, setSelectedYCopr] = useState(defaultYCopr);
+  const [treatment, setTreatment] = useState<Treatment>('current');
   const isDesktop = useMediaQuery('(min-width: 640px)');
 
   // Base UI's Select.Value renders the raw value unless the items are
@@ -249,23 +409,53 @@ export default function CoprScatterChart({
                 />
               }
             />
-            <Scatter>
+            <Scatter
+              shape={(props: ScatterShapeProps) => (
+                <TeamDot {...props} casing={treatment === 'casing'} />
+              )}
+            >
               {data.map((entry, index) => (
-                // Outline every dot in the theme's foreground so team colors
-                // close to the card background (white, black) stay visible.
                 <Cell
                   key={`cell-${index}`}
-                  fill={getTeamFill(colors, entry.teamKey)}
-                  stroke="var(--card-foreground)"
-                  strokeWidth={1}
+                  {...getDotStyle(
+                    treatment,
+                    getTeamColors(colors, entry.teamKey),
+                  )}
                 />
               ))}
 
-              <LabelList
-                dataKey={'teamKey'}
-                position={'top'}
-                formatter={(value) => String(value).substring(3)}
-              />
+              {treatment === 'current' ? (
+                <LabelList
+                  dataKey={'teamKey'}
+                  position={'top'}
+                  formatter={(value) => String(value).substring(3)}
+                />
+              ) : treatment === 'chip' ? (
+                <LabelList
+                  dataKey={'teamKey'}
+                  content={({ viewBox, index }) => {
+                    const teamKey = data[index ?? -1]?.teamKey;
+                    return teamKey ? (
+                      <TeamChip
+                        viewBox={viewBox}
+                        teamKey={teamKey}
+                        team={getTeamColors(colors, teamKey)}
+                      />
+                    ) : null;
+                  }}
+                />
+              ) : (
+                <LabelList
+                  dataKey={'teamKey'}
+                  position={'top'}
+                  formatter={(value) => String(value).substring(3)}
+                  fill="var(--card-foreground)"
+                  stroke="var(--card)"
+                  strokeWidth={3}
+                  strokeLinejoin="round"
+                  paintOrder="stroke"
+                />
+              )}
             </Scatter>
           </ScatterChart>
         </ChartContainer>
@@ -311,6 +501,31 @@ export default function CoprScatterChart({
               <SelectGroup>
                 <SelectLabel>X Axis</SelectLabel>
                 {coprItems.map(({ value, label }) => (
+                  <SelectItem value={value} key={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex min-w-0 flex-row items-center gap-2">
+          <div className="shrink-0 font-bold">Colors (temp)</div>
+          <Select
+            items={treatmentItems}
+            value={treatment}
+            onValueChange={(value) =>
+              value !== null && setTreatment(value as Treatment)
+            }
+          >
+            <SelectTrigger className="w-auto min-w-0 flex-1 sm:flex-none">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Colors</SelectLabel>
+                {treatmentItems.map(({ value, label }) => (
                   <SelectItem value={value} key={value}>
                     {label}
                   </SelectItem>
