@@ -145,6 +145,18 @@ test.describe('/event/2024mil', () => {
     await expect(page.locator('svg.recharts-surface')).toBeVisible();
   });
 
+  test('shows a tooltip when hovering a dot on the insights chart', async ({
+    page,
+  }) => {
+    await page.getByRole('tab', { name: 'Insights' }).click();
+    await page
+      .locator('[data-testid^="hover-area-"]')
+      .first()
+      .hover({ force: true });
+
+    await expect(page.locator('.recharts-tooltip-wrapper')).toBeVisible();
+  });
+
   test('selects a tab whose content is still loading', async ({ page }) => {
     // Hold back the lazily loaded Insights chart so its tab suspends
     await page.route(/coprScatterChart/, async (route) => {
@@ -167,6 +179,16 @@ test.describe('/event/2024mil', () => {
       'https://www.match13.com/event/2024mil',
     );
   });
+});
+
+test('shows the closest team when hovering overlapping insights chart dots', async ({
+  page,
+}) => {
+  await page.goto('/event/2026new#insights');
+  await page.locator('body[data-hydrated]').waitFor();
+  await page.getByTestId('dot-frc4206').hover({ force: true });
+
+  await expect(page.locator('.recharts-tooltip-wrapper')).toContainText('4206');
 });
 
 test('defers the animated tab indicator until a tab changes', async ({

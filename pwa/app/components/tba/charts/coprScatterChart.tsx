@@ -44,7 +44,7 @@ import {
 import { parseColor, wcagContrast } from '~/lib/colorContrast';
 import { useMediaQuery } from '~/lib/hooks';
 import { Box, layoutLabels } from '~/lib/labelLayout';
-import { camelCaseToHumanReadable } from '~/lib/utils';
+import { camelCaseToHumanReadable, removeNonNumeric } from '~/lib/utils';
 
 interface Datapoint {
   teamKey: string;
@@ -52,46 +52,41 @@ interface Datapoint {
   valueY: number;
 }
 
-function generateWholeNumberedGridlinePoints(
-  maxVal: number,
-  increment: number,
-) {
-  return Array.from(
-    { length: Math.ceil(maxVal / increment) + 1 },
-    (_, i) => i * increment,
-  );
-}
-
-function generateFractionalGridlinePoints(maxVal: number, segments: number) {
-  const points = [];
-  for (let i = 0; i <= segments; i++) {
-    points.push(Math.round(i * (maxVal / segments) * 10) / 10);
-  }
-  return points;
-}
-
-function generateGridPoints(maxVal: number, segments: number) {
-  return maxVal > 1
-    ? generateWholeNumberedGridlinePoints(maxVal, Math.ceil(maxVal / segments))
-    : generateFractionalGridlinePoints(maxVal, segments);
-}
-
 // Both axes set allowDataOverflow, which makes recharts clip the scatter layer
 // to exactly the axis range. Pad the domain proportionally so the outermost
 // dots and their labels sit inside that clip rather than straddling it.
 const DOMAIN_PADDING_RATIO = 0.05;
+const TARGET_TICKS = 5;
 
-function generateDomain(dataMin: number, dataMax: number): [number, number] {
-  if (dataMax > 1) {
-    const padding = (dataMax - Math.min(dataMin, 0)) * DOMAIN_PADDING_RATIO;
+function niceStep(span: number): number {
+  const rough = span / TARGET_TICKS;
+  const power = 10 ** Math.floor(Math.log10(rough));
+  const error = rough / power;
+  const factor =
+    error >= Math.sqrt(50)
+      ? 10
+      : error >= Math.sqrt(10)
+        ? 5
+        : error >= Math.SQRT2
+          ? 2
+          : 1;
+  return factor * power;
+}
 
-    return [
-      dataMin > 0 ? 0 : Math.floor(dataMin - padding),
-      Math.ceil(dataMax + padding),
-    ];
-  }
-
-  return [-0.1, 1 + DOMAIN_PADDING_RATIO];
+function niceAxis(values: number[]) {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const padding =
+    (Math.max(max, 0) - Math.min(min, 0) || 1) * DOMAIN_PADDING_RATIO;
+  const lo = min > 0 ? 0 : min - padding;
+  const hi = max < 0 ? 0 : max + padding;
+  const step = niceStep(hi - lo);
+  const first = Math.ceil(lo / step);
+  const ticks = Array.from(
+    { length: Math.floor(hi / step) - first + 1 },
+    (_, i) => Number(((first + i) * step).toPrecision(12)),
+  );
+  return { domain: [lo, hi] as [number, number], ticks };
 }
 
 const CARD_LIGHT = 'oklch(1 0 0)';
@@ -101,6 +96,8 @@ const RING = 'var(--card-foreground)';
 const GAP = 'var(--card)';
 const NEUTRAL = 'var(--muted-foreground)';
 const DOT_RADIUS = 5.5;
+const HOVER_RADIUS = 14;
+const HOVER_STEPS = 32;
 
 function themed(light: string, dark: string): string {
   return light === dark ? light : `light-dark(${light}, ${dark})`;
@@ -115,7 +112,8 @@ function outlineFor(fill: string, card: string): string {
 }
 
 function getTeamPrimary(colors: EventColors, teamKey: string): string | null {
-  const primaryHex = colors.teams[teamKey.substring(3)]?.colors?.primaryHex;
+  const primaryHex =
+    colors.teams[removeNonNumeric(teamKey)]?.colors?.primaryHex;
   return primaryHex ? parseColor(primaryHex) : null;
 }
 
@@ -131,20 +129,100 @@ function getDotStyle(primary: string | null) {
     : { fill: NEUTRAL, stroke: GAP };
 }
 
+type Point = [number, number];
+
+function keepCloserTo(
+  polygon: Point[],
+  [cx, cy]: Point,
+  [ox, oy]: Point,
+): Point[] {
+  const side = ([x, y]: Point) =>
+    (x - (cx + ox) / 2) * (ox - cx) + (y - (cy + oy) / 2) * (oy - cy);
+  return polygon.flatMap((cur, i) => {
+    const prev = polygon.at(i - 1) ?? cur;
+    const sc = side(cur);
+    const sp = side(prev);
+    const t = sp / (sp - sc);
+    const crossing: Point[] =
+      sc <= 0 === sp <= 0
+        ? []
+        : [
+            [
+              prev[0] + t * (cur[0] - prev[0]),
+              prev[1] + t * (cur[1] - prev[1]),
+            ],
+          ];
+    return sc <= 0 ? [...crossing, cur] : crossing;
+  });
+}
+
+function HoverArea({
+  cx,
+  cy,
+  teamKey,
+  data,
+}: {
+  cx: number;
+  cy: number;
+  teamKey: string;
+  data: Datapoint[];
+}) {
+  const xScale = useXAxisScale();
+  const yScale = useYAxisScale();
+  const circle = Array.from({ length: HOVER_STEPS }, (_, i): Point => {
+    const angle = (2 * Math.PI * i) / HOVER_STEPS;
+    return [
+      cx + HOVER_RADIUS * Math.cos(angle),
+      cy + HOVER_RADIUS * Math.sin(angle),
+    ];
+  });
+  const area = data
+    .filter((d) => d.teamKey !== teamKey)
+    .map((d): Point => [
+      xScale?.(d.valueX) ?? Infinity,
+      yScale?.(d.valueY) ?? Infinity,
+    ])
+    .filter(([x, y]) => Math.hypot(x - cx, y - cy) < 2 * HOVER_RADIUS)
+    .reduce((polygon, other) => keepCloserTo(polygon, [cx, cy], other), circle);
+  return (
+    <polygon
+      points={area.map((p) => p.join(',')).join(' ')}
+      fill="transparent"
+      data-testid={`hover-area-${teamKey}`}
+    />
+  );
+}
+
 function TeamDot({
   cx,
   cy,
   size,
+  payload,
   fill,
   stroke,
-}: ScatterShapeProps & { fill?: string; stroke?: string }) {
+  data,
+}: ScatterShapeProps & {
+  fill?: string;
+  stroke?: string;
+  data: Datapoint[];
+}) {
   return (
-    <circle
-      cx={cx}
-      cy={cy}
-      r={Math.sqrt(size / Math.PI)}
-      style={{ fill, stroke, strokeWidth: 1.5 }}
-    />
+    <g className="cursor-pointer">
+      <HoverArea
+        cx={cx ?? 0}
+        cy={cy ?? 0}
+        teamKey={(payload as Datapoint).teamKey}
+        data={data}
+      />
+      <circle
+        cx={cx}
+        cy={cy}
+        r={Math.sqrt(size / Math.PI)}
+        pointerEvents="none"
+        data-testid={`dot-${(payload as Datapoint).teamKey}`}
+        style={{ fill, stroke, strokeWidth: 1.5 }}
+      />
+    </g>
   );
 }
 
@@ -208,7 +286,7 @@ function TeamChip({
       : '#ffffff'
     : GAP;
   return (
-    <g>
+    <g pointerEvents="none">
       <rect
         x={box.x}
         y={box.y}
@@ -274,6 +352,8 @@ export default function CoprScatterChart({
         .sort((a, b) => a.valueX - b.valueX),
     [selectedXCopr, selectedYCopr, coprs],
   );
+  const xAxis = useMemo(() => niceAxis(data.map((d) => d.valueX)), [data]);
+  const yAxis = useMemo(() => niceAxis(data.map((d) => d.valueY)), [data]);
 
   return (
     <Card>
@@ -337,17 +417,11 @@ export default function CoprScatterChart({
                 : { left: 0, right: 10, bottom: 10, top: 10 }
             }
           >
-            {generateGridPoints(
-              Math.ceil(Math.max(...data.map((d) => d.valueX))),
-              5,
-            ).map((x) => (
+            {xAxis.ticks.map((x) => (
               <ReferenceLine key={`gridline-x-${x}`} x={x} />
             ))}
 
-            {generateGridPoints(
-              Math.ceil(Math.max(...data.map((d) => d.valueY))),
-              5,
-            ).map((y) => (
+            {yAxis.ticks.map((y) => (
               <ReferenceLine key={`gridline-y-${y}`} y={y} />
             ))}
 
@@ -357,12 +431,9 @@ export default function CoprScatterChart({
               axisLine={false}
               allowDecimals={false}
               type="number"
-              domain={([dataMin, dataMax]) => generateDomain(dataMin, dataMax)}
+              domain={xAxis.domain}
               allowDataOverflow={true}
-              ticks={generateGridPoints(
-                Math.ceil(Math.max(...data.map((d) => d.valueX))),
-                5,
-              )}
+              ticks={xAxis.ticks}
             >
               <Label
                 value={camelCaseToHumanReadable(selectedXCopr)}
@@ -374,12 +445,9 @@ export default function CoprScatterChart({
               width={isDesktop ? 60 : 36}
               axisLine={false}
               tickLine={false}
-              domain={([dataMin, dataMax]) => generateDomain(dataMin, dataMax)}
+              domain={yAxis.domain}
               allowDataOverflow={true}
-              ticks={generateGridPoints(
-                Math.ceil(Math.max(...data.map((d) => d.valueY))),
-                5,
-              )}
+              ticks={yAxis.ticks}
             >
               <Label
                 value={camelCaseToHumanReadable(selectedYCopr)}
@@ -395,7 +463,7 @@ export default function CoprScatterChart({
                 />
               }
             />
-            <Scatter shape={TeamDot}>
+            <Scatter shape={(props) => <TeamDot {...props} data={data} />}>
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
@@ -461,6 +529,17 @@ export default function CoprScatterChart({
   );
 }
 
+function TooltipRow({ label, value }: { label: string; value?: ValueType }) {
+  return (
+    <div className="flex justify-between gap-4 leading-none">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-mono font-medium text-foreground numeric-data">
+        {Number(value).toFixed(2)}
+      </span>
+    </div>
+  );
+}
+
 const CustomTooltip = ({
   active,
   payload,
@@ -481,22 +560,12 @@ const CustomTooltip = ({
 
     return (
       <div
-        className="flex flex-col rounded-md bg-background text-foreground
-          shadow-xl"
+        className="grid min-w-32 gap-1.5 rounded-lg border border-border/50
+          bg-background px-2.5 py-1.5 text-xs shadow-xl"
       >
-        <div className="flex flex-col p-4">
-          <div className="pb-2 text-xl">{teamKey}</div>
-          <div className="">
-            <div className="flex justify-between gap-4">
-              <div>{yCopr}</div>
-              <div>{Number(payload[1].value).toFixed(2)}</div>
-            </div>
-            <div className="flex justify-between gap-4">
-              <div>{xCopr}</div>
-              <div>{Number(payload[0].value).toFixed(2)}</div>
-            </div>
-          </div>
-        </div>
+        <div className="font-medium">{teamKey}</div>
+        <TooltipRow label={yCopr} value={payload[1].value} />
+        <TooltipRow label={xCopr} value={payload[0].value} />
       </div>
     );
   }
