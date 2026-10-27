@@ -64,17 +64,10 @@ def test_read_none():
 
 def test_read():
     file_name = "some_file.json"
-    mock_content = "some_content"
-
-    mock_file = Mock()
-    mock_file.configure_mock(**{"read.return_value": mock_content})
-
-    mock_context = Mock()
-    mock_context.__enter__ = Mock(return_value=mock_file)
-    mock_context.__exit__ = Mock(return_value=False)
+    mock_content = b"some_content"
 
     mock_blob = Mock()
-    mock_blob.configure_mock(**{"open.return_value": mock_context})
+    mock_blob.configure_mock(**{"download_as_bytes.return_value": mock_content})
 
     mock_bucket = Mock(spec=Bucket)
     mock_bucket.configure_mock(**{"get_blob.return_value": mock_blob})
@@ -87,7 +80,7 @@ def test_read():
 
     assert client.read("some_file.json") == mock_content
     mock_bucket.get_blob.assert_called_with(file_name)
-    mock_blob.open.assert_called_with("r")
+    mock_blob.download_as_bytes.assert_called_once_with()
 
 
 def test_get_files():

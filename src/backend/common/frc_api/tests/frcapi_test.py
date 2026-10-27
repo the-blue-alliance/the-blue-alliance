@@ -392,6 +392,21 @@ def test_save_response_updated(
     assert f2 == json.dumps(content2).encode()
 
 
+def test_response_content_and_saved_snapshot_are_bytes(
+    monkeypatch: pytest.MonkeyPatch,
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+) -> None:
+    # Pins the runtime types behind the `content: bytes` and `read -> bytes` annotations.
+    monkeypatch.setenv("SAVE_FRC_API_RESPONSE", "true")
+    _mock_frc_api(urlfetch_stub, {"currentSeason": 2021})
+    response = FRCAPI("zach", save_response=True).root().get_result()
+
+    files = cloud_storage_get_files("frc-api-response/v3.0/")
+    assert len(files) == 1
+    assert isinstance(response.content, bytes)
+    assert isinstance(cloud_storage_read(files[0]), bytes)
+
+
 def test_regional_rankings() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
@@ -437,8 +452,8 @@ def test_get_cached_gcs_files_downloads_and_caches(
     monkeypatch.setattr(frc_api_module, "__file__", str(tmp_path / "frc_api.py"))
     gcs_dir = "frc-api-response/v3.0/2020/root/"
     contents = {
-        f"{gcs_dir}2020-03-01 10:00:00.0.json": "text",
-        f"{gcs_dir}2020-03-02 10:00:00.0.json": b"bytes",
+        f"{gcs_dir}2020-03-01 10:00:00.0.json": b"first",
+        f"{gcs_dir}2020-03-02 10:00:00.0.json": b"second",
         f"{gcs_dir}2020-03-03 10:00:00.0.json": None,
     }
     with (
@@ -455,8 +470,8 @@ def test_get_cached_gcs_files_downloads_and_caches(
         "2020-03-02 10_00_00.0.json",
     ]
     cache_dir = tmp_path / "gcs_test_data_cache" / safe_dir
-    assert (cache_dir / "2020-03-01 10_00_00.0.json").read_text() == "text"
-    assert (cache_dir / "2020-03-02 10_00_00.0.json").read_bytes() == b"bytes"
+    assert (cache_dir / "2020-03-01 10_00_00.0.json").read_bytes() == b"first"
+    assert (cache_dir / "2020-03-02 10_00_00.0.json").read_bytes() == b"second"
     assert not (cache_dir / "2020-03-03 10_00_00.0.json").exists()
 
     # A second lookup is served from the local cache
@@ -479,7 +494,7 @@ def test_get_cached_gcs_files_same_paths_downloaded_or_cached(
 
     monkeypatch.setattr(frc_api_module, "__file__", str(tmp_path / "frc_api.py"))
     gcs_dir = "frc-api-response/v3.0/2020/root/"
-    contents = {f"{gcs_dir}2020-03-01 10:00:00.0.json": "text"}
+    contents = {f"{gcs_dir}2020-03-01 10:00:00.0.json": b"text"}
     with (
         patch("backend.common.storage.get_files", return_value=list(contents)),
         patch("backend.common.storage.read", side_effect=contents.get),
@@ -490,6 +505,25 @@ def test_get_cached_gcs_files_same_paths_downloaded_or_cached(
     expected = [f"{gcs_dir}2020-03-01 10_00_00.0.json"]
     assert downloaded == expected
     assert cached == expected
+
+
+def test_get_cached_gcs_files_rejects_paths_outside_cache(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+) -> None:
+    from backend.common.frc_api import frc_api as frc_api_module
+
+    gcs_dir = "../escape/"
+    monkeypatch.setattr(
+        frc_api_module, "__file__", str(tmp_path / "pkg" / "frc_api.py")
+    )
+    with (
+        patch("backend.common.storage.get_files", return_value=[f"{gcs_dir}a.json"]),
+        patch("backend.common.storage.read", return_value=b"{}") as mock_read,
+        pytest.raises(ValueError),
+    ):
+        FRCAPI.get_cached_gcs_files(gcs_dir)
+    mock_read.assert_not_called()
+    assert not (tmp_path / "pkg" / "escape").exists()
 
 
 def test_simulated_v2_schedule_uses_hybrid_endpoint() -> None:
