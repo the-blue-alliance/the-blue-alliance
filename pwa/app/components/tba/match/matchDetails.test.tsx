@@ -1,6 +1,7 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { AnchorHTMLAttributes } from 'react';
-import { describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import {
   AllianceColor,
@@ -13,6 +14,21 @@ import {
 import MatchDetails from '~/components/tba/match/matchDetails';
 import type { TeamTooltipProps } from '~/components/tba/teamTooltip';
 import { formatMatchTime } from '~/lib/matchUtils';
+
+const zebraMocks = vi.hoisted(() => ({
+  fetchZebra: vi.fn<() => Promise<unknown>>(),
+}));
+
+vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
+  getMatchZebraOptions: ({ path }: { path: { match_key: string } }) => ({
+    queryKey: ['zebra', path.match_key],
+    queryFn: zebraMocks.fetchZebra,
+  }),
+}));
+
+vi.mock('~/components/tba/match/zebraMotionWorks', () => ({
+  default: () => <div>ZebraMotionWorks</div>,
+}));
 
 vi.mock('~/components/tba/teamTooltip', () => ({
   TeamLinkWithTooltip: ({
@@ -157,12 +173,22 @@ function breakdownWith(
 }
 
 function renderDetails(match: Match, eventOverrides: Partial<Event> = {}) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   return render(
-    <MatchDetails match={match} event={{ ...event, ...eventOverrides }} />,
+    <QueryClientProvider client={queryClient}>
+      <MatchDetails match={match} event={{ ...event, ...eventOverrides }} />
+    </QueryClientProvider>,
   );
 }
 
 describe('MatchDetails', () => {
+  beforeEach(() => {
+    zebraMocks.fetchZebra.mockReset();
+    zebraMocks.fetchZebra.mockResolvedValue(null);
+  });
+
   test('renders the match row with every team linked', () => {
     renderDetails(makeMatch());
 
@@ -377,5 +403,19 @@ describe('MatchDetails', () => {
     expect(screen.getByText('Scheduled:').parentElement?.textContent).toMatch(
       /^Scheduled:2:30 AM$/,
     );
+  });
+
+  test('shows the Zebra MotionWorks field for a 2019 match with data', async () => {
+    zebraMocks.fetchZebra.mockResolvedValue({ key: '2019test_qm1' });
+    renderDetails(makeMatch(), { year: 2019 });
+
+    expect(await screen.findByText('ZebraMotionWorks')).toBeTruthy();
+  });
+
+  test('does not fetch Zebra MotionWorks data outside 2019-2020', () => {
+    renderDetails(makeMatch());
+
+    expect(zebraMocks.fetchZebra).not.toHaveBeenCalled();
+    expect(screen.queryByText('ZebraMotionWorks')).toBeNull();
   });
 });
