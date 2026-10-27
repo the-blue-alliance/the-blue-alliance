@@ -18,6 +18,8 @@ const STEPS_PER_LABEL = 400;
 const BOUNDS_WEIGHT = 2;
 const PREFERENCE_WEIGHT = 0.02;
 
+// The 8 spots a label may take around its dot, in order of preference:
+// top first, then top-right, right, and around to bottom-left.
 function candidates({ x, y, r, w, h }: LabelAnchor): Box[] {
   const d = r + GAP;
   const k = d * Math.SQRT1_2;
@@ -33,16 +35,21 @@ function candidates({ x, y, r, w, h }: LabelAnchor): Box[] {
   ];
 }
 
+// Area in square pixels where two boxes overlap, or 0 if they don't touch.
 function overlap(a: Box, b: Box): number {
   const w = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
   const h = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
   return w > 0 && h > 0 ? w * h : 0;
 }
 
+// The square around a dot, used as an obstacle that labels should avoid.
 function dotBox({ x, y, r }: LabelAnchor): Box {
   return { x: x - r, y: y - r, w: 2 * r, h: 2 * r };
 }
 
+// How bad it is to put label `index` in `box`: how much it covers other labels
+// and dots, how far it sticks out of bounds, and a small penalty for less
+// preferred spots. Lower is better.
 function cost(
   index: number,
   box: Box,
@@ -62,6 +69,9 @@ function cost(
   );
 }
 
+// A small seeded random number generator (mulberry32). A fixed seed makes the
+// same data always produce the same layout, so labels don't jump between
+// renders.
 function seededRandom(seed: number): () => number {
   let state = seed;
   return () => {
@@ -72,6 +82,9 @@ function seededRandom(seed: number): () => number {
   };
 }
 
+// Places one label per dot with simulated annealing: try random moves to other
+// spots, always keep moves that lower the cost, and early on sometimes keep
+// worse ones so the layout doesn't get stuck.
 export function layoutLabels(anchors: LabelAnchor[], bounds: Box): Box[] {
   const dots = anchors.map(dotBox);
   const options = anchors.map(candidates);
