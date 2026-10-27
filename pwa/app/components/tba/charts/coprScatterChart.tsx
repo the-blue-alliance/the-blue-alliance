@@ -2,19 +2,24 @@ import { useMemo, useState } from 'react';
 import {
   Cell,
   DefaultTooltipContentProps,
+  DefaultZIndexes,
   Label,
-  LabelList,
   ReferenceLine,
   Scatter,
   ScatterChart,
   Tooltip,
   XAxis,
   YAxis,
+  ZIndexLayer,
+  usePlotArea,
+  useXAxisScale,
+  useYAxisScale,
 } from 'recharts';
 import {
   NameType,
   ValueType,
 } from 'recharts/types/component/DefaultTooltipContent';
+import { ScatterShapeProps } from 'recharts/types/util/ScatterUtils';
 
 import HelpCircleIcon from '~icons/lucide/help-circle';
 
@@ -36,7 +41,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
+import { parseColor, wcagContrast } from '~/lib/colorContrast';
 import { useMediaQuery } from '~/lib/hooks';
+import { Box, layoutLabels } from '~/lib/labelLayout';
 import { camelCaseToHumanReadable } from '~/lib/utils';
 
 interface Datapoint {
@@ -87,11 +94,150 @@ function generateDomain(dataMin: number, dataMax: number): [number, number] {
   return [-0.1, 1 + DOMAIN_PADDING_RATIO];
 }
 
-// Teams with no colors on record get a neutral theme color.
-function getTeamFill(colors: EventColors, teamKey: string): string {
+const CARD_LIGHT = 'oklch(1 0 0)';
+const CARD_DARK = 'oklch(0.287 0.004 286.09)';
+const MIN_CONTRAST = 3;
+const RING = 'var(--card-foreground)';
+const GAP = 'var(--card)';
+const NEUTRAL = 'var(--muted-foreground)';
+const DOT_RADIUS = 5.5;
+
+function themed(light: string, dark: string): string {
+  return light === dark ? light : `light-dark(${light}, ${dark})`;
+}
+
+function ringFor(fill: string, card: string): string {
+  return wcagContrast(fill, card) < MIN_CONTRAST ? RING : GAP;
+}
+
+function outlineFor(fill: string, card: string): string {
+  return wcagContrast(fill, card) < MIN_CONTRAST ? RING : 'transparent';
+}
+
+function getTeamPrimary(colors: EventColors, teamKey: string): string | null {
+  const primaryHex = colors.teams[teamKey.substring(3)]?.colors?.primaryHex;
+  return primaryHex ? parseColor(primaryHex) : null;
+}
+
+function getDotStyle(primary: string | null) {
+  return primary
+    ? {
+        fill: primary,
+        stroke: themed(
+          ringFor(primary, CARD_LIGHT),
+          ringFor(primary, CARD_DARK),
+        ),
+      }
+    : { fill: NEUTRAL, stroke: GAP };
+}
+
+function TeamDot({
+  cx,
+  cy,
+  size,
+  fill,
+  stroke,
+}: ScatterShapeProps & { fill?: string; stroke?: string }) {
   return (
-    colors.teams[teamKey.substring(3)]?.colors?.primaryHex ??
-    'var(--muted-foreground)'
+    <circle
+      cx={cx}
+      cy={cy}
+      r={Math.sqrt(size / Math.PI)}
+      style={{ fill, stroke, strokeWidth: 1.5 }}
+    />
+  );
+}
+
+function chipSize(number: string) {
+  return { w: number.length * 5.5 + 5, h: 11 };
+}
+
+function TeamChips({
+  data,
+  colors,
+}: {
+  data: Datapoint[];
+  colors: EventColors;
+}) {
+  const xScale = useXAxisScale();
+  const yScale = useYAxisScale();
+  const plotArea = usePlotArea();
+  const boxes = useMemo(() => {
+    if (!xScale || !yScale || !plotArea) return [];
+    return layoutLabels(
+      data.map((d) => ({
+        x: xScale(d.valueX) ?? 0,
+        y: yScale(d.valueY) ?? 0,
+        r: DOT_RADIUS,
+        ...chipSize(d.teamKey.substring(3)),
+      })),
+      {
+        x: plotArea.x,
+        y: plotArea.y,
+        w: plotArea.width,
+        h: plotArea.height,
+      },
+    );
+  }, [xScale, yScale, plotArea, data]);
+  return (
+    <ZIndexLayer zIndex={DefaultZIndexes.label}>
+      {boxes.map((box, i) => (
+        <TeamChip
+          key={data[i].teamKey}
+          box={box}
+          number={data[i].teamKey.substring(3)}
+          primary={getTeamPrimary(colors, data[i].teamKey)}
+        />
+      ))}
+    </ZIndexLayer>
+  );
+}
+
+function TeamChip({
+  box,
+  number,
+  primary,
+}: {
+  box: Box;
+  number: string;
+  primary: string | null;
+}) {
+  const textColor = primary
+    ? wcagContrast(primary, '#000000') >= wcagContrast(primary, '#ffffff')
+      ? '#000000'
+      : '#ffffff'
+    : GAP;
+  return (
+    <g>
+      <rect
+        x={box.x}
+        y={box.y}
+        width={box.w}
+        height={box.h}
+        rx={3}
+        style={{
+          fill: primary ?? NEUTRAL,
+          stroke: primary
+            ? themed(
+                outlineFor(primary, CARD_LIGHT),
+                outlineFor(primary, CARD_DARK),
+              )
+            : 'transparent',
+          strokeWidth: 1,
+        }}
+      />
+      <text
+        x={box.x + box.w / 2}
+        y={box.y + box.h / 2}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={9}
+        fontWeight={600}
+        style={{ fill: textColor }}
+      >
+        {number}
+      </text>
+    </g>
   );
 }
 
@@ -249,24 +395,15 @@ export default function CoprScatterChart({
                 />
               }
             />
-            <Scatter>
+            <Scatter shape={TeamDot}>
               {data.map((entry, index) => (
-                // Outline every dot in the theme's foreground so team colors
-                // close to the card background (white, black) stay visible.
                 <Cell
                   key={`cell-${index}`}
-                  fill={getTeamFill(colors, entry.teamKey)}
-                  stroke="var(--card-foreground)"
-                  strokeWidth={1}
+                  {...getDotStyle(getTeamPrimary(colors, entry.teamKey))}
                 />
               ))}
-
-              <LabelList
-                dataKey={'teamKey'}
-                position={'top'}
-                formatter={(value) => String(value).substring(3)}
-              />
             </Scatter>
+            <TeamChips data={data} colors={colors} />
           </ScatterChart>
         </ChartContainer>
       </CardContent>
