@@ -1,4 +1,10 @@
-import { createEvent, fireEvent, render, screen } from '@testing-library/react';
+import {
+  createEvent,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from '@testing-library/react';
 import {
   type ReactElement,
   type ReactNode,
@@ -27,7 +33,6 @@ const captured = vi.hoisted(() => ({
   xAxis: undefined as AxisProps | undefined,
   yAxis: undefined as AxisProps | undefined,
   tooltip: undefined as ReactElement | undefined,
-  formatter: undefined as ((value: unknown) => string) | undefined,
   isDesktop: true,
 }));
 
@@ -63,13 +68,18 @@ vi.mock('recharts', () => ({
     return null;
   },
   Scatter: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-  Cell: ({ fill }: { fill?: string }) => (
-    <span data-testid="cell" data-fill={fill ?? 'none'} />
+  Cell: ({ fill, stroke }: { fill?: string; stroke?: string }) => (
+    <span
+      data-testid="cell"
+      data-fill={fill ?? 'none'}
+      data-stroke={stroke ?? 'none'}
+    />
   ),
-  LabelList: ({ formatter }: { formatter: (value: unknown) => string }) => {
-    captured.formatter = formatter;
-    return null;
-  },
+  ZIndexLayer: ({ children }: { children: ReactNode }) => <svg>{children}</svg>,
+  DefaultZIndexes: { label: 2000 },
+  useXAxisScale: () => (value: unknown) => Number(value) * 10,
+  useYAxisScale: () => (value: unknown) => 500 - Number(value) * 10,
+  usePlotArea: () => ({ x: 0, y: 0, width: 1000, height: 1000 }),
 }));
 
 vi.mock('~/components/ui/chart', () => ({
@@ -268,11 +278,69 @@ describe('CoprScatterChart', () => {
     );
   });
 
-  test('labels dots with the team number', () => {
+  test('reads team colors written without a leading #', () => {
+    const colors = makeColors();
+    colors.teams['254'].colors = {
+      verified: true,
+      primaryHex: '0000ff',
+      secondaryHex: 'ffffff',
+    };
+    renderChart(colors);
+
+    expect(screen.getAllByTestId('cell')[2].dataset.fill).toBe('#0000ff');
+  });
+
+  test.each([
+    {
+      name: 'white dot in light mode only',
+      primaryHex: '#ffffff',
+      expected: 'light-dark(var(--card-foreground), var(--card))',
+    },
+    {
+      name: 'black dot in dark mode only',
+      primaryHex: '#000000',
+      expected: 'light-dark(var(--card), var(--card-foreground))',
+    },
+    {
+      name: 'red dot in neither mode',
+      primaryHex: '#ff0000',
+      expected: 'var(--card)',
+    },
+  ])('outlines a $name', ({ primaryHex, expected }) => {
+    const colors = makeColors();
+    colors.teams['254'].colors = {
+      verified: true,
+      primaryHex,
+      secondaryHex: '#808080',
+    };
+    renderChart(colors);
+
+    expect(screen.getAllByTestId('cell')[2].dataset.stroke).toBe(expected);
+  });
+
+  test('labels each dot with its team number', () => {
     renderChart();
 
-    expect(captured.formatter?.('frc254')).toBe('254');
+    expect(screen.getByText('604')).toBeTruthy();
   });
+
+  test.each([
+    { name: 'white', primaryHex: '#ffffff', expected: 'rgb(0, 0, 0)' },
+    { name: 'navy', primaryHex: '#000080', expected: 'rgb(255, 255, 255)' },
+  ])(
+    'writes the team number on a $name chip in the more readable of black or white',
+    ({ primaryHex, expected }) => {
+      const colors = makeColors();
+      colors.teams['254'].colors = {
+        verified: true,
+        primaryHex,
+        secondaryHex: '#808080',
+      };
+      renderChart(colors);
+
+      expect(screen.getByText('254').style.fill).toBe(expected);
+    },
+  );
 
   test('uses tighter spacing on small screens', () => {
     captured.isDesktop = false;
@@ -307,7 +375,7 @@ describe('CoprScatterChart', () => {
     const tooltip = captured.tooltip;
     if (!isValidElement(tooltip)) throw new Error('No tooltip');
 
-    render(
+    const { container } = render(
       cloneElement(tooltip, {
         active: true,
         payload: [
@@ -317,9 +385,9 @@ describe('CoprScatterChart', () => {
       } as object),
     );
 
-    expect(screen.getByText('254')).toBeTruthy();
-    expect(screen.getByText('47.20')).toBeTruthy();
-    expect(screen.getByText('0.90')).toBeTruthy();
+    expect(within(container).getByText('254')).toBeTruthy();
+    expect(within(container).getByText('47.20')).toBeTruthy();
+    expect(within(container).getByText('0.90')).toBeTruthy();
   });
 
   test('renders no tooltip when inactive or incomplete', () => {
