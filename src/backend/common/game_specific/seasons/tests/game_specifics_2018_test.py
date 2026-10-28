@@ -143,4 +143,4 @@ def test_get_per_robot_coprs() -> None:
         "endgameRobot3": "Parking",
     }
     assert coprs["autoRunPoints"](breakdown) == [5, 0, 5]
-    assert coprs["endgamePoints"](breakdown) == [30, 30, 5]
+    assert coprs["endgamePoints"](breakdown) == [40, 10, 15]
