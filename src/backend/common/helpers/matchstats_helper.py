@@ -50,8 +50,7 @@ CCWM_ACCESSOR: StatAccessor = (
 )
 
 
-COPR_RIDGE_LAMBDA = 2.0
-PER_ROBOT_SHRINK = 4.0
+COPR_RIDGE_LAMBDA = 1.0
 
 
 def make_default_component_accessor(component: Component) -> StatAccessor:
@@ -196,10 +195,8 @@ class MatchstatsHelper(object):
                     sums[team] += team_points
                     counts[team] += 1
 
-        mean = sum(sums.values()) / max(sum(counts.values()), 1)
         return {
-            team: (sums[team] + PER_ROBOT_SHRINK * mean)
-            / (counts[team] + PER_ROBOT_SHRINK)
+            team: sums[team] / counts[team] if counts[team] else 0.0
             for team in team_list
         }
 

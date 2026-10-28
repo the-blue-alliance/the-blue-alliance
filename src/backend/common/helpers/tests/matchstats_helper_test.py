@@ -284,27 +284,26 @@ def _tower_matches(schedule: List[Tuple[List[str], List[str]]]) -> List[Match]:
 def test_compute_coprs_per_robot_follows_station_order() -> None:
     coprs = MatchstatsHelper.calculate_coprs(_tower_matches(SCHEDULE), 2026)
 
-    assert coprs["endGameTowerPoints"]["1"] == pytest.approx(  # pyre-ignore[16]
-        (120 + 4 * 5) / (4 + 4)
-    )
+    assert coprs["endGameTowerPoints"]["1"] == 30
     for team in ["2", "3", "4", "5", "6"]:
-        assert coprs["endGameTowerPoints"][team] == pytest.approx(  # pyre-ignore[16]
-            (0 + 4 * 5) / (4 + 4)
-        )
+        assert coprs["endGameTowerPoints"][team] == 0
 
 
 def test_compute_coprs_per_robot_skips_partial_alliances() -> None:
-    partial = (["frc1", "frc2"], ["frc3", "frc4", "frc5"])
-
-    coprs = MatchstatsHelper.calculate_coprs(_tower_matches(SCHEDULE + [partial]), 2026)
-
-    mean = 120 / 27
-    assert coprs["endGameTowerPoints"]["1"] == pytest.approx(  # pyre-ignore[16]
-        (120 + 4 * mean) / (4 + 4)
+    red, blue = ["frc1", "frc2"], ["frc3", "frc4", "frc5"]
+    partial = _qual_match(
+        2026,
+        len(SCHEDULE) + 1,
+        red,
+        blue,
+        _tower_breakdown(red, "frc2"),
+        _tower_breakdown(blue, "frc2"),
     )
-    assert coprs["endGameTowerPoints"]["2"] == pytest.approx(  # pyre-ignore[16]
-        (0 + 4 * mean) / (4 + 4)
-    )
+
+    coprs = MatchstatsHelper.calculate_coprs(_tower_matches(SCHEDULE) + [partial], 2026)
+
+    assert coprs["endGameTowerPoints"]["1"] == 30
+    assert coprs["endGameTowerPoints"]["2"] == 0
 
 
 def test_get_last_event_stats(memcache_stub) -> None:
