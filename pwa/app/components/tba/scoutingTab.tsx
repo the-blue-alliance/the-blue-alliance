@@ -7,6 +7,7 @@ import { generateCsv } from '~/lib/csvUtils';
 import {
   transformCoprsToTable,
   transformMatchesToFlatSchedule,
+  transformMatchesToRobotBreakdown,
   transformMatchesToSchedule,
   transformTeamsToTeamList,
 } from '~/lib/scoutingUtils';
@@ -39,6 +40,11 @@ export default function ScoutingTab({
 
   const flatScheduleData = useMemo(
     () => transformMatchesToFlatSchedule(matches),
+    [matches],
+  );
+
+  const robotBreakdownTable = useMemo(
+    () => transformMatchesToRobotBreakdown(matches),
     [matches],
   );
 
@@ -106,6 +112,11 @@ export default function ScoutingTab({
     [flatScheduleData],
   );
 
+  const robotBreakdownCsv = useMemo(
+    () => generateCsv(robotBreakdownTable),
+    [robotBreakdownTable],
+  );
+
   const coprsCsv = useMemo(
     () =>
       coprsTable
@@ -141,6 +152,14 @@ export default function ScoutingTab({
         csvData={flatScheduleCsv}
         filename={`${eventKey}_flat_schedule.csv`}
       />
+
+      {robotBreakdownTable.data.length > 0 && (
+        <ScoutingExport
+          title="Per-Robot Match Breakdown"
+          csvData={robotBreakdownCsv}
+          filename={`${eventKey}_robot_breakdown.csv`}
+        />
+      )}
 
       {coprsTable && (
         <ScoutingExport

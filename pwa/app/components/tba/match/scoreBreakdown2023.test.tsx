@@ -4,6 +4,7 @@ import { describe, expect, test, vi } from 'vitest';
 import {
   AllianceColor,
   AutoChargeStationRobot2023,
+  BridgeState2023,
   CompLevel,
   EndGameChargeStationRobot2023,
   type Match,
@@ -188,13 +189,25 @@ describe('ScoreBreakdown2023', () => {
   });
 
   test.each([
-    { name: '254 Docked (+10) Robot 1 Endgame 148 None (+0)' },
+    { name: '254 Docked (+6) Robot 1 Endgame 148 None (+0)' },
     { name: '1114 Parked (+2) Robot 2 Endgame 217 Park (+2)' },
     { name: '2056 Park (+2) Robot 3 Endgame 33 (+0)' },
   ])('shows the charge station state and points in row "$name"', ({ name }) => {
     renderBreakdown();
 
     expect(screen.getByRole('row', { name })).toBeTruthy();
+  });
+
+  test('scores a robot docked on a level charge station as engaged', () => {
+    renderBreakdown(
+      makeBreakdown({ endGameBridgeState: BridgeState2023.LEVEL }),
+    );
+
+    expect(
+      screen.getByRole('row', {
+        name: '254 Docked (+10) Robot 1 Endgame 148 None (+0)',
+      }),
+    ).toBeTruthy();
   });
 
   test('shows the link count with link points', () => {
