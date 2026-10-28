@@ -34,7 +34,9 @@ describe('ComponentOprsTable', () => {
   });
 
   test('shows the preferred components on desktop, sorted by total', () => {
-    render(<ComponentOprsTable coprs={coprs} year={2025} />);
+    render(
+      <ComponentOprsTable title="Component OPRs" coprs={coprs} year={2025} />,
+    );
     expect(headers()).toEqual([
       '#',
       'Team',
@@ -56,7 +58,9 @@ describe('ComponentOprsTable', () => {
   });
 
   test('ranks teams by the selected component', () => {
-    render(<ComponentOprsTable coprs={coprs} year={2025} />);
+    render(
+      <ComponentOprsTable title="Component OPRs" coprs={coprs} year={2025} />,
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'Teleop Points' }));
 
@@ -69,7 +73,9 @@ describe('ComponentOprsTable', () => {
   });
 
   test('inverts ranks when the component is sorted ascending', () => {
-    render(<ComponentOprsTable coprs={coprs} year={2025} />);
+    render(
+      <ComponentOprsTable title="Component OPRs" coprs={coprs} year={2025} />,
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'Total Points ↓' }));
 
@@ -82,7 +88,9 @@ describe('ComponentOprsTable', () => {
   });
 
   test('returns to descending sorting instead of clearing the sort', () => {
-    render(<ComponentOprsTable coprs={coprs} year={2025} />);
+    render(
+      <ComponentOprsTable title="Component OPRs" coprs={coprs} year={2025} />,
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Total Points ↓' }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Total Points ↑' }));
@@ -95,7 +103,9 @@ describe('ComponentOprsTable', () => {
 
   test('shows only the sort component on mobile and lets the user pick', async () => {
     useMediaQueryMock.mockReturnValue(false);
-    render(<ComponentOprsTable coprs={coprs} year={2025} />);
+    render(
+      <ComponentOprsTable title="Component OPRs" coprs={coprs} year={2025} />,
+    );
     expect(headers()).toEqual(['#', 'Team', 'Total Points ↓']);
 
     fireEvent.click(screen.getByRole('button', { name: 'Columns' }));
@@ -111,7 +121,9 @@ describe('ComponentOprsTable', () => {
   });
 
   test('does not sort without components', () => {
-    render(<ComponentOprsTable coprs={{}} year={2025} />);
+    render(
+      <ComponentOprsTable title="Component OPRs" coprs={{}} year={2025} />,
+    );
     expect(headers()).toEqual(['#', 'Team']);
     expect(screen.getByText('No results.')).toBeTruthy();
   });

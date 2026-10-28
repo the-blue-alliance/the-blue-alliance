@@ -45,6 +45,7 @@ import {
   getEventMatchesOptions,
   getEventMediaOptions,
   getEventNexusInfoOptions,
+  getEventOprsOptions,
   getEventOptions,
   getEventPlayoffAdvancementOptions,
   getEventPracticeMatchesOptions,
@@ -131,6 +132,7 @@ import { getFinalsResult, sortMatchComparator } from '~/lib/matchUtils';
 import { getEventVideos, getSmugmugAlbums } from '~/lib/mediaUtils';
 import { type NexusMatchStatus, buildNexusStatusMap } from '~/lib/nexus';
 import {
+  eventOprsToComponents,
   getDefaultCoprYAxisComponentName,
   getDefaultTeleopComponentName,
 } from '~/lib/oprUtils';
@@ -345,15 +347,16 @@ function EventPage() {
     legacyHashes: LEGACY_EVENT_TAB_HASHES,
   });
 
-  const isSeasonEvent = SEASON_EVENT_TYPES.has(event.event_type);
+  const canHavePracticeMatches =
+    SEASON_EVENT_TYPES.has(event.event_type) && event.year >= 2026;
   const practiceMatchesQuery = useQuery({
     ...getEventPracticeMatchesOptions({ path: { event_key: eventKey } }),
     staleTime: eventStaleTime,
-    enabled: isSeasonEvent,
+    enabled: canHavePracticeMatches,
   });
   const practiceMatches = practiceMatchesQuery.data ?? [];
   const shouldShowPracticeTab =
-    isSeasonEvent &&
+    canHavePracticeMatches &&
     (practiceMatchesQuery.isPending || practiceMatches.length > 0);
 
   const alliancesQuery = useQuery({
@@ -367,14 +370,24 @@ function EventPage() {
     staleTime: eventStaleTime,
   });
 
+  const usesLegacyOprs = event.year <= 2014;
+
+  const oprsQuery = useQuery({
+    ...getEventOprsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+    enabled: usesLegacyOprs,
+  });
+
   const coprsQuery = useQuery({
     ...getEventCoprsOptions({ path: { event_key: eventKey } }),
     staleTime: eventStaleTime,
+    enabled: !usesLegacyOprs,
   });
 
   const colorsQuery = useQuery({
     ...getEventColorsOptions({ path: { eventKey: eventKey } }),
     staleTime: eventStaleTime,
+    enabled: !usesLegacyOprs,
   });
 
   const rankingsQuery = useQuery({
@@ -476,6 +489,12 @@ function EventPage() {
   const shouldPreviewAwardsTab =
     SEASON_EVENT_TYPES.has(event.event_type) && hasEventEnded(event);
   const shouldPreviewInsightsTab = matches.length > 0;
+  const isInsightsPending = usesLegacyOprs
+    ? oprsQuery.isPending
+    : coprsQuery.isPending || colorsQuery.isPending;
+  const hasInsightsData = usesLegacyOprs
+    ? !!oprsQuery.data
+    : !!(coprsQuery.data && colorsQuery.data);
   const shouldPreviewRankingsTab = matches.length > 0 && !isCmpFinals;
 
   return (
@@ -685,9 +704,8 @@ function EventPage() {
               </Badge>
             </InlineIcon>
           </AnimatedTabsTrigger>
-          {((shouldPreviewInsightsTab &&
-            (coprsQuery.isPending || colorsQuery.isPending)) ||
-            (coprsQuery.data && colorsQuery.data)) &&
+          {((shouldPreviewInsightsTab && isInsightsPending) ||
+            hasInsightsData) &&
             matches.length > 0 && (
               <AnimatedTabsTrigger value="insights">
                 <InlineIcon>
@@ -786,6 +804,13 @@ function EventPage() {
           className="data-hidden:hidden"
         >
           <div className="space-y-6">
+            {oprsQuery.data && (
+              <ComponentOprsTable
+                title="OPRs"
+                coprs={eventOprsToComponents(oprsQuery.data)}
+                year={event.year}
+              />
+            )}
             {coprsQuery.data && Object.keys(coprsQuery.data).length > 0 && (
               <>
                 <Suspense
@@ -806,7 +831,11 @@ function EventPage() {
                     )}
                   />
                 </Suspense>
-                <ComponentOprsTable coprs={coprsQuery.data} year={event.year} />
+                <ComponentOprsTable
+                  title="Component OPRs"
+                  coprs={coprsQuery.data}
+                  year={event.year}
+                />
               </>
             )}
             <EventSuccessRateTable eventKey={eventKey} year={event.year} />
