@@ -4,6 +4,7 @@ import {
   copyCsvToClipboard,
   downloadCsv,
   escapeCsvField,
+  escapeTsvField,
   generateCsv,
 } from '~/lib/csvUtils';
 
@@ -36,6 +37,16 @@ describe('escapeCsvField', () => {
   });
 });
 
+describe('escapeTsvField', () => {
+  test('keeps commas and quotes as they are', () => {
+    expect(escapeTsvField('San Jose, "CA"')).toBe('San Jose, "CA"');
+  });
+
+  test('replaces tabs and line breaks with a single space', () => {
+    expect(escapeTsvField('a\tb\r\nc')).toBe('a b c');
+  });
+});
+
 describe('generateCsv', () => {
   test('writes a header row followed by CRLF separated data rows', () => {
     const csv = generateCsv({
@@ -63,10 +74,20 @@ describe('generateCsv', () => {
   test('writes only the header without data', () => {
     expect(generateCsv({ columns: ['a', 'b'], data: [] })).toBe('a,b');
   });
+
+  test('separates tsv fields with tabs', () => {
+    const tsv = generateCsv({
+      columns: ['team_number', 'city'],
+      data: [[254, 'San Jose, CA']],
+      format: 'tsv',
+    });
+
+    expect(tsv).toBe('team_number\tcity\r\n254\tSan Jose, CA');
+  });
 });
 
 describe('downloadCsv', () => {
-  const createObjectURL = vi.fn<() => string>(() => 'blob:csv');
+  const createObjectURL = vi.fn<(blob: Blob) => string>(() => 'blob:csv');
   const revokeObjectURL = vi.fn<(url: string) => void>();
   const clickedLinks: Array<{ download: string; href: string }> = [];
 
@@ -102,6 +123,22 @@ describe('downloadCsv', () => {
     downloadCsv('a,b', 'teams.csv');
 
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:csv');
+  });
+
+  test('labels a csv download as csv', () => {
+    downloadCsv('a,b', 'teams.csv');
+
+    expect(createObjectURL.mock.lastCall?.[0].type).toBe(
+      'text/csv;charset=utf-8;',
+    );
+  });
+
+  test('labels a tsv download as tab separated values', () => {
+    downloadCsv('a\tb', 'teams.tsv', 'tsv');
+
+    expect(createObjectURL.mock.lastCall?.[0].type).toBe(
+      'text/tab-separated-values;charset=utf-8;',
+    );
   });
 });
 

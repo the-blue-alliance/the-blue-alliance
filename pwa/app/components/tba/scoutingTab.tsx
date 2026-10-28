@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { EventCoprs, Match, Media, Team } from '~/api/tba/read';
 import ScoutingExport from '~/components/tba/scoutingExport';
-import { generateCsv } from '~/lib/csvUtils';
+import { Button } from '~/components/ui/button';
+import { type DelimitedFormat, generateCsv } from '~/lib/csvUtils';
 import {
   transformCoprsToTable,
   transformMatchesToFlatSchedule,
@@ -27,6 +28,8 @@ export default function ScoutingTab({
   eventKey,
   coprs,
 }: ScoutingTabProps) {
+  const [format, setFormat] = useState<DelimitedFormat>('tsv');
+
   // Transform data - memoized to avoid recalculation
   const teamListData = useMemo(
     () => transformTeamsToTeamList(teams, media),
@@ -66,8 +69,9 @@ export default function ScoutingTab({
           'robot_picture_url',
         ],
         data: teamListData,
+        format,
       }),
-    [teamListData],
+    [teamListData, format],
   );
 
   const scheduleCsv = useMemo(
@@ -90,8 +94,9 @@ export default function ScoutingTab({
           'blue_score',
         ],
         data: scheduleData,
+        format,
       }),
-    [scheduleData],
+    [scheduleData, format],
   );
 
   const flatScheduleCsv = useMemo(
@@ -108,13 +113,14 @@ export default function ScoutingTab({
           'team',
         ],
         data: flatScheduleData,
+        format,
       }),
-    [flatScheduleData],
+    [flatScheduleData, format],
   );
 
   const robotBreakdownCsv = useMemo(
-    () => generateCsv(robotBreakdownTable),
-    [robotBreakdownTable],
+    () => generateCsv({ ...robotBreakdownTable, format }),
+    [robotBreakdownTable, format],
   );
 
   const coprsCsv = useMemo(
@@ -123,51 +129,93 @@ export default function ScoutingTab({
         ? generateCsv({
             columns: coprsTable.columns,
             data: coprsTable.data,
+            format,
           })
         : '',
-    [coprsTable],
+    [coprsTable, format],
   );
 
   return (
-    <div className="space-y-8">
-      <p className="text-muted-foreground">
-        Export event data in CSV format for scouting purposes. You can get these
-        in JSON format from <Link to="/apidocs/v3">the API</Link>.
-      </p>
+    <div className="space-y-4">
+      <div
+        className="flex flex-col gap-3 sm:flex-row sm:items-center
+          sm:justify-between"
+      >
+        <p className="text-muted-foreground">
+          Export event data for scouting spreadsheets. TSV pastes straight into
+          Google Sheets and Excel. For JSON, use{' '}
+          <Link to="/apidocs/v3">the API</Link>.
+        </p>
+        <fieldset className="flex shrink-0 gap-1" aria-label="Format">
+          <Button
+            size="sm"
+            variant={format === 'csv' ? 'default' : 'outline'}
+            aria-pressed={format === 'csv'}
+            onClick={() => setFormat('csv')}
+          >
+            CSV
+          </Button>
+          <Button
+            size="sm"
+            variant={format === 'tsv' ? 'default' : 'outline'}
+            aria-pressed={format === 'tsv'}
+            onClick={() => setFormat('tsv')}
+          >
+            TSV
+          </Button>
+        </fieldset>
+      </div>
 
-      <ScoutingExport
-        title="Team List"
-        csvData={teamListCsv}
-        filename={`${eventKey}_teams.csv`}
-      />
-
-      <ScoutingExport
-        title="Match Schedule"
-        csvData={scheduleCsv}
-        filename={`${eventKey}_schedule.csv`}
-      />
-
-      <ScoutingExport
-        title="Flat Match Schedule"
-        csvData={flatScheduleCsv}
-        filename={`${eventKey}_flat_schedule.csv`}
-      />
-
-      {robotBreakdownTable.data.length > 0 && (
+      <ul className="divide-y rounded-xl border bg-card">
         <ScoutingExport
-          title="Per-Robot Match Breakdown"
-          csvData={robotBreakdownCsv}
-          filename={`${eventKey}_robot_breakdown.csv`}
+          title="Team List"
+          description="One row per team"
+          rowCount={teamListData.length}
+          csvData={teamListCsv}
+          filename={`${eventKey}_teams.${format}`}
+          format={format}
         />
-      )}
 
-      {coprsTable && (
         <ScoutingExport
-          title="Component OPRs"
-          csvData={coprsCsv}
-          filename={`${eventKey}_coprs.csv`}
+          title="Match Schedule"
+          description="One row per match"
+          rowCount={scheduleData.length}
+          csvData={scheduleCsv}
+          filename={`${eventKey}_schedule.${format}`}
+          format={format}
         />
-      )}
+
+        <ScoutingExport
+          title="Flat Match Schedule"
+          description="One row per team per match"
+          rowCount={flatScheduleData.length}
+          csvData={flatScheduleCsv}
+          filename={`${eventKey}_flat_schedule.${format}`}
+          format={format}
+        />
+
+        {robotBreakdownTable.data.length > 0 && (
+          <ScoutingExport
+            title="Per-Robot Match Breakdown"
+            description="One row per robot per played match"
+            rowCount={robotBreakdownTable.data.length}
+            csvData={robotBreakdownCsv}
+            filename={`${eventKey}_robot_breakdown.${format}`}
+            format={format}
+          />
+        )}
+
+        {coprsTable && (
+          <ScoutingExport
+            title="Component OPRs"
+            description="One row per team, one column per scoring component"
+            rowCount={coprsTable.data.length}
+            csvData={coprsCsv}
+            filename={`${eventKey}_coprs.${format}`}
+            format={format}
+          />
+        )}
+      </ul>
     </div>
   );
 }
