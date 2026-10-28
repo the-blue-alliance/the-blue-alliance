@@ -6,7 +6,9 @@ from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.frc_api.types import ScoreDetailModelAlliance2024
 from backend.common.game_specific.base import (
+    per_robot_points,
     PredictionStatConfig,
+    RobotPointsAccessor,
     safe_div,
     StatAccessor,
     TCriteria,
@@ -251,6 +253,15 @@ class GameSpecifics2024(
                 + match.score_breakdown[color].get(
                     "teleopSpeakerNoteAmplifiedCount", 0
                 ),
+            ),
+        }
+
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
+        return {
+            "autoLeavePoints": per_robot_points("autoLineRobot{}", {"Yes": 2}),
+            "endGameParkPoints": per_robot_points("endGameRobot{}", {"Parked": 1}),
+            "endGameOnStagePoints": per_robot_points(
+                "endGameRobot{}", {"StageLeft": 3, "StageRight": 3, "CenterStage": 3}
             ),
         }
 

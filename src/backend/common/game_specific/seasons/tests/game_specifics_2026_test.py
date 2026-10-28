@@ -510,3 +510,17 @@ def test_auto_climbs_capped_at_two_per_alliance() -> None:
     qual = none_throws(_insights([match])["qual"])
     assert qual["auto_climb_count"] == [3, 4, 75.0]
     assert _measure(match)["auto_climb"] == (3, 4)
+
+
+def test_get_per_robot_coprs() -> None:
+    coprs = GameSpecifics2026().get_per_robot_coprs()
+    breakdown = {
+        "autoTowerRobot1": "Level1",
+        "autoTowerRobot2": "None",
+        "autoTowerRobot3": "None",
+        "endGameTowerRobot1": "Level3",
+        "endGameTowerRobot2": "Level1",
+        "endGameTowerRobot3": "Level2",
+    }
+    assert coprs["autoTowerPoints"](breakdown) == [15, 0, 0]
+    assert coprs["endGameTowerPoints"](breakdown) == [30, 10, 20]

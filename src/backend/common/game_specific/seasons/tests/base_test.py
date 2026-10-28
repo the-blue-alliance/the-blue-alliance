@@ -27,6 +27,7 @@ def test_cannot_instantiate_abstract_root() -> None:
         ("finals_can_be_tiebroken", ()),
         ("calculate_event_insights", ([],)),
         ("get_manual_coprs", ()),
+        ("get_per_robot_coprs", ()),
         ("get_prediction_relevant_stats", ()),
         ("prediction_brier_fields", ()),
         ("ranking_bonus_rp_breakdown_fields", ()),
@@ -66,6 +67,7 @@ def test_default_season_game_config_is_a_no_op() -> None:
     assert game.finals_can_be_tiebroken() is False
     assert game.calculate_event_insights([]) is None
     assert game.get_manual_coprs() == {}
+    assert game.get_per_robot_coprs() == {}
     assert game.get_prediction_relevant_stats() == []
     assert game.prediction_brier_fields() == []
     assert game.ranking_bonus_rp_breakdown_fields() == []
@@ -103,6 +105,7 @@ def test_modern_game_config_defaults() -> None:
     remote_season = GameSpecifics2021()
     assert remote_season.finals_can_be_tiebroken() is False
     assert remote_season.get_manual_coprs() == {}
+    assert remote_season.get_per_robot_coprs() == {}
     assert remote_season.prediction_brier_fields() == []
     assert remote_season.qual_average_in_rankings() is False
     assert remote_season.ranking_win_points() == 2

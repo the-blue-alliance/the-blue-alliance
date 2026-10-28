@@ -12,7 +12,9 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2020
 from backend.common.game_specific.base import (
+    per_robot_points,
     PredictionStatConfig,
+    RobotPointsAccessor,
     safe_div,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
@@ -20,6 +22,20 @@ from backend.common.game_specific.base import (
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
+
+
+def _endgame_points(breakdown: Dict[str, Any]) -> List[float]:
+    states = [breakdown.get(f"endgameRobot{robot}") for robot in (1, 2, 3)]
+    hanging = states.count("Hang")
+    rung_bonus = (
+        15.0 / hanging
+        if hanging and breakdown.get("endgameRungIsLevel") == "IsLevel"
+        else 0.0
+    )
+    return [
+        25.0 + rung_bonus if state == "Hang" else 5.0 if state == "Park" else 0.0
+        for state in states
+    ]
 
 
 class GameSpecifics2020(
@@ -359,6 +375,12 @@ class GameSpecifics2020(
             "high_score": list(high_score),
         }
         return event_insights
+
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
+        return {
+            "autoInitLinePoints": per_robot_points("initLineRobot{}", {"Exited": 5}),
+            "endgamePoints": _endgame_points,
+        }
 
     def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return [

@@ -1,8 +1,9 @@
 import datetime
 import json
 import os
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
+import numpy as np
 import pytest
 from google.appengine.ext import ndb
 
@@ -167,6 +168,143 @@ def test_compute_matchstats_playoffs_only() -> None:
 
 def test_compute_coprs_playoffs_only() -> None:
     assert MatchstatsHelper.calculate_coprs([_playoff_match(True)], 2014) == {}
+
+
+SCHEDULE = [
+    (["frc1", "frc2", "frc3"], ["frc4", "frc5", "frc6"]),
+    (["frc1", "frc4", "frc5"], ["frc2", "frc3", "frc6"]),
+    (["frc1", "frc2", "frc6"], ["frc3", "frc4", "frc5"]),
+    (["frc2", "frc4", "frc6"], ["frc1", "frc3", "frc5"]),
+]
+
+
+def _qual_match(
+    year: int,
+    number: int,
+    red: List[str],
+    blue: List[str],
+    red_breakdown: Dict[str, Any],
+    blue_breakdown: Dict[str, Any],
+) -> Match:
+    return Match(
+        id=f"{year}test_qm{number}",
+        event=ndb.Key(Event, f"{year}test"),
+        year=year,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=number,
+        alliances_json=json.dumps(
+            {
+                "red": {"teams": red, "score": red_breakdown["totalPoints"]},
+                "blue": {"teams": blue, "score": blue_breakdown["totalPoints"]},
+            }
+        ),
+        score_breakdown_json=json.dumps({"red": red_breakdown, "blue": blue_breakdown}),
+    )
+
+
+def test_compute_coprs_constant_component_splits_evenly() -> None:
+    matches = [
+        _qual_match(2021, i, red, blue, {"totalPoints": 30}, {"totalPoints": 30})
+        for i, (red, blue) in enumerate(SCHEDULE, start=1)
+    ]
+
+    coprs = MatchstatsHelper.calculate_coprs(matches, 2021)
+
+    for team in ["1", "2", "3", "4", "5", "6"]:
+        assert coprs["totalPoints"][team] == pytest.approx(10)  # pyre-ignore[16]
+
+
+def test_compute_coprs_shrinks_low_sample_team_but_opr_does_not() -> None:
+    schedule = SCHEDULE + [(["frc7", "frc1", "frc2"], ["frc3", "frc4", "frc5"])]
+    scores = [(30, 30)] * len(SCHEDULE) + [(90, 30)]
+    matches = [
+        _qual_match(2021, i, red, blue, {"totalPoints": r}, {"totalPoints": b})
+        for i, ((red, blue), (r, b)) in enumerate(zip(schedule, scores), start=1)
+    ]
+
+    coprs = MatchstatsHelper.calculate_coprs(matches, 2021)
+    oprs = MatchstatsHelper.calculate_matchstats(matches, 2021)[StatType.OPR]
+
+    teams = sorted({t[3:] for red, blue in schedule for t in red + blue})
+    design = np.array(
+        [
+            [float(f"frc{t}" in alliance) for t in teams]
+            for m in schedule
+            for alliance in m
+        ]
+    )
+    alliance_scores = np.array([float(s) for pair in scores for s in pair])
+    least_squares = dict(
+        zip(teams, np.linalg.lstsq(design, alliance_scores, rcond=None)[0])
+    )
+    team_mean = np.mean(alliance_scores) / 3
+
+    assert team_mean < coprs["totalPoints"]["7"] < least_squares["7"]
+    for team in teams:
+        assert oprs[team] == pytest.approx(least_squares[team])  # pyre-ignore[16]
+
+
+def test_compute_coprs_components_still_sum_to_total(test_data_importer) -> None:
+    matches = test_data_importer.parse_match_list(
+        __file__, "data/2023cada_matches.json"
+    )
+
+    coprs = MatchstatsHelper.calculate_coprs(matches, 2023)
+
+    for team, total in coprs["totalPoints"].items():
+        assert coprs["Total Points Less Fouls"][team] + coprs["foulPoints"][
+            team
+        ] == pytest.approx(  # pyre-ignore[16]
+            total
+        )
+
+
+def _tower_breakdown(teams: List[str], climber: str) -> Dict[str, Any]:
+    breakdown: Dict[str, Any] = {"totalPoints": 0, "hubScore": {}}
+    for robot, team in enumerate(teams, start=1):
+        breakdown[f"endGameTowerRobot{robot}"] = "Level3" if team == climber else "None"
+    return breakdown
+
+
+def _tower_matches(schedule: List[Tuple[List[str], List[str]]]) -> List[Match]:
+    return [
+        _qual_match(
+            2026,
+            i,
+            red,
+            blue,
+            _tower_breakdown(red, "frc1"),
+            _tower_breakdown(blue, "frc1"),
+        )
+        for i, (red, blue) in enumerate(schedule, start=1)
+    ]
+
+
+def test_compute_coprs_per_robot_follows_station_order() -> None:
+    coprs = MatchstatsHelper.calculate_coprs(_tower_matches(SCHEDULE), 2026)
+
+    assert coprs["endGameTowerPoints"]["1"] == pytest.approx(  # pyre-ignore[16]
+        (120 + 4 * 5) / (4 + 4)
+    )
+    for team in ["2", "3", "4", "5", "6"]:
+        assert coprs["endGameTowerPoints"][team] == pytest.approx(  # pyre-ignore[16]
+            (0 + 4 * 5) / (4 + 4)
+        )
+
+
+def test_compute_coprs_per_robot_skips_partial_alliances() -> None:
+    partial = (["frc1", "frc2"], ["frc3", "frc4", "frc5"])
+
+    coprs = MatchstatsHelper.calculate_coprs(_tower_matches(SCHEDULE + [partial]), 2026)
+
+    mean = 120 / 27
+    assert coprs["endGameTowerPoints"]["1"] == pytest.approx(  # pyre-ignore[16]
+        (120 + 4 * mean) / (4 + 4)
+    )
+    assert coprs["endGameTowerPoints"]["2"] == pytest.approx(  # pyre-ignore[16]
+        (0 + 4 * mean) / (4 + 4)
+    )
 
 
 def test_get_last_event_stats(memcache_stub) -> None:

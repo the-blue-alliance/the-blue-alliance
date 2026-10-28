@@ -23,6 +23,7 @@ from backend.common.consts.alliance_color import (
 )
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
+from backend.common.game_specific.base import RobotPointsAccessor
 from backend.common.game_specific.registry import get_game
 from backend.common.memcache import MemcacheClient
 from backend.common.models.event_matchstats import (
@@ -47,6 +48,10 @@ CCWM_ACCESSOR: StatAccessor = (
     lambda match, color: match.alliances[color]["score"]
     - match.alliances[OPPONENT[color]]["score"]
 )
+
+
+COPR_RIDGE_LAMBDA = 2.0
+PER_ROBOT_SHRINK = 4.0
 
 
 def make_default_component_accessor(component: Component) -> StatAccessor:
@@ -83,6 +88,18 @@ class MatchstatsHelper(object):
     def build_Minv_matrix(
         cls, matches: List[Match], team_id_map: TTeamIdMap
     ) -> npt.NDArray[np.float64]:
+        return np.linalg.pinv(cls.build_M_matrix(matches, team_id_map))
+
+    @classmethod
+    def build_ridge_Minv_matrix(
+        cls, M: npt.NDArray[np.float64]
+    ) -> npt.NDArray[np.float64]:
+        return np.linalg.inv(M + np.eye(len(M)) * COPR_RIDGE_LAMBDA)
+
+    @classmethod
+    def build_M_matrix(
+        cls, matches: List[Match], team_id_map: TTeamIdMap
+    ) -> npt.NDArray[np.float64]:
         n = len(team_id_map.keys())
         M = np.zeros((n, n))
         for match in matches:
@@ -96,7 +113,7 @@ class MatchstatsHelper(object):
                     team1_id = team_id_map[team1[3:]]
                     for team2 in alliance_teams:
                         M[team1_id, team_id_map[team2[3:]]] += 1
-        return np.linalg.pinv(M)
+        return M
 
     @classmethod
     def build_s_matrix(
@@ -143,6 +160,50 @@ class MatchstatsHelper(object):
         return stat_dict
 
     @classmethod
+    def calc_ridge_stat(
+        cls,
+        matches: List[Match],
+        team_list: List[TeamId],
+        team_id_map: TTeamIdMap,
+        M: npt.NDArray[np.float64],
+        ridge_Minv: npt.NDArray[np.float64],
+        stat_accessor: StatAccessor,
+    ) -> TeamStatMap:
+        s = cls.build_s_matrix(matches, team_id_map, stat_accessor)
+        team_mean = s.sum() / (3 * max(np.trace(M), 1))
+        x = np.dot(ridge_Minv, s + COPR_RIDGE_LAMBDA * team_mean)
+        return {team: stat[0] for team, stat in zip(team_list, x)}
+
+    @classmethod
+    def calc_per_robot_stat(
+        cls,
+        matches: List[Match],
+        team_list: List[TeamId],
+        accessor: RobotPointsAccessor,
+    ) -> TeamStatMap:
+        sums: Dict[TeamId, float] = defaultdict(float)
+        counts: Dict[TeamId, int] = defaultdict(int)
+        for match in matches:
+            if (match.comp_level != CompLevel.QM) or (not match.has_been_played):
+                continue
+
+            for alliance_color in ALLIANCE_COLORS:
+                teams = [team[3:] for team in match.alliances[alliance_color]["teams"]]
+                points = accessor(none_throws(match.score_breakdown)[alliance_color])
+                if len(teams) != len(points):
+                    continue
+                for team, team_points in zip(teams, points):
+                    sums[team] += team_points
+                    counts[team] += 1
+
+        mean = sum(sums.values()) / max(sum(counts.values()), 1)
+        return {
+            team: (sums[team] + PER_ROBOT_SHRINK * mean)
+            / (counts[team] + PER_ROBOT_SHRINK)
+            for team in team_list
+        }
+
+    @classmethod
     def calculate_matchstats(cls, matches: List[Match], year: Year) -> EventMatchStats:
         if not matches:
             return {}
@@ -180,11 +241,18 @@ class MatchstatsHelper(object):
         if not team_list:
             return {}
 
-        Minv = cls.build_Minv_matrix(matches_with_score_breakdown, team_id_map)
+        M = cls.build_M_matrix(matches_with_score_breakdown, team_id_map)
+        ridge_Minv = cls.build_ridge_Minv_matrix(M)
+        game = get_game(year)
 
-        for name, accessor in get_game(year).get_manual_coprs().items():
-            coprs[name] = cls.calc_stat(
-                matches_with_score_breakdown, team_list, team_id_map, Minv, accessor
+        for name, accessor in game.get_manual_coprs().items():
+            coprs[name] = cls.calc_ridge_stat(
+                matches_with_score_breakdown,
+                team_list,
+                team_id_map,
+                M,
+                ridge_Minv,
+                accessor,
             )
 
         # For each k-v in score_breakdown, attempt to convert v to a float.
@@ -199,13 +267,19 @@ class MatchstatsHelper(object):
             except (ValueError, TypeError):
                 pass
             else:
-                coprs[component] = cls.calc_stat(
+                coprs[component] = cls.calc_ridge_stat(
                     matches_with_score_breakdown,
                     team_list,
                     team_id_map,
-                    Minv,
+                    M,
+                    ridge_Minv,
                     make_default_component_accessor(component),
                 )
+
+        for name, robot_accessor in game.get_per_robot_coprs().items():
+            coprs[name] = cls.calc_per_robot_stat(
+                matches_with_score_breakdown, team_list, robot_accessor
+            )
 
         return coprs
 

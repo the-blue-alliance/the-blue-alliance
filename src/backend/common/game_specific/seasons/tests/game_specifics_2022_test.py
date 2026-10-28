@@ -162,3 +162,17 @@ def test_insights_with_some_breakdowns(test_data_importer) -> None:
     test_data_importer.import_match_list(HELPERS_TESTS, "data/2022cmptx_matches.json")
     matches = Match.query(Match.event == ndb.Key(Event, "2022cmptx")).fetch()
     assert_partial_breakdowns_split_counters(GameSpecifics2022(), matches)
+
+
+def test_get_per_robot_coprs() -> None:
+    coprs = GameSpecifics2022().get_per_robot_coprs()
+    breakdown = {
+        "taxiRobot1": "Yes",
+        "taxiRobot2": "No",
+        "taxiRobot3": "Yes",
+        "endgameRobot1": "Traversal",
+        "endgameRobot2": "Mid",
+        "endgameRobot3": "None",
+    }
+    assert coprs["autoTaxiPoints"](breakdown) == [2, 0, 2]
+    assert coprs["endgamePoints"](breakdown) == [15, 6, 0]

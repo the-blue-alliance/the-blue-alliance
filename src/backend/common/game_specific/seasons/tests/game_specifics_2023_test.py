@@ -128,3 +128,28 @@ def test_insights_with_some_breakdowns(test_data_importer) -> None:
     test_data_importer.import_match_list(HELPERS_TESTS, "data/2023njfla_matches.json")
     matches = Match.query(Match.event == ndb.Key(Event, "2023njfla")).fetch()
     assert_partial_breakdowns_split_counters(GameSpecifics2023(), matches)
+
+
+def test_get_per_robot_coprs() -> None:
+    coprs = GameSpecifics2023().get_per_robot_coprs()
+    breakdown = {
+        "mobilityRobot1": "Yes",
+        "mobilityRobot2": "No",
+        "mobilityRobot3": "Yes",
+        "autoChargeStationRobot1": "Docked",
+        "autoChargeStationRobot2": "None",
+        "autoChargeStationRobot3": "None",
+        "autoBridgeState": "Level",
+        "endGameChargeStationRobot1": "Docked",
+        "endGameChargeStationRobot2": "Park",
+        "endGameChargeStationRobot3": "Docked",
+        "endGameBridgeState": "Level",
+    }
+    assert coprs["autoMobilityPoints"](breakdown) == [3, 0, 3]
+    assert coprs["autoChargeStationPoints"](breakdown) == [12, 0, 0]
+    assert coprs["endGameChargeStationPoints"](breakdown) == [10, 0, 10]
+    assert coprs["endGameParkPoints"](breakdown) == [0, 2, 0]
+    breakdown["autoBridgeState"] = "NotLevel"
+    breakdown["endGameBridgeState"] = "NotLevel"
+    assert coprs["autoChargeStationPoints"](breakdown) == [8, 0, 0]
+    assert coprs["endGameChargeStationPoints"](breakdown) == [6, 0, 6]
