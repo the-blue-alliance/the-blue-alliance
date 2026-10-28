@@ -218,9 +218,9 @@ describe('ScoreBreakdown2026', () => {
   });
 
   test.each([
-    { name: '254 Level 3 (+15) Robot 1 Endgame 148 Level 1 (+6)' },
-    { name: '1114 Level 2 (+10) Robot 2 Endgame 217 None (+0)' },
-    { name: '2056 Level 1 (+6) Robot 3 Endgame 33 None (+0)' },
+    { name: '254 Level 3 (+30) Robot 1 Endgame 148 Level 1 (+10)' },
+    { name: '1114 Level 2 (+20) Robot 2 Endgame 217 None (+0)' },
+    { name: '2056 Level 1 (+10) Robot 3 Endgame 33 None (+0)' },
   ])('shows the tower level and points in row "$name"', ({ name }) => {
     renderBreakdown();
 

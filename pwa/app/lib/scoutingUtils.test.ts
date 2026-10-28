@@ -14,6 +14,7 @@ import {
   formatTime,
   transformCoprsToTable,
   transformMatchesToFlatSchedule,
+  transformMatchesToRobotBreakdown,
   transformMatchesToSchedule,
   transformTeamsToTeamList,
 } from '~/lib/scoutingUtils';
@@ -269,5 +270,105 @@ describe('transformCoprsToTable', () => {
       [1, 1, 3],
       [2, 2, 0],
     ]);
+  });
+});
+
+describe('transformMatchesToRobotBreakdown', () => {
+  const towerBreakdown = {
+    red: {
+      autoTowerRobot1: 'Level1',
+      autoTowerRobot2: 'None',
+      autoTowerRobot3: 'None',
+      endGameTowerRobot1: 'Level3',
+      endGameTowerRobot2: 'None',
+      endGameTowerRobot3: 'None',
+    },
+    blue: {},
+  } as unknown as Match['score_breakdown'];
+
+  test('uses the scored actions of the year as columns', () => {
+    const matches = [
+      makeMatch({ key: '2026miket_qm1', score_breakdown: towerBreakdown }),
+    ];
+
+    expect(transformMatchesToRobotBreakdown(matches).columns).toEqual([
+      'match_key',
+      'comp_level',
+      'set_number',
+      'match_number',
+      'color',
+      'station',
+      'team',
+      'auto_climb',
+      'auto_climb_points',
+      'endgame',
+      'endgame_points',
+    ]);
+  });
+
+  test('writes a row for each robot with its results and points', () => {
+    const matches = [
+      makeMatch({ key: '2026miket_qm1', score_breakdown: towerBreakdown }),
+    ];
+
+    expect(transformMatchesToRobotBreakdown(matches).data[0]).toEqual([
+      '2026miket_qm1',
+      'qm',
+      1,
+      1,
+      'red',
+      1,
+      254,
+      'Level1',
+      15,
+      'Level3',
+      30,
+    ]);
+  });
+
+  test('skips matches without a score breakdown', () => {
+    const matches = [
+      makeMatch({ key: '2026miket_qm1', score_breakdown: towerBreakdown }),
+      makeMatch({ key: '2026miket_qm2', match_number: 2 }),
+    ];
+
+    expect(transformMatchesToRobotBreakdown(matches).data).toHaveLength(6);
+  });
+
+  test('lists per-robot fields for a year without scoring', () => {
+    const matches = [
+      makeMatch({
+        key: '2027miket_qm1',
+        score_breakdown: {
+          red: { climbRobot1: 'High' },
+          blue: {},
+        } as unknown as Match['score_breakdown'],
+      }),
+    ];
+
+    expect(transformMatchesToRobotBreakdown(matches).data[0]).toEqual([
+      '2027miket_qm1',
+      'qm',
+      1,
+      1,
+      'red',
+      1,
+      254,
+      'High',
+    ]);
+  });
+
+  test('returns no rows when no robot has per-robot data', () => {
+    const matches = [
+      makeMatch({
+        key: '2015miket_qm1',
+        score_breakdown: {
+          red: { totalPoints: 10 },
+          blue: { totalPoints: 20 },
+        } as unknown as Match['score_breakdown'],
+      }),
+    ];
+
+    expect(transformMatchesToRobotBreakdown(matches).data).toEqual([]);
   });
 });

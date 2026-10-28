@@ -11,13 +11,7 @@ import {
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
 import { Badge } from '~/components/ui/badge';
-
-const TOWER_ROBOT_POINTS: Record<TowerRobot2026, number> = {
-  Level3: 15,
-  Level2: 10,
-  Level1: 6,
-  None: 0,
-};
+import { getRobotPoints } from '~/lib/robotScoring';
 
 const TOWER_ROBOT_DISPLAY: Record<TowerRobot2026, string> = {
   Level3: 'Level 3',
@@ -28,16 +22,18 @@ const TOWER_ROBOT_DISPLAY: Record<TowerRobot2026, string> = {
 
 function EndgameTowerCell({
   endgame,
+  points,
   teamKey,
 }: {
   endgame: TowerRobot2026;
+  points: number;
   teamKey: string;
 }) {
   return (
     <div className="flex flex-col items-center gap-1">
       <Badge variant="outline">{teamKey.substring(3)}</Badge>
       <span>
-        {TOWER_ROBOT_DISPLAY[endgame]} (+{TOWER_ROBOT_POINTS[endgame]})
+        {TOWER_ROBOT_DISPLAY[endgame]} (+{points})
       </span>
     </div>
   );
@@ -304,6 +300,7 @@ export default function ScoreBreakdown2026({
         >
           <EndgameTowerCell
             endgame={scoreBreakdown.red.endGameTowerRobot1}
+            points={getRobotPoints(2026, scoreBreakdown.red, 1, 'endgame')}
             teamKey={match.alliances.red.team_keys[0]}
           />
         </ScoreBreakdownAllianceCell>
@@ -317,6 +314,7 @@ export default function ScoreBreakdown2026({
         >
           <EndgameTowerCell
             endgame={scoreBreakdown.blue.endGameTowerRobot1}
+            points={getRobotPoints(2026, scoreBreakdown.blue, 1, 'endgame')}
             teamKey={match.alliances.blue.team_keys[0]}
           />
         </ScoreBreakdownAllianceCell>
@@ -331,6 +329,7 @@ export default function ScoreBreakdown2026({
         >
           <EndgameTowerCell
             endgame={scoreBreakdown.red.endGameTowerRobot2}
+            points={getRobotPoints(2026, scoreBreakdown.red, 2, 'endgame')}
             teamKey={match.alliances.red.team_keys[1]}
           />
         </ScoreBreakdownAllianceCell>
@@ -344,6 +343,7 @@ export default function ScoreBreakdown2026({
         >
           <EndgameTowerCell
             endgame={scoreBreakdown.blue.endGameTowerRobot2}
+            points={getRobotPoints(2026, scoreBreakdown.blue, 2, 'endgame')}
             teamKey={match.alliances.blue.team_keys[1]}
           />
         </ScoreBreakdownAllianceCell>
@@ -358,6 +358,7 @@ export default function ScoreBreakdown2026({
         >
           <EndgameTowerCell
             endgame={scoreBreakdown.red.endGameTowerRobot3}
+            points={getRobotPoints(2026, scoreBreakdown.red, 3, 'endgame')}
             teamKey={match.alliances.red.team_keys[2]}
           />
         </ScoreBreakdownAllianceCell>
@@ -371,6 +372,7 @@ export default function ScoreBreakdown2026({
         >
           <EndgameTowerCell
             endgame={scoreBreakdown.blue.endGameTowerRobot3}
+            points={getRobotPoints(2026, scoreBreakdown.blue, 3, 'endgame')}
             teamKey={match.alliances.blue.team_keys[2]}
           />
         </ScoreBreakdownAllianceCell>

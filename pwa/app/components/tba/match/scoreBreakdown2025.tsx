@@ -10,6 +10,7 @@ import {
 } from '~/components/tba/match/common';
 import { Badge } from '~/components/ui/badge';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
+import { getRobotPoints } from '~/lib/robotScoring';
 
 export default function ScoreBreakdown2025({
   scoreBreakdown,
@@ -248,6 +249,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-loser" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot1}
+              points={getRobotPoints(2025, scoreBreakdown.red, 1, 'endgame')}
               teamKey={match.alliances.red.team_keys[0]}
             />
           </TableCell>
@@ -255,6 +257,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot1}
+              points={getRobotPoints(2025, scoreBreakdown.blue, 1, 'endgame')}
               teamKey={match.alliances.blue.team_keys[0]}
             />
           </TableCell>
@@ -265,6 +268,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-loser" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot2}
+              points={getRobotPoints(2025, scoreBreakdown.red, 2, 'endgame')}
               teamKey={match.alliances.red.team_keys[1]}
             />
           </TableCell>
@@ -272,6 +276,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot2}
+              points={getRobotPoints(2025, scoreBreakdown.blue, 2, 'endgame')}
               teamKey={match.alliances.blue.team_keys[1]}
             />
           </TableCell>
@@ -282,6 +287,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-loser" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot3}
+              points={getRobotPoints(2025, scoreBreakdown.red, 3, 'endgame')}
               teamKey={match.alliances.red.team_keys[2]}
             />
           </TableCell>
@@ -289,6 +295,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot3}
+              points={getRobotPoints(2025, scoreBreakdown.blue, 3, 'endgame')}
               teamKey={match.alliances.blue.team_keys[2]}
             />
           </TableCell>
@@ -449,21 +456,13 @@ export default function ScoreBreakdown2025({
 
 function EndgameRobotCell({
   endgame,
+  points,
   teamKey,
 }: {
   endgame: MatchScoreBreakdown2025['red']['endGameRobot1'];
+  points: number;
   teamKey: string;
 }) {
-  const pointMap: Record<
-    NonNullable<MatchScoreBreakdown2025['red']['endGameRobot1']>,
-    number
-  > = {
-    DeepCage: 12,
-    ShallowCage: 6,
-    Parked: 2,
-    None: 0,
-  };
-
   const displayMap: Record<
     NonNullable<MatchScoreBreakdown2025['red']['endGameRobot1']>,
     string
@@ -477,7 +476,7 @@ function EndgameRobotCell({
   return (
     <div className="flex flex-col items-center gap-1">
       <Badge variant={'outline'}>{teamKey.substring(3)}</Badge>
-      {displayMap[endgame ?? 'None']} (+{pointMap[endgame ?? 'None']})
+      {displayMap[endgame ?? 'None']} (+{points})
     </div>
   );
 }

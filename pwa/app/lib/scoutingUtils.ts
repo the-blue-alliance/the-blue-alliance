@@ -1,6 +1,15 @@
 import { EventCoprs, Match, Media, Team } from '~/api/tba/read';
 import { sortMatchComparator } from '~/lib/matchUtils';
 import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
+import { MatchScoreBreakdownAlliance } from '~/lib/rankingPoints';
+import {
+  ROBOT_ACTIONS,
+  RobotActionName,
+  STATIONS,
+  Station,
+  getRobotScore,
+  getUnscoredRobotFields,
+} from '~/lib/robotScoring';
 
 function extractTeamNumber(teamKey: string): number {
   return parseInt(teamKey.replace(/^frc/, ''), 10);
@@ -140,6 +149,96 @@ export function transformMatchesToFlatSchedule(
   }
 
   return rows;
+}
+
+const ROBOT_ACTION_COLUMNS: Record<RobotActionName, string> = {
+  leave: 'leave',
+  autoClimb: 'auto_climb',
+  endgame: 'endgame',
+};
+
+function robotCells(
+  year: number,
+  alliance: MatchScoreBreakdownAlliance,
+  station: Station,
+): Record<string, string | number> {
+  const score = getRobotScore(year, alliance, station);
+  if (score === undefined) {
+    return getUnscoredRobotFields(alliance, station);
+  }
+
+  return Object.fromEntries(
+    ROBOT_ACTIONS.flatMap((name) => {
+      const action = score[name];
+      const column = ROBOT_ACTION_COLUMNS[name];
+      return action
+        ? [
+            [column, action.result],
+            [`${column}_points`, action.points],
+          ]
+        : [];
+    }),
+  );
+}
+
+export function transformMatchesToRobotBreakdown(matches: Match[]): {
+  columns: string[];
+  data: (string | number)[][];
+} {
+  const baseColumns = [
+    'match_key',
+    'comp_level',
+    'set_number',
+    'match_number',
+    'color',
+    'station',
+    'team',
+  ];
+  const robots: {
+    base: (string | number)[];
+    cells: Record<string, string | number>;
+  }[] = [];
+
+  for (const match of [...matches].sort(sortMatchComparator)) {
+    if (match.score_breakdown === null) {
+      continue;
+    }
+
+    const year = Number(match.key.slice(0, 4));
+
+    for (const color of ['red', 'blue'] as const) {
+      for (const station of STATIONS) {
+        const teamKey = match.alliances[color].team_keys[station - 1];
+        robots.push({
+          base: [
+            match.key,
+            match.comp_level,
+            match.set_number,
+            match.match_number,
+            color,
+            station,
+            teamKey ? extractTeamNumber(teamKey) : '',
+          ],
+          cells: robotCells(year, match.score_breakdown[color], station),
+        });
+      }
+    }
+  }
+
+  const robotColumns = [
+    ...new Set(robots.flatMap(({ cells }) => Object.keys(cells))),
+  ];
+  if (robotColumns.length === 0) {
+    return { columns: baseColumns, data: [] };
+  }
+
+  return {
+    columns: [...baseColumns, ...robotColumns],
+    data: robots.map(({ base, cells }) => [
+      ...base,
+      ...robotColumns.map((column) => cells[column] ?? ''),
+    ]),
+  };
 }
 
 export function transformCoprsToTable(coprs: EventCoprs): {

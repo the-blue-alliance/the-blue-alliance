@@ -47,6 +47,7 @@ const match = {
     red: { team_keys: ['frc254', 'frc1', 'frc2'], score: 10 },
     blue: { team_keys: ['frc3', 'frc4', 'frc5'], score: 20 },
   },
+  score_breakdown: null,
 } as unknown as Match;
 
 function exportSection(name: string) {
@@ -85,6 +86,29 @@ describe('ScoutingTab', () => {
     const coprs = exportSection('Component OPRs');
     expect(coprs.dataset.filename).toBe('2026miket_coprs.csv');
     expect(coprs.textContent).toContain('totalPoints');
+  });
+
+  test('offers a per-robot breakdown export for played matches', () => {
+    render(
+      <ScoutingTab
+        teams={[team]}
+        media={[]}
+        matches={[
+          {
+            ...match,
+            score_breakdown: {
+              red: { autoTowerRobot1: 'Level1', endGameTowerRobot1: 'Level3' },
+              blue: {},
+            },
+          } as unknown as Match,
+        ]}
+        eventKey="2026miket"
+      />,
+    );
+
+    expect(exportSection('Per-Robot Match Breakdown').dataset.filename).toBe(
+      '2026miket_robot_breakdown.csv',
+    );
   });
 
   test('omits the COPR export without COPRs', () => {
