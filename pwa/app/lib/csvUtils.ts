@@ -1,6 +1,9 @@
+export type DelimitedFormat = 'csv' | 'tsv';
+
 interface GenerateCsvOptions {
   columns: string[];
   data: (string | number)[][];
+  format?: DelimitedFormat;
 }
 
 export function escapeCsvField(value: string | number): string {
@@ -19,22 +22,37 @@ export function escapeCsvField(value: string | number): string {
   return strValue;
 }
 
-export function generateCsv({ columns, data }: GenerateCsvOptions): string {
+export function escapeTsvField(value: string | number): string {
+  return String(value).replace(/[\t\r\n]+/g, ' ');
+}
+
+export function generateCsv({
+  columns,
+  data,
+  format = 'csv',
+}: GenerateCsvOptions): string {
+  const [escape, separator] =
+    format === 'tsv' ? [escapeTsvField, '\t'] : [escapeCsvField, ','];
   const rows: string[] = [];
 
-  const headerRow = columns.map(escapeCsvField).join(',');
+  const headerRow = columns.map(escape).join(separator);
   rows.push(headerRow);
 
   for (const row of data) {
-    const csvRow = row.map(escapeCsvField).join(',');
+    const csvRow = row.map(escape).join(separator);
     rows.push(csvRow);
   }
 
   return rows.join('\r\n');
 }
 
-export function downloadCsv(csv: string, filename: string): void {
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+export function downloadCsv(
+  csv: string,
+  filename: string,
+  format: DelimitedFormat = 'csv',
+): void {
+  const mimeType = format === 'tsv' ? 'text/tab-separated-values' : 'text/csv';
+  const blob = new Blob([csv], { type: `${mimeType};charset=utf-8;` });
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement('a');
