@@ -13,10 +13,16 @@ import { useMediaQuery } from '~/lib/hooks';
 import { type CoprRow, buildCoprTableModel } from '~/lib/oprUtils';
 import { camelCaseToHumanReadable } from '~/lib/utils';
 
+function componentLabel(name: string): string {
+  return name === 'opr' ? 'OPR' : camelCaseToHumanReadable(name);
+}
+
 export function ComponentOprsTable({
+  title,
   coprs,
   year,
 }: {
+  title: string;
   coprs: EventCoprs;
   year: number;
 }) {
@@ -67,7 +73,7 @@ export function ComponentOprsTable({
     },
     ...componentNames.map<TbaColumnDef<CoprRow>>((name) => ({
       id: name,
-      header: camelCaseToHumanReadable(name),
+      header: componentLabel(name),
       accessorFn: (row) => row.values[name] ?? null,
       cell: (cell) => {
         const value = cell.getValue<number | null>();
@@ -80,11 +86,11 @@ export function ComponentOprsTable({
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between gap-4">
-          <CardTitle>Component OPRs</CardTitle>
+          <CardTitle>{title}</CardTitle>
           <ColumnVisibilityMenu
             columns={componentNames.map((name) => ({
               id: name,
-              label: camelCaseToHumanReadable(name),
+              label: componentLabel(name),
             }))}
             visibility={columnVisibility}
             onVisibilityChange={setChosenVisibility}
