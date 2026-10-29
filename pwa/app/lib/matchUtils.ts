@@ -151,6 +151,25 @@ export function getFinalsResult(
   };
 }
 
+export function allianceRobots(alliance: EliminationAlliance): string[] {
+  return alliance.backup
+    ? [...alliance.picks, alliance.backup.in]
+    : alliance.picks;
+}
+
+export function findAllianceNumber(
+  teamKeys: string[],
+  alliances: EliminationAlliance[],
+): number | null {
+  if (teamKeys.length === 0) {
+    return null;
+  }
+  const index = alliances.findIndex((alliance) =>
+    teamKeys.every((key) => allianceRobots(alliance).includes(key)),
+  );
+  return index === -1 ? null : index + 1;
+}
+
 function getMaybeUnpenalizedScores(m: Match): { blue: number; red: number } {
   if (m.score_breakdown === null) {
     return { blue: m.alliances.blue.score, red: m.alliances.red.score };

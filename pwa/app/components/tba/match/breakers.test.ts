@@ -214,25 +214,33 @@ describe('START_OF_QUALS_BREAKER', () => {
 
 describe('START_OF_ELIMS_BREAKER', () => {
   test.each([
-    [PlayoffType.DOUBLE_ELIM_8_TEAM, 'Round 1'],
-    [PlayoffType.AVG_SCORE_8_TEAM, 'Quarterfinals'],
-    [PlayoffType.BRACKET_8_TEAM, 'Quarterfinals'],
-    [PlayoffType.CUSTOM, 'Playoffs'],
-    [null, 'Quarterfinals'],
-  ])('labels playoff type %s as %s', (playoffType, expectedText) => {
-    expect(
-      START_OF_ELIMS_BREAKER({
-        match: makeMatch({ comp_level: CompLevel.SF }),
-        matchIndex: 0,
-        nextMatch: null,
-        event: makeEvent({ playoff_type: playoffType }),
-      }),
-    ).toEqual({
-      shouldBreak: true,
-      text: expectedText,
-      whereToInsertBreak: 'before',
-    });
-  });
+    [PlayoffType.DOUBLE_ELIM_8_TEAM, CompLevel.SF, 'Round 1'],
+    [PlayoffType.DOUBLE_ELIM_4_TEAM, CompLevel.SF, 'Round 1'],
+    [PlayoffType.ROUND_ROBIN_6_TEAM, CompLevel.SF, 'Round Robin'],
+    [PlayoffType.CUSTOM, CompLevel.QF, 'Playoffs'],
+    [PlayoffType.AVG_SCORE_8_TEAM, CompLevel.QF, 'Quarterfinals'],
+    [PlayoffType.BRACKET_8_TEAM, CompLevel.QF, 'Quarterfinals'],
+    [PlayoffType.BRACKET_16_TEAM, CompLevel.EF, 'Eighthfinals'],
+    [PlayoffType.BRACKET_4_TEAM, CompLevel.SF, 'Semifinals'],
+    [PlayoffType.BO3_FINALS, CompLevel.F, 'Finals'],
+    [null, CompLevel.QF, 'Quarterfinals'],
+  ])(
+    'labels playoff type %s starting at %s as %s',
+    (playoffType, compLevel, expectedText) => {
+      expect(
+        START_OF_ELIMS_BREAKER({
+          match: makeMatch({ comp_level: compLevel }),
+          matchIndex: 0,
+          nextMatch: null,
+          event: makeEvent({ playoff_type: playoffType }),
+        }),
+      ).toEqual({
+        shouldBreak: true,
+        text: expectedText,
+        whereToInsertBreak: 'before',
+      });
+    },
+  );
 
   test('does not break before a qualification match', () => {
     expect(
@@ -357,7 +365,7 @@ describe('CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER', () => {
         match: makeMatch({ set_number: 1 }),
         matchIndex: 0,
         nextMatch: makeMatch({ set_number: 4 }),
-        event: makeEvent(),
+        event: makeEvent({ playoff_type: PlayoffType.DOUBLE_ELIM_8_TEAM }),
       }),
     ).toEqual({
       shouldBreak: false,
@@ -379,7 +387,7 @@ describe('CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER', () => {
           match: makeMatch({ set_number: setNumber }),
           matchIndex: 0,
           nextMatch: makeMatch({ set_number: nextSetNumber }),
-          event: makeEvent(),
+          event: makeEvent({ playoff_type: PlayoffType.DOUBLE_ELIM_8_TEAM }),
         }),
       ).toEqual({
         shouldBreak: true,
@@ -395,8 +403,40 @@ describe('CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER', () => {
         match: makeMatch({ set_number: 12 }),
         matchIndex: 0,
         nextMatch: makeMatch({ comp_level: CompLevel.F, set_number: 1 }),
-        event: makeEvent(),
+        event: makeEvent({ playoff_type: PlayoffType.DOUBLE_ELIM_8_TEAM }),
       }).shouldBreak,
     ).toBe(false);
+  });
+
+  test.each([
+    [2, 3, 'Round 2'],
+    [4, 5, 'Round 3'],
+  ])(
+    'labels the 4-team transition from set %s to set %s as %s',
+    (setNumber, nextSetNumber, expectedText) => {
+      expect(
+        CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER({
+          match: makeMatch({ set_number: setNumber }),
+          matchIndex: 0,
+          nextMatch: makeMatch({ set_number: nextSetNumber }),
+          event: makeEvent({ playoff_type: PlayoffType.DOUBLE_ELIM_4_TEAM }),
+        }),
+      ).toEqual({
+        shouldBreak: true,
+        text: expectedText,
+        whereToInsertBreak: 'after',
+      });
+    },
+  );
+
+  test('does not break between sets of a single-elimination bracket', () => {
+    expect(
+      CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER({
+        match: makeMatch({ comp_level: CompLevel.EF, set_number: 4 }),
+        matchIndex: 0,
+        nextMatch: makeMatch({ comp_level: CompLevel.EF, set_number: 5 }),
+        event: makeEvent({ playoff_type: PlayoffType.BRACKET_16_TEAM }),
+      }),
+    ).toEqual({ shouldBreak: false });
   });
 });

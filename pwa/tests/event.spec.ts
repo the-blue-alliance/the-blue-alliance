@@ -573,3 +573,43 @@ test.describe('/event/2025camb Champs Qual Points tab', () => {
     ).toHaveAttribute('href', '/events/regional/2025');
   });
 });
+
+test.describe('/event/2016casd', () => {
+  test('labels the event with its 2016 week', async ({ page }) => {
+    await page.goto('/event/2016casd');
+    await page.locator('body[data-hydrated]').waitFor();
+
+    await expect(page.getByText('Week 1', { exact: true })).toBeVisible();
+  });
+});
+
+test.describe('/event/2023micmp playoff matches', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/event/2023micmp');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  [['Round 1'], ['Round 3']].forEach(([round]) => {
+    test(`labels ${round} of the 4-team double elimination`, async ({
+      page,
+    }) => {
+      await expect(
+        page.locator('#playoff-matches').getByText(round, { exact: true }),
+      ).toBeVisible();
+    });
+  });
+});
+
+test.describe('/event/2024mil hash', () => {
+  test('opens the default tab when the hash has a stray percent sign', async ({
+    page,
+  }) => {
+    await page.goto('/event/2024mil#100%');
+    await page.locator('body[data-hydrated]').waitFor();
+
+    await expect(page.getByRole('tab', { name: 'Results' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+});

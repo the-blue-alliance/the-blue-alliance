@@ -346,6 +346,23 @@ describe('TeamEventAppearance', () => {
     expect(screen.getByTestId('rank').textContent).toBe('3 of 40');
   });
 
+  test('labels a 2016 week 1 event as Week 1', () => {
+    render(
+      <TeamEventAppearance
+        event={{ ...fullEvent, key: '2016casd', year: 2016, week: 1 }}
+        matches={[]}
+        status={null}
+        team={team}
+        awards={[]}
+        maybeDistrictPoints={null}
+        maybeRegionalPoolPoints={null}
+        maybeAlliances={null}
+      />,
+    );
+
+    expect(screen.getByText('Week 1')).toBeTruthy();
+  });
+
   test('omits the week badge and banners for offseason events', () => {
     render(
       <TeamEventAppearance

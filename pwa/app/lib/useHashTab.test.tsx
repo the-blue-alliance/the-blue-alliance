@@ -143,6 +143,12 @@ describe('useHashTab', () => {
     expect(selectedTab()).toBe('results');
   });
 
+  test('opens the default tab when the hash has a stray percent sign', () => {
+    window.history.replaceState(null, '', '/#100%');
+    render(<Page />);
+    expect(selectedTab()).toBe('results');
+  });
+
   test('follows external hash changes such as back/forward', async () => {
     render(<Page />);
     await act(async () => {

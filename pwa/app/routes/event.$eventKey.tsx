@@ -121,6 +121,7 @@ import {
   eventCacheControlHeaders,
   getCurrentWeekEvents,
   getEventDateString,
+  getEventWeekString,
   getPublicAgendaUrl,
   hasEventEnded,
   isAfterEventEndDate,
@@ -481,7 +482,7 @@ function EventPage() {
     [nexusInfo],
   );
   const sortedMatches = useMemo(
-    () => matches.sort(sortMatchComparator),
+    () => matches.toSorted(sortMatchComparator),
     [matches],
   );
 
@@ -589,9 +590,9 @@ function EventPage() {
         <DetailEntity icon={<DateIcon />}>
           {getEventDateString(event, 'long')}
           <AddToCalendarLinks event={event} />
-          {event.week !== null && (
+          {getEventWeekString(event) && (
             <Badge className="mx-2 h-[1.5em] align-text-top">
-              Week {event.week + 1}
+              {getEventWeekString(event)}
             </Badge>
           )}
         </DetailEntity>
@@ -1084,12 +1085,11 @@ function ResultsTab({
 }
 
 function AwardsTab({ awards }: { awards: Award[] }) {
-  awards.sort(sortAwardsComparator);
   return (
     <div className="flex flex-wrap-reverse">
       <div className="mt-1 flow-root w-full">
         <dl className="divide-y text-sm">
-          {awards.map((award) => (
+          {awards.toSorted(sortAwardsComparator).map((award) => (
             <div
               key={award.name}
               className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3 sm:gap-4
@@ -1098,7 +1098,7 @@ function AwardsTab({ awards }: { awards: Award[] }) {
               <dt className="font-medium sm:col-span-2">{award.name}</dt>
               <dd className="text-muted-foreground sm:text-right">
                 {award.recipient_list
-                  .sort((a, b) =>
+                  .toSorted((a, b) =>
                     sortTeamKeysComparator(
                       a.team_key ?? '0',
                       b.team_key ?? '0',

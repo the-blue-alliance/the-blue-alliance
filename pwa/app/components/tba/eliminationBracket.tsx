@@ -48,7 +48,11 @@ import {
   sideAllianceNumber,
 } from '~/lib/doubleElimBracket';
 import { getDivisionShortform } from '~/lib/eventUtils';
-import { sortMatchComparator } from '~/lib/matchUtils';
+import {
+  allianceRobots,
+  findAllianceNumber,
+  sortMatchComparator,
+} from '~/lib/matchUtils';
 
 export type MatchLabel =
   | 'Match 1'
@@ -429,18 +433,8 @@ export default function EliminationBracket({
   );
 
   const getAllianceNumber = useCallback(
-    (teamKeys: string[]): number | null => {
-      if (teamKeys.length === 0) return null;
-      for (let i = 0; i < alliances.length; i++) {
-        const allianceTeamKeys = alliances[i].picks.map((pick) =>
-          pick.substring(3),
-        );
-        if (teamKeys.every((team) => allianceTeamKeys.includes(team))) {
-          return i + 1;
-        }
-      }
-      return null;
-    },
+    (teamKeys: string[]): number | null =>
+      findAllianceNumber(teamKeys, alliances),
     [alliances],
   );
 
@@ -460,17 +454,21 @@ export default function EliminationBracket({
       }
 
       // Get alliance numbers and full alliance rosters
-      const redAllianceNumber = getAllianceNumber(matchRedTeams);
-      const blueAllianceNumber = getAllianceNumber(matchBlueTeams);
+      const redAllianceNumber = getAllianceNumber(
+        setMatches[0].alliances.red.team_keys,
+      );
+      const blueAllianceNumber = getAllianceNumber(
+        setMatches[0].alliances.blue.team_keys,
+      );
 
       // Get full alliance rosters (all teams, not just the 3 that played)
       const redTeams = redAllianceNumber
-        ? alliances[redAllianceNumber - 1].picks.map((pick) =>
+        ? allianceRobots(alliances[redAllianceNumber - 1]).map((pick) =>
             pick.substring(3),
           )
         : matchRedTeams;
       const blueTeams = blueAllianceNumber
-        ? alliances[blueAllianceNumber - 1].picks.map((pick) =>
+        ? allianceRobots(alliances[blueAllianceNumber - 1]).map((pick) =>
             pick.substring(3),
           )
         : matchBlueTeams;

@@ -60,7 +60,11 @@ import {
 } from '~/components/ui/tooltip';
 import { CMP_QUALIFICATION_METHOD_LABELS } from '~/lib/api/CmpQualificationMethod';
 import { getDistrictColorBorderClass } from '~/lib/districtUtils';
-import { getEventDateString, sortEvents } from '~/lib/eventUtils';
+import {
+  getEventDateString,
+  getEventWeekString,
+  sortEvents,
+} from '~/lib/eventUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import { sortTeams } from '~/lib/teamUtils';
 import { useHashTab } from '~/lib/useHashTab';
@@ -509,7 +513,7 @@ function DistrictEventsTable({
                 </div>
               </TableCell>
               <TableCell className="px-1 text-center align-top sm:px-4">
-                {event.week !== null && (
+                {getEventWeekString(event) && (
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger
@@ -520,9 +524,11 @@ function DistrictEventsTable({
                           />
                         }
                       >
-                        <span className="sm:hidden">Wk {event.week + 1}</span>
+                        <span className="sm:hidden">
+                          {getEventWeekString(event)?.replace(/^Week /, 'Wk ')}
+                        </span>
                         <span className="hidden sm:inline">
-                          Week {event.week + 1}
+                          {getEventWeekString(event)}
                         </span>
                       </TooltipTrigger>
                       <TooltipContent side="top">
@@ -577,7 +583,14 @@ function DistrictEventsTable({
       <TableFooter>
         <TableRow>
           <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">{events.length} Events</TableCell>
+          <TableCell className="text-right">
+            {
+              events.filter(
+                (event) => event.event_type !== EventType.DISTRICT_CMP_DIVISION,
+              ).length
+            }{' '}
+            Events
+          </TableCell>
         </TableRow>
       </TableFooter>
     </Table>

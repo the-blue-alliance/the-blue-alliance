@@ -48,7 +48,11 @@ import {
   sideAllianceNumber,
 } from '~/lib/doubleElimBracket';
 import { getDivisionShortform } from '~/lib/eventUtils';
-import { sortMatchComparator } from '~/lib/matchUtils';
+import {
+  allianceRobots,
+  findAllianceNumber,
+  sortMatchComparator,
+} from '~/lib/matchUtils';
 
 type MatchLabel4 =
   'Match 1' | 'Match 2' | 'Match 3' | 'Match 4' | 'Match 5' | 'Finals';
@@ -380,18 +384,8 @@ export default function DoubleElim4TeamBracket({
   );
 
   const getAllianceNumber = useCallback(
-    (teamKeys: string[]): number | null => {
-      if (teamKeys.length === 0) return null;
-      for (let i = 0; i < alliances.length; i++) {
-        const allianceTeamKeys = alliances[i].picks.map((pick) =>
-          pick.substring(3),
-        );
-        if (teamKeys.every((team) => allianceTeamKeys.includes(team))) {
-          return i + 1;
-        }
-      }
-      return null;
-    },
+    (teamKeys: string[]): number | null =>
+      findAllianceNumber(teamKeys, alliances),
     [alliances],
   );
 
@@ -421,16 +415,20 @@ export default function DoubleElim4TeamBracket({
         return null;
       }
 
-      const redAllianceNumber = getAllianceNumber(matchRedTeams);
-      const blueAllianceNumber = getAllianceNumber(matchBlueTeams);
+      const redAllianceNumber = getAllianceNumber(
+        setMatches[0].alliances.red.team_keys,
+      );
+      const blueAllianceNumber = getAllianceNumber(
+        setMatches[0].alliances.blue.team_keys,
+      );
 
       const redTeams = redAllianceNumber
-        ? alliances[redAllianceNumber - 1].picks.map((pick) =>
+        ? allianceRobots(alliances[redAllianceNumber - 1]).map((pick) =>
             pick.substring(3),
           )
         : matchRedTeams;
       const blueTeams = blueAllianceNumber
-        ? alliances[blueAllianceNumber - 1].picks.map((pick) =>
+        ? allianceRobots(alliances[blueAllianceNumber - 1]).map((pick) =>
             pick.substring(3),
           )
         : matchBlueTeams;

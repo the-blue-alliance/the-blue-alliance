@@ -13,8 +13,10 @@ import {
   PlayoffType,
 } from '~/api/tba/read';
 import {
+  allianceRobots,
   calculateRobotsRecord,
   calculateTeamRecordsFromMatches,
+  findAllianceNumber,
   formatMatchKeyName,
   formatMatchTime,
   getAllianceMatchResult,
@@ -938,5 +940,52 @@ describe('getFinalsResult', () => {
     expect(
       getFinalsResult([semifinalist, red, blue], [semifinal], true),
     ).toEqual({ winner: undefined, finalists: [] });
+  });
+});
+
+describe('findAllianceNumber', () => {
+  const alliances: EliminationAlliance[] = [
+    { picks: ['frc254', 'frc971', 'frc604'], declines: [] },
+    {
+      picks: ['frc1323', 'frc5817', 'frc8'],
+      backup: { in: 'frc5677', out: 'frc8' },
+      declines: [],
+    },
+  ];
+
+  test('finds the alliance whose picks played', () => {
+    expect(findAllianceNumber(['frc604', 'frc254', 'frc971'], alliances)).toBe(
+      1,
+    );
+  });
+
+  test('finds the alliance when its backup robot played', () => {
+    expect(
+      findAllianceNumber(['frc5817', 'frc1323', 'frc5677'], alliances),
+    ).toBe(2);
+  });
+
+  test('returns null when no alliance has every robot', () => {
+    expect(
+      findAllianceNumber(['frc254', 'frc971', 'frc5677'], alliances),
+    ).toBeNull();
+  });
+});
+
+describe('allianceRobots', () => {
+  test('lists the picks followed by the backup robot', () => {
+    expect(
+      allianceRobots({
+        picks: ['frc1323', 'frc5817', 'frc8'],
+        backup: { in: 'frc5677', out: 'frc8' },
+        declines: [],
+      }),
+    ).toEqual(['frc1323', 'frc5817', 'frc8', 'frc5677']);
+  });
+
+  test('lists only the picks without a backup', () => {
+    expect(
+      allianceRobots({ picks: ['frc254', 'frc971'], declines: [] }),
+    ).toEqual(['frc254', 'frc971']);
   });
 });

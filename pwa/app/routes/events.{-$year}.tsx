@@ -116,7 +116,7 @@ function YearEventsPage() {
   const [inView, setInView] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
 
-  const sortedEvents = events.sort(sortEventsComparator);
+  const sortedEvents = events.toSorted(sortEventsComparator);
   const groupedEvents = groupEventsBySections(sortedEvents);
   const officialGroups = groupedEvents.filter((group) => group.isOfficial);
   const unofficialGroups = groupedEvents.filter((group) => !group.isOfficial);

@@ -36,10 +36,9 @@ export function useHashTab<T extends string>({
 } {
   const navigate = useNavigate();
   const isHydrated = useIsHydrated();
-  const routerHash = useLocation({ select: (location) => location.hash });
+  const hash = useLocation({ select: (location) => location.hash });
   // The tab just clicked, shown until the router's location catches up
   const [pending, setPending] = useState<string>();
-  const hash = decodeURIComponent(routerHash);
   if (pending !== undefined && pending === hash) {
     setPending(undefined);
   }

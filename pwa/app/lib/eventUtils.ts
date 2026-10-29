@@ -331,7 +331,7 @@ export function isEventActive(event: Event): boolean {
 }
 
 export function sortEvents(events: Event[]) {
-  return events.sort((a, b) => sortEventsComparator(a, b));
+  return events.toSorted(sortEventsComparator);
 }
 
 /**
@@ -405,8 +405,8 @@ export function getDivisionShortform(divisionName: string): string {
 
 export function isEventWithinDays(
   event: Event,
-  negativeDaysBefore: number,
-  positiveDaysAfter: number,
+  daysBefore: number,
+  daysAfter: number,
 ): boolean {
   const days = getEventDays(event);
   if (!days) return false;
@@ -415,17 +415,17 @@ export function isEventWithinDays(
   const eventTimeZone = getEventTz(event);
   const { start: startDate, end: endDate } = days;
 
-  // Window opens negativeDaysBefore days before midnight of start_date in the
+  // Window opens daysBefore days before midnight of start_date in the
   // event's timezone.
   const windowStart = startDate
-    .subtract({ days: negativeDaysBefore })
+    .subtract({ days: daysBefore })
     .toZonedDateTime(eventTimeZone)
     .toInstant();
 
   // endDate is the last calendar day. +1 moves to the next midnight (end of
-  // the last day), then positiveDaysAfter extends further.
+  // the last day), then daysAfter extends further.
   const windowEnd = endDate
-    .add({ days: 1 + positiveDaysAfter })
+    .add({ days: 1 + daysAfter })
     .toZonedDateTime(eventTimeZone)
     .toInstant();
 
@@ -437,7 +437,7 @@ export function isEventWithinDays(
 }
 
 export function isEventWithinADay(event: Event): boolean {
-  return isEventWithinDays(event, -1, 1);
+  return isEventWithinDays(event, 1, 1);
 }
 
 /**

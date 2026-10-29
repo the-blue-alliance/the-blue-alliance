@@ -199,6 +199,20 @@ describe('transformMatchesToFlatSchedule', () => {
     ]);
   });
 
+  test('keeps the letter of a second robot', () => {
+    const rows = transformMatchesToFlatSchedule([
+      makeMatch({
+        key: '2024test_qm1',
+        alliances: {
+          red: alliance(100, ['frc971B']),
+          blue: alliance(80, ['frc971']),
+        },
+      }),
+    ]);
+
+    expect(rows.map((row) => row[7])).toEqual(['971B', 971]);
+  });
+
   test('orders rows by match order', () => {
     const matches = [
       makeMatch({ key: '2024test_sf1m1', comp_level: CompLevel.SF }),
@@ -237,6 +251,18 @@ describe('transformCoprsToTable', () => {
         [1678, 12.35],
       ],
     });
+  });
+
+  test('lists a second robot with its letter after its team', () => {
+    const coprs: EventCoprs = {
+      totalPoints: { frc971B: 5, frc1678: 12, frc971: 10 },
+    };
+
+    expect(transformCoprsToTable(coprs).data).toEqual([
+      [971, 10],
+      ['971B', 5],
+      [1678, 12],
+    ]);
   });
 
   test('drops components that are zero for every team', () => {
