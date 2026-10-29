@@ -59,6 +59,9 @@ export const Route = createFileRoute('/match/$matchKey')({
     }
 
     const { event, match } = loaderData;
+    const location = [event.city, event.state_prov, event.country]
+      .filter(Boolean)
+      .join(', ');
     const playoffType = event.playoff_type ?? PlayoffType.CUSTOM;
     const title = matchTitleShort(match, playoffType);
 
@@ -124,7 +127,7 @@ export const Route = createFileRoute('/match/$matchKey')({
         },
         {
           name: 'description',
-          content: `${title} at the ${event.year} ${event.name} FIRST Robotics Competition in ${event.city}, ${event.state_prov}, ${event.country}`,
+          content: `${title} at the ${event.year} ${event.name} FIRST Robotics Competition${location ? ` in ${location}` : ''}`,
         },
       ],
       scripts: [

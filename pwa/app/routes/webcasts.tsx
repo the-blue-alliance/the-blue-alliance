@@ -200,9 +200,9 @@ function EventWebcastCard({ event }: { event: Event }) {
         </CardTitle>
         <CardDescription>
           <EventLocationLink event={event} hideUSA hideVenue />
-          {event.week !== null && (
+          {getEventWeekString(event) && (
             <Badge variant="secondary" className="ml-2">
-              Week {event.week + 1}
+              {getEventWeekString(event)}
             </Badge>
           )}
         </CardDescription>

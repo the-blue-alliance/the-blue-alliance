@@ -250,6 +250,13 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     }
 
     const { team } = loaderData;
+    const location = [
+      team.city,
+      [team.state_prov, team.postal_code].filter(Boolean).join(' '),
+      team.country,
+    ]
+      .filter(Boolean)
+      .join(', ');
     const jsonLd = {
       '@context': 'https://schema.org',
       '@type': 'SportsTeam',
@@ -279,9 +286,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
         },
         {
           name: 'description',
-          content:
-            `From ${team.city}, ${team.state_prov} ${team.postal_code}, ${team.country}.` +
-            ' Team information, match results, and match videos from the FIRST Robotics Competition.',
+          content: `${location ? `From ${location}. ` : ''}Team information, match results, and match videos from the FIRST Robotics Competition.`,
         },
       ],
       scripts: [
@@ -321,7 +326,9 @@ function TeamPage(): React.JSX.Element {
   const yearsParticipatedQuery = useQuery(
     getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
   );
-  const yearsParticipated = yearsParticipatedQuery.data ?? [];
+  const yearsParticipated = (yearsParticipatedQuery.data ?? []).toSorted(
+    (a, b) => b - a,
+  );
   const eventsQuery = useQuery({
     ...getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
     staleTime: yearStaleTime,
@@ -388,7 +395,7 @@ function TeamPage(): React.JSX.Element {
 
   // sort BEFORE launching queries that depend on it
   const sortedEvents = useMemo(
-    () => events.sort(sortEventsComparator),
+    () => events.toSorted(sortEventsComparator),
     [events],
   );
 
@@ -493,8 +500,6 @@ function TeamPage(): React.JSX.Element {
 
   const [inView, setInView] = useState(new Set<string>());
 
-  yearsParticipated.sort((a, b) => b - a);
-
   const robotPics = useMemo(() => getImageMedia(media), [media]);
   const embedMedia = useMemo(() => getEmbedMedia(media), [media]);
 
@@ -502,6 +507,14 @@ function TeamPage(): React.JSX.Element {
     () =>
       avatarMediaQuery.data?.find((m): m is MediaAvatar => m.type === 'avatar'),
     [avatarMediaQuery.data],
+  );
+
+  const blueBannerAwards = awards.filter(
+    (a) =>
+      BLUE_BANNER_AWARDS.has(a.award_type) &&
+      sortedEvents.some(
+        (e) => e.key === a.event_key && SEASON_EVENT_TYPES.has(e.event_type),
+      ),
   );
 
   const tocItems = useMemo(
@@ -580,22 +593,14 @@ function TeamPage(): React.JSX.Element {
             remappedRobots={Object.values(remappedRobotsByEvent).flat()}
           />
 
-          {awards.filter((a) => BLUE_BANNER_AWARDS.has(a.award_type)).length >
-            0 && (
+          {blueBannerAwards.length > 0 && (
             <>
               <Separator className="my-4" />
-              <div className="flex flex-row justify-around">
-                <BlueBanners
-                  awards={awards
-                    .filter((a) => BLUE_BANNER_AWARDS.has(a.award_type))
-                    .filter((a) => {
-                      const event = sortedEvents.find(
-                        (e) => e.key === a.event_key,
-                      );
-                      return event && SEASON_EVENT_TYPES.has(event.event_type);
-                    })}
-                  events={sortedEvents}
-                />
+              <div
+                data-testid="blue-banners"
+                className="flex flex-row justify-around"
+              >
+                <BlueBanners awards={blueBannerAwards} events={sortedEvents} />
               </div>
             </>
           )}

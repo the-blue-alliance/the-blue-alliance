@@ -1419,6 +1419,30 @@ describe('sortEvents', () => {
       'later',
     ]);
   });
+
+  test('leaves the input array in its original order', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const later: Event = {
+      key: 'later',
+      start_date: '2024-04-01',
+      end_date: '2024-04-03',
+      event_type: EventType.REGIONAL,
+      name: 'Later',
+    };
+    // @ts-expect-error: Don't need to fill out all the fields
+    const earlier: Event = {
+      key: 'earlier',
+      start_date: '2024-03-01',
+      end_date: '2024-03-03',
+      event_type: EventType.REGIONAL,
+      name: 'Earlier',
+    };
+    const events = [later, earlier];
+
+    sortEvents(events);
+
+    expect(events.map((e) => e.key)).toEqual(['later', 'earlier']);
+  });
 });
 
 describe('getEventWeekString 2021 challenges', () => {
@@ -1540,6 +1564,28 @@ describe('isEventWithinADay', () => {
         makeEvent(today.subtract({ days: 3 }), today.add({ days: 3 })),
       ),
     ).toBe(true);
+  });
+
+  test('is true on the day of a one-day event', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-20T15:00:00Z'));
+    const event = makeEvent(
+      Temporal.PlainDate.from('2024-04-20'),
+      Temporal.PlainDate.from('2024-04-20'),
+    );
+    expect(isEventWithinADay(event)).toBe(true);
+    vi.useRealTimers();
+  });
+
+  test('is true the day before the event starts', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-17T15:00:00Z'));
+    const event = makeEvent(
+      Temporal.PlainDate.from('2024-04-18'),
+      Temporal.PlainDate.from('2024-04-20'),
+    );
+    expect(isEventWithinADay(event)).toBe(true);
+    vi.useRealTimers();
   });
 
   test('is false for an event that ended years ago', () => {

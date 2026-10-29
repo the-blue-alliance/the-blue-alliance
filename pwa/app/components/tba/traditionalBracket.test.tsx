@@ -279,6 +279,60 @@ describe('TraditionalBracket', () => {
     expect(row.getAttribute('data-winner')).toBe('false');
   });
 
+  test('labels a series in which a backup robot played', () => {
+    const withBackup = alliances.map((alliance, index) =>
+      index === 7
+        ? { ...alliance, backup: { in: 'frc899', out: 'frc803' } }
+        : alliance,
+    );
+    render(
+      <TraditionalBracket
+        alliances={withBackup}
+        matches={[
+          makeMatch(
+            CompLevel.QF,
+            1,
+            1,
+            allianceTeams(1),
+            ['frc801', 'frc802', 'frc899'],
+            50,
+            40,
+          ),
+        ]}
+        event={makeEvent()}
+      />,
+    );
+
+    expect(cardFor('801').textContent).toContain('#1 vs #8');
+  });
+
+  test('shows the backup robot that played in a series', () => {
+    const withBackup = alliances.map((alliance, index) =>
+      index === 7
+        ? { ...alliance, backup: { in: 'frc899', out: 'frc803' } }
+        : alliance,
+    );
+    render(
+      <TraditionalBracket
+        alliances={withBackup}
+        matches={[
+          makeMatch(
+            CompLevel.QF,
+            1,
+            1,
+            allianceTeams(1),
+            ['frc801', 'frc802', 'frc899'],
+            50,
+            40,
+          ),
+        ]}
+        event={makeEvent()}
+      />,
+    );
+
+    expect(screen.getByRole('link', { name: '899' })).toBeTruthy();
+  });
+
   test('hides alliance members who did not play in the series', () => {
     render(
       <TraditionalBracket

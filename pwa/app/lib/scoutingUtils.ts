@@ -10,9 +10,11 @@ import {
   getRobotScore,
   getUnscoredRobotFields,
 } from '~/lib/robotScoring';
+import { sortTeamKeysComparator } from '~/lib/teamUtils';
 
-function extractTeamNumber(teamKey: string): number {
-  return parseInt(teamKey.replace(/^frc/, ''), 10);
+function teamLabel(teamKey: string): number | string {
+  const team = teamKey.replace(/^frc/, '');
+  return /^\d+$/.test(team) ? Number(team) : team;
 }
 
 export function formatDate(timestamp: number | null): string {
@@ -86,22 +88,22 @@ export function transformMatchesToSchedule(
 
   return sortedMatches.map((match) => {
     const red1 = match.alliances.red.team_keys[0]
-      ? extractTeamNumber(match.alliances.red.team_keys[0])
+      ? teamLabel(match.alliances.red.team_keys[0])
       : '';
     const red2 = match.alliances.red.team_keys[1]
-      ? extractTeamNumber(match.alliances.red.team_keys[1])
+      ? teamLabel(match.alliances.red.team_keys[1])
       : '';
     const red3 = match.alliances.red.team_keys[2]
-      ? extractTeamNumber(match.alliances.red.team_keys[2])
+      ? teamLabel(match.alliances.red.team_keys[2])
       : '';
     const blue1 = match.alliances.blue.team_keys[0]
-      ? extractTeamNumber(match.alliances.blue.team_keys[0])
+      ? teamLabel(match.alliances.blue.team_keys[0])
       : '';
     const blue2 = match.alliances.blue.team_keys[1]
-      ? extractTeamNumber(match.alliances.blue.team_keys[1])
+      ? teamLabel(match.alliances.blue.team_keys[1])
       : '';
     const blue3 = match.alliances.blue.team_keys[2]
-      ? extractTeamNumber(match.alliances.blue.team_keys[2])
+      ? teamLabel(match.alliances.blue.team_keys[2])
       : '';
 
     return [
@@ -140,11 +142,11 @@ export function transformMatchesToFlatSchedule(
     ];
 
     for (const teamKey of match.alliances.red.team_keys) {
-      rows.push([...baseData, 'red', extractTeamNumber(teamKey)]);
+      rows.push([...baseData, 'red', teamLabel(teamKey)]);
     }
 
     for (const teamKey of match.alliances.blue.team_keys) {
-      rows.push([...baseData, 'blue', extractTeamNumber(teamKey)]);
+      rows.push([...baseData, 'blue', teamLabel(teamKey)]);
     }
   }
 
@@ -217,7 +219,7 @@ export function transformMatchesToRobotBreakdown(matches: Match[]): {
             match.match_number,
             color,
             station,
-            teamKey ? extractTeamNumber(teamKey) : '',
+            teamKey ? teamLabel(teamKey) : '',
           ],
           cells: robotCells(year, match.score_breakdown[color], station),
         });
@@ -255,15 +257,13 @@ export function transformCoprsToTable(coprs: EventCoprs): {
   }
 
   const teamKeys = Object.keys(coprs[componentNames[0]]);
-  const sortedTeamKeys = teamKeys.sort((a, b) => {
-    const numA = extractTeamNumber(a);
-    const numB = extractTeamNumber(b);
-    return numA - numB;
-  });
+  const sortedTeamKeys = teamKeys.sort(
+    (a, b) => sortTeamKeysComparator(a, b) || a.localeCompare(b),
+  );
 
   const columns = ['team_number', ...componentNames];
   const data = sortedTeamKeys.map((teamKey) => {
-    const teamNumber = extractTeamNumber(teamKey);
+    const teamNumber = teamLabel(teamKey);
     const row: (string | number)[] = [teamNumber];
 
     for (const componentName of componentNames) {

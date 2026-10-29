@@ -29,7 +29,7 @@ import { Separator } from '~/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
-import { getEventDateString } from '~/lib/eventUtils';
+import { getEventDateString, getEventWeekString } from '~/lib/eventUtils';
 import {
   calculateTeamRecordsFromMatches,
   sortMatchComparator,
@@ -203,8 +203,8 @@ export default function TeamEventAppearance({
             <DetailEntity icon={<DateIcon />}>
               {getEventDateString(event, 'long')}
               <AddToCalendarLinks event={event} />{' '}
-              {event.week !== null && (
-                <Badge variant={'secondary'}>Week {event.week + 1}</Badge>
+              {getEventWeekString(event) && (
+                <Badge variant={'secondary'}>{getEventWeekString(event)}</Badge>
               )}
             </DetailEntity>
             <DetailEntity icon={<LocationIcon />}>

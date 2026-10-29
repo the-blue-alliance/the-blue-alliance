@@ -25,7 +25,7 @@ export function sortTeamKeysComparator(a: string, b: string) {
 }
 
 export function sortTeams(teams: Team[]) {
-  return teams.sort((a, b) => sortTeamsComparator(a, b));
+  return teams.toSorted(sortTeamsComparator);
 }
 
 export function attemptToParseSponsors(teamName: string): string[] {

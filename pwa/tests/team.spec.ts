@@ -594,3 +594,15 @@ test.describe('/team/604/2025', () => {
     ).toHaveAttribute('href', '/events/regional/2025');
   });
 });
+
+[
+  ['shows', '/team/254/2024', 1],
+  ['hides', '/team/1002/2017', 0],
+].forEach(([verb, path, count]) => {
+  test(`${verb} the blue banners section on ${path}`, async ({ page }) => {
+    await page.goto(String(path));
+    await page.locator('body[data-hydrated]').waitFor();
+
+    await expect(page.getByTestId('blue-banners')).toHaveCount(Number(count));
+  });
+});

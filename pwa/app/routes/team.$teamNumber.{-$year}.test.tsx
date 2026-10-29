@@ -160,6 +160,38 @@ describe('team route head', () => {
     });
   });
 
+  test('describes a team with no postal code without printing null', () => {
+    expect(
+      runHead(Route, {
+        loaderData: { team: { ...team, postal_code: null } },
+      })?.meta?.[1],
+    ).toEqual({
+      name: 'description',
+      content:
+        'From San Jose, CA, USA. Team information, match results, and match videos from the FIRST Robotics Competition.',
+    });
+  });
+
+  test('omits the location sentence for a team with no location', () => {
+    expect(
+      runHead(Route, {
+        loaderData: {
+          team: {
+            ...team,
+            city: null,
+            state_prov: null,
+            postal_code: null,
+            country: null,
+          },
+        },
+      })?.meta?.[1],
+    ).toEqual({
+      name: 'description',
+      content:
+        'Team information, match results, and match videos from the FIRST Robotics Competition.',
+    });
+  });
+
   test('falls back to a generic title without loader data', () => {
     expect(runHead(Route)?.meta?.[0]).toEqual({
       title: 'Team Information - The Blue Alliance',

@@ -340,6 +340,14 @@ describe('sortTeams', () => {
     ]);
   });
 
+  test('leaves the input array in its original order', () => {
+    const teams = [{ team_number: 1678 }, { team_number: 254 }] as Team[];
+
+    sortTeams(teams);
+
+    expect(teams.map((team) => team.team_number)).toEqual([1678, 254]);
+  });
+
   test('the comparator sorts a lower team number first', () => {
     expect(
       sortTeamsComparator(

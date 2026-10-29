@@ -129,3 +129,23 @@ test('insights tab shows district leaderboards', async ({ page }) => {
     page.getByRole('heading', { name: 'Leaderboards' }),
   ).toBeVisible();
 });
+
+test('events tab labels 2016 weeks the way the events list does', async ({
+  page,
+}) => {
+  await page.goto('/district/fim/2016#events');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(
+    page.getByRole('row').filter({ hasText: 'Southfield' }),
+  ).toContainText('Week 1');
+});
+
+test('events tab total leaves out championship divisions', async ({ page }) => {
+  await page.goto('/district/fim/2024#events');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(
+    page.getByRole('row', { name: 'Total 27 Events' }),
+  ).toBeVisible();
+});
