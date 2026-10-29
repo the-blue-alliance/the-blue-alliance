@@ -315,7 +315,7 @@ def enqueue_district_insights(year: Optional[Year] = None) -> Response:
     if year == 0:
         # year=0 means compute overall/all-time aggregate insights for every
         # known district abbreviation.
-        abbreviations = RenamedDistricts.get_latest_codes()
+        abbreviations = RenamedDistricts.get_canonical_codes()
         for abbrev in abbreviations:
             taskqueue.add(
                 url=url_for(

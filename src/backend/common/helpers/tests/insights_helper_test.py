@@ -179,7 +179,9 @@ def test_do_prediction_insights_for_events_scopes_to_district() -> None:
 @mock.patch("backend.common.helpers.insights_helper.DistrictEventsQuery")
 @mock.patch("backend.common.helpers.insights_helper.DistrictHistoryQuery")
 @mock.patch("backend.common.helpers.insights_helper.InsightsDistrictsHelper")
-@mock.patch("backend.common.helpers.insights_helper.RenamedDistricts.get_latest_codes")
+@mock.patch(
+    "backend.common.helpers.insights_helper.RenamedDistricts.get_canonical_codes"
+)
 @mock.patch.object(InsightsHelper, "_doPredictionInsightsForEvents")
 @mock.patch.object(InsightsHelper, "_doAwardInsightsForEvents")
 @mock.patch.object(InsightsHelper, "_doMatchInsightsForEvents")

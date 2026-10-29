@@ -144,7 +144,7 @@ def test_enqueue_district_insights_year_zero(
 ) -> None:
     from backend.common.consts.renamed_districts import RenamedDistricts
 
-    expected_abbrevs = set(RenamedDistricts.get_latest_codes())
+    expected_abbrevs = set(RenamedDistricts.get_canonical_codes())
 
     resp = tasks_cpu_client.get("/backend-tasks-b2/enqueue/math/insights/districts/0")
     assert resp.status_code == 200
@@ -199,10 +199,10 @@ def test_calc_districts_year_zero_writes_overall_district_insights(
 
     # Team data and district data insights for every district abbreviation
     stored = Insight.query().fetch()
-    assert len(stored) == 2 * len(RenamedDistricts.get_latest_codes())
+    assert len(stored) == 2 * len(RenamedDistricts.get_canonical_codes())
     assert {insight.year for insight in stored} == {0}
     assert {insight.district_abbreviation for insight in stored} == set(
-        RenamedDistricts.get_latest_codes()
+        RenamedDistricts.get_canonical_codes()
     )
 
 

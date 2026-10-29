@@ -54,3 +54,10 @@ def test_with_districts() -> None:
         e.district_key is not None and none_throws(e.district_key).id() == "2019ne"
         for e in events
     )
+
+
+def test_other_code_returns_events_under_that_years_code() -> None:
+    preseed_events(2026, 3, "tx")
+
+    events = DistrictEventsQuery(district_key="2026fit").fetch()
+    assert len(events) == 3

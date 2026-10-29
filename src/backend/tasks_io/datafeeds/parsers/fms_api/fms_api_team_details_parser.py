@@ -2,6 +2,7 @@ from typing import List, Optional, Tuple
 
 from google.appengine.ext import ndb
 
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.frc_api.types import SeasonTeamListModelV2, SeasonTeamModelV2
 from backend.common.helpers.website_helper import WebsiteHelper
 from backend.common.models.district import District
@@ -66,7 +67,10 @@ class FMSAPITeamDetailsParser(
             districtTeam = None
             if team_district_code := teamData["districtCode"]:
                 districtKey = District.render_key_name(
-                    self.year, team_district_code.lower()
+                    self.year,
+                    RenamedDistricts.get_code_for_year(
+                        team_district_code.lower(), self.year
+                    ),
                 )
                 districtTeam = DistrictTeam(
                     id=DistrictTeam.render_key_name(districtKey, team.key_name),

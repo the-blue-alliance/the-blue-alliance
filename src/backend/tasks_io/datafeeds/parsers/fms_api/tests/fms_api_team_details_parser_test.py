@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 import pytest
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.models.district import District
 from backend.common.sitevars.website_blocklist import WebsiteBlocklist
@@ -200,6 +201,20 @@ def test_parse_team_websites(website, expected_website, test_data_importer, ndb_
 
     assert team.key_name == "frc1124"
     assert team.website == expected_website
+
+
+def test_parse_stale_district_code_uses_that_years_district(
+    test_data_importer, ndb_stub
+):
+    path = test_data_importer._get_path(__file__, "data/2015_frc1124.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+        data["teams"][0]["districtCode"] = "FIT"
+
+    team_details, _ = FMSAPITeamDetailsParser(2026).parse(data)
+
+    _, district_team, _ = none_throws(team_details)[0]
+    assert none_throws(district_team).district_key.id() == "2026tx"
 
 
 def test_parse_2018_teams(test_data_importer, ndb_stub):
