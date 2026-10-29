@@ -416,9 +416,11 @@ function EventPage() {
     staleTime: eventStaleTime,
   });
 
+  const isDistrictEvent = DISTRICT_EVENT_TYPES.has(event.event_type);
   const districtPointsQuery = useQuery({
     ...getEventDistrictPointsOptions({ path: { event_key: eventKey } }),
     staleTime: eventStaleTime,
+    enabled: isDistrictEvent,
   });
 
   const regionalChampsPoolPointsQuery = useQuery({
@@ -497,6 +499,7 @@ function EventPage() {
     ? !!oprsQuery.data
     : !!(coprsQuery.data && colorsQuery.data);
   const shouldPreviewRankingsTab = matches.length > 0 && !isCmpFinals;
+  const shouldPreviewDistrictPointsTab = isDistrictEvent && matches.length > 0;
 
   return (
     <div className="py-8">
@@ -715,8 +718,10 @@ function EventPage() {
                 </InlineIcon>
               </AnimatedTabsTrigger>
             )}
-          {districtPointsQuery.data &&
-            DISTRICT_EVENT_TYPES.has(event.event_type) && (
+          {isDistrictEvent &&
+            ((shouldPreviewDistrictPointsTab &&
+              districtPointsQuery.isPending) ||
+              districtPointsQuery.data) && (
               <AnimatedTabsTrigger value="district-points">
                 <InlineIcon>
                   <DistrictPointsIcon />
@@ -843,15 +848,16 @@ function EventPage() {
           </div>
         </TabsContent>
 
-        {districtPointsQuery.data &&
-          DISTRICT_EVENT_TYPES.has(event.event_type) && (
-            <TabsContent value="district-points">
+        {isDistrictEvent && (
+          <TabsContent value="district-points">
+            {districtPointsQuery.data && (
               <DistrictPointsTab
                 districtPoints={districtPointsQuery.data}
                 year={event.year}
               />
-            </TabsContent>
-          )}
+            )}
+          </TabsContent>
+        )}
 
         {event.event_type === EventType.REGIONAL &&
           (event.year >= 2025 || regionalAdvancementQuery.data != null) && (
