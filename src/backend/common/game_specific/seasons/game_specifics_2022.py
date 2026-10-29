@@ -12,7 +12,9 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2022
 from backend.common.game_specific.base import (
+    per_robot_points,
     PredictionStatConfig,
+    RobotPointsAccessor,
     safe_div,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
@@ -322,6 +324,14 @@ class GameSpecifics2022(
             "high_score": list(high_score),
         }
         return event_insights
+
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
+        return {
+            "autoTaxiPoints": per_robot_points("taxiRobot{}", {"Yes": 2}),
+            "endgamePoints": per_robot_points(
+                "endgameRobot{}", {"Low": 4, "Mid": 6, "High": 10, "Traversal": 15}
+            ),
+        }
 
     def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return [

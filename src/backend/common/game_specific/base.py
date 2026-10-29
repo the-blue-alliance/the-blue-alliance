@@ -29,6 +29,17 @@ TCriteria = Optional[Tuple[int, int]]
 # Computes a numeric value from a match + alliance for use in OPR calculations.
 StatAccessor = Callable[[Match, AllianceColor], float]
 
+RobotPointsAccessor = Callable[[Dict[str, Any]], List[float]]
+
+
+def per_robot_points(
+    field_template: str, points: Dict[str, float]
+) -> RobotPointsAccessor:
+    return lambda breakdown: [
+        float(points.get(breakdown.get(field_template.format(robot)), 0))
+        for robot in (1, 2, 3)
+    ]
+
 
 def safe_div(numerator: float, denominator: float) -> float:
     """Divides, or returns 0.0 when there is nothing to divide by."""
@@ -175,6 +186,10 @@ class SeasonGameConfig(ABC, Generic[TScoreBreakdown]):
         """
         raise NotImplementedError()
 
+    @abstractmethod
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
+        raise NotImplementedError()
+
     # ── Match Predictions ──────────────────────────────────────────────────────
 
     @abstractmethod
@@ -306,6 +321,9 @@ class DefaultSeasonGameConfig(SeasonGameConfig[Dict[str, object]]):
         return None
 
     def get_manual_coprs(self) -> Dict[str, StatAccessor]:
+        return {}
+
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
         return {}
 
     def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
@@ -455,6 +473,9 @@ class AbstractModernGameConfig(
         return False
 
     def get_manual_coprs(self) -> Dict[str, StatAccessor]:
+        return {}
+
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
         return {}
 
     def prediction_brier_fields(self) -> List[Tuple[str, str, str]]:

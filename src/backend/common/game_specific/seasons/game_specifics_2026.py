@@ -6,7 +6,9 @@ from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.frc_api.types import ScoreDetailModelAlliance2026
 from backend.common.game_specific.base import (
+    per_robot_points,
     PredictionStatConfig,
+    RobotPointsAccessor,
     safe_div,
     StatAccessor,
     SuccessRateCounter,
@@ -382,6 +384,14 @@ class GameSpecifics2026(
             "Hub Uncounted": lambda match, color: match.score_breakdown[color][
                 "hubScore"
             ].get("uncounted", 0),
+        }
+
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
+        return {
+            "autoTowerPoints": per_robot_points("autoTowerRobot{}", {"Level1": 15}),
+            "endGameTowerPoints": per_robot_points(
+                "endGameTowerRobot{}", {"Level1": 10, "Level2": 20, "Level3": 30}
+            ),
         }
 
     def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
