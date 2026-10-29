@@ -16,7 +16,7 @@ function beforeLoad(q: string | number) {
       .mockResolvedValue(searchIndex),
   } as unknown as QueryClient;
   return Route.options.beforeLoad?.({
-    context: { queryClient },
+    context: { queryClient, currentSeason: 2026 },
     search: { q },
   } as never);
 }

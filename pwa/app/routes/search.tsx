@@ -12,13 +12,17 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute('/search')({
   validateSearch: searchSchema,
-  beforeLoad: async ({ context: { queryClient }, search }) => {
+  beforeLoad: async ({ context: { queryClient, currentSeason }, search }) => {
     const searchIndex = await queryClient.ensureQueryData({
       ...getSearchIndexOptions({}),
       staleTime: STALE_TIME.SEARCH_INDEX,
     });
     // Tanstack may auto-parse '604' to a number, so just stringify it just in case
-    const result = getSearchRedirect(searchIndex, search.q.toString());
+    const result = getSearchRedirect(
+      searchIndex,
+      search.q.toString(),
+      currentSeason,
+    );
 
     // If we found a team or event, redirect to it
     if (result.type === 'team' || result.type === 'event') {

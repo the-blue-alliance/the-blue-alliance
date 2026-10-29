@@ -1,5 +1,5 @@
 import { SearchIndex } from '~/api/tba/read';
-import FuzzysortFilterer from '~/lib/search/fuzzysortFilterer';
+import { siteSearch } from '~/lib/search/siteSearch';
 
 export interface SearchRedirectResult {
   type: 'team' | 'event' | 'no-results';
@@ -10,15 +10,9 @@ export interface SearchRedirectResult {
 export function getSearchRedirect(
   searchIndex: SearchIndex,
   query: string,
+  currentSeason: number,
 ): SearchRedirectResult {
-  const normalizedQuery = query.trim();
-  if (!normalizedQuery) {
-    return { type: 'no-results', query };
-  }
-
-  const top = new FuzzysortFilterer()
-    .filter(searchIndex, normalizedQuery)
-    .at(0);
+  const top = siteSearch(searchIndex, query, currentSeason).at(0);
   return top
     ? { type: top.type, path: top.path, query }
     : { type: 'no-results', query };

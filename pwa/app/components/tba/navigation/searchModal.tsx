@@ -1,5 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { ClientOnly, useNavigate } from '@tanstack/react-router';
+import {
+  ClientOnly,
+  useNavigate,
+  useRouteContext,
+} from '@tanstack/react-router';
 import { cn } from 'cn';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
@@ -27,9 +31,7 @@ import { Kbd, KbdGroup } from '~/components/ui/kbd';
 import { Spinner } from '~/components/ui/spinner';
 import defaultAvatar from '~/images/default-avatar.png';
 import { STALE_TIME } from '~/lib/queryClient';
-import FuzzysortFilterer, {
-  SearchResult,
-} from '~/lib/search/fuzzysortFilterer';
+import { SearchResult, siteSearch } from '~/lib/search/siteSearch';
 
 export function SearchModal() {
   const [open, setOpen] = useState<boolean>(false);
@@ -39,7 +41,7 @@ export function SearchModal() {
     ...getSearchIndexOptions({}),
     staleTime: STALE_TIME.SEARCH_INDEX,
   });
-  const filterer = useMemo(() => new FuzzysortFilterer(), []);
+  const { currentSeason } = useRouteContext({ from: '__root__' });
   const navigate = useNavigate();
   const isMacintosh =
     typeof navigator !== 'undefined'
@@ -47,11 +49,11 @@ export function SearchModal() {
       : false;
 
   const searchResults: SearchResult[] | null = useMemo(() => {
-    if (!searchIndexQuery.data) {
+    if (!open || !searchIndexQuery.data) {
       return null;
     }
-    return filterer.filter(searchIndexQuery.data, query);
-  }, [query, searchIndexQuery.data, filterer]);
+    return siteSearch(searchIndexQuery.data, query, currentSeason);
+  }, [open, query, searchIndexQuery.data, currentSeason]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -76,7 +78,8 @@ export function SearchModal() {
   }, []);
 
   const isIndexPending = searchIndexQuery.isPending && !searchIndexQuery.data;
-  const hasNoResults = searchResults !== null && searchResults.length === 0;
+  const hasNoResults =
+    query.trim() !== '' && searchResults !== null && searchResults.length === 0;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
