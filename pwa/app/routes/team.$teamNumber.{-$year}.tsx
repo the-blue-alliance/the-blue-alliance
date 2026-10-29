@@ -66,6 +66,7 @@ import {
 } from '~/lib/matchUtils';
 import { getEmbedMedia, getImageMedia } from '~/lib/mediaUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
+import { avatarYearForTeamPage } from '~/lib/teamUtils';
 import {
   MODEL_TYPE,
   addRecords,
@@ -193,9 +194,24 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       throw notFound();
     }
 
+    const avatarYear = avatarYearForTeamPage(
+      year,
+      yearsParticipated,
+      currentSeason,
+    );
+    const avatarMediaQuery = queryClient
+      .ensureQueryData({
+        ...getTeamMediaByYearOptions({
+          path: { team_key: teamKey, year: avatarYear },
+        }),
+        staleTime: staleTimeForYear(avatarYear),
+      })
+      .catch(() => []);
+
     await Promise.all([
       // await the earlier queries
       teamMediaQuery,
+      avatarMediaQuery,
       teamSocialsQuery,
       teamMatchesQuery,
       teamStatusesQuery,
@@ -215,6 +231,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     return {
       teamKey,
       year,
+      avatarYear,
       team,
     };
   },
@@ -280,7 +297,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
 // v8 ignore stop
 
 function TeamPage(): React.JSX.Element {
-  const { teamKey, year } = Route.useLoaderData();
+  const { teamKey, year, avatarYear } = Route.useLoaderData();
   const yearStaleTime = staleTimeForYear(year);
 
   const { data: team } = useSuspenseQuery(
@@ -291,6 +308,12 @@ function TeamPage(): React.JSX.Element {
     staleTime: yearStaleTime,
   });
   const media = useMemo(() => mediaQuery.data ?? [], [mediaQuery.data]);
+  const avatarMediaQuery = useQuery({
+    ...getTeamMediaByYearOptions({
+      path: { team_key: teamKey, year: avatarYear },
+    }),
+    staleTime: staleTimeForYear(avatarYear),
+  });
   const socialsQuery = useQuery(
     getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
   );
@@ -476,8 +499,9 @@ function TeamPage(): React.JSX.Element {
   const embedMedia = useMemo(() => getEmbedMedia(media), [media]);
 
   const maybeAvatar = useMemo(
-    () => media.find((m): m is MediaAvatar => m.type === 'avatar'),
-    [media],
+    () =>
+      avatarMediaQuery.data?.find((m): m is MediaAvatar => m.type === 'avatar'),
+    [avatarMediaQuery.data],
   );
 
   const tocItems = useMemo(

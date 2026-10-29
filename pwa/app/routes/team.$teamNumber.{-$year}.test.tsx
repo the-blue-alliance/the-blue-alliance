@@ -34,7 +34,18 @@ describe('team route loader', () => {
   test('loads a year the team competed in', async () => {
     await expect(
       load('2024', { getTeam: team, getTeamYearsParticipated: [2024] }),
-    ).resolves.toEqual({ teamKey: 'frc254', year: 2024, team });
+    ).resolves.toEqual({
+      teamKey: 'frc254',
+      year: 2024,
+      avatarYear: 2024,
+      team,
+    });
+  });
+
+  test('uses the most recent active year for the avatar before 2018', async () => {
+    await expect(
+      load('2015', { getTeam: team, getTeamYearsParticipated: [2015, 2025] }),
+    ).resolves.toMatchObject({ avatarYear: 2025 });
   });
 
   test('throws not-found for an invalid year', async () => {

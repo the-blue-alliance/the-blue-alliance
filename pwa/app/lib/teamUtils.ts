@@ -1,6 +1,21 @@
 import { Team } from '~/api/tba/read';
 import { removeNonNumeric } from '~/lib/utils';
 
+const FIRST_AVATAR_YEAR = 2018;
+
+export function avatarYearForTeamPage(
+  year: number,
+  yearsParticipated: number[] | null,
+  currentSeason: number,
+): number {
+  if (year >= FIRST_AVATAR_YEAR) {
+    return year;
+  }
+  return yearsParticipated?.length
+    ? Math.max(...yearsParticipated)
+    : currentSeason;
+}
+
 export function sortTeamsComparator(a: Team, b: Team) {
   return a.team_number - b.team_number;
 }

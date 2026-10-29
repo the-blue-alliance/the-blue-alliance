@@ -35,6 +35,17 @@ test.describe('/team/1768/2026', () => {
   });
 });
 
+test.describe('/team/604/2015', () => {
+  test('shows the team avatar from a recent year', async ({ page }) => {
+    await page.goto('/team/604/2015');
+    await page.locator('body[data-hydrated]').waitFor();
+
+    await expect(
+      page.getByRole('img', { name: 'Team Avatar', exact: true }),
+    ).toBeVisible();
+  });
+});
+
 test.describe('/team/604/2024', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/team/604/2024');
