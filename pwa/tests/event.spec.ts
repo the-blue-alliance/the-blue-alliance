@@ -223,6 +223,19 @@ test('loads the animated tab indicator when a tab changes', async ({
   expect((await indicatorRequest).url()).toContain('animatedTabIndicator');
 });
 
+test('shows the District Points tab while its data loads', async ({ page }) => {
+  await page.route(/\/district_points/, async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await route.continue();
+  });
+  await page.goto('/event/2026necmp1');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(page.getByRole('tab', { name: 'District Points' })).toBeVisible({
+    timeout: 1000,
+  });
+});
+
 test.describe('/event/2026necmp Media tab', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/event/2026necmp');
