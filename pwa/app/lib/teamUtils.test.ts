@@ -4,10 +4,48 @@ import type { Team } from '~/api/tba/read';
 import {
   attemptToParseSchoolNameFromOldTeamName,
   attemptToParseSponsors,
+  avatarYearForTeamPage,
   sortTeamKeysComparator,
   sortTeams,
   sortTeamsComparator,
 } from '~/lib/teamUtils';
+
+describe('avatarYearForTeamPage', () => {
+  test.each([
+    {
+      name: 'uses the page year for 2018',
+      year: 2018,
+      yearsParticipated: [2015, 2018, 2024],
+      expected: 2018,
+    },
+    {
+      name: 'uses the page year after 2018',
+      year: 2024,
+      yearsParticipated: [2015, 2018, 2026],
+      expected: 2024,
+    },
+    {
+      name: 'uses the most recent active year before 2018',
+      year: 2017,
+      yearsParticipated: [2024, 2015, 2017],
+      expected: 2024,
+    },
+    {
+      name: 'uses the current season when years failed to load',
+      year: 2017,
+      yearsParticipated: null,
+      expected: 2026,
+    },
+    {
+      name: 'uses the current season when the team has no years',
+      year: 2017,
+      yearsParticipated: [],
+      expected: 2026,
+    },
+  ])('$name', ({ year, yearsParticipated, expected }) => {
+    expect(avatarYearForTeamPage(year, yearsParticipated, 2026)).toBe(expected);
+  });
+});
 
 describe('attemptToParseSponsors', () => {
   test('Single school, multiple sponsors', () => {
