@@ -6,7 +6,7 @@ import {
   notFound,
   redirect,
 } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
 import {
@@ -133,39 +133,93 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     const teamDistrictsQuery = queryClient
       .ensureQueryData(getTeamDistrictsOptions({ path: { team_key: teamKey } }))
       .catch(() => []);
-    const remappedRobotsQuery = teamEventsQuery.then((events) =>
-      Promise.all(
-        events.flatMap((e) => {
-          const robots = getRemappedRobots(e, teamKey);
-          if (robots.length === 0) {
-            return [];
+    void teamEventsQuery.then((events) =>
+      events.forEach((e) => {
+        const robots = getRemappedRobots(e, teamKey);
+        if (robots.length === 0) {
+          return;
+        }
+        void queryClient
+          .ensureQueryData({
+            ...getEventMatchesOptions({ path: { event_key: e.key } }),
+            staleTime: yearStaleTime,
+          })
+          .catch(() => undefined);
+        void queryClient
+          .ensureQueryData({
+            ...getEventAwardsOptions({ path: { event_key: e.key } }),
+            staleTime: yearStaleTime,
+          })
+          .catch(() => undefined);
+        robots.forEach((r) => {
+          void queryClient
+            .ensureQueryData({
+              ...getTeamEventStatusOptions({
+                path: { team_key: r.sourceTeamKey, event_key: e.key },
+              }),
+              staleTime: yearStaleTime,
+            })
+            .catch(() => undefined);
+        });
+      }),
+    );
+    void Promise.all([teamEventsQuery, teamDistrictsQuery]).then(
+      ([events, districts]) => {
+        events.forEach((e) => {
+          void queryClient
+            .ensureQueryData({
+              ...getEventAlliancesOptions({ path: { event_key: e.key } }),
+              staleTime: yearStaleTime,
+            })
+            .catch(() => undefined);
+          if (DISTRICT_EVENT_TYPES.has(e.event_type)) {
+            void queryClient
+              .ensureQueryData({
+                ...getEventDistrictPointsOptions({
+                  path: { event_key: e.key },
+                }),
+                staleTime: yearStaleTime,
+              })
+              .catch(() => undefined);
           }
-          return [
-            queryClient
+          if (e.event_type === EventType.REGIONAL) {
+            void queryClient
               .ensureQueryData({
-                ...getEventMatchesOptions({ path: { event_key: e.key } }),
+                ...getRegionalChampsPoolPointsOptions({
+                  path: { event_key: e.key },
+                }),
                 staleTime: yearStaleTime,
               })
-              .catch(() => []),
-            queryClient
-              .ensureQueryData({
-                ...getEventAwardsOptions({ path: { event_key: e.key } }),
-                staleTime: yearStaleTime,
-              })
-              .catch(() => []),
-            ...robots.map((r) =>
-              queryClient
-                .ensureQueryData({
-                  ...getTeamEventStatusOptions({
-                    path: { team_key: r.sourceTeamKey, event_key: e.key },
-                  }),
-                  staleTime: yearStaleTime,
-                })
-                .catch(() => null),
-            ),
-          ];
-        }),
-      ),
+              .catch(() => undefined);
+          }
+        });
+        if (events.some((e) => e.event_type === EventType.REGIONAL)) {
+          void queryClient
+            .ensureQueryData({
+              ...getRegionalAdvancementOptions({ path: { year } }),
+              staleTime: yearStaleTime,
+            })
+            .catch(() => undefined);
+        }
+        const district = districts.find((d) => d.year === year);
+        if (district) {
+          void queryClient
+            .ensureQueryData({
+              ...getDistrictRankingsOptions({
+                path: { district_key: district.key },
+              }),
+              staleTime: yearStaleTime,
+            })
+            .catch(() => undefined);
+        } else {
+          void queryClient
+            .ensureQueryData({
+              ...getRegionalRankingsOptions({ path: { year } }),
+              staleTime: yearStaleTime,
+            })
+            .catch(() => undefined);
+        }
+      },
     );
 
     // these need to be awaited so we can validate the year
@@ -218,7 +272,6 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       teamAwardsQuery,
       teamEventsQuery,
       teamDistrictsQuery,
-      remappedRobotsQuery,
     ]);
 
     const endTime = Temporal.Now.instant().epochMilliseconds;
@@ -303,11 +356,91 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
 
 function TeamPage(): React.JSX.Element {
   const { teamKey, year, avatarYear } = Route.useLoaderData();
-  const yearStaleTime = staleTimeForYear(year);
 
   const { data: team } = useSuspenseQuery(
     getTeamOptions({ path: { team_key: teamKey } }),
   );
+  const yearsParticipatedQuery = useQuery(
+    getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
+  );
+  const yearsParticipated = (yearsParticipatedQuery.data ?? []).toSorted(
+    (a, b) => b - a,
+  );
+  const eventsQuery = useQuery({
+    ...getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
+    staleTime: staleTimeForYear(year),
+  });
+  const sortedEvents = useMemo(
+    () => (eventsQuery.data ?? []).toSorted(sortEventsComparator),
+    [eventsQuery.data],
+  );
+
+  const [inView, setInView] = useState(new Set<string>());
+
+  const tocItems = useMemo(
+    () => [
+      { slug: 'team-info', label: 'Team Info' },
+      ...sortedEvents.map((e) => ({
+        slug: e.key,
+        label: e.short_name?.trim() ? e.short_name : e.name,
+      })),
+    ],
+    [sortedEvents],
+  );
+
+  return (
+    <div className="flex flex-wrap gap-8 lg:flex-nowrap">
+      <TableOfContents tocItems={tocItems} inView={inView}>
+        <YearSelector
+          currentLabel={String(year)}
+          triggerClassName="w-[180px]"
+          options={[
+            {
+              label: 'History',
+              to: `/team/${team.team_number}/history`,
+            },
+            {
+              label: 'Stats',
+              to: `/team/${team.team_number}/stats`,
+            },
+            ...yearsParticipated.map((y) => ({
+              label: String(y),
+              to: `/team/${team.team_number}/${y}`,
+              isCurrent: y === year,
+            })),
+          ]}
+        />
+      </TableOfContents>
+
+      <TeamPageContent
+        team={team}
+        teamKey={teamKey}
+        year={year}
+        avatarYear={avatarYear}
+        sortedEvents={sortedEvents}
+        setInView={setInView}
+      />
+    </div>
+  );
+}
+
+const TeamPageContent = memo(function TeamPageContent({
+  team,
+  teamKey,
+  year,
+  avatarYear,
+  sortedEvents,
+  setInView,
+}: {
+  team: Team;
+  teamKey: string;
+  year: number;
+  avatarYear: number;
+  sortedEvents: Event[];
+  setInView: React.Dispatch<React.SetStateAction<Set<string>>>;
+}): React.JSX.Element {
+  const yearStaleTime = staleTimeForYear(year);
+
   const mediaQuery = useQuery({
     ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
     staleTime: yearStaleTime,
@@ -323,17 +456,6 @@ function TeamPage(): React.JSX.Element {
     getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
   );
   const socials = socialsQuery.data ?? [];
-  const yearsParticipatedQuery = useQuery(
-    getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
-  );
-  const yearsParticipated = (yearsParticipatedQuery.data ?? []).toSorted(
-    (a, b) => b - a,
-  );
-  const eventsQuery = useQuery({
-    ...getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
-    staleTime: yearStaleTime,
-  });
-  const events = useMemo(() => eventsQuery.data ?? [], [eventsQuery.data]);
   const matchesQuery = useQuery({
     ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
     staleTime: yearStaleTime,
@@ -380,7 +502,7 @@ function TeamPage(): React.JSX.Element {
     (r) => r.team_key === teamKey,
   );
 
-  const hasRegionalEvents = events.some(
+  const hasRegionalEvents = sortedEvents.some(
     (e) => e.event_type === EventType.REGIONAL,
   );
 
@@ -392,12 +514,6 @@ function TeamPage(): React.JSX.Element {
 
   const teamRegionalAdvancement: RegionalAdvancement | undefined =
     regionalAdvancement?.[teamKey];
-
-  // sort BEFORE launching queries that depend on it
-  const sortedEvents = useMemo(
-    () => events.toSorted(sortEventsComparator),
-    [events],
-  );
 
   const eventDistrictPtsQueries = useQueries({
     queries: sortedEvents.map((e) => ({
@@ -498,8 +614,6 @@ function TeamPage(): React.JSX.Element {
     });
   });
 
-  const [inView, setInView] = useState(new Set<string>());
-
   const robotPics = useMemo(() => getImageMedia(media), [media]);
   const embedMedia = useMemo(() => getEmbedMedia(media), [media]);
 
@@ -517,139 +631,100 @@ function TeamPage(): React.JSX.Element {
       ),
   );
 
-  const tocItems = useMemo(
-    () => [
-      { slug: 'team-info', label: 'Team Info' },
-      ...sortedEvents.map((e) => ({
-        slug: e.key,
-        label: e.short_name?.trim() ? e.short_name : e.name,
-      })),
-    ],
-    [sortedEvents],
-  );
-
   return (
-    <div className="flex flex-wrap gap-8 lg:flex-nowrap">
-      <TableOfContents tocItems={tocItems} inView={inView}>
-        <YearSelector
-          currentLabel={String(year)}
-          triggerClassName="w-[180px]"
-          options={[
-            {
-              label: 'History',
-              to: `/team/${team.team_number}/history`,
-            },
-            {
-              label: 'Stats',
-              to: `/team/${team.team_number}/stats`,
-            },
-            ...yearsParticipated.map((y) => ({
-              label: String(y),
-              to: `/team/${team.team_number}/${y}`,
-              isCurrent: y === year,
-            })),
-          ]}
-        />
-      </TableOfContents>
-
-      <div className="mt-8 w-full">
-        <TableOfContentsSection id="team-info" setInView={setInView}>
-          <div
-            className="flex flex-wrap justify-center sm:flex-nowrap
-              sm:justify-between"
-          >
-            <div className="flex flex-col justify-between">
-              <div>
-                <TeamPageTeamInfo
-                  team={team}
-                  socials={socials}
-                  maybeAvatar={maybeAvatar}
-                  district={districts.find((d) => d.year === year)}
-                  favoriteButton={
-                    <FavoriteButton
-                      modelKey={teamKey}
-                      modelType={MODEL_TYPE.TEAM}
-                    />
-                  }
-                />
-              </div>
-            </div>
-            <div className="flex-none">
-              <TeamRobotPicsCarousel
-                key={`${teamKey}-${year}`}
-                media={robotPics}
+    <div className="mt-8 w-full">
+      <TableOfContentsSection id="team-info" setInView={setInView}>
+        <div
+          className="flex flex-wrap justify-center sm:flex-nowrap
+            sm:justify-between"
+        >
+          <div className="flex flex-col justify-between">
+            <div>
+              <TeamPageTeamInfo
+                team={team}
+                socials={socials}
+                maybeAvatar={maybeAvatar}
+                district={districts.find((d) => d.year === year)}
+                favoriteButton={
+                  <FavoriteButton
+                    modelKey={teamKey}
+                    modelType={MODEL_TYPE.TEAM}
+                  />
+                }
               />
             </div>
           </div>
+          <div className="flex-none">
+            <TeamRobotPicsCarousel
+              key={`${teamKey}-${year}`}
+              media={robotPics}
+            />
+          </div>
+        </div>
 
-          <StatsSection
-            events={sortedEvents}
-            team={team}
-            matches={matches}
-            year={year}
-            district={currentDistrict}
-            districtRanking={teamDistrictRanking}
-            regionalRanking={teamRegionalRanking}
-            remappedRobots={Object.values(remappedRobotsByEvent).flat()}
-          />
+        <StatsSection
+          events={sortedEvents}
+          team={team}
+          matches={matches}
+          year={year}
+          district={currentDistrict}
+          districtRanking={teamDistrictRanking}
+          regionalRanking={teamRegionalRanking}
+          remappedRobots={Object.values(remappedRobotsByEvent).flat()}
+        />
 
-          {blueBannerAwards.length > 0 && (
-            <>
-              <Separator className="my-4" />
-              <div
-                data-testid="blue-banners"
-                className="flex flex-row justify-around"
-              >
-                <BlueBanners awards={blueBannerAwards} events={sortedEvents} />
-              </div>
-            </>
-          )}
-        </TableOfContentsSection>
+        {blueBannerAwards.length > 0 && (
+          <>
+            <Separator className="my-4" />
+            <div
+              data-testid="blue-banners"
+              className="flex flex-row justify-around"
+            >
+              <BlueBanners awards={blueBannerAwards} events={sortedEvents} />
+            </div>
+          </>
+        )}
+      </TableOfContentsSection>
+
+      <div>
+        <Separator className="mt-4 mb-8" />
+
+        {sortedEvents.map((e) => (
+          <TableOfContentsSection key={e.key} id={e.key} setInView={setInView}>
+            <TeamEventAppearance
+              event={e}
+              matches={matches.filter((m) => m.event_key === e.key)}
+              status={statuses[e.key]}
+              team={team}
+              awards={awards.filter((a) => a.event_key === e.key)}
+              maybeDistrictPoints={eventDistrictPtsQueries[e.key]}
+              maybeRegionalPoolPoints={regionalPoolPtsQueries[e.key]}
+              maybeAlliances={eventAlliancesQueries[e.key]}
+              teamRegionalAdvancement={teamRegionalAdvancement}
+              remappedRobots={remappedRobotsByEvent[e.key]}
+            />
+            <Separator className="my-4" />
+          </TableOfContentsSection>
+        ))}
 
         <div>
-          <Separator className="mt-4 mb-8" />
-
-          {sortedEvents.map((e) => (
-            <TableOfContentsSection
-              key={e.key}
-              id={e.key}
-              setInView={setInView}
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Media</h2>
+            <Link
+              to="/suggest/team/media"
+              search={{ team_key: teamKey, year }}
+              className="text-sm text-muted-foreground underline-offset-4
+                hover:underline"
             >
-              <TeamEventAppearance
-                event={e}
-                matches={matches.filter((m) => m.event_key === e.key)}
-                status={statuses[e.key]}
-                team={team}
-                awards={awards.filter((a) => a.event_key === e.key)}
-                maybeDistrictPoints={eventDistrictPtsQueries[e.key]}
-                maybeRegionalPoolPoints={regionalPoolPtsQueries[e.key]}
-                maybeAlliances={eventAlliancesQueries[e.key]}
-                teamRegionalAdvancement={teamRegionalAdvancement}
-                remappedRobots={remappedRobotsByEvent[e.key]}
-              />
-              <Separator className="my-4" />
-            </TableOfContentsSection>
-          ))}
-
-          <div>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Media</h2>
-              <Link
-                to="/suggest/team/media"
-                search={{ team_key: teamKey, year }}
-                className="text-sm text-muted-foreground underline-offset-4
-                  hover:underline"
-              >
-                Add Media
-              </Link>
-            </div>
-            {embedMedia.length > 0 && <TeamMediaGallery media={media} />}
+              Add Media
+            </Link>
           </div>
+          {embedMedia.length > 0 && <TeamMediaGallery media={media} />}
         </div>
       </div>
     </div>
   );
-}
+});
 
 function StatsSection({
   events,

@@ -138,6 +138,133 @@ describe('team route loader', () => {
         .find(({ _id }) => _id === 'getTeamEventStatus')?.path,
     ).toEqual({ team_key: 'frc9997', event_key: '2026nhmm' });
   });
+
+  test.each(['getEventMatches', 'getEventAlliances'])(
+    'does not wait for %s',
+    async (pendingId) => {
+      const responses: Record<string, unknown> = {
+        getTeam: team,
+        getTeamYearsParticipated: [2026],
+        getTeamEventsByYear: [
+          {
+            key: '2026nhmm',
+            event_type: 99,
+            remap_teams: { frc9997: 'frc254B' },
+          },
+        ],
+      };
+      const ensureQueryData = vi.fn<
+        (options: { queryKey: [{ _id: string }] }) => Promise<unknown>
+      >(({ queryKey }) =>
+        queryKey[0]._id === pendingId
+          ? new Promise(() => {})
+          : Promise.resolve(responses[queryKey[0]._id] ?? []),
+      );
+
+      await expect(
+        runLoader(Route, {
+          params: { teamNumber: '254', year: '2026' },
+          context: {
+            queryClient: { ensureQueryData } as unknown as QueryClient,
+            currentSeason: 2026,
+          },
+        }),
+      ).resolves.toMatchObject({ year: 2026 });
+    },
+  );
+});
+
+describe('team route loader prefetching', () => {
+  async function startedQueries(responses: Record<string, unknown>) {
+    const ensureQueryData = vi.fn<
+      (options: {
+        queryKey: [{ _id: string; path?: Record<string, unknown> }];
+      }) => Promise<unknown>
+    >(({ queryKey }) => Promise.resolve(responses[queryKey[0]._id] ?? []));
+    await runLoader(Route, {
+      params: { teamNumber: '254', year: '2026' },
+      context: {
+        queryClient: { ensureQueryData } as unknown as QueryClient,
+        currentSeason: 2026,
+      },
+    });
+    return ensureQueryData.mock.calls.map(([{ queryKey }]) => ({
+      _id: queryKey[0]._id,
+      path: queryKey[0].path,
+    }));
+  }
+
+  test.each([
+    {
+      name: 'alliances for an offseason event',
+      events: [{ key: '2026cc', event_type: 99 }],
+      districts: [],
+      expected: { _id: 'getEventAlliances', path: { event_key: '2026cc' } },
+    },
+    {
+      name: 'district points for a district event',
+      events: [{ key: '2026nhgrs', event_type: 1 }],
+      districts: [],
+      expected: {
+        _id: 'getEventDistrictPoints',
+        path: { event_key: '2026nhgrs' },
+      },
+    },
+    {
+      name: 'regional pool points for a regional',
+      events: [{ key: '2026casj', event_type: 0 }],
+      districts: [],
+      expected: {
+        _id: 'getRegionalChampsPoolPoints',
+        path: { event_key: '2026casj' },
+      },
+    },
+    {
+      name: 'regional advancement when the team attends a regional',
+      events: [{ key: '2026casj', event_type: 0 }],
+      districts: [],
+      expected: { _id: 'getRegionalAdvancement', path: { year: 2026 } },
+    },
+    {
+      name: 'district rankings for the team district that year',
+      events: [],
+      districts: [
+        { key: '2025ne', year: 2025 },
+        { key: '2026ne', year: 2026 },
+      ],
+      expected: {
+        _id: 'getDistrictRankings',
+        path: { district_key: '2026ne' },
+      },
+    },
+    {
+      name: 'regional rankings when the team has no district that year',
+      events: [],
+      districts: [{ key: '2025ne', year: 2025 }],
+      expected: { _id: 'getRegionalRankings', path: { year: 2026 } },
+    },
+  ])('starts $name', async ({ events, districts, expected }) => {
+    const queries = await startedQueries({
+      getTeam: team,
+      getTeamYearsParticipated: [2026],
+      getTeamEventsByYear: events,
+      getTeamDistricts: districts,
+    });
+
+    expect(queries).toContainEqual(expected);
+  });
+
+  test('skips district points for a regional', async () => {
+    const queries = await startedQueries({
+      getTeam: team,
+      getTeamYearsParticipated: [2026],
+      getTeamEventsByYear: [{ key: '2026casj', event_type: 0 }],
+    });
+
+    expect(queries.map(({ _id }) => _id)).not.toContain(
+      'getEventDistrictPoints',
+    );
+  });
 });
 
 describe('team route head', () => {
