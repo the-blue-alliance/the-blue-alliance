@@ -45,6 +45,7 @@ const SEARCH_INDEX: SearchIndex = {
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => useNavigateMock,
+  useRouteContext: () => ({ currentSeason: 2026 }),
   ClientOnly: ({ children }: { children: ReactNode }) => children,
 }));
 
@@ -209,6 +210,16 @@ describe('SearchModal', () => {
     await openAndType('zzzzzz');
 
     expect(await screen.findByText('No results found.')).toBeTruthy();
+  });
+
+  test('shows no empty-results message before anything is typed', async () => {
+    renderSearchModal();
+    fireEvent.click(screen.getByRole('button', { name: 'Search' }));
+    await waitFor(() =>
+      expect(screen.queryByTestId('search-index-loading')).toBeNull(),
+    );
+
+    expect(screen.queryByText('No results found.')).toBeNull();
   });
 
   test('lists teams and events in one list without section headings', async () => {
