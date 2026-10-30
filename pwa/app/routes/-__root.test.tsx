@@ -135,17 +135,57 @@ describe('root route module setup', () => {
     vi.stubEnv('VITE_TBA_MODERATION_API_BASE_URL', '');
   });
 
-  test('adds the read key to every TBA API request', async () => {
+  test('puts the read key in the URL for browser requests', async () => {
     await loadRoot();
     const onRequest = registered<(request: Request) => Request>(
       clients.read.interceptors.request.use,
     );
-    const request = new Request(
-      'https://www.thebluealliance.com/api/v3/status',
+
+    const sent = onRequest(
+      new Request('https://www.thebluealliance.com/api/v3/team/frc254'),
     );
 
-    expect(onRequest(request)).toBe(request);
-    expect(request.headers.get('X-TBA-Auth-Key')).toBe('read-key');
+    expect(sent.url).toBe(
+      'https://www.thebluealliance.com/api/v3/team/frc254?X-TBA-Auth-Key=read-key',
+    );
+  });
+
+  test('sends no auth header from the browser so CORS skips the preflight', async () => {
+    await loadRoot();
+    const onRequest = registered<(request: Request) => Request>(
+      clients.read.interceptors.request.use,
+    );
+
+    const sent = onRequest(
+      new Request('https://www.thebluealliance.com/api/v3/team/frc254'),
+    );
+
+    expect(sent.headers.get('X-TBA-Auth-Key')).toBeNull();
+  });
+
+  test('sends the read key as a header when rendering on the server', async () => {
+    vi.stubEnv('SSR', true);
+    await loadRoot();
+    const onRequest = registered<(request: Request) => Request>(
+      clients.read.interceptors.request.use,
+    );
+
+    const sent = onRequest(
+      new Request('https://www.thebluealliance.com/api/v3/team/frc254'),
+    );
+
+    expect(sent.headers.get('X-TBA-Auth-Key')).toBe('read-key');
+    expect(sent.url).toBe('https://www.thebluealliance.com/api/v3/team/frc254');
+  });
+
+  test('logs each TBA API request without the read key', async () => {
+    await loadRoot();
+    const onRequest = registered<(request: Request) => Request>(
+      clients.read.interceptors.request.use,
+    );
+
+    onRequest(new Request('https://www.thebluealliance.com/api/v3/status'));
+
     expect(mocks.loggerDebug).toHaveBeenCalledWith(
       {
         method: 'GET',
