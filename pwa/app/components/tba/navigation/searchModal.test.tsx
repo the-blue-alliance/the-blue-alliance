@@ -88,6 +88,40 @@ describe('SearchModal', () => {
     document.body.innerHTML = '';
   });
 
+  test('does not download the search index before search is used', async () => {
+    renderSearchModal();
+
+    await screen.findByRole('button', { name: 'Search' });
+
+    expect(searchIndexMock).not.toHaveBeenCalled();
+  });
+
+  test('downloads the search index when the pointer reaches the search button', async () => {
+    renderSearchModal();
+
+    fireEvent.pointerEnter(
+      screen.getByRole('button', { name: /search teams and events/i }),
+    );
+
+    await waitFor(() => expect(searchIndexMock).toHaveBeenCalledTimes(1));
+  });
+
+  test('downloads the search index when the search button gets focus', async () => {
+    renderSearchModal();
+
+    fireEvent.focus(screen.getByRole('button', { name: 'Search' }));
+
+    await waitFor(() => expect(searchIndexMock).toHaveBeenCalledTimes(1));
+  });
+
+  test('downloads the search index when search opens from the keyboard', async () => {
+    renderSearchModal();
+
+    fireEvent.keyDown(document, { key: 'k', ctrlKey: true });
+
+    await waitFor(() => expect(searchIndexMock).toHaveBeenCalledTimes(1));
+  });
+
   test('focuses the search text box when opened via mouse click', async () => {
     renderSearchModal();
 

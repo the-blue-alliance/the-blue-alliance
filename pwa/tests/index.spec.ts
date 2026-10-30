@@ -236,6 +236,21 @@ test('search trigger stays enabled while search_index is pending', async ({
   releaseSearchIndex();
 });
 
+test('(mobile) loads the page without downloading the search index', async ({
+  page,
+}) => {
+  const requestUrls: string[] = [];
+  page.on('request', (request) => requestUrls.push(request.url()));
+
+  await page.reload();
+  await page.locator('body[data-hydrated]').waitFor();
+  await page.waitForLoadState('networkidle');
+
+  expect(
+    requestUrls.filter((url) => url.includes('/api/v3/search_index')),
+  ).toHaveLength(0);
+});
+
 test('(mobile) opening search focuses the input', async ({ page }) => {
   await page.route('**/api/v3/search_index**', async (route) => {
     await route.fulfill({

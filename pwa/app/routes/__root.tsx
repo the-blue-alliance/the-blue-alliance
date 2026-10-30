@@ -16,10 +16,7 @@ import { z } from 'zod';
 import { client as colorsClient } from '~/api/colors/client.gen';
 import { client as mobileClient } from '~/api/tba/mobile/client.gen';
 import { client as moderationClient } from '~/api/tba/moderation/client.gen';
-import {
-  getSearchIndexOptions,
-  getStatusOptions,
-} from '~/api/tba/read/@tanstack/react-query.gen';
+import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { client } from '~/api/tba/read/client.gen';
 import { AuthContextProvider } from '~/components/tba/auth/auth';
 import { MatchModal } from '~/components/tba/match/matchModal';
@@ -160,15 +157,6 @@ export const Route = createRootRouteWithContext<{
       ...getStatusOptions({}),
       staleTime: STALE_TIME.STATUS,
     });
-    // Kick off /search_index on the client without awaiting so navbar search
-    // is usually ready by first open, without blocking navigations or
-    // dehydrating the large payload into every SSR response (see #10254).
-    if (!import.meta.env.SSR) {
-      void queryClient.prefetchQuery({
-        ...getSearchIndexOptions({}),
-        staleTime: STALE_TIME.SEARCH_INDEX,
-      });
-    }
     return {
       status,
       currentSeason: status.current_season ?? Temporal.Now.plainDateISO().year,
