@@ -106,9 +106,7 @@ describe('EventListTable', () => {
   test('shows the event date range', () => {
     render(<EventListTable events={[makeEvent()]} />);
 
-    expect(screen.getByText('Mar 1 to Mar 3, 2026').textContent).toBe(
-      'Mar 1 to Mar 3, 2026',
-    );
+    expect(screen.getByText('Mar 1–3').textContent).toBe('Mar 1–3');
   });
 
   test('groups divisions after their parent and trims parent name prefixes', () => {

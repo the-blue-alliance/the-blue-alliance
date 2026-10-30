@@ -39,7 +39,7 @@ function Home() {
         </div>
       )}
 
-      <h1 className="mt-5 mb-2.5 text-4xl">This Week&apos;s Events</h1>
+      <h1 className="mt-5 mb-3 text-4xl">This Week&apos;s Events</h1>
       {weekEvents.length > 0 ? (
         <EventListTable events={weekEvents} />
       ) : (
