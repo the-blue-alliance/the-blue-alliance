@@ -8,6 +8,7 @@ import {
   eventSsrTtlSeconds,
   getCurrentWeekEvents,
   getDivisionShortform,
+  getEventCompactDateString,
   getEventDateString,
   getEventNormalizedName,
   getEventWeekString,
@@ -270,6 +271,19 @@ describe('getEventDateString', () => {
       end_date: '2024-04-01',
     };
     expect(getEventDateString(event, 'short')).toEqual('Mar 30 to Apr 1, 2024');
+  });
+});
+
+describe('getEventCompactDateString', () => {
+  test.each([
+    ['one-day event', '2024-03-05', '2024-03-05', 'Mar 5'],
+    ['same-month event', '2024-03-05', '2024-03-08', 'Mar 5–8'],
+    ['cross-month event', '2024-03-30', '2024-04-01', 'Mar 30 – Apr 1'],
+  ])('formats a %s', (_name, start_date, end_date, expected) => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = { start_date, end_date };
+
+    expect(getEventCompactDateString(event)).toEqual(expected);
   });
 });
 

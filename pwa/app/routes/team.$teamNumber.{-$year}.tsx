@@ -639,7 +639,7 @@ const TeamPageContent = memo(function TeamPageContent({
   );
 
   return (
-    <div className="mt-8 w-full">
+    <div className="mt-2 w-full md:mt-8">
       <TableOfContentsSection id="team-info" setInView={setInView}>
         <div
           className="flex flex-wrap justify-center sm:flex-nowrap

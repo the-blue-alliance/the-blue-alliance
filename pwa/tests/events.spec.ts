@@ -29,6 +29,18 @@ test.describe('/events/2025', () => {
     ).toBeVisible();
   });
 
+  test('hides the webcast column (mobile)', async ({ page }) => {
+    await expect(
+      page.getByRole('columnheader', { name: 'Webcast' }),
+    ).toHaveCount(0);
+  });
+
+  test('shows the webcast column on desktop', async ({ page }) => {
+    await expect(
+      page.getByRole('columnheader', { name: 'Webcast' }).first(),
+    ).toBeVisible();
+  });
+
   test('preloads an event team list when its link is hovered', async ({
     page,
   }) => {

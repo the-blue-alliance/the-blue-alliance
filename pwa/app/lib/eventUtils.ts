@@ -147,6 +147,24 @@ export function getEventDateString(event: Event, month: 'long' | 'short') {
   return `${startDateString} to ${endDateString}`;
 }
 
+export function getEventCompactDateString(event: Event) {
+  const startDate = Temporal.PlainDate.from(event.start_date);
+  const endDate = Temporal.PlainDate.from(event.end_date);
+  const monthDay = { month: 'short', day: 'numeric' } as const;
+
+  if (Temporal.PlainDate.compare(startDate, endDate) === 0) {
+    return endDate.toLocaleString('default', monthDay);
+  }
+
+  const startDateString = startDate.toLocaleString('default', monthDay);
+
+  if (startDate.month === endDate.month && startDate.year === endDate.year) {
+    return `${startDateString}–${endDate.day}`;
+  }
+
+  return `${startDateString} – ${endDate.toLocaleString('default', monthDay)}`;
+}
+
 export function getEventWeekString(event: Event) {
   if (event.week === null) {
     return null;

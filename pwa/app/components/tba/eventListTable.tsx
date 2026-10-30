@@ -16,7 +16,7 @@ import {
 } from '~/components/ui/table';
 import { getDistrictColorBorderClass } from '~/lib/districtUtils';
 import {
-  getEventDateString,
+  getEventCompactDateString,
   groupEventsByParent,
   isEventActive,
   stripParentPrefix,
@@ -38,7 +38,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
       <TableHeader>
         <TableRow>
           <TableHead>Event</TableHead>
-          <TableHead>Webcast</TableHead>
+          <TableHead className="hidden md:table-cell">Webcast</TableHead>
           <TableHead>Dates</TableHead>
         </TableRow>
       </TableHeader>
@@ -75,7 +75,9 @@ export default function EventListTable({ events }: { events: Event[] }) {
               )}
             >
               <TableCell
-                className={cn('w-8/12', { 'relative pl-[26px]': isDivision })}
+                className={cn('py-2 md:w-8/12 md:py-1.5', {
+                  'relative pl-[26px]': isDivision,
+                })}
               >
                 {isDivision && districtColor && (
                   <div
@@ -103,7 +105,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
                   </div>
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell className="hidden md:table-cell">
                 {event.webcasts.length > 0 &&
                   (isOnline || withinADay ? (
                     <a
@@ -123,7 +125,9 @@ export default function EventListTable({ events }: { events: Event[] }) {
                     </Button>
                   ))}
               </TableCell>
-              <TableCell>{getEventDateString(event, 'short')}</TableCell>
+              <TableCell className="py-2 whitespace-nowrap md:py-1.5">
+                {getEventCompactDateString(event)}
+              </TableCell>
             </TableRow>
           );
         })}

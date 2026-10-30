@@ -580,7 +580,7 @@ function EventPage() {
   const shouldPreviewDistrictPointsTab = isDistrictEvent && matches.length > 0;
 
   return (
-    <div className="py-8">
+    <div className="py-2 md:py-8">
       <div className="mb-2 flex items-center gap-2">
         <h1 className="text-3xl font-medium">
           {event.name} {event.year}

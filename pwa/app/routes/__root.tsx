@@ -247,7 +247,7 @@ function RootComponent() {
                     <div
                       className={cn(
                         !isFullwidth && 'container',
-                        'flex-1 px-4 text-sm',
+                        'flex-1 px-2 text-sm md:px-4',
                       )}
                     >
                       <div vaul-drawer-wrapper="" className="bg-background">

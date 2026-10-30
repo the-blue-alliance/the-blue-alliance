@@ -278,7 +278,7 @@ export default function TeamEventAppearance({
               ))}
             </Tabs>
           ) : (
-            matchList(tabs[0])
+            <div className="mt-2 md:mt-0">{matchList(tabs[0])}</div>
           )}
         </div>
       </div>
