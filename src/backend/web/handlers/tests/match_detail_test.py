@@ -2,8 +2,12 @@ import json
 
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import CompLevel
+from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.web.handlers.match import (
@@ -228,6 +232,89 @@ def test_render_match_meta_description(web_client: Client, setup_full_match) -> 
     og_desc = soup.find("meta", {"property": "og:description"})
     assert og_desc is not None
     assert og_desc.get("content") == content
+
+
+def test_render_2015_snake_case_score_breakdown(web_client: Client, ndb_stub) -> None:
+    Event(
+        id="2015test",
+        year=2015,
+        name="Test Regional",
+        event_short="test",
+        event_type_enum=0,
+        city="Test City",
+        state_prov="CA",
+        country="USA",
+    ).put()
+
+    alliance = {
+        "robot_set": True,
+        "container_set": False,
+        "tote_set": True,
+        "tote_stack": False,
+        "tote_count_far": 2,
+        "tote_count_near": 4,
+        "container_count_level1": 1,
+        "container_count_level2": 0,
+        "container_count_level3": 0,
+        "container_count_level4": 0,
+        "container_count_level5": 0,
+        "container_count_level6": 0,
+        "litter_count_container": 1,
+        "litter_count_landfill": 2,
+        "litter_count_unprocessed": 0,
+        "foul_count": 1,
+        "auto_points": 10,
+        "tote_points": 24,
+        "container_points": 8,
+        "litter_points": 6,
+        "teleop_points": 38,
+        "adjust_points": 0,
+        "foul_points": 5,
+        "total_points": 43,
+    }
+    Match(
+        id="2015test_qm1",
+        event=ndb.Key(Event, "2015test"),
+        year=2015,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        team_key_names=["frc254", "frc971", "frc1678", "frc118", "frc148", "frc2056"],
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(
+                    teams=["frc254", "frc971", "frc1678"], score=43
+                ),
+                AllianceColor.BLUE: MatchAlliance(
+                    teams=["frc118", "frc148", "frc2056"], score=43
+                ),
+            }
+        ),
+        score_breakdown_json=json.dumps(
+            {
+                "red": alliance,
+                "blue": alliance,
+                "coopertition": "Stack",
+                "coopertition_points": 40,
+            }
+        ),
+    ).put()
+
+    resp = web_client.get("/match/2015test_qm1")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    breakdown = soup.find(id="match-breakdown")
+    assert breakdown is not None
+    text = " ".join(breakdown.stripped_strings)
+    assert "Robot Set" in text
+    assert "Total Auto" in text
+    assert "Coopertition" in text
+    assert "Fouls" in text
+    assert "4" in text  # robot set points
+    assert "10" in text  # auto points
+    assert "40" in text  # coopertition points
+    assert "-5" in text  # foul points
 
 
 def test_schema_org_match_sports_event(web_client: Client, setup_full_match) -> None:

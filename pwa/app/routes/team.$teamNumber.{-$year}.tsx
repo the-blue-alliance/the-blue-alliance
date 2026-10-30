@@ -76,6 +76,8 @@ import {
   publicCacheControlHeaders,
 } from '~/lib/utils';
 
+const FIRST_REGIONAL_POOL_YEAR = 2025;
+
 export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
   loader: async ({ params, context: { queryClient, currentSeason } }) => {
     const startTime = Temporal.Now.instant().epochMilliseconds;
@@ -193,7 +195,10 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
               .catch(() => undefined);
           }
         });
-        if (events.some((e) => e.event_type === EventType.REGIONAL)) {
+        if (
+          year >= FIRST_REGIONAL_POOL_YEAR &&
+          events.some((e) => e.event_type === EventType.REGIONAL)
+        ) {
           void queryClient
             .ensureQueryData({
               ...getRegionalAdvancementOptions({ path: { year } }),
@@ -211,7 +216,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
               staleTime: yearStaleTime,
             })
             .catch(() => undefined);
-        } else {
+        } else if (year >= FIRST_REGIONAL_POOL_YEAR) {
           void queryClient
             .ensureQueryData({
               ...getRegionalRankingsOptions({ path: { year } }),

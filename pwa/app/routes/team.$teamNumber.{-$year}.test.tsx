@@ -175,14 +175,17 @@ describe('team route loader', () => {
 });
 
 describe('team route loader prefetching', () => {
-  async function startedQueries(responses: Record<string, unknown>) {
+  async function startedQueries(
+    responses: Record<string, unknown>,
+    year = '2026',
+  ) {
     const ensureQueryData = vi.fn<
       (options: {
         queryKey: [{ _id: string; path?: Record<string, unknown> }];
       }) => Promise<unknown>
     >(({ queryKey }) => Promise.resolve(responses[queryKey[0]._id] ?? []));
     await runLoader(Route, {
-      params: { teamNumber: '254', year: '2026' },
+      params: { teamNumber: '254', year },
       context: {
         queryClient: { ensureQueryData } as unknown as QueryClient,
         currentSeason: 2026,
@@ -265,6 +268,22 @@ describe('team route loader prefetching', () => {
       'getEventDistrictPoints',
     );
   });
+
+  test.each(['getRegionalAdvancement', 'getRegionalRankings'])(
+    'skips %s before the regional pool existed',
+    async (skippedId) => {
+      const queries = await startedQueries(
+        {
+          getTeam: team,
+          getTeamYearsParticipated: [2024],
+          getTeamEventsByYear: [{ key: '2024casj', event_type: 0 }],
+        },
+        '2024',
+      );
+
+      expect(queries.map(({ _id }) => _id)).not.toContain(skippedId);
+    },
+  );
 });
 
 describe('team route head', () => {
