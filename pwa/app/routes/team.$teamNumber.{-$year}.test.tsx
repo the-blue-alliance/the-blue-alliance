@@ -1,8 +1,43 @@
 import type { QueryClient } from '@tanstack/react-query';
+import { render, screen } from '@testing-library/react';
+import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
+import {
+  AllianceColor,
+  CompLevel,
+  EventType,
+  type Match,
+  type Team,
+} from '~/api/tba/read';
 import { runHead, runLoader } from '~/routes/-testUtils';
-import { Route } from '~/routes/team.$teamNumber.{-$year}';
+import { Route, StatsSection } from '~/routes/team.$teamNumber.{-$year}';
+
+vi.mock('@tanstack/react-router', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@tanstack/react-router')>();
+  return {
+    ...actual,
+    Link: ({
+      children,
+      to,
+      ...props
+    }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
+      children?: ReactNode;
+      to: string;
+    }) => (
+      <a href={to} {...props}>
+        {children}
+      </a>
+    ),
+  };
+});
+
+vi.mock('~/components/tba/links', () => ({
+  DistrictLink: ({ children }: { children: ReactNode }) => (
+    <a href="#district">{children}</a>
+  ),
+}));
 
 const team = {
   key: 'frc254',
@@ -284,6 +319,133 @@ describe('team route loader prefetching', () => {
       expect(queries.map(({ _id }) => _id)).not.toContain(skippedId);
     },
   );
+});
+
+describe('StatsSection', () => {
+  function alliance(score: number, teamKeys: string[]) {
+    return {
+      score,
+      team_keys: teamKeys,
+      surrogate_team_keys: [],
+      dq_team_keys: [],
+    };
+  }
+
+  function makeMatch(overrides: Partial<Match> & { key: string }): Match {
+    return {
+      comp_level: CompLevel.QM,
+      set_number: 1,
+      match_number: 1,
+      alliances: {
+        red: alliance(50, ['frc2791']),
+        blue: alliance(40, ['frc1']),
+      },
+      winning_alliance: AllianceColor.NO_ALLIANCE,
+      event_key: overrides.key.split('_')[0],
+      time: null,
+      actual_time: null,
+      predicted_time: null,
+      post_result_time: null,
+      score_breakdown: null,
+      videos: [],
+      ...overrides,
+    };
+  }
+
+  const team2791 = {
+    key: 'frc2791',
+    team_number: 2791,
+  } as Team;
+
+  const events = [
+    {
+      key: '2015nytr',
+      event_type: EventType.REGIONAL,
+      year: 2015,
+    },
+  ] as Parameters<typeof StatsSection>[0]['events'];
+
+  test('shows 2015 average qual and playoff scores instead of a W-L-T', () => {
+    render(
+      <StatsSection
+        events={events}
+        team={team2791}
+        year={2015}
+        remappedRobots={[]}
+        matches={[
+          makeMatch({
+            key: '2015nytr_qm1',
+            alliances: {
+              red: alliance(44, ['frc2791']),
+              blue: alliance(68, ['frc1']),
+            },
+          }),
+          makeMatch({
+            key: '2015nytr_qm2',
+            match_number: 2,
+            alliances: {
+              red: alliance(114, ['frc2791']),
+              blue: alliance(70, ['frc1']),
+            },
+          }),
+          makeMatch({
+            key: '2015nytr_qf1m1',
+            comp_level: CompLevel.QF,
+            alliances: {
+              red: alliance(49, ['frc2791']),
+              blue: alliance(137, ['frc1']),
+            },
+          }),
+          makeMatch({
+            key: '2015nytr_qf1m2',
+            comp_level: CompLevel.QF,
+            match_number: 2,
+            alliances: {
+              red: alliance(82, ['frc2791']),
+              blue: alliance(137, ['frc1']),
+            },
+          }),
+        ]}
+      />,
+    );
+
+    expect(screen.getByText('79.00')).toBeTruthy();
+    expect(screen.getByText('65.50')).toBeTruthy();
+    expect(screen.getByText(/Overall, Team 2791 had/)).toBeTruthy();
+    expect(screen.queryByText(/0-0-/)).toBeNull();
+  });
+
+  test('keeps W-L-T summaries for non-2015 seasons', () => {
+    render(
+      <StatsSection
+        events={
+          [
+            {
+              key: '2024nytr',
+              event_type: EventType.REGIONAL,
+              year: 2024,
+            },
+          ] as Parameters<typeof StatsSection>[0]['events']
+        }
+        team={team2791}
+        year={2024}
+        remappedRobots={[]}
+        matches={[
+          makeMatch({
+            key: '2024nytr_qm1',
+            alliances: {
+              red: alliance(100, ['frc2791']),
+              blue: alliance(80, ['frc1']),
+            },
+            winning_alliance: AllianceColor.RED,
+          }),
+        ]}
+      />,
+    );
+
+    expect(screen.getByText('1-0')).toBeTruthy();
+    expect(screen.queryByText(/average qual score/)).toBeNull();
+  });
 });
 
 describe('team route head', () => {

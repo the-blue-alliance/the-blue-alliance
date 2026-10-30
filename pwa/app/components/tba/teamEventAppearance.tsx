@@ -31,7 +31,10 @@ import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { getEventDateString, getEventWeekString } from '~/lib/eventUtils';
 import {
+  type TeamAvgScore,
+  calculateTeamAvgScore,
   calculateTeamRecordsFromMatches,
+  formatAvgScore,
   sortMatchComparator,
 } from '~/lib/matchUtils';
 import { addRecords, hasAnyMatches } from '~/lib/utils';
@@ -95,6 +98,23 @@ export function getTeamEventRecord(
   const { quals, playoff } = calculateTeamRecordsFromMatches(teamKey, matches);
   const record = addRecords(quals, playoff);
   return hasAnyMatches(record) ? record : undefined;
+}
+
+export function getTeamEventAvgScore(
+  event: Event,
+  teamKey: string,
+  matches: Match[],
+): TeamAvgScore | undefined {
+  if (event.year !== 2015) {
+    return undefined;
+  }
+  const avg = calculateTeamAvgScore(teamKey, matches);
+  // Event appearance only surfaces qual averages; playoff averages stay on the
+  // season summary so the compact stats row does not grow for 2015.
+  if (avg.qualAvg === null) {
+    return undefined;
+  }
+  return { qualAvg: avg.qualAvg, playoffAvg: null };
 }
 
 function Section({
@@ -283,14 +303,16 @@ export function TeamEventRecord({
   teamKey,
   status,
   record,
+  avgScore,
 }: {
   event: Event;
   teamKey: string;
   status: TeamEventStatus | null;
   record: WltRecord | undefined;
+  avgScore?: TeamAvgScore;
 }) {
   const rank = status?.qual?.ranking?.rank;
-  if (!rank && !record) {
+  if (!rank && !record && !avgScore) {
     return null;
   }
   const rankingPoints = getTotalRankingPoints(event, status);
@@ -311,6 +333,9 @@ export function TeamEventRecord({
           value={`${record.wins}-${record.losses}-${record.ties}`}
           sub={rankingPoints === undefined ? undefined : `${rankingPoints} RP`}
         />
+      )}
+      {avgScore?.qualAvg != null && (
+        <StatChip label="Avg Qual" value={formatAvgScore(avgScore.qualAvg)} />
       )}
     </div>
   );
@@ -339,6 +364,7 @@ export function TeamStatus({
 }) {
   const hasRank = status?.qual?.ranking?.rank;
   const record = getTeamEventRecord(event, teamKey, matches);
+  const avgScore = getTeamEventAvgScore(event, teamKey, matches);
   const hasAlliance =
     status?.alliance && maybeAlliances && maybeAlliances.length > 0;
   const hasAwards = awards.length > 0;
@@ -351,8 +377,8 @@ export function TeamStatus({
 
   const sections = [];
 
-  // Stats row (rank + record)
-  if (hasRank || record) {
+  // Stats row (rank + record, or 2015 average scores)
+  if (hasRank || record || avgScore) {
     sections.push(
       <TeamEventRecord
         key="stats"
@@ -360,6 +386,7 @@ export function TeamStatus({
         teamKey={teamKey}
         status={status}
         record={record}
+        avgScore={avgScore}
       />,
     );
   }

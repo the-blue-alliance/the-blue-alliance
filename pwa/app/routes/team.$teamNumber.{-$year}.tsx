@@ -62,7 +62,9 @@ import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { getRemappedRobots, sortEventsComparator } from '~/lib/eventUtils';
 import {
   calculateRobotsRecord,
+  calculateTeamAvgScore,
   calculateTeamRecordsFromMatches,
+  formatAvgScore,
 } from '~/lib/matchUtils';
 import { getEmbedMedia, getImageMedia } from '~/lib/mediaUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
@@ -731,7 +733,7 @@ const TeamPageContent = memo(function TeamPageContent({
   );
 });
 
-function StatsSection({
+export function StatsSection({
   events,
   team,
   matches,
@@ -794,7 +796,21 @@ function StatsSection({
   );
   const hasUnofficialMatches = hasAnyMatches(unofficialRecord);
 
+  const yearAvgScore = useMemo(
+    () => (year === 2015 ? calculateTeamAvgScore(team.key, matches) : null),
+    [year, team.key, matches],
+  );
+
   if (matches.length === 0) {
+    return null;
+  }
+
+  if (
+    year === 2015 &&
+    yearAvgScore &&
+    yearAvgScore.qualAvg === null &&
+    yearAvgScore.playoffAvg === null
+  ) {
     return null;
   }
 
@@ -802,25 +818,54 @@ function StatsSection({
     <>
       <Separator className="my-4" />
       <div className="">
-        Team {team.team_number} was{' '}
-        <span className="font-semibold">
-          {officialRecord.wins}-{officialRecord.losses}
-          {officialRecord.ties > 0 ? `-${officialRecord.ties}` : ''}
-        </span>{' '}
-        {hasUnofficialMatches ? (
+        {year === 2015 && yearAvgScore ? (
           <>
-            in official play and{' '}
-            <span className="font-semibold">
-              {officialRecord.wins + unofficialRecord.wins}-
-              {officialRecord.losses + unofficialRecord.losses}
-              {officialRecord.ties + unofficialRecord.ties > 0
-                ? `-${officialRecord.ties + unofficialRecord.ties}`
-                : ''}
-            </span>{' '}
-            overall in {year}.
+            Overall, Team {team.team_number} had
+            {yearAvgScore.qualAvg !== null && (
+              <>
+                {' '}
+                an average qual score of{' '}
+                <span className="font-semibold">
+                  {formatAvgScore(yearAvgScore.qualAvg)}
+                </span>
+              </>
+            )}
+            {yearAvgScore.qualAvg !== null &&
+              yearAvgScore.playoffAvg !== null && <> and</>}
+            {yearAvgScore.playoffAvg !== null && (
+              <>
+                {' '}
+                an average playoff score of{' '}
+                <span className="font-semibold">
+                  {formatAvgScore(yearAvgScore.playoffAvg)}
+                </span>
+              </>
+            )}{' '}
+            in {year}.
           </>
         ) : (
-          <>overall in {year}.</>
+          <>
+            Team {team.team_number} was{' '}
+            <span className="font-semibold">
+              {officialRecord.wins}-{officialRecord.losses}
+              {officialRecord.ties > 0 ? `-${officialRecord.ties}` : ''}
+            </span>{' '}
+            {hasUnofficialMatches ? (
+              <>
+                in official play and{' '}
+                <span className="font-semibold">
+                  {officialRecord.wins + unofficialRecord.wins}-
+                  {officialRecord.losses + unofficialRecord.losses}
+                  {officialRecord.ties + unofficialRecord.ties > 0
+                    ? `-${officialRecord.ties + unofficialRecord.ties}`
+                    : ''}
+                </span>{' '}
+                overall in {year}.
+              </>
+            ) : (
+              <>overall in {year}.</>
+            )}
+          </>
         )}
         {district && districtRanking && (
           <>
