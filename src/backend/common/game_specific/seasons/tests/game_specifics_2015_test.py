@@ -10,12 +10,14 @@ def test_ranking_sort_order_info() -> None:
 
 def test_valid_score_breakdown_keys() -> None:
     keys = GameSpecifics2015().valid_score_breakdown_keys()
-    assert "coopertition_points" in keys
-    assert "auto_points" in keys
-    assert "container_points" in keys
-    assert "tote_points" in keys
-    assert "litter_points" in keys
-    assert "foul_points" in keys
+    assert "autoPoints" in keys
+    assert "containerPoints" in keys
+    assert "totePoints" in keys
+    assert "litterPoints" in keys
+    assert "foulPoints" in keys
+    assert "totalPoints" in keys
+    assert "robotSet" in keys
+    assert "containerCountLevel1" in keys
 
 
 def test_tiebreak_criteria_empty() -> None:

@@ -3,10 +3,6 @@ import type { ColumnVisibilityState } from '@tanstack/react-table';
 import type { EventCoprs, EventOprs } from '~/api/tba/read';
 
 export function getDefaultTeleopComponentName(year: number): string {
-  if (year == 2015) {
-    return 'teleop_points';
-  }
-
   if (year < 2026) {
     return 'teleopPoints';
   }
@@ -15,10 +11,6 @@ export function getDefaultTeleopComponentName(year: number): string {
 }
 
 export function getDefaultAutoComponentName(year: number): string {
-  if (year == 2015) {
-    return 'auto_points';
-  }
-
   if (year < 2026) {
     return 'autoPoints';
   }
@@ -26,11 +18,7 @@ export function getDefaultAutoComponentName(year: number): string {
   return 'totalAutoPoints';
 }
 
-export function getDefaultTotalComponentName(year: number): string {
-  if (year == 2015) {
-    return 'total_points';
-  }
-
+export function getDefaultTotalComponentName(_year: number): string {
   return 'totalPoints';
 }
 

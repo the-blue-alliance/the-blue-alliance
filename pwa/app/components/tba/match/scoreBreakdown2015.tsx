@@ -22,40 +22,38 @@ export default function ScoreBreakdown2015({
       {/* Robot Set */}
       <ScoreBreakdownRow
         blueValue={
-          scoreBreakdown.blue.robot_set ? AUTO_ROBOT_SET_2015_POINTS : 0
+          scoreBreakdown.blue.robotSet ? AUTO_ROBOT_SET_2015_POINTS : 0
         }
-        redValue={scoreBreakdown.red.robot_set ? AUTO_ROBOT_SET_2015_POINTS : 0}
+        redValue={scoreBreakdown.red.robotSet ? AUTO_ROBOT_SET_2015_POINTS : 0}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          {scoreBreakdown.red.robot_set ? AUTO_ROBOT_SET_2015_POINTS : 0}
+          {scoreBreakdown.red.robotSet ? AUTO_ROBOT_SET_2015_POINTS : 0}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Robot Set
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          {scoreBreakdown.blue.robot_set ? AUTO_ROBOT_SET_2015_POINTS : 0}
+          {scoreBreakdown.blue.robotSet ? AUTO_ROBOT_SET_2015_POINTS : 0}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Container Set */}
       <ScoreBreakdownRow
         blueValue={
-          scoreBreakdown.blue.container_set ? AUTO_CONTAINER_SET_2015_POINTS : 0
+          scoreBreakdown.blue.containerSet ? AUTO_CONTAINER_SET_2015_POINTS : 0
         }
         redValue={
-          scoreBreakdown.red.container_set ? AUTO_CONTAINER_SET_2015_POINTS : 0
+          scoreBreakdown.red.containerSet ? AUTO_CONTAINER_SET_2015_POINTS : 0
         }
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          {scoreBreakdown.red.container_set
-            ? AUTO_CONTAINER_SET_2015_POINTS
-            : 0}
+          {scoreBreakdown.red.containerSet ? AUTO_CONTAINER_SET_2015_POINTS : 0}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Container Set
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          {scoreBreakdown.blue.container_set
+          {scoreBreakdown.blue.containerSet
             ? AUTO_CONTAINER_SET_2015_POINTS
             : 0}
         </ScoreBreakdownAllianceCell>
@@ -63,39 +61,37 @@ export default function ScoreBreakdown2015({
 
       {/* Tote Set */}
       <ScoreBreakdownRow
-        blueValue={scoreBreakdown.blue.tote_set ? AUTO_TOTE_SET_2015_POINTS : 0}
-        redValue={scoreBreakdown.red.tote_set ? AUTO_TOTE_SET_2015_POINTS : 0}
+        blueValue={scoreBreakdown.blue.toteSet ? AUTO_TOTE_SET_2015_POINTS : 0}
+        redValue={scoreBreakdown.red.toteSet ? AUTO_TOTE_SET_2015_POINTS : 0}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          {scoreBreakdown.red.tote_set ? AUTO_TOTE_SET_2015_POINTS : 0}
+          {scoreBreakdown.red.toteSet ? AUTO_TOTE_SET_2015_POINTS : 0}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Tote Set
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          {scoreBreakdown.blue.tote_set ? AUTO_TOTE_SET_2015_POINTS : 0}
+          {scoreBreakdown.blue.toteSet ? AUTO_TOTE_SET_2015_POINTS : 0}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Stacked Tote Set */}
       <ScoreBreakdownRow
         blueValue={
-          scoreBreakdown.blue.tote_stack ? AUTO_STACKED_TOTE_SET_2015_POINTS : 0
+          scoreBreakdown.blue.toteStack ? AUTO_STACKED_TOTE_SET_2015_POINTS : 0
         }
         redValue={
-          scoreBreakdown.red.tote_stack ? AUTO_STACKED_TOTE_SET_2015_POINTS : 0
+          scoreBreakdown.red.toteStack ? AUTO_STACKED_TOTE_SET_2015_POINTS : 0
         }
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          {scoreBreakdown.red.tote_stack
-            ? AUTO_STACKED_TOTE_SET_2015_POINTS
-            : 0}
+          {scoreBreakdown.red.toteStack ? AUTO_STACKED_TOTE_SET_2015_POINTS : 0}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Stacked Tote Set
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          {scoreBreakdown.blue.tote_stack
+          {scoreBreakdown.blue.toteStack
             ? AUTO_STACKED_TOTE_SET_2015_POINTS
             : 0}
         </ScoreBreakdownAllianceCell>
@@ -103,113 +99,113 @@ export default function ScoreBreakdown2015({
 
       {/* Total Auto */}
       <ScoreBreakdownRow
-        blueValue={scoreBreakdown.blue.auto_points ?? 0}
-        redValue={scoreBreakdown.red.auto_points ?? 0}
+        blueValue={scoreBreakdown.blue.autoPoints ?? 0}
+        redValue={scoreBreakdown.red.autoPoints ?? 0}
       >
         <ScoreBreakdownAllianceCell color="red" shade="dark">
-          {scoreBreakdown.red.auto_points}
+          {scoreBreakdown.red.autoPoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="dark">
           Total Auto
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="dark">
-          {scoreBreakdown.blue.auto_points}
+          {scoreBreakdown.blue.autoPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Tote Points */}
       <ScoreBreakdownRow
-        blueValue={scoreBreakdown.blue.tote_points ?? 0}
-        redValue={scoreBreakdown.red.tote_points ?? 0}
+        blueValue={scoreBreakdown.blue.totePoints ?? 0}
+        redValue={scoreBreakdown.red.totePoints ?? 0}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          {scoreBreakdown.red.tote_points}
+          {scoreBreakdown.red.totePoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Tote Points
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          {scoreBreakdown.blue.tote_points}
+          {scoreBreakdown.blue.totePoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Container Points */}
       <ScoreBreakdownRow
-        blueValue={scoreBreakdown.blue.container_points ?? 0}
-        redValue={scoreBreakdown.red.container_points ?? 0}
+        blueValue={scoreBreakdown.blue.containerPoints ?? 0}
+        redValue={scoreBreakdown.red.containerPoints ?? 0}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          {scoreBreakdown.red.container_points}
+          {scoreBreakdown.red.containerPoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Container Points
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          {scoreBreakdown.blue.container_points}
+          {scoreBreakdown.blue.containerPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Litter Points */}
       <ScoreBreakdownRow
-        blueValue={scoreBreakdown.blue.litter_points ?? 0}
-        redValue={scoreBreakdown.red.litter_points ?? 0}
+        blueValue={scoreBreakdown.blue.litterPoints ?? 0}
+        redValue={scoreBreakdown.red.litterPoints ?? 0}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          {scoreBreakdown.red.litter_points}
+          {scoreBreakdown.red.litterPoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Litter Points
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          {scoreBreakdown.blue.litter_points}
+          {scoreBreakdown.blue.litterPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Total Teleop */}
       <ScoreBreakdownRow
-        blueValue={scoreBreakdown.blue.teleop_points ?? 0}
-        redValue={scoreBreakdown.red.teleop_points ?? 0}
+        blueValue={scoreBreakdown.blue.teleopPoints ?? 0}
+        redValue={scoreBreakdown.red.teleopPoints ?? 0}
       >
         <ScoreBreakdownAllianceCell color="red" shade="dark">
-          {scoreBreakdown.red.teleop_points}
+          {scoreBreakdown.red.teleopPoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="dark">
           Total Teleop
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="dark">
-          {scoreBreakdown.blue.teleop_points}
+          {scoreBreakdown.blue.teleopPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Foul Points */}
       <ScoreBreakdownRow
-        blueValue={scoreBreakdown.blue.foul_points ?? 0}
-        redValue={scoreBreakdown.red.foul_points ?? 0}
+        blueValue={scoreBreakdown.blue.foulPoints ?? 0}
+        redValue={scoreBreakdown.red.foulPoints ?? 0}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          {scoreBreakdown.red.foul_points}
+          {scoreBreakdown.red.foulPoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Foul Points
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          {scoreBreakdown.blue.foul_points}
+          {scoreBreakdown.blue.foulPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Total Score */}
       <ScoreBreakdownRow
-        blueValue={scoreBreakdown.blue.total_points ?? 0}
-        redValue={scoreBreakdown.red.total_points ?? 0}
+        blueValue={scoreBreakdown.blue.totalPoints ?? 0}
+        redValue={scoreBreakdown.red.totalPoints ?? 0}
       >
         <ScoreBreakdownAllianceCell color="red" shade="dark">
-          {scoreBreakdown.red.total_points}
+          {scoreBreakdown.red.totalPoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="dark">
           Total Score
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="dark">
-          {scoreBreakdown.blue.total_points}
+          {scoreBreakdown.blue.totalPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
     </ScoreBreakdownTable>

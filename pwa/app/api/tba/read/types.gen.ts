@@ -1887,37 +1887,38 @@ export type Match = {
 export type MatchScoreBreakdown2015 = {
   blue: MatchScoreBreakdown2015Alliance;
   red: MatchScoreBreakdown2015Alliance;
-  coopertition: 'None' | 'Unknown' | 'Stack';
-  coopertition_points: number;
+  coopertition: 'None' | 'Unknown' | 'Stack' | 'Set';
+  /**
+   * Present when coopertition points were awarded; omitted otherwise.
+   */
+  coopertition_points?: number;
 };
 
 export type MatchScoreBreakdown2015Alliance = {
-  auto?: string | null;
-  auto_points?: number | null;
-  teleop_points?: number;
-  container_points?: number;
-  tote_points?: number;
-  litter_points?: number;
-  foul?: string | null;
-  foul_points?: number | null;
-  adjust_points?: number;
-  total_points?: number;
-  foul_count?: number;
-  tote_count_far?: number;
-  tote_count_near?: number;
-  tote_set?: boolean;
-  tote_stack?: boolean;
-  container_count_level1?: number;
-  container_count_level2?: number;
-  container_count_level3?: number;
-  container_count_level4?: number;
-  container_count_level5?: number;
-  container_count_level6?: number;
-  container_set?: boolean;
-  litter_count_container?: number;
-  litter_count_landfill?: number;
-  litter_count_unprocessed?: number;
-  robot_set?: boolean;
+  robotSet: boolean;
+  containerSet: boolean;
+  toteSet: boolean;
+  toteStack: boolean;
+  toteCountFar: number;
+  toteCountNear: number;
+  containerCountLevel1: number;
+  containerCountLevel2: number;
+  containerCountLevel3: number;
+  containerCountLevel4: number;
+  containerCountLevel5: number;
+  containerCountLevel6: number;
+  litterCountContainer: number;
+  litterCountLandfill: number;
+  litterCountUnprocessed: number;
+  foulCount: number;
+  autoPoints: number;
+  totePoints: number;
+  containerPoints: number;
+  litterPoints: number;
+  teleopPoints: number;
+  adjustPoints: number;
+  foulPoints: number;
+  totalPoints: number;
 };
 
 /**

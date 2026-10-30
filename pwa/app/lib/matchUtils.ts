@@ -175,18 +175,6 @@ function getMaybeUnpenalizedScores(m: Match): { blue: number; red: number } {
     return { blue: m.alliances.blue.score, red: m.alliances.red.score };
   }
 
-  // 2015 used snake_case
-  if (
-    'foul_points' in m.score_breakdown.red &&
-    'foul_points' in m.score_breakdown.blue
-  ) {
-    return {
-      blue: m.alliances.blue.score - (m.score_breakdown.blue.foul_points ?? 0),
-      red: m.alliances.red.score - (m.score_breakdown.red.foul_points ?? 0),
-    };
-  }
-
-  // 2016+ uses camelCase
   if (
     'foulPoints' in m.score_breakdown.red &&
     'foulPoints' in m.score_breakdown.blue
@@ -412,20 +400,6 @@ export function getMatchScoreWithoutAdjustPoints(match: Match): {
       blueScore:
         match.alliances.blue.score -
         (match.score_breakdown.blue.adjustPoints ?? 0),
-    };
-  }
-  if (
-    match.score_breakdown &&
-    'adjust_points' in match.score_breakdown.red &&
-    'adjust_points' in match.score_breakdown.blue
-  ) {
-    return {
-      redScore:
-        match.alliances.red.score -
-        (match.score_breakdown.red.adjust_points ?? 0),
-      blueScore:
-        match.alliances.blue.score -
-        (match.score_breakdown.blue.adjust_points ?? 0),
     };
   }
   return {

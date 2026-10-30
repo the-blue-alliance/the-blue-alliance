@@ -19,30 +19,30 @@ function makeAlliance(
   overrides: Partial<MatchScoreBreakdown2015Alliance> = {},
 ): MatchScoreBreakdown2015Alliance {
   return {
-    auto_points: 20,
-    teleop_points: 90,
-    container_points: 48,
-    tote_points: 24,
-    litter_points: 18,
-    foul_points: 6,
-    adjust_points: 0,
-    total_points: 116,
-    foul_count: 1,
-    tote_count_far: 6,
-    tote_count_near: 6,
-    tote_set: true,
-    tote_stack: false,
-    container_count_level1: 0,
-    container_count_level2: 0,
-    container_count_level3: 0,
-    container_count_level4: 3,
-    container_count_level5: 0,
-    container_count_level6: 3,
-    container_set: true,
-    litter_count_container: 3,
-    litter_count_landfill: 4,
-    litter_count_unprocessed: 2,
-    robot_set: true,
+    autoPoints: 20,
+    teleopPoints: 90,
+    containerPoints: 48,
+    totePoints: 24,
+    litterPoints: 18,
+    foulPoints: 6,
+    adjustPoints: 0,
+    totalPoints: 116,
+    foulCount: 1,
+    toteCountFar: 6,
+    toteCountNear: 6,
+    toteSet: true,
+    toteStack: false,
+    containerCountLevel1: 0,
+    containerCountLevel2: 0,
+    containerCountLevel3: 0,
+    containerCountLevel4: 3,
+    containerCountLevel5: 0,
+    containerCountLevel6: 3,
+    containerSet: true,
+    litterCountContainer: 3,
+    litterCountLandfill: 4,
+    litterCountUnprocessed: 2,
+    robotSet: true,
     ...overrides,
   };
 }
@@ -56,7 +56,7 @@ function makeBreakdown(
     blue: makeAlliance(blue),
     coopertition: 'Stack',
     coopertition_points: 40,
-  } as MatchScoreBreakdown2015;
+  };
 }
 
 function rowCells(label: string): string[] {
@@ -71,10 +71,10 @@ function rowCells(label: string): string[] {
 
 describe('ScoreBreakdown2015', () => {
   test.each([
-    { label: 'Robot Set', field: 'robot_set' as const, points: '4' },
-    { label: 'Container Set', field: 'container_set' as const, points: '8' },
-    { label: 'Tote Set', field: 'tote_set' as const, points: '6' },
-    { label: 'Stacked Tote Set', field: 'tote_stack' as const, points: '20' },
+    { label: 'Robot Set', field: 'robotSet' as const, points: '4' },
+    { label: 'Container Set', field: 'containerSet' as const, points: '8' },
+    { label: 'Tote Set', field: 'toteSet' as const, points: '6' },
+    { label: 'Stacked Tote Set', field: 'toteStack' as const, points: '20' },
   ])(
     'awards $points points for $label when achieved and 0 when not',
     ({ label, field, points }) => {
@@ -92,8 +92,8 @@ describe('ScoreBreakdown2015', () => {
     render(
       <ScoreBreakdown2015
         scoreBreakdown={makeBreakdown(
-          { robot_set: undefined },
-          { robot_set: undefined },
+          { robotSet: undefined },
+          { robotSet: undefined },
         )}
       />,
     );
@@ -102,13 +102,13 @@ describe('ScoreBreakdown2015', () => {
   });
 
   test.each([
-    { label: 'Total Auto', field: 'auto_points' as const },
-    { label: 'Tote Points', field: 'tote_points' as const },
-    { label: 'Container Points', field: 'container_points' as const },
-    { label: 'Litter Points', field: 'litter_points' as const },
-    { label: 'Total Teleop', field: 'teleop_points' as const },
-    { label: 'Foul Points', field: 'foul_points' as const },
-    { label: 'Total Score', field: 'total_points' as const },
+    { label: 'Total Auto', field: 'autoPoints' as const },
+    { label: 'Tote Points', field: 'totePoints' as const },
+    { label: 'Container Points', field: 'containerPoints' as const },
+    { label: 'Litter Points', field: 'litterPoints' as const },
+    { label: 'Total Teleop', field: 'teleopPoints' as const },
+    { label: 'Foul Points', field: 'foulPoints' as const },
+    { label: 'Total Score', field: 'totalPoints' as const },
   ])('shows each alliance value for $label', ({ label, field }) => {
     render(
       <ScoreBreakdown2015
@@ -123,8 +123,8 @@ describe('ScoreBreakdown2015', () => {
     render(
       <ScoreBreakdown2015
         scoreBreakdown={makeBreakdown(
-          { total_points: 100 },
-          { total_points: 140 },
+          { totalPoints: 100 },
+          { totalPoints: 140 },
         )}
       />,
     );
@@ -136,13 +136,13 @@ describe('ScoreBreakdown2015', () => {
   });
 
   test.each([
-    { label: 'Total Auto', field: 'auto_points' as const },
-    { label: 'Tote Points', field: 'tote_points' as const },
-    { label: 'Container Points', field: 'container_points' as const },
-    { label: 'Litter Points', field: 'litter_points' as const },
-    { label: 'Total Teleop', field: 'teleop_points' as const },
-    { label: 'Foul Points', field: 'foul_points' as const },
-    { label: 'Total Score', field: 'total_points' as const },
+    { label: 'Total Auto', field: 'autoPoints' as const },
+    { label: 'Tote Points', field: 'totePoints' as const },
+    { label: 'Container Points', field: 'containerPoints' as const },
+    { label: 'Litter Points', field: 'litterPoints' as const },
+    { label: 'Total Teleop', field: 'teleopPoints' as const },
+    { label: 'Foul Points', field: 'foulPoints' as const },
+    { label: 'Total Score', field: 'totalPoints' as const },
   ])(
     'shows no arrow when $label is missing on both sides',
     ({ label, field }) => {

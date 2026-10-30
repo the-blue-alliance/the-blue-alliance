@@ -1,68 +1,68 @@
 <table class="match-table">
   <tbody>
-    {% if "robot_set" in match.score_breakdown.red %}
+    {% if "robotSet" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{% if match.score_breakdown.red.robot_set %}4{% else %}0{% endif %}</td>
+      <td class="red">{% if match.score_breakdown.red.robotSet %}4{% else %}0{% endif %}</td>
       <td>Robot Set</td>
-      <td class="blue">{% if match.score_breakdown.blue.robot_set %}4{% else %}0{% endif %}</td>
+      <td class="blue">{% if match.score_breakdown.blue.robotSet %}4{% else %}0{% endif %}</td>
     </tr>
     {% endif %}
-    {% if "container_set" in match.score_breakdown.red %}
+    {% if "containerSet" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{% if match.score_breakdown.red.container_set %}8{% else %}0{% endif %}</td>
+      <td class="red">{% if match.score_breakdown.red.containerSet %}8{% else %}0{% endif %}</td>
       <td>Container Set</td>
-      <td class="blue">{% if match.score_breakdown.blue.container_set %}8{% else %}0{% endif %}</td>
+      <td class="blue">{% if match.score_breakdown.blue.containerSet %}8{% else %}0{% endif %}</td>
     </tr>
     {% endif %}
-    {% if "tote_set" in match.score_breakdown.red %}
+    {% if "toteSet" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{% if match.score_breakdown.red.tote_set %}6{% else %}0{% endif %}</td>
+      <td class="red">{% if match.score_breakdown.red.toteSet %}6{% else %}0{% endif %}</td>
       <td>Tote Set</td>
-      <td class="blue">{% if match.score_breakdown.blue.tote_set %}6{% else %}0{% endif %}</td>
+      <td class="blue">{% if match.score_breakdown.blue.toteSet %}6{% else %}0{% endif %}</td>
     </tr>
     {% endif %}
-    {% if "tote_stack" in match.score_breakdown.red %}
+    {% if "toteStack" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{% if match.score_breakdown.red.tote_stack %}20{% else %}0{% endif %}</td>
+      <td class="red">{% if match.score_breakdown.red.toteStack %}20{% else %}0{% endif %}</td>
       <td>Tote Stack</td>
-      <td class="blue">{% if match.score_breakdown.blue.tote_stack %}20{% else %}0{% endif %}</td>
+      <td class="blue">{% if match.score_breakdown.blue.toteStack %}20{% else %}0{% endif %}</td>
     </tr>
     {% endif %}
-    {% if "auto_points" in match.score_breakdown.red %}
+    {% if "autoPoints" in match.score_breakdown.red %}
     <tr class="key">
-      <td class="redScore">{{match.score_breakdown.red.auto_points}}</td>
+      <td class="redScore">{{match.score_breakdown.red.autoPoints}}</td>
       <th>Total Auto</th>
-      <td class="blueScore">{{match.score_breakdown.blue.auto_points}}</td>
+      <td class="blueScore">{{match.score_breakdown.blue.autoPoints}}</td>
     </tr>
     {% endif %}
 
-    {% if "tote_points" in match.score_breakdown.red %}
+    {% if "totePoints" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{{match.score_breakdown.red.tote_points}}</td>
+      <td class="red">{{match.score_breakdown.red.totePoints}}</td>
       <td>Tote Points</td>
-      <td class="blue">{{match.score_breakdown.blue.tote_points}}</td>
+      <td class="blue">{{match.score_breakdown.blue.totePoints}}</td>
     </tr>
     {% endif %}
-    {% if "container_points" in match.score_breakdown.red %}
+    {% if "containerPoints" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{{match.score_breakdown.red.container_points}}</td>
+      <td class="red">{{match.score_breakdown.red.containerPoints}}</td>
       <td>Container Points</td>
-      <td class="blue">{{match.score_breakdown.blue.container_points}}</td>
+      <td class="blue">{{match.score_breakdown.blue.containerPoints}}</td>
     </tr>
     {% endif %}
-    {% if "litter_points" in match.score_breakdown.red %}
+    {% if "litterPoints" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{{match.score_breakdown.red.litter_points}}</td>
+      <td class="red">{{match.score_breakdown.red.litterPoints}}</td>
       <td>Litter Points</td>
-      <td class="blue">{{match.score_breakdown.blue.litter_points}}</td>
+      <td class="blue">{{match.score_breakdown.blue.litterPoints}}</td>
     </tr>
     {% endif %}
 
-    {% if "tote_points" in match.score_breakdown.red and "container_points" in match.score_breakdown.red and "litter_points" in match.score_breakdown.red %}
+    {% if "totePoints" in match.score_breakdown.red and "containerPoints" in match.score_breakdown.red and "litterPoints" in match.score_breakdown.red %}
     <tr class="key">
-      <td class="redScore">{{match.score_breakdown.red.tote_points + match.score_breakdown.red.container_points + match.score_breakdown.red.litter_points}}</td>
+      <td class="redScore">{{match.score_breakdown.red.totePoints + match.score_breakdown.red.containerPoints + match.score_breakdown.red.litterPoints}}</td>
       <th>Total Teleop</th>
-      <td class="blueScore">{{match.score_breakdown.blue.tote_points + match.score_breakdown.blue.container_points + match.score_breakdown.blue.litter_points}}</td>
+      <td class="blueScore">{{match.score_breakdown.blue.totePoints + match.score_breakdown.blue.containerPoints + match.score_breakdown.blue.litterPoints}}</td>
     </tr>
     {% endif %}
 
@@ -80,18 +80,18 @@
       <td class="blue">{{match.score_breakdown.blue.coopertition_points}}</td>
     </tr>
     {% endif %}
-    {% if "foul_points" in match.score_breakdown.red %}
+    {% if "foulPoints" in match.score_breakdown.red %}
     <tr>
-      <td class="red">-{{match.score_breakdown.red.foul_points}}</td>
+      <td class="red">-{{match.score_breakdown.red.foulPoints}}</td>
       <td>Fouls</td>
-      <td class="blue">-{{match.score_breakdown.blue.foul_points}}</td>
+      <td class="blue">-{{match.score_breakdown.blue.foulPoints}}</td>
     </tr>
     {% endif %}
-    {% if "adjust_points" in match.score_breakdown.red %}
+    {% if "adjustPoints" in match.score_breakdown.red %}
     <tr>
-      <td class="red">{{match.score_breakdown.red.adjust_points}}</td>
+      <td class="red">{{match.score_breakdown.red.adjustPoints}}</td>
       <td>Adjustments</td>
-      <td class="blue">{{match.score_breakdown.blue.adjust_points}}</td>
+      <td class="blue">{{match.score_breakdown.blue.adjustPoints}}</td>
     </tr>
     {% endif %}
 

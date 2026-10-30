@@ -280,7 +280,7 @@ describe('match score breakdown guards', () => {
     {
       year: 2015,
       guard: isScoreBreakdown2015,
-      marker: 'container_count_level1',
+      marker: 'containerCountLevel1',
     },
     {
       year: 2016,
@@ -351,7 +351,7 @@ describe('match score breakdown guards', () => {
   );
 
   test.each([
-    [{ container_count_level1: 0 }, true],
+    [{ containerCountLevel1: 0 }, true],
     [{}, false],
   ])(
     'isScoreBreakdown2015Alliance (%#)',
@@ -362,6 +362,9 @@ describe('match score breakdown guards', () => {
   );
 
   test('getBonusRankingPoints has no bonus points for a 2015 alliance', () => {
-    expect(getBonusRankingPoints({ container_count_level1: 0 })).toEqual([]);
+    expect(
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      getBonusRankingPoints({ containerCountLevel1: 0 }),
+    ).toEqual([]);
   });
 });
