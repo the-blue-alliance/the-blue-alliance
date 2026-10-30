@@ -1,6 +1,10 @@
 import { act, render, screen } from '@testing-library/react';
 import { useState } from 'react';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import {
+  mockAllIsIntersecting,
+  setupIntersectionMocking,
+} from 'react-intersection-observer/test-utils';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { Media } from '~/api/tba/read';
 import TeamMediaGallery from '~/components/tba/teamMediaGallery';
@@ -65,6 +69,10 @@ function stubImages(state: {
   }
 }
 
+beforeEach(() => {
+  setupIntersectionMocking(vi.fn);
+});
+
 afterEach(() => {
   for (const prop of imageProps) {
     Reflect.deleteProperty(HTMLImageElement.prototype, prop);
@@ -99,22 +107,77 @@ describe('TeamMediaGallery', () => {
     expect(screen.getByTestId('team-media-gallery').innerHTML).toBe('');
   });
 
-  test('waits for in-flight imgur loads', () => {
+  test('shows imgur images while they are still loading', () => {
     stubImages({ complete: false });
-    const { unmount } = render(
-      <TeamMediaGallery media={[imgur('aaaaaaa'), imgur('bbbbbbb')]} />,
-    );
-    const [first, second] = Array.from(
-      screen.getByTestId('team-media-gallery').querySelectorAll('img'),
-    );
-    expect(first.className).toBe('hidden');
+
+    render(<TeamMediaGallery media={[imgur('aaaaaaa')]} />);
+
+    expect(screen.getByRole('img', { name: 'Team media' })).toBeTruthy();
+  });
+
+  test('hides imgur images that fail to load', () => {
+    stubImages({ complete: false });
+    render(<TeamMediaGallery media={[imgur('aaaaaaa')]} />);
 
     act(() => {
-      first.dispatchEvent(new Event('load'));
-      second.dispatchEvent(new Event('error'));
+      screen
+        .getByRole('img', { name: 'Team media' })
+        .dispatchEvent(new Event('error'));
     });
-    expect(screen.getAllByRole('img', { name: 'Team media' })).toHaveLength(1);
-    unmount();
+
+    expect(screen.getByTestId('team-media-gallery').innerHTML).toBe('');
+  });
+
+  test('hides imgur images that finish loading as the removed placeholder', () => {
+    stubImages({ complete: false });
+    render(<TeamMediaGallery media={[imgur('aaaaaaa')]} />);
+    stubImages({ complete: true, naturalWidth: 161, naturalHeight: 81 });
+
+    act(() => {
+      screen
+        .getByRole('img', { name: 'Team media' })
+        .dispatchEvent(new Event('load'));
+    });
+
+    expect(screen.getByTestId('team-media-gallery').innerHTML).toBe('');
+  });
+
+  test('lazy-loads imgur images', () => {
+    render(<TeamMediaGallery media={[imgur('aaaaaaa')]} />);
+
+    expect(
+      screen.getByRole('img', { name: 'Team media' }).getAttribute('loading'),
+    ).toBe('lazy');
+  });
+
+  test('lazy-loads CAD thumbnails', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('onshape', 'abc/w/def', 'https://cad.example/s.png')]}
+      />,
+    );
+
+    expect(
+      screen
+        .getByRole('img', { name: 'Nightshade 2026' })
+        .getAttribute('loading'),
+    ).toBe('lazy');
+  });
+
+  test('holds instagram embeds until they near the viewport', () => {
+    render(<TeamMediaGallery media={[instagram('xyz')]} />);
+
+    expect(screen.queryByTestId('instagram')).toBeNull();
+  });
+
+  test('embeds instagram posts once they near the viewport', () => {
+    render(<TeamMediaGallery media={[instagram('xyz')]} />);
+
+    act(() => mockAllIsIntersecting(true));
+
+    expect(screen.getByTestId('instagram').textContent).toBe(
+      'https://www.instagram.com/p/xyz/',
+    );
   });
 
   test('skips imgur media without an image url', () => {
@@ -157,6 +220,7 @@ describe('TeamMediaGallery', () => {
         ]}
       />,
     );
+    act(() => mockAllIsIntersecting(true));
     expect(screen.getByTestId('instagram').textContent).toBe(
       'https://www.instagram.com/p/xyz/',
     );
@@ -238,20 +302,25 @@ describe('TeamMediaGallery', () => {
   test('lists instagram posts before imgur images', () => {
     stubImages({ complete: true, naturalWidth: 640, naturalHeight: 480 });
     render(<TeamMediaGallery media={[imgur('abcdefg'), instagram('xyz')]} />);
+
+    act(() => mockAllIsIntersecting(true));
+
     expect(
       screen
         .getByTestId('team-media-gallery')
-        .firstElementChild?.getAttribute('data-testid'),
-    ).toBe('instagram');
+        .firstElementChild?.querySelector('[data-testid="instagram"]'),
+    ).toBeTruthy();
   });
 
   test('replaces instagram embeds when the media list changes', () => {
     const { rerender } = render(
       <TeamMediaGallery media={[instagram('old')]} />,
     );
+    act(() => mockAllIsIntersecting(true));
     rerender(
       <TeamMediaGallery media={[instagram('new1'), instagram('new2')]} />,
     );
+    act(() => mockAllIsIntersecting(true));
     expect(
       screen.getAllByTestId('instagram').map((e) => e.textContent),
     ).toEqual([
