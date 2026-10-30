@@ -69,7 +69,31 @@ beforeEach(() => {
   mediaMock.mockResolvedValue([]);
 });
 
+function stubHoverCapability(canHover: boolean) {
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn<(query: string) => Pick<MediaQueryList, 'matches'>>(() => ({
+      matches: canHover,
+    })),
+  );
+}
+
+describe('TeamLinkWithTooltip on a touch-only device', () => {
+  test('does not download the search index', async () => {
+    stubHoverCapability(false);
+
+    renderWithClient(<TeamLinkWithTooltip teamKey="frc254" year={2026} />);
+    await screen.findByRole('link', { name: '254' });
+
+    expect(searchIndexMock).not.toHaveBeenCalled();
+  });
+});
+
 describe('TeamLinkWithTooltip', () => {
+  beforeEach(() => {
+    stubHoverCapability(true);
+  });
+
   test('renders a plain link when the team is not in the search index', async () => {
     const { container } = renderWithClient(
       <TeamLinkWithTooltip teamKey="frc9999" year={2026} />,

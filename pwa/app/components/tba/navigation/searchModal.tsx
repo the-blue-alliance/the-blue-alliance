@@ -36,11 +36,14 @@ import { SearchResult, siteSearch } from '~/lib/search/siteSearch';
 export function SearchModal() {
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>('');
+  const [searchIntended, setSearchIntended] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchIndexQuery = useQuery({
     ...getSearchIndexOptions({}),
     staleTime: STALE_TIME.SEARCH_INDEX,
+    enabled: open || searchIntended,
   });
+  const intendSearch = () => setSearchIntended(true);
   const { currentSeason } = useRouteContext({ from: '__root__' });
   const navigate = useNavigate();
   const isMacintosh =
@@ -84,6 +87,8 @@ export function SearchModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
+        onPointerEnter={intendSearch}
+        onFocus={intendSearch}
         render={
           <Button
             variant="secondary"
@@ -110,6 +115,8 @@ export function SearchModal() {
       </DialogTrigger>
 
       <DialogTrigger
+        onPointerEnter={intendSearch}
+        onFocus={intendSearch}
         aria-label="Search"
         className="z-30 cursor-pointer rounded-full p-2 text-white
           transition-colors duration-200 hover:bg-black/20 xl:hidden"

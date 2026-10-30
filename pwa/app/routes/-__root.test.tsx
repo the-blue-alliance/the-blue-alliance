@@ -59,7 +59,6 @@ vi.mock('~/api/colors/client.gen', () => ({
 
 vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
   getStatusOptions: () => ({ queryKey: ['status'] }),
-  getSearchIndexOptions: () => ({ queryKey: ['searchIndex'] }),
 }));
 
 vi.mock('~/lib/logger', () => ({
@@ -258,16 +257,13 @@ describe('root route options', () => {
     expect(validateSearch.parse({})).toEqual({});
   });
 
-  test('loads status once and prefetches the search index', async () => {
+  test('loads status once and exposes the current season', async () => {
     const { beforeLoad } = await loadRoot();
     const queryClient = new QueryClient();
     const status = { current_season: 2026, max_season: 2026 };
     const ensureQueryData = vi
       .spyOn(queryClient, 'ensureQueryData')
       .mockResolvedValue(status);
-    const prefetchQuery = vi
-      .spyOn(queryClient, 'prefetchQuery')
-      .mockResolvedValue();
 
     await expect(beforeLoad({ context: { queryClient } })).resolves.toEqual({
       status,
@@ -277,25 +273,31 @@ describe('root route options', () => {
       queryKey: ['status'],
       staleTime: expect.any(Number),
     });
-    expect(prefetchQuery).toHaveBeenCalledWith({
-      queryKey: ['searchIndex'],
-      staleTime: expect.any(Number),
+  });
+
+  test('does not download the search index on page load', async () => {
+    const { beforeLoad } = await loadRoot();
+    const queryClient = new QueryClient();
+    vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue({
+      current_season: 2026,
     });
+    const prefetchQuery = vi.spyOn(queryClient, 'prefetchQuery');
+
+    await beforeLoad({ context: { queryClient } });
+
+    expect(prefetchQuery).not.toHaveBeenCalled();
   });
 
   test('falls back to the calendar year without a current season', async () => {
-    vi.stubEnv('SSR', true);
     const { beforeLoad } = await loadRoot();
     const queryClient = new QueryClient();
     vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue({
       current_season: null,
     });
-    const prefetchQuery = vi.spyOn(queryClient, 'prefetchQuery');
 
     const context = await beforeLoad({ context: { queryClient } });
 
     expect(context.currentSeason).toBe(new Date().getFullYear());
-    expect(prefetchQuery).not.toHaveBeenCalled();
   });
 
   test('builds head tags with a canonical link for the deepest match', async () => {
