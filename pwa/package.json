@@ -115,8 +115,5 @@
   "engines": {
     "node": ">=22",
     "pnpm": "11.18.0"
-  },
-  "overrides": {
-    "react-is": "19.1.0"
   }
 }
