@@ -75,6 +75,34 @@ test('does not request regional pool points for a district event', async ({
   expect(poolPointsRequests).toEqual([]);
 });
 
+test('does not request district points for a regional', async ({ page }) => {
+  const districtPointsRequests: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().includes('/district_points')) {
+      districtPointsRequests.push(request.url());
+    }
+  });
+
+  await page.goto('/event/2024casj');
+  await page.locator('body[data-hydrated]').waitFor();
+  await page.waitForLoadState('networkidle');
+
+  expect(districtPointsRequests).toEqual([]);
+});
+
+test('shows the event name while awards are still loading', async ({
+  page,
+}) => {
+  await page.route(
+    /\/api\/v3\/event\/[^/]+\/awards/,
+    () => new Promise(() => {}),
+  );
+
+  await page.goto('/event/2024mil');
+
+  await expect(page.locator('h1')).toBeVisible();
+});
+
 test.describe('/event/2024mil', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/event/2024mil');

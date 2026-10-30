@@ -1,5 +1,18 @@
 import { type Page, expect, test } from '@playwright/test';
 
+test('shows the team name while event alliances are still loading', async ({
+  page,
+}) => {
+  await page.route(
+    /\/api\/v3\/event\/[^/]+\/alliances/,
+    () => new Promise(() => {}),
+  );
+
+  await page.goto('/team/604/2024');
+
+  await expect(page.locator('h1')).toHaveText('Team 604 - Quixilver');
+});
+
 [
   ['history', '/team/604/history', 'History'],
   ['stats', '/team/604/stats', 'Stats'],

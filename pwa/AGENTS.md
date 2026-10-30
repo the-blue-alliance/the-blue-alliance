@@ -131,9 +131,22 @@ Type-aware rules are enabled via `oxlint-tsgolint`.
 - Prefer user-visible behavior and accessibility contracts in component tests: roles, accessible names, text, links, disabled state, and ARIA attributes.
 - Do not couple functional tests to colors, spacing, typography, Tailwind or CSS classes, DOM nesting, or private component structure.
 - Use browser-level screenshot or visual-regression tests only when appearance itself is the requirement under test.
-- Assert on the actual value, not whether a mock was called, unless the call itself is the behavior.
+- Assert on the actual value, not whether a mock was called, unless the call itself is the behavior. For network and loading behavior, see the section below — mock call lists are almost never the behavior.
 - Do not assert on fields unrelated to the behavior under test.
 - Inline test data where it is used. Prefer literal values over computed ones.
+
+#### Network and loading behavior
+
+- Test what the user can see or do, or what the browser actually requests relative to a user action. Do not test how fetching is wired.
+- Forbidden patterns (examples of bad tests):
+  - "`getTeams` is a blocking call" / "`getImages` is not a blocking call"
+  - "Foo is lazily loaded" / "prefetches X" / "starts `getEventRankings`"
+  - Asserting `ensureQueryData` / `prefetchQuery` / query-fn mock call lists or `_id`s
+  - Asserting `loading="lazy"`, `fetchpriority`, dynamic chunk URLs, or `requestIdleCallback` option values
+- Allowed patterns:
+  - **Loader unit tests**: return shape, redirects, not-found, tolerance of failed secondary fetches — never which queries were started or awaited
+  - **Playwright**: observe real requests or visible content relative to navigation / hover / tab click (mirror `tests/event.spec.ts` `does not request … on page load` / `requests … when …`)
+  - **Component tests**: placeholder then content appears; content withheld until near viewport — not the scheduling API
 
 #### Isolation
 

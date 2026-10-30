@@ -261,31 +261,12 @@ describe('root route options', () => {
     const { beforeLoad } = await loadRoot();
     const queryClient = new QueryClient();
     const status = { current_season: 2026, max_season: 2026 };
-    const ensureQueryData = vi
-      .spyOn(queryClient, 'ensureQueryData')
-      .mockResolvedValue(status);
+    vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue(status);
 
     await expect(beforeLoad({ context: { queryClient } })).resolves.toEqual({
       status,
       currentSeason: 2026,
     });
-    expect(ensureQueryData).toHaveBeenCalledWith({
-      queryKey: ['status'],
-      staleTime: expect.any(Number),
-    });
-  });
-
-  test('does not download the search index on page load', async () => {
-    const { beforeLoad } = await loadRoot();
-    const queryClient = new QueryClient();
-    vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue({
-      current_season: 2026,
-    });
-    const prefetchQuery = vi.spyOn(queryClient, 'prefetchQuery');
-
-    await beforeLoad({ context: { queryClient } });
-
-    expect(prefetchQuery).not.toHaveBeenCalled();
   });
 
   test('falls back to the calendar year without a current season', async () => {
