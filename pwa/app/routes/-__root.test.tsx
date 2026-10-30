@@ -315,6 +315,18 @@ describe('root route options', () => {
       href: '/manifest.webmanifest',
     });
   });
+
+  test('preconnects to the TBA API origin for CORS fetches', async () => {
+    const { head } = await loadRoot();
+
+    const tags = head({ matches: [{ pathname: '/' }] });
+
+    expect(tags.links).toContainEqual({
+      rel: 'preconnect',
+      href: 'https://www.thebluealliance.com',
+      crossOrigin: 'anonymous',
+    });
+  });
 });
 
 describe('RootComponent', () => {

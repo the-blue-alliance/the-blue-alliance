@@ -201,6 +201,11 @@ export const Route = createRootRouteWithContext<{
     ],
     links: [
       {
+        rel: 'preconnect',
+        href: 'https://www.thebluealliance.com',
+        crossOrigin: 'anonymous',
+      },
+      {
         rel: 'canonical',
         href: `https://www.thebluealliance.com${matches[matches.length - 1].pathname}`,
       },
