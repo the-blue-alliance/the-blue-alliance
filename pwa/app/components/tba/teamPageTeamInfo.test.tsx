@@ -122,6 +122,21 @@ describe('TeamPageTeamInfo', () => {
     expect(screen.queryByText(/sponsor/)).toBeNull();
   });
 
+  test('shows no sponsors when the school name contains a slash', () => {
+    render(
+      <TeamPageTeamInfo
+        team={{
+          ...team,
+          name: 'Centreville Jr/Sr High School',
+          school_name: 'Centreville Jr/Sr High School',
+        }}
+        maybeAvatar={undefined}
+        socials={[]}
+      />,
+    );
+    expect(screen.queryByText(/sponsor/)).toBeNull();
+  });
+
   test('shows the default avatar for a team without one', () => {
     render(
       <TeamPageTeamInfo team={team} maybeAvatar={undefined} socials={[]} />,
