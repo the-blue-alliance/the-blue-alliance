@@ -66,12 +66,9 @@ const ReactQueryDevtools = import.meta.env.PROD
 client.interceptors.request.use((request) => {
   // The prod read key isn't valid against the local dev datastore, which
   // has its own well-known dev key (seeded by /local/bootstrap)
-  request.headers.set(
-    'X-TBA-Auth-Key',
-    isLocalDataSource()
-      ? LOCAL_API_AUTH_KEY
-      : import.meta.env.VITE_TBA_API_READ_KEY,
-  );
+  const authKey = isLocalDataSource()
+    ? LOCAL_API_AUTH_KEY
+    : import.meta.env.VITE_TBA_API_READ_KEY;
 
   logger.debug(
     {
@@ -81,8 +78,18 @@ client.interceptors.request.use((request) => {
     'Sending request to TBA API',
   );
 
-  return request;
+  if (import.meta.env.SSR) {
+    request.headers.set('X-TBA-Auth-Key', authKey);
+    return request;
+  }
+  return asSimpleCorsRequest(request, authKey);
 });
+
+function asSimpleCorsRequest(request: Request, authKey: string): Request {
+  const url = new URL(request.url);
+  url.searchParams.set('X-TBA-Auth-Key', authKey);
+  return new Request(url, request);
+}
 
 // Attach the HTTP status code to thrown errors so the QueryClient's retry
 // function can distinguish 4xx "client error" failures from transient ones.
