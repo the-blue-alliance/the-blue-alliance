@@ -409,7 +409,7 @@ function EventPage() {
   });
 
   const canHavePracticeMatches =
-    SEASON_EVENT_TYPES.has(event.event_type) && event.year >= 2026;
+    SEASON_EVENT_TYPES.has(event.event_type) && event.year >= 2015;
   const practiceMatchesQuery = useQuery({
     ...getEventPracticeMatchesOptions({ path: { event_key: eventKey } }),
     staleTime: eventStaleTime,

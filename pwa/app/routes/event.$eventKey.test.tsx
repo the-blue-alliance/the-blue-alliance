@@ -252,10 +252,10 @@ describe('event route loader', () => {
       skipped: 'getEventOprs:2015casj',
     },
     {
-      name: 'practice matches before 2026',
-      eventKey: '2025casj',
-      overrides: { year: 2025, event_type: EventType.REGIONAL },
-      skipped: 'getEventPracticeMatches:2025casj',
+      name: 'practice matches before 2015',
+      eventKey: '2014casj',
+      overrides: { year: 2014, event_type: EventType.REGIONAL },
+      skipped: 'getEventPracticeMatches:2014casj',
     },
     {
       name: 'practice matches for an offseason event',
