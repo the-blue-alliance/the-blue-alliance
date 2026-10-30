@@ -24,13 +24,9 @@ import {
   TableOfContentsList,
 } from '~/components/ui/toc';
 
-const TOCRendererContext = createContext<{
-  content: React.ReactNode;
-  setContent: (content: React.ReactNode) => void;
-}>({
-  content: null,
-  setContent: () => {},
-});
+const TOCRendererContext = createContext<(content: React.ReactNode) => void>(
+  () => {},
+);
 
 export function TOCRendererProvider({
   children,
@@ -39,7 +35,7 @@ export function TOCRendererProvider({
 }) {
   const [content, setContent] = useState<React.ReactNode>(null);
   return (
-    <TOCRendererContext.Provider value={{ content, setContent }}>
+    <TOCRendererContext.Provider value={setContent}>
       {/* Render the TOC header below navbar */}
       {content}
       {/* Render the provider outlet children */}
@@ -49,7 +45,7 @@ export function TOCRendererProvider({
 }
 
 function TOCRenderPortal({ children }: { children: React.ReactNode }) {
-  const { setContent } = useContext(TOCRendererContext);
+  const setContent = useContext(TOCRendererContext);
 
   useEffect(() => {
     setContent(children);

@@ -129,6 +129,20 @@ test.describe('/team/604/2024', () => {
     });
   });
 
+  test('mobile: names the scrolled-to event in the table-of-contents bar', async ({
+    page,
+  }) => {
+    await page
+      .locator('section[id="2024camb"]')
+      .evaluate((section) => section.scrollIntoView({ block: 'start' }));
+
+    await expect(
+      page
+        .locator('[data-toc-bar]')
+        .getByRole('button', { name: 'Monterey Bay', exact: true }),
+    ).toBeVisible();
+  });
+
   [
     ['Silicon Valley Regional', '2024casj', '/event/2024casj'],
     ['Sacramento Regional', '2024cada', '/event/2024cada'],
