@@ -579,20 +579,38 @@ test.describe('/team/254/2026', () => {
   test('requests resized Imgur images for the media gallery', async ({
     page,
   }) => {
-    await page
+    const imgurRequestUrls = () =>
+      page.evaluate(() =>
+        performance
+          .getEntriesByType('resource')
+          .map((entry) => entry.name)
+          .filter((url) => url.includes('i.imgur.com')),
+      );
+    await page.getByTestId('team-media-gallery').scrollIntoViewIfNeeded();
+    await expect
+      .poll(async () => (await imgurRequestUrls()).length)
+      .toBeGreaterThan(3);
+
+    expect(
+      (await imgurRequestUrls()).every((url) => !isImgurOriginal(url)),
+    ).toBe(true);
+  });
+
+  test('waits to request media gallery images until the gallery nears the viewport', async ({
+    page,
+  }) => {
+    await page.waitForLoadState('networkidle');
+
+    const galleryImageRequested = await page
       .getByTestId('team-media-gallery')
       .locator('img')
-      .first()
-      .waitFor();
-    const requestUrls = await page.evaluate(() =>
-      performance.getEntriesByType('resource').map((entry) => entry.name),
-    );
-    const imgurRequestUrls = requestUrls.filter((url) =>
-      url.includes('i.imgur.com'),
-    );
+      .last()
+      .evaluate(
+        (img: HTMLImageElement) =>
+          performance.getEntriesByName(img.currentSrc || img.src).length > 0,
+      );
 
-    expect(imgurRequestUrls.length).toBeGreaterThan(3);
-    expect(imgurRequestUrls.every((url) => !isImgurOriginal(url))).toBe(true);
+    expect(galleryImageRequested).toBe(false);
   });
 });
 

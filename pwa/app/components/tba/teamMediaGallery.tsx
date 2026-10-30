@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { InstagramEmbed } from 'react-social-media-embed';
 
 import SimpleIconsInstagram from '~icons/simple-icons/instagram';
@@ -82,47 +83,15 @@ export default function TeamMediaGallery({
   );
 }
 
+function isImgurRemovedPlaceholder(img: HTMLImageElement): boolean {
+  return img.naturalWidth === 161 && img.naturalHeight === 81;
+}
+
 function ImgurEmbed({ media }: { media: Media }): React.JSX.Element | null {
-  // This component automatically hides imgur images that have been deleted or made unavailable
   const [failed, setFailed] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
   const thumbnailUrl = getMediaThumbUrl(media);
 
-  useEffect(() => {
-    const img = imgRef.current;
-    if (!img) return;
-
-    const check = () => {
-      // Imgur serves a 302 redirect to /removed.png for deleted images rather
-      // than a 404, so onError never fires. The removed placeholder is 161x81.
-      if (img.naturalWidth === 161 && img.naturalHeight === 81) {
-        setFailed(true);
-      } else {
-        setVisible(true);
-      }
-    };
-
-    // React's synthetic onLoad misses images that finish loading before
-    // hydration attaches the handler (common when the browser has the image
-    // cached). Using a ref lets us check img.complete synchronously and fall
-    // back to a native listener only when the load is still in flight.
-    if (img.complete) {
-      check();
-    } else {
-      img.addEventListener('load', check);
-      img.addEventListener('error', () => setFailed(true));
-      return () => img.removeEventListener('load', check);
-    }
-  }, []);
-
   if (!thumbnailUrl || failed) return null;
-
-  // While the check is in flight, render a hidden img that takes no space.
-  // Once confirmed valid, swap to the real card — same src hits browser cache.
-  if (!visible) {
-    return <img ref={imgRef} src={thumbnailUrl} alt="" className="hidden" />;
-  }
 
   return (
     <a
@@ -133,8 +102,17 @@ function ImgurEmbed({ media }: { media: Media }): React.JSX.Element | null {
         hover:border-neutral-400"
     >
       <img
+        ref={(el) => {
+          if (el?.complete && isImgurRemovedPlaceholder(el)) setFailed(true);
+        }}
         src={thumbnailUrl}
         alt="Team media"
+        loading="lazy"
+        decoding="async"
+        onLoad={(e) => {
+          if (isImgurRemovedPlaceholder(e.currentTarget)) setFailed(true);
+        }}
+        onError={() => setFailed(true)}
         className="h-full w-full object-cover"
       />
     </a>
@@ -166,6 +144,8 @@ function CaptionedEmbed({
       <img
         src={imageUrl}
         alt={title ?? ''}
+        loading="lazy"
+        decoding="async"
         className="min-h-0 w-full flex-1 object-cover"
       />
       {title && (
@@ -184,22 +164,35 @@ function InstagramImageEmbed({
   media: Media;
 }): React.JSX.Element | null {
   const url = getMediaLinkUrl(media);
+  const { ref, inView } = useInView({ triggerOnce: true, rootMargin: '400px' });
   if (!url) return null;
+  const placeholder = (
+    <Skeleton
+      className="flex h-[512px] items-center justify-center rounded-none"
+    >
+      <SimpleIconsInstagram className="size-10 text-muted-foreground" />
+    </Skeleton>
+  );
   return (
-    <InstagramEmbed
-      url={url}
-      width="100%"
-      className="row-span-2 rounded-lg! border-2 border-neutral-300
-        hover:border-neutral-400 [&_iframe]:m-0! [&_iframe]:h-full!
-        [&_iframe]:w-full! [&_iframe]:min-w-0! [&_iframe]:rounded-none!
-        [&_iframe]:border-0!"
-      embedPlaceholder={
-        <Skeleton
-          className="flex h-[512px] items-center justify-center rounded-none"
+    <div ref={ref} className="row-span-2">
+      {inView ? (
+        <InstagramEmbed
+          url={url}
+          width="100%"
+          className="h-full rounded-lg! border-2 border-neutral-300
+            hover:border-neutral-400 [&_iframe]:m-0! [&_iframe]:h-full!
+            [&_iframe]:w-full! [&_iframe]:min-w-0! [&_iframe]:rounded-none!
+            [&_iframe]:border-0!"
+          embedPlaceholder={placeholder}
+        />
+      ) : (
+        <div
+          className="h-full overflow-clip rounded-lg border-2
+            border-neutral-300"
         >
-          <SimpleIconsInstagram className="size-10 text-muted-foreground" />
-        </Skeleton>
-      }
-    />
+          {placeholder}
+        </div>
+      )}
+    </div>
   );
 }
