@@ -414,7 +414,11 @@ export function TeamStatus({
                 year={event.year}
                 aria-current={k === teamKey ? 'page' : undefined}
               >
-                <Badge variant={k === teamKey ? 'secondary' : 'outline'}>
+                <Badge
+                  variant={k === teamKey ? 'default' : 'secondary'}
+                  className="px-2 tabular-nums shadow-xs transition-all
+                    hover:-translate-y-px hover:shadow-sm"
+                >
                   {k.substring(3)}
                 </Badge>
               </TeamLink>
