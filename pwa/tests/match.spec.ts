@@ -69,7 +69,9 @@ test.describe('/match/2026cmptx_f1m1 videos', () => {
 });
 
 [
-  ['2015 match', '/match/2015nyny_qm1'],
+  // TODO: re-enable after 2015 events are regrabbed with snake_case remap
+  // (prod currently serves camelCase alliance keys until then).
+  // ['2015 match', '/match/2015nyny_qm1'],
   ['2024 match', '/match/2024mil_f1m2'],
 ].forEach(([name, path]) => {
   test(`shows the score breakdown for a ${name}`, async ({ page }) => {
