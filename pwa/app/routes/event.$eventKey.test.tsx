@@ -1,16 +1,16 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { describe, expect, test, vi } from 'vitest';
 
-import { PlayoffType } from '~/api/tba/read';
+import { EventType, PlayoffType } from '~/api/tba/read';
 import { runHead, runLoader } from '~/routes/-testUtils';
 import { Route } from '~/routes/event.$eventKey';
 
 interface QueryOptions {
-  queryKey: [{ _id: string; path: { event_key: string } }];
+  queryKey: [{ _id: string; path: { event_key?: string; year?: number } }];
 }
 
 function fakeQueryClient(
-  respond: (id: string, eventKey: string) => Promise<unknown>,
+  respond: (id: string, eventKey: string | undefined) => Promise<unknown>,
 ) {
   const ensureQueryData = vi.fn<(options: QueryOptions) => Promise<unknown>>(
     ({ queryKey }) => respond(queryKey[0]._id, queryKey[0].path.event_key),
@@ -19,7 +19,8 @@ function fakeQueryClient(
     queryClient: { ensureQueryData } as unknown as QueryClient,
     requested: () =>
       ensureQueryData.mock.calls.map(
-        ([{ queryKey }]) => `${queryKey[0]._id}:${queryKey[0].path.event_key}`,
+        ([{ queryKey }]) =>
+          `${queryKey[0]._id}:${queryKey[0].path.event_key ?? queryKey[0].path.year}`,
       ),
   };
 }
@@ -184,6 +185,112 @@ describe('event route loader', () => {
     );
     await load('2024casj', queryClient);
     expect(requested()).not.toContain('getEventPlayoffAdvancement:2024casj');
+  });
+
+  test.each([
+    {
+      name: 'awards',
+      eventKey: '2024casj',
+      overrides: {},
+      expected: 'getEventAwards:2024casj',
+    },
+    {
+      name: 'rankings',
+      eventKey: '2024casj',
+      overrides: {},
+      expected: 'getEventRankings:2024casj',
+    },
+    {
+      name: 'media',
+      eventKey: '2024casj',
+      overrides: {},
+      expected: 'getEventMedia:2024casj',
+    },
+    {
+      name: 'legacy OPRs for a 2014 event',
+      eventKey: '2014casj',
+      overrides: { year: 2014 },
+      expected: 'getEventOprs:2014casj',
+    },
+    {
+      name: 'practice matches for a 2026 season event',
+      eventKey: '2026casj',
+      overrides: { year: 2026, event_type: EventType.REGIONAL },
+      expected: 'getEventPracticeMatches:2026casj',
+    },
+    {
+      name: 'district points for a district event',
+      eventKey: '2024mawor',
+      overrides: { event_type: EventType.DISTRICT },
+      expected: 'getEventDistrictPoints:2024mawor',
+    },
+    {
+      name: 'regional pool points for a regional',
+      eventKey: '2024casj',
+      overrides: { event_type: EventType.REGIONAL },
+      expected: 'getRegionalChampsPoolPoints:2024casj',
+    },
+    {
+      name: 'regional advancement for a regional',
+      eventKey: '2024casj',
+      overrides: { event_type: EventType.REGIONAL },
+      expected: 'getRegionalAdvancement:2024',
+    },
+  ])('starts $name', async ({ eventKey, overrides, expected }) => {
+    const { queryClient, requested } = fakeQueryClient((id) =>
+      Promise.resolve(id === 'getEvent' ? { ...event, ...overrides } : []),
+    );
+    await load(eventKey, queryClient);
+    expect(requested()).toContain(expected);
+  });
+
+  test.each([
+    {
+      name: 'legacy OPRs for a 2015 event',
+      eventKey: '2015casj',
+      overrides: { year: 2015 },
+      skipped: 'getEventOprs:2015casj',
+    },
+    {
+      name: 'practice matches before 2026',
+      eventKey: '2025casj',
+      overrides: { year: 2025, event_type: EventType.REGIONAL },
+      skipped: 'getEventPracticeMatches:2025casj',
+    },
+    {
+      name: 'practice matches for an offseason event',
+      eventKey: '2026cc',
+      overrides: { year: 2026, event_type: EventType.OFFSEASON },
+      skipped: 'getEventPracticeMatches:2026cc',
+    },
+    {
+      name: 'district points for a regional',
+      eventKey: '2024casj',
+      overrides: { event_type: EventType.REGIONAL },
+      skipped: 'getEventDistrictPoints:2024casj',
+    },
+    {
+      name: 'regional pool points for a district event',
+      eventKey: '2024mawor',
+      overrides: { event_type: EventType.DISTRICT },
+      skipped: 'getRegionalChampsPoolPoints:2024mawor',
+    },
+  ])('skips $name', async ({ eventKey, overrides, skipped }) => {
+    const { queryClient, requested } = fakeQueryClient((id) =>
+      Promise.resolve(id === 'getEvent' ? { ...event, ...overrides } : []),
+    );
+    await load(eventKey, queryClient);
+    expect(requested()).not.toContain(skipped);
+  });
+
+  test('does not wait for event awards', async () => {
+    const { queryClient } = fakeQueryClient((id) => {
+      if (id === 'getEventAwards') return new Promise(() => {});
+      return Promise.resolve(id === 'getEvent' ? event : []);
+    });
+    await expect(load('2024casj', queryClient)).resolves.toMatchObject({
+      eventKey: '2024casj',
+    });
   });
 });
 

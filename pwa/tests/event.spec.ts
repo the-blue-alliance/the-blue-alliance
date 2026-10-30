@@ -14,6 +14,39 @@ test('fetches Nexus event data in the browser', async ({ page }) => {
   await expect.poll(() => nexusRequests.length).toBeGreaterThan(0);
 });
 
+test('requests insights success rates before the Insights tab opens', async ({
+  page,
+}) => {
+  const gameStatsRequests: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().includes('/game_stats')) {
+      gameStatsRequests.push(request.url());
+    }
+  });
+
+  await page.goto('/event/2024mil');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect.poll(() => gameStatsRequests.length).toBeGreaterThan(0);
+});
+
+test('does not request regional pool points for a district event', async ({
+  page,
+}) => {
+  const poolPointsRequests: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().includes('/regional_champs_pool_points')) {
+      poolPointsRequests.push(request.url());
+    }
+  });
+
+  await page.goto('/event/2024mawor');
+  await page.locator('body[data-hydrated]').waitFor();
+  await page.waitForLoadState('networkidle');
+
+  expect(poolPointsRequests).toEqual([]);
+});
+
 test.describe('/event/2024mil', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/event/2024mil');
@@ -143,6 +176,30 @@ test.describe('/event/2024mil', () => {
     await page.getByRole('tab', { name: 'Insights' }).click();
 
     await expect(page.locator('svg.recharts-surface')).toBeVisible();
+  });
+
+  test('draws insights chart dots at full size as soon as they appear', async ({
+    page,
+  }) => {
+    const firstRadius = await page.evaluate(() => {
+      const tab = [...document.querySelectorAll('[role="tab"]')].find(
+        (el) => el.textContent?.trim() === 'Insights',
+      );
+      (tab as HTMLElement).click();
+      return new Promise<number>((resolve) => {
+        const check = () => {
+          const dot = document.querySelector('[data-testid^="dot-"]');
+          if (dot) {
+            resolve(Number(dot.getAttribute('r')));
+          } else {
+            requestAnimationFrame(check);
+          }
+        };
+        requestAnimationFrame(check);
+      });
+    });
+
+    expect(firstRadius).toBeGreaterThan(4);
   });
 
   test('shows a tooltip when hovering a dot on the insights chart', async ({
