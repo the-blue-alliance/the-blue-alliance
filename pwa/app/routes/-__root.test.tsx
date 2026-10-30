@@ -82,6 +82,9 @@ vi.mock('~/components/tba/navigation/footer', () => ({
 vi.mock('~/components/tba/navigation/navbar', () => ({
   Navbar: () => <nav>Navbar</nav>,
 }));
+vi.mock('~/components/tba/navigation/navigationProgress', () => ({
+  NavigationProgress: () => <div>Navigation progress</div>,
+}));
 vi.mock('~/components/tba/tableOfContents', () => ({
   TOCRendererProvider: passThrough,
 }));
@@ -359,6 +362,14 @@ describe('RootComponent', () => {
     expect(
       within(document.head).getByTestId('script-once').getAttribute('content'),
     ).toBe('theme-init-script');
+  });
+
+  test('renders the navigation progress bar with the site chrome', async () => {
+    const { component: Root } = await loadRoot();
+
+    renderRoot(Root);
+
+    expect(screen.getByText('Navigation progress')).toBeTruthy();
   });
 
   test('drops the container on full-width routes', async () => {

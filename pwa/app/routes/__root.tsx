@@ -25,6 +25,7 @@ import { AuthContextProvider } from '~/components/tba/auth/auth';
 import { MatchModal } from '~/components/tba/match/matchModal';
 import { Footer } from '~/components/tba/navigation/footer';
 import { Navbar } from '~/components/tba/navigation/navbar';
+import { NavigationProgress } from '~/components/tba/navigation/navigationProgress';
 import { TOCRendererProvider } from '~/components/tba/tableOfContents';
 import { Toaster } from '~/components/ui/sonner';
 import { TooltipProvider } from '~/components/ui/tooltip';
@@ -254,6 +255,7 @@ function RootComponent() {
                 <Outlet />
               ) : (
                 <div className="flex min-h-svh flex-col">
+                  <NavigationProgress />
                   <Navbar />
                   <TOCRendererProvider>
                     <div

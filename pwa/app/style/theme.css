@@ -64,6 +64,8 @@
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-navigation-item-fade-in: navigation-item-fade-in 150ms ease-out
     forwards;
+  --animate-navigation-progress: navigation-progress 1.1s
+    cubic-bezier(0.77, 0, 0.175, 1) infinite;
 
   @keyframes accordion-down {
     from {
@@ -79,6 +81,14 @@
     }
     to {
       height: 0;
+    }
+  }
+  @keyframes navigation-progress {
+    from {
+      translate: -100% 0;
+    }
+    to {
+      translate: 250% 0;
     }
   }
   @keyframes navigation-item-fade-in {
