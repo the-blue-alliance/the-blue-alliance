@@ -1,6 +1,20 @@
-import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import {
+  type EnsureQueryDataOptions,
+  type QueryKey,
+  useQueries,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 import { Link, createFileRoute, notFound } from '@tanstack/react-router';
-import { Suspense, lazy, useMemo, useState } from 'react';
+import {
+  type ComponentProps,
+  Suspense,
+  lazy,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import ParentEventIcon from '~icons/lucide/arrow-up-right';
 import SourceIcon from '~icons/lucide/badge-check';
@@ -54,6 +68,7 @@ import {
   getEventTeamMediaOptions,
   getEventTeamsOptions,
   getEventTeamsStatusesOptions,
+  getInsightsV2YearCategoryOptions,
   getRegionalAdvancementOptions,
   getRegionalChampsPoolPointsOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
@@ -144,9 +159,25 @@ import { MODEL_TYPE, doThrowNotFound } from '~/lib/utils';
 
 // Lazy-loaded: recharts is heavy and this chart only renders once the
 // insights tab is opened, which most visitors never do.
-const CoprScatterChart = lazy(
-  () => import('~/components/tba/charts/coprScatterChart'),
-);
+type CoprScatterChartComponent =
+  typeof import('~/components/tba/charts/coprScatterChart').default;
+
+let preloadedCoprScatterChart: CoprScatterChartComponent | undefined;
+
+const loadCoprScatterChart = () =>
+  import('~/components/tba/charts/coprScatterChart').then((module) => {
+    preloadedCoprScatterChart = module.default;
+    return module;
+  });
+
+const LazyCoprScatterChart = lazy(loadCoprScatterChart);
+
+function CoprScatterChart(props: ComponentProps<CoprScatterChartComponent>) {
+  const [Chart] = useState(
+    () => preloadedCoprScatterChart ?? LazyCoprScatterChart,
+  );
+  return <Chart {...props} />;
+}
 
 export const Route = createFileRoute('/event/$eventKey')({
   loader: async ({ params, context: { queryClient } }) => {
@@ -230,6 +261,35 @@ export const Route = createFileRoute('/event/$eventKey')({
           staleTime: eventStaleTime,
         })
         .catch(() => undefined);
+    }
+
+    const startQuery = <
+      TQueryFnData,
+      TError,
+      TData,
+      TQueryKey extends QueryKey,
+    >(
+      options: EnsureQueryDataOptions<TQueryFnData, TError, TData, TQueryKey>,
+    ) =>
+      void queryClient
+        .ensureQueryData({ ...options, staleTime: eventStaleTime })
+        .catch(() => undefined);
+    const eventPath = { path: { event_key: params.eventKey } };
+    startQuery(getEventAwardsOptions(eventPath));
+    startQuery(getEventRankingsOptions(eventPath));
+    startQuery(getEventMediaOptions(eventPath));
+    if (event.year <= 2014) {
+      startQuery(getEventOprsOptions(eventPath));
+    }
+    if (SEASON_EVENT_TYPES.has(event.event_type) && event.year >= 2026) {
+      startQuery(getEventPracticeMatchesOptions(eventPath));
+    }
+    if (DISTRICT_EVENT_TYPES.has(event.event_type)) {
+      startQuery(getEventDistrictPointsOptions(eventPath));
+    }
+    if (event.event_type === EventType.REGIONAL) {
+      startQuery(getRegionalChampsPoolPointsOptions(eventPath));
+      startQuery(getRegionalAdvancementOptions({ path: { year: event.year } }));
     }
 
     await Promise.all([matchesQuery, alliancesQuery, teamsQuery]);
@@ -426,6 +486,7 @@ function EventPage() {
   const regionalChampsPoolPointsQuery = useQuery({
     ...getRegionalChampsPoolPointsOptions({ path: { event_key: eventKey } }),
     staleTime: eventStaleTime,
+    enabled: event.event_type === EventType.REGIONAL,
   });
 
   const regionalAdvancementQuery = useQuery({
@@ -492,6 +553,19 @@ function EventPage() {
   const shouldPreviewAwardsTab =
     SEASON_EVENT_TYPES.has(event.event_type) && hasEventEnded(event);
   const shouldPreviewInsightsTab = matches.length > 0;
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (!shouldPreviewInsightsTab) {
+      return;
+    }
+    void queryClient.prefetchQuery({
+      ...getInsightsV2YearCategoryOptions({
+        path: { year: event.year, category: 'game_stats' },
+      }),
+      staleTime: staleTimeForYear(event.year),
+    });
+    void loadCoprScatterChart();
+  }, [queryClient, shouldPreviewInsightsTab, event.year]);
   const isInsightsPending = usesLegacyOprs
     ? oprsQuery.isPending
     : coprsQuery.isPending || colorsQuery.isPending;
@@ -804,11 +878,7 @@ function EventPage() {
           )}
         </TabsContent>
 
-        <TabsContent
-          value="insights"
-          keepMounted
-          className="data-hidden:hidden"
-        >
+        <TabsContent value="insights">
           <div className="space-y-6">
             {oprsQuery.data && (
               <ComponentOprsTable

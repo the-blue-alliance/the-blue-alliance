@@ -463,7 +463,10 @@ export default function CoprScatterChart({
                 />
               }
             />
-            <Scatter shape={(props) => <TeamDot {...props} data={data} />}>
+            <Scatter
+              isAnimationActive={false}
+              shape={(props) => <TeamDot {...props} data={data} />}
+            >
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
