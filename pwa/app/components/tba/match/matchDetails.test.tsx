@@ -179,7 +179,7 @@ describe('MatchDetails', () => {
   });
 
   test.each([
-    { year: 2015, fields: { containerCountLevel1: 0 } },
+    { year: 2015, fields: { container_count_level1: 0 } },
     { year: 2016, fields: { teleopDefensesBreached: false } },
     { year: 2017, fields: { kPaRankingPointAchieved: false } },
     { year: 2018, fields: { autoQuestRankingPoint: false } },

@@ -48,7 +48,7 @@ export function isScoreBreakdown2015(
   return (
     scoreBreakdown !== null &&
     (scoreBreakdown.red as MatchScoreBreakdown2015Alliance)
-      .containerCountLevel1 !== undefined
+      .container_count_level1 !== undefined
   );
 }
 
@@ -56,8 +56,8 @@ export function isScoreBreakdown2015Alliance(
   scoreBreakdown: MatchScoreBreakdownAlliance,
 ): scoreBreakdown is MatchScoreBreakdown2015Alliance {
   return (
-    (scoreBreakdown as MatchScoreBreakdown2015Alliance).containerCountLevel1 !==
-    undefined
+    (scoreBreakdown as MatchScoreBreakdown2015Alliance)
+      .container_count_level1 !== undefined
   );
 }
 export function isScoreBreakdown2016(

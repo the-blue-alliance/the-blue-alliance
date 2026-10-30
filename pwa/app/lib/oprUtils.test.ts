@@ -30,16 +30,16 @@ describe('getDefaultCoprYAxisComponentName', () => {
     expect(componentName).toEqual('totalPoints');
   });
 
-  test('uses camelCase component names for 2015', () => {
+  test('uses the 2015 snake_case component names', () => {
     const componentName = getDefaultCoprYAxisComponentName(
       {
-        teleopPoints: { frc254: 55.2 },
-        totalPoints: { frc254: 88.4 },
+        teleop_points: { frc254: 55.2 },
+        total_points: { frc254: 88.4 },
       },
       2015,
     );
 
-    expect(componentName).toEqual('totalPoints');
+    expect(componentName).toEqual('total_points');
   });
 
   test('uses the 2026 total-prefixed auto component name', () => {
@@ -108,24 +108,24 @@ describe('buildCoprTableModel', () => {
     expect(model.defaultSortComponent).toEqual('totalPoints');
   });
 
-  test('uses camelCase component names for 2015', () => {
+  test('uses the 2015 snake_case component names', () => {
     const model = buildCoprTableModel(
       {
-        containerPoints: { frc254: 9 },
-        teleopPoints: { frc254: 55.2 },
-        totalPoints: { frc254: 88.4 },
-        autoPoints: { frc254: 21 },
+        container_points: { frc254: 9 },
+        teleop_points: { frc254: 55.2 },
+        total_points: { frc254: 88.4 },
+        auto_points: { frc254: 21 },
       },
       2015,
     );
 
     expect(model.componentNames.slice(0, 3)).toEqual([
-      'totalPoints',
-      'autoPoints',
-      'teleopPoints',
+      'total_points',
+      'auto_points',
+      'teleop_points',
     ]);
-    expect(model.defaultVisible.containerPoints).toBe(false);
-    expect(model.defaultSortComponent).toEqual('totalPoints');
+    expect(model.defaultVisible.container_points).toBe(false);
+    expect(model.defaultSortComponent).toEqual('total_points');
   });
 
   test('uses the 2026 total-prefixed auto and teleop names', () => {

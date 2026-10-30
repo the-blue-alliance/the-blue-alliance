@@ -234,7 +234,7 @@ def test_render_match_meta_description(web_client: Client, setup_full_match) -> 
     assert og_desc.get("content") == content
 
 
-def test_render_2015_camelcase_score_breakdown(web_client: Client, ndb_stub) -> None:
+def test_render_2015_snake_case_score_breakdown(web_client: Client, ndb_stub) -> None:
     Event(
         id="2015test",
         year=2015,
@@ -247,30 +247,30 @@ def test_render_2015_camelcase_score_breakdown(web_client: Client, ndb_stub) -> 
     ).put()
 
     alliance = {
-        "robotSet": True,
-        "containerSet": False,
-        "toteSet": True,
-        "toteStack": False,
-        "toteCountFar": 2,
-        "toteCountNear": 4,
-        "containerCountLevel1": 1,
-        "containerCountLevel2": 0,
-        "containerCountLevel3": 0,
-        "containerCountLevel4": 0,
-        "containerCountLevel5": 0,
-        "containerCountLevel6": 0,
-        "litterCountContainer": 1,
-        "litterCountLandfill": 2,
-        "litterCountUnprocessed": 0,
-        "foulCount": 1,
-        "autoPoints": 10,
-        "totePoints": 24,
-        "containerPoints": 8,
-        "litterPoints": 6,
-        "teleopPoints": 38,
-        "adjustPoints": 0,
-        "foulPoints": 5,
-        "totalPoints": 43,
+        "robot_set": True,
+        "container_set": False,
+        "tote_set": True,
+        "tote_stack": False,
+        "tote_count_far": 2,
+        "tote_count_near": 4,
+        "container_count_level1": 1,
+        "container_count_level2": 0,
+        "container_count_level3": 0,
+        "container_count_level4": 0,
+        "container_count_level5": 0,
+        "container_count_level6": 0,
+        "litter_count_container": 1,
+        "litter_count_landfill": 2,
+        "litter_count_unprocessed": 0,
+        "foul_count": 1,
+        "auto_points": 10,
+        "tote_points": 24,
+        "container_points": 8,
+        "litter_points": 6,
+        "teleop_points": 38,
+        "adjust_points": 0,
+        "foul_points": 5,
+        "total_points": 43,
     }
     Match(
         id="2015test_qm1",

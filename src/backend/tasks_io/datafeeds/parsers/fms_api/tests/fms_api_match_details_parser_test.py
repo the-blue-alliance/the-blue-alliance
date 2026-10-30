@@ -266,8 +266,153 @@ def test_parse_2015_coopertition() -> None:
     breakdown = breakdowns["2015nyny_qm1"]
     assert breakdown["coopertition"] == "Stack"
     assert breakdown["coopertition_points"] == 40
-    assert breakdown[AllianceColor.RED] == {"totalPoints": 50}
-    assert breakdown[AllianceColor.BLUE] == {"totalPoints": 60}
+    assert breakdown[AllianceColor.RED] == {"total_points": 50}
+    assert breakdown[AllianceColor.BLUE] == {"total_points": 60}
+
+
+def test_parse_2015_remaps_alliance_keys_to_snake_case() -> None:
+    """FRC API camelCase alliance keys are stored as TBA's historical snake_case."""
+    _put_event(2015, "nyny", PlayoffType.AVG_SCORE_8_TEAM)
+    breakdowns = _parse(
+        2015,
+        "nyny",
+        [
+            {
+                "matchLevel": "Qualification",
+                "matchNumber": 2,
+                "coopertition": "None",
+                "coopertitionPoints": 0,
+                "Alliances": [
+                    {
+                        "alliance": "Red",
+                        "robotSet": True,
+                        "containerSet": False,
+                        "toteSet": True,
+                        "toteStack": False,
+                        "toteCountFar": 2,
+                        "toteCountNear": 4,
+                        "containerCountLevel1": 1,
+                        "containerCountLevel2": 0,
+                        "containerCountLevel3": 0,
+                        "containerCountLevel4": 0,
+                        "containerCountLevel5": 0,
+                        "containerCountLevel6": 0,
+                        "litterCountLandfill": 2,
+                        "litterCountContainer": 1,
+                        "litterCountUnprocessed": 0,
+                        "foulCount": 1,
+                        "autoPoints": 10,
+                        "totePoints": 24,
+                        "containerPoints": 8,
+                        "litterPoints": 6,
+                        "teleopPoints": 38,
+                        "adjustPoints": 0,
+                        "foulPoints": 5,
+                        "totalPoints": 43,
+                    },
+                    {
+                        "alliance": "Blue",
+                        "robotSet": False,
+                        "containerSet": True,
+                        "toteSet": False,
+                        "toteStack": True,
+                        "toteCountFar": 0,
+                        "toteCountNear": 0,
+                        "containerCountLevel1": 0,
+                        "containerCountLevel2": 1,
+                        "containerCountLevel3": 0,
+                        "containerCountLevel4": 0,
+                        "containerCountLevel5": 0,
+                        "containerCountLevel6": 0,
+                        "litterCountLandfill": 0,
+                        "litterCountContainer": 0,
+                        "litterCountUnprocessed": 1,
+                        "foulCount": 0,
+                        "autoPoints": 28,
+                        "totePoints": 0,
+                        "containerPoints": 8,
+                        "litterPoints": 4,
+                        "teleopPoints": 12,
+                        "adjustPoints": 1,
+                        "foulPoints": 0,
+                        "totalPoints": 41,
+                    },
+                ],
+            }
+        ],
+    )
+    breakdown = breakdowns["2015nyny_qm2"]
+    assert breakdown[AllianceColor.RED] == {
+        "robot_set": True,
+        "container_set": False,
+        "tote_set": True,
+        "tote_stack": False,
+        "tote_count_far": 2,
+        "tote_count_near": 4,
+        "container_count_level1": 1,
+        "container_count_level2": 0,
+        "container_count_level3": 0,
+        "container_count_level4": 0,
+        "container_count_level5": 0,
+        "container_count_level6": 0,
+        "litter_count_landfill": 2,
+        "litter_count_container": 1,
+        "litter_count_unprocessed": 0,
+        "foul_count": 1,
+        "auto_points": 10,
+        "tote_points": 24,
+        "container_points": 8,
+        "litter_points": 6,
+        "teleop_points": 38,
+        "adjust_points": 0,
+        "foul_points": 5,
+        "total_points": 43,
+    }
+    assert breakdown[AllianceColor.BLUE] == {
+        "robot_set": False,
+        "container_set": True,
+        "tote_set": False,
+        "tote_stack": True,
+        "tote_count_far": 0,
+        "tote_count_near": 0,
+        "container_count_level1": 0,
+        "container_count_level2": 1,
+        "container_count_level3": 0,
+        "container_count_level4": 0,
+        "container_count_level5": 0,
+        "container_count_level6": 0,
+        "litter_count_landfill": 0,
+        "litter_count_container": 0,
+        "litter_count_unprocessed": 1,
+        "foul_count": 0,
+        "auto_points": 28,
+        "tote_points": 0,
+        "container_points": 8,
+        "litter_points": 4,
+        "teleop_points": 12,
+        "adjust_points": 1,
+        "foul_points": 0,
+        "total_points": 41,
+    }
+    # Unknown keys pass through unchanged.
+    breakdowns_passthrough = _parse(
+        2015,
+        "nyny",
+        [
+            {
+                "matchLevel": "Qualification",
+                "matchNumber": 3,
+                "Alliances": [
+                    {"alliance": "Red", "totalPoints": 1, "futureField": "x"},
+                    {"alliance": "Blue", "totalPoints": 2},
+                ],
+            }
+        ],
+    )
+    assert breakdowns_passthrough["2015nyny_qm3"][AllianceColor.RED] == {
+        "total_points": 1,
+        "futureField": "x",
+    }
 
 
 def test_parse_2024_copies_bonus_thresholds_to_each_alliance() -> None:

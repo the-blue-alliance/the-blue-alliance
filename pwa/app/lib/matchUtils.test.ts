@@ -710,14 +710,14 @@ describe('getTeamsUnpenalizedHighScore', () => {
     expect(high?.score).toBe(80);
   });
 
-  test('subtracts 2015 camelCase foul points', () => {
+  test('subtracts 2015 snake_case foul points', () => {
     const match = makeMatch({
       key: '2015test_qm1',
       alliances: {
         red: alliance(100, ['frc254']),
         blue: alliance(10, ['frc1']),
       },
-      score_breakdown: breakdown({ foulPoints: 12 }, { foulPoints: 0 }),
+      score_breakdown: breakdown({ foul_points: 12 }, { foul_points: 0 }),
     });
 
     expect(getTeamsUnpenalizedHighScore('frc254', [match])?.score).toBe(88);
@@ -779,11 +779,11 @@ describe('getMatchScoreWithoutAdjustPoints', () => {
     });
   });
 
-  test('subtracts 2015 camelCase adjust points', () => {
+  test('subtracts 2015 snake_case adjust points', () => {
     const match = makeMatch({
       key: '2015test_qm1',
       alliances: { red: alliance(100, []), blue: alliance(50, []) },
-      score_breakdown: breakdown({ adjustPoints: 10 }, { adjustPoints: 5 }),
+      score_breakdown: breakdown({ adjust_points: 10 }, { adjust_points: 5 }),
     });
 
     expect(getMatchScoreWithoutAdjustPoints(match)).toEqual({
