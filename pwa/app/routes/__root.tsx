@@ -33,7 +33,6 @@ import {
   LOCAL_API_BASE_URL,
   isLocalDataSource,
 } from '~/lib/dataSource';
-import { createCachedFetch } from '~/lib/middleware/network-cache';
 import { STALE_TIME } from '~/lib/queryClient';
 import { THEME_INIT_SCRIPT, ThemeProvider } from '~/lib/theme';
 import { createLogger } from '~/lib/utils';
@@ -108,7 +107,8 @@ moderationClient.interceptors.error.use((error, response) => {
 
 // SSR-only network LRU under the API client. Client freshness is owned by
 // React Query staleTime — do not install a second TTL in the browser.
-if (typeof window === 'undefined') {
+if (import.meta.env.SSR) {
+  const { createCachedFetch } = await import('~/lib/middleware/network-cache');
   client.setConfig({
     fetch: createCachedFetch({
       cacheableMethods: ['GET'],
