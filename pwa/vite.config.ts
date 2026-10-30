@@ -116,7 +116,11 @@ export default defineConfig({
           if (id.includes('/temporal-polyfill/')) return 'temporal-polyfill';
 
           // Base UI primitives + their floating-ui dep — spread across 36 chunks
-          if (id.includes('/@base-ui/react/') || id.includes('/@floating-ui/'))
+          if (
+            id.includes('/@base-ui/react/') ||
+            (id.includes('/@floating-ui/') &&
+              !id.includes('/@floating-ui/vue/'))
+          )
             return 'vendor-baseui';
 
           // React core — already eager on every page, one stable long-cache chunk

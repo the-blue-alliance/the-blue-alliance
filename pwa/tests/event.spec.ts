@@ -14,20 +14,48 @@ test('fetches Nexus event data in the browser', async ({ page }) => {
   await expect.poll(() => nexusRequests.length).toBeGreaterThan(0);
 });
 
-test('requests insights success rates before the Insights tab opens', async ({
+[
+  ['insights success rates', '/game_stats'],
+  ['component OPRs', '/coprs'],
+  ['team media', '/team_media'],
+  ['team statuses', '/teams/statuses'],
+].forEach(([name, path]) => {
+  test(`does not request ${name} on page load`, async ({ page }) => {
+    const requestUrls: string[] = [];
+    page.on('request', (request) => requestUrls.push(request.url()));
+
+    await page.goto('/event/2024mil');
+    await page.locator('body[data-hydrated]').waitFor();
+    await page.waitForLoadState('networkidle');
+
+    expect(requestUrls.filter((url) => url.includes(path))).toHaveLength(0);
+  });
+});
+
+test('requests insights success rates when the pointer reaches the Insights tab', async ({
   page,
 }) => {
-  const gameStatsRequests: string[] = [];
-  page.on('request', (request) => {
-    if (request.url().includes('/game_stats')) {
-      gameStatsRequests.push(request.url());
-    }
-  });
-
   await page.goto('/event/2024mil');
   await page.locator('body[data-hydrated]').waitFor();
+  const gameStatsRequest = page.waitForRequest((request) =>
+    request.url().includes('/game_stats'),
+  );
 
-  await expect.poll(() => gameStatsRequests.length).toBeGreaterThan(0);
+  await page.getByRole('tab', { name: 'Insights' }).hover();
+
+  expect((await gameStatsRequest).url()).toContain('/game_stats');
+});
+
+test('requests team media when the Teams tab opens', async ({ page }) => {
+  await page.goto('/event/2024mil');
+  await page.locator('body[data-hydrated]').waitFor();
+  const teamMediaRequest = page.waitForRequest((request) =>
+    request.url().includes('/team_media'),
+  );
+
+  await page.getByRole('tab', { name: /^Teams/ }).click();
+
+  expect((await teamMediaRequest).url()).toContain('/team_media');
 });
 
 test('does not request regional pool points for a district event', async ({

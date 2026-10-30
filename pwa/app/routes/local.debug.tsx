@@ -4,7 +4,6 @@ import { Temporal } from 'temporal-polyfill';
 
 import { Badge } from '~/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { getCacheEntries, getCacheStats } from '~/lib/middleware/network-cache';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 interface CacheInfo {
@@ -20,7 +19,9 @@ interface CacheInfo {
 const PREVIEW_JSON_LENGTH = 50;
 
 export const Route = createFileRoute('/local/debug')({
-  loader: () => {
+  loader: async () => {
+    const { getCacheEntries, getCacheStats } =
+      await import('~/lib/middleware/network-cache');
     const stats = getCacheStats();
     const entries = getCacheEntries();
     const now = Temporal.Now.instant().epochMilliseconds;

@@ -7,14 +7,7 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { Link, createFileRoute, notFound } from '@tanstack/react-router';
-import {
-  type ComponentProps,
-  Suspense,
-  lazy,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { type ComponentProps, Suspense, lazy, useMemo, useState } from 'react';
 
 import ParentEventIcon from '~icons/lucide/arrow-up-right';
 import SourceIcon from '~icons/lucide/badge-check';
@@ -407,6 +400,15 @@ function EventPage() {
     defaultValue: matches.length > 0 ? 'results' : 'teams',
     legacyHashes: LEGACY_EVENT_TAB_HASHES,
   });
+  const [intendedTabs, setIntendedTabs] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
+  const tabIsWanted = (...values: string[]) =>
+    values.some((v) => v === tabs.value || intendedTabs.has(v));
+  const intendTab = (value: string) =>
+    setIntendedTabs((prev) =>
+      prev.has(value) ? prev : new Set([...prev, value]),
+    );
 
   const canHavePracticeMatches =
     SEASON_EVENT_TYPES.has(event.event_type) && event.year >= 2015;
@@ -439,16 +441,18 @@ function EventPage() {
     enabled: usesLegacyOprs,
   });
 
+  const wantsCoprs = !usesLegacyOprs && tabIsWanted('insights', 'scouting');
+
   const coprsQuery = useQuery({
     ...getEventCoprsOptions({ path: { event_key: eventKey } }),
     staleTime: eventStaleTime,
-    enabled: !usesLegacyOprs,
+    enabled: wantsCoprs,
   });
 
   const colorsQuery = useQuery({
     ...getEventColorsOptions({ path: { eventKey: eventKey } }),
     staleTime: eventStaleTime,
-    enabled: !usesLegacyOprs,
+    enabled: wantsCoprs,
   });
 
   const rankingsQuery = useQuery({
@@ -464,6 +468,7 @@ function EventPage() {
   const teamMediaQuery = useQuery({
     ...getEventTeamMediaOptions({ path: { event_key: eventKey } }),
     staleTime: eventStaleTime,
+    enabled: tabIsWanted('teams', 'scouting'),
   });
 
   const eventMediaQuery = useQuery({
@@ -474,6 +479,7 @@ function EventPage() {
   const teamStatusesQuery = useQuery({
     ...getEventTeamsStatusesOptions({ path: { event_key: eventKey } }),
     staleTime: eventStaleTime,
+    enabled: tabIsWanted('teams'),
   });
 
   const isDistrictEvent = DISTRICT_EVENT_TYPES.has(event.event_type);
@@ -554,10 +560,8 @@ function EventPage() {
     SEASON_EVENT_TYPES.has(event.event_type) && hasEventEnded(event);
   const shouldPreviewInsightsTab = matches.length > 0;
   const queryClient = useQueryClient();
-  useEffect(() => {
-    if (!shouldPreviewInsightsTab) {
-      return;
-    }
+  const intendInsights = () => {
+    intendTab('insights');
     void queryClient.prefetchQuery({
       ...getInsightsV2YearCategoryOptions({
         path: { year: event.year, category: 'game_stats' },
@@ -565,7 +569,7 @@ function EventPage() {
       staleTime: staleTimeForYear(event.year),
     });
     void loadCoprScatterChart();
-  }, [queryClient, shouldPreviewInsightsTab, event.year]);
+  };
   const isInsightsPending = usesLegacyOprs
     ? oprsQuery.isPending
     : coprsQuery.isPending || colorsQuery.isPending;
@@ -773,7 +777,11 @@ function EventPage() {
               </InlineIcon>
             </AnimatedTabsTrigger>
           )}
-          <AnimatedTabsTrigger value="teams">
+          <AnimatedTabsTrigger
+            value="teams"
+            onPointerEnter={() => intendTab('teams')}
+            onFocus={() => intendTab('teams')}
+          >
             <InlineIcon>
               <TeamsIcon />
               Teams
@@ -785,7 +793,11 @@ function EventPage() {
           {((shouldPreviewInsightsTab && isInsightsPending) ||
             hasInsightsData) &&
             matches.length > 0 && (
-              <AnimatedTabsTrigger value="insights">
+              <AnimatedTabsTrigger
+                value="insights"
+                onPointerEnter={intendInsights}
+                onFocus={intendInsights}
+              >
                 <InlineIcon>
                   <InsightsIcon />
                   Insights
@@ -823,7 +835,11 @@ function EventPage() {
               </Badge>
             </InlineIcon>
           </AnimatedTabsTrigger>
-          <AnimatedTabsTrigger value="scouting">
+          <AnimatedTabsTrigger
+            value="scouting"
+            onPointerEnter={() => intendTab('scouting')}
+            onFocus={() => intendTab('scouting')}
+          >
             <InlineIcon>
               <ScoutingIcon />
               Scouting

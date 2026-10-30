@@ -234,7 +234,7 @@ describe('root route module setup', () => {
   test('installs the network cache when rendering on the server', async () => {
     const cachedFetch = vi.fn<typeof fetch>();
     mocks.createCachedFetch.mockReturnValue(cachedFetch);
-    vi.stubGlobal('window', undefined);
+    vi.stubEnv('SSR', true);
 
     await loadRoot();
 
