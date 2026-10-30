@@ -18,8 +18,8 @@ importers:
         specifier: 0.9.83
         version: 0.9.83(@oxc-project/types@0.155.0)(esbuild@0.28.2)(lightningcss@1.33.0)(oxc-parser@0.152.0)(react@19.3.1)(rolldown@1.2.15)(rollup@4.62.3)(supports-color@10.2.2)(tailwindcss@4.3.3)(typescript@6.0.3)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.15)(yaml@2.9.1))(zod@4.6.7)
       '@scalar/react-renderer':
-        specifier: 0.4.4
-        version: 0.4.4(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vue@3.5.44(typescript@6.0.3))
+        specifier: 0.4.5
+        version: 0.4.5(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vue@3.5.44(typescript@6.0.3))
       '@sentry/tanstackstart-react':
         specifier: 11.9.0
         version: 11.9.0(react@19.3.1)(rollup@4.62.3)
@@ -2716,13 +2716,13 @@ packages:
     resolution: {integrity: sha512-wkTbowGZAlDA5AhCAnBVft6y3veoE17P+okH/zrwM/BZWBSzPghGpa4BPTCg3+IzRmRP/8ZeaYO7LfxCDAEmcA==}
     engines: {node: '>=22'}
 
-  '@scalar/react-renderer@0.4.4':
-    resolution: {integrity: sha512-rKZWqLpQt5JD76qwthou/KxmA0vqpU8ucJe4MUIDtw5U8Dp9kxXSASwnqY16452a/U42Zdlp045Voshz5ay+Pg==}
+  '@scalar/react-renderer@0.4.5':
+    resolution: {integrity: sha512-ED23WUoauRH8yQ6MsK4XA5/U5x5MLOvQ2svpvytAMdYghGp0QjMCyoLZifuqCeDCW08Xz/D0EPcTOY0DleWHdw==}
     engines: {node: '>=22'}
     peerDependencies:
       react: ^19.0.0
       react-dom: ^19.0.0
-      vue: ^3.5.40
+      vue: ^3.5.44
 
   '@scalar/schemas@0.15.0':
     resolution: {integrity: sha512-YxvmWVymAC536CFC84SGyt8PD57UqB5GOvr73y7Oj1Bjf8HMUUowzEt3AM3w9s21sR8ZKkncbt1R3r8sYsASnA==}
@@ -10642,7 +10642,7 @@ snapshots:
       '@scalar/helpers': 0.16.4
       '@scalar/openapi-types': 0.9.8
 
-  '@scalar/react-renderer@0.4.4(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vue@3.5.44(typescript@6.0.3))':
+  '@scalar/react-renderer@0.4.5(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vue@3.5.44(typescript@6.0.3))':
     dependencies:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
