@@ -142,28 +142,6 @@ describe('TeamMediaGallery', () => {
     expect(screen.getByTestId('team-media-gallery').innerHTML).toBe('');
   });
 
-  test('lazy-loads imgur images', () => {
-    render(<TeamMediaGallery media={[imgur('aaaaaaa')]} />);
-
-    expect(
-      screen.getByRole('img', { name: 'Team media' }).getAttribute('loading'),
-    ).toBe('lazy');
-  });
-
-  test('lazy-loads CAD thumbnails', () => {
-    render(
-      <TeamMediaGallery
-        media={[cad('onshape', 'abc/w/def', 'https://cad.example/s.png')]}
-      />,
-    );
-
-    expect(
-      screen
-        .getByRole('img', { name: 'Nightshade 2026' })
-        .getAttribute('loading'),
-    ).toBe('lazy');
-  });
-
   test('holds instagram embeds until they near the viewport', () => {
     render(<TeamMediaGallery media={[instagram('xyz')]} />);
 

@@ -251,6 +251,30 @@ test('(mobile) loads the page without downloading the search index', async ({
   ).toHaveLength(0);
 });
 
+test('requests the search index when the pointer reaches search', async ({
+  page,
+}) => {
+  // Keep the cursor off the search control so a remount under the pointer
+  // cannot intend search before this test does.
+  await page.mouse.move(0, 0);
+
+  const searchIndexUrls: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().includes('search_index')) {
+      searchIndexUrls.push(request.url());
+    }
+  });
+
+  await page.goto('/');
+  await page.locator('body[data-hydrated]').waitFor();
+  expect(searchIndexUrls).toEqual([]);
+
+  await page.getByRole('button', { name: /Search teams and events/ }).hover();
+
+  await expect.poll(() => searchIndexUrls.length).toBe(1);
+  expect(searchIndexUrls[0]).toContain('search_index');
+});
+
 test('(mobile) opening search focuses the input', async ({ page }) => {
   await page.route('**/api/v3/search_index**', async (route) => {
     await route.fulfill({

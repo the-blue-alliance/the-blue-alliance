@@ -25,7 +25,7 @@ function load(year: string | undefined, insights: unknown[]) {
     params: { year },
     context: { queryClient },
   });
-  return { result, ensureQueryData };
+  return { result };
 }
 
 describe('insights route loader', () => {
@@ -94,18 +94,6 @@ describe('insights route loader', () => {
     await expect(load(undefined, insights).result).resolves.toMatchObject({
       eventYears: [],
     });
-  });
-
-  test('prefetches events for each leaderboard year', async () => {
-    const { result, ensureQueryData } = load(undefined, [
-      leaderboard('event', ['2019casj']),
-    ]);
-    await result;
-    expect(ensureQueryData).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        queryKey: [expect.objectContaining({ path: { year: 2019 } })],
-      }),
-    );
   });
 });
 

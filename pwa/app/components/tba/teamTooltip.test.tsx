@@ -78,17 +78,6 @@ function stubHoverCapability(canHover: boolean) {
   );
 }
 
-describe('TeamLinkWithTooltip on a touch-only device', () => {
-  test('does not download the search index', async () => {
-    stubHoverCapability(false);
-
-    renderWithClient(<TeamLinkWithTooltip teamKey="frc254" year={2026} />);
-    await screen.findByRole('link', { name: '254' });
-
-    expect(searchIndexMock).not.toHaveBeenCalled();
-  });
-});
-
 describe('TeamLinkWithTooltip', () => {
   beforeEach(() => {
     stubHoverCapability(true);
