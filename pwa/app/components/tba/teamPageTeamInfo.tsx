@@ -42,7 +42,7 @@ export default function TeamPageTeamInfo({
   district?: District;
   favoriteButton?: ReactNode;
 }) {
-  const sponsors = attemptToParseSponsors(team.name);
+  const sponsors = attemptToParseSponsors(team.name, team.school_name);
   const schoolName =
     team.school_name ?? attemptToParseSchoolNameFromOldTeamName(team.name);
 
