@@ -332,6 +332,61 @@ export function calculateTeamRecordsFromMatches(
   return { quals: qualsRecord, playoff: playoffRecord };
 }
 
+export interface TeamAvgScore {
+  qualAvg: number | null;
+  playoffAvg: number | null;
+}
+
+/**
+ * Average alliance score for a team across played matches, split into
+ * qualification and playoff. Matches Recycle Rush (2015) Jinja pages, where
+ * W-L-T is not meaningful for most of the season.
+ */
+export function calculateTeamAvgScore(
+  teamKey: string,
+  matches: Match[],
+): TeamAvgScore {
+  const qualScores: number[] = [];
+  const playoffScores: number[] = [];
+
+  for (const match of matches) {
+    if (!matchHasBeenPlayed(match)) {
+      continue;
+    }
+
+    for (const alliance of [match.alliances.red, match.alliances.blue]) {
+      if (!alliance.team_keys.includes(teamKey)) {
+        continue;
+      }
+      if (
+        match.comp_level === CompLevel.QM ||
+        match.comp_level === CompLevel.PM
+      ) {
+        qualScores.push(alliance.score);
+      } else {
+        playoffScores.push(alliance.score);
+      }
+      break;
+    }
+  }
+
+  return {
+    qualAvg:
+      qualScores.length > 0
+        ? qualScores.reduce((sum, score) => sum + score, 0) / qualScores.length
+        : null,
+    playoffAvg:
+      playoffScores.length > 0
+        ? playoffScores.reduce((sum, score) => sum + score, 0) /
+          playoffScores.length
+        : null,
+  };
+}
+
+export function formatAvgScore(value: number): string {
+  return value.toFixed(2);
+}
+
 export function calculateRobotsRecord(
   robots: { robotKey: string; matches: Match[] }[],
 ): WltRecord {

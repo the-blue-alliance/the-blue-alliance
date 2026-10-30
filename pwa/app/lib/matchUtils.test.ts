@@ -15,8 +15,10 @@ import {
 import {
   allianceRobots,
   calculateRobotsRecord,
+  calculateTeamAvgScore,
   calculateTeamRecordsFromMatches,
   findAllianceNumber,
+  formatAvgScore,
   formatMatchKeyName,
   formatMatchTime,
   getAllianceMatchResult,
@@ -668,6 +670,84 @@ describe('getTeamMatchResults', () => {
       quals: { wins: 1, losses: 1, ties: 1 },
       playoff: { wins: 1, losses: 1, ties: 0 },
     });
+  });
+});
+
+describe('calculateTeamAvgScore', () => {
+  test('is empty without matches', () => {
+    expect(calculateTeamAvgScore('frc2791', [])).toEqual({
+      qualAvg: null,
+      playoffAvg: null,
+    });
+  });
+
+  test('ignores unplayed matches and matches without the team', () => {
+    expect(
+      calculateTeamAvgScore('frc2791', [
+        makeMatch({
+          key: '2015nytr_qm1',
+          alliances: {
+            red: alliance(-1, ['frc2791']),
+            blue: alliance(-1, ['frc1']),
+          },
+        }),
+        makeMatch({
+          key: '2015nytr_qm2',
+          match_number: 2,
+          alliances: {
+            red: alliance(50, ['frc1']),
+            blue: alliance(40, ['frc2']),
+          },
+        }),
+      ]),
+    ).toEqual({ qualAvg: null, playoffAvg: null });
+  });
+
+  test('averages qualification and playoff alliance scores separately', () => {
+    expect(
+      calculateTeamAvgScore('frc2791', [
+        makeMatch({
+          key: '2015nytr_qm1',
+          alliances: {
+            red: alliance(44, ['frc340', 'frc145', 'frc2791']),
+            blue: alliance(68, ['frc4508', 'frc303', 'frc527']),
+          },
+        }),
+        makeMatch({
+          key: '2015nytr_qm2',
+          match_number: 2,
+          alliances: {
+            red: alliance(114, ['frc639', 'frc2791', 'frc303']),
+            blue: alliance(70, ['frc533', 'frc263', 'frc3687']),
+          },
+        }),
+        makeMatch({
+          key: '2015nytr_qf1m1',
+          comp_level: CompLevel.QF,
+          alliances: {
+            red: alliance(49, ['frc870', 'frc2791', 'frc1111']),
+            blue: alliance(137, ['frc2852', 'frc303', 'frc4203']),
+          },
+        }),
+        makeMatch({
+          key: '2015nytr_qf1m2',
+          comp_level: CompLevel.QF,
+          match_number: 2,
+          alliances: {
+            red: alliance(82, ['frc870', 'frc2791', 'frc1111']),
+            blue: alliance(137, ['frc340', 'frc195', 'frc4930']),
+          },
+        }),
+      ]),
+    ).toEqual({
+      qualAvg: 79,
+      playoffAvg: 65.5,
+    });
+  });
+
+  test('formats averages to two decimal places', () => {
+    expect(formatAvgScore(78.73913043478261)).toBe('78.74');
+    expect(formatAvgScore(74.75)).toBe('74.75');
   });
 });
 

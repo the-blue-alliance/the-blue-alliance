@@ -266,27 +266,28 @@ const points: EventDistrictPoints = {
 
 function makeMatch(
   key: string,
-  compLevel: 'qm' | 'sf',
+  compLevel: 'qm' | 'sf' | 'qf',
   matchNumber: number,
   red: string[] = [],
   blue: string[] = [],
+  scores: { red?: number; blue?: number } = {},
 ) {
   return {
     key,
     comp_level: compLevel,
     set_number: 1,
     match_number: matchNumber,
-    event_key: '2026casj',
+    event_key: key.split('_')[0],
     winning_alliance: 'red',
     alliances: {
       red: {
-        score: 1,
+        score: scores.red ?? 1,
         team_keys: red,
         surrogate_team_keys: [],
         dq_team_keys: [],
       },
       blue: {
-        score: 0,
+        score: scores.blue ?? 0,
         team_keys: blue,
         surrogate_team_keys: [],
         dq_team_keys: [],
@@ -604,10 +605,21 @@ describe('TeamStatus sections', () => {
     expect(screen.getByText('2-0-0')).toBeTruthy();
   });
 
-  test('omits the record at 2015 events', () => {
-    renderStatus({ event: { ...fullEvent, year: 2015 } });
+  test('shows the average qual score instead of a record at 2015 events', () => {
+    renderStatus({
+      event: { ...fullEvent, key: '2015nytr', year: 2015 },
+      matches: [
+        makeMatch('2015nytr_qm1', 'qm', 1, ['frc254'], [], { red: 44 }),
+        makeMatch('2015nytr_qm2', 'qm', 2, ['frc254'], [], { red: 114 }),
+        makeMatch('2015nytr_qf1m1', 'qf', 1, ['frc254'], [], { red: 49 }),
+        makeMatch('2015nytr_qf1m2', 'qf', 2, ['frc254'], [], { red: 82 }),
+      ],
+    });
 
     expect(screen.queryByText('Record')).toBeNull();
+    expect(screen.getByText('Avg Qual')).toBeTruthy();
+    expect(screen.getByText('79.00')).toBeTruthy();
+    expect(screen.queryByText('Avg Playoff')).toBeNull();
   });
 
   test('lists the alliance with the team itself marked current', () => {
