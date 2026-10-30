@@ -83,7 +83,7 @@ function TeamsPage() {
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <div className="basis-full lg:basis-1/6">
-        <div className="top-(--header-height) pt-8 lg:sticky">
+        <div className="top-[calc(var(--header-height)+0.5rem)] lg:sticky">
           <Select
             items={pageItems}
             value={pageNum.toString()}
@@ -108,7 +108,7 @@ function TeamsPage() {
           </Select>
         </div>
       </div>
-      <div className="basis-full overflow-x-auto lg:basis-5/6 lg:py-8">
+      <div className="basis-full overflow-x-auto lg:basis-5/6">
         {pageNum === 1 && <FavoriteTeamsSection />}
         <h1 className="mb-3 text-3xl font-medium">
           <i>FIRST</i> Robotics Teams {TeamPageNumberToRange(pageNum)}

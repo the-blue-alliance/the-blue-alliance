@@ -116,7 +116,7 @@ function WebcastsPage() {
   const pastGroups = groupEventsByWeek(pastEvents).reverse();
 
   return (
-    <div className="py-8">
+    <div>
       <h1 className="mb-4 text-3xl font-medium">
         {year} Webcasts{' '}
         <small className="text-xl text-muted-foreground">

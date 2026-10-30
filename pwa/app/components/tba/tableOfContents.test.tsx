@@ -18,10 +18,12 @@ const { router } = vi.hoisted(() => ({
   router: {
     listeners: [] as Array<() => void>,
     unsubscribe: vi.fn<() => void>(),
+    match: undefined as unknown,
   },
 }));
 
 vi.mock('@tanstack/react-router', () => ({
+  useRouterState: () => router.match,
   useRouter: () => ({
     subscribe: (_event: string, listener: () => void) => {
       router.listeners.push(listener);
@@ -60,6 +62,7 @@ const scrollIntoView = vi.fn<(options?: ScrollIntoViewOptions) => void>();
 
 beforeEach(() => {
   router.listeners = [];
+  router.match = undefined;
   Element.prototype.scrollIntoView = scrollIntoView;
 });
 
@@ -116,17 +119,55 @@ describe('TableOfContents', () => {
         <TableOfContents tocItems={tocItems} inView={new Set()} mobileOnly />
       </TOCRendererProvider>,
     );
-    // No section is in view, so the trigger has no label.
-    expect(screen.queryAllByRole('link')).toHaveLength(0);
-    const trigger = await screen.findByRole('button');
-    expect(trigger.textContent).toBe('');
-
-    fireEvent.click(trigger);
+    fireEvent.click(await screen.findByRole('button'));
     expect(await screen.findByRole('dialog')).toBeTruthy();
     act(() => {
       router.listeners.forEach((listener) => listener());
     });
     await vi.waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  test('labels the mobile trigger with the first section before any is in view', async () => {
+    render(
+      <TOCRendererProvider>
+        <TableOfContents tocItems={tocItems} inView={new Set()} mobileOnly />
+      </TOCRendererProvider>,
+    );
+    expect(await screen.findByRole('button', { name: 'Info' })).toBeTruthy();
+  });
+
+  test('labels the mobile trigger with the first nested section before any is in view', async () => {
+    render(
+      <TOCRendererProvider>
+        <TableOfContents
+          tocItems={[
+            {
+              slug: 'official',
+              label: 'Official',
+              children: [{ slug: 'week-1', label: 'Week 1' }],
+            },
+          ]}
+          inView={new Set()}
+          mobileOnly
+        />
+      </TOCRendererProvider>,
+    );
+    expect(await screen.findByRole('button', { name: 'Week 1' })).toBeTruthy();
+  });
+
+  test('shows the route preview in the placeholder before the mobile header mounts', () => {
+    router.match = {
+      staticData: {
+        tocPreview: ({ year }: { year: number }) => ({
+          activeLabel: 'Team Info',
+          action: <span>{year}</span>,
+        }),
+      },
+      loaderData: { year: 2026 },
+    };
+    render(<TOCRendererProvider>{null}</TOCRendererProvider>);
+    expect(screen.getByText('Team Info')).toBeTruthy();
+    expect(screen.getByText('2026')).toBeTruthy();
   });
 
   test('clicking a desktop link without a target does not scroll', () => {

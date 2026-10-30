@@ -173,6 +173,11 @@ function CoprScatterChart(props: ComponentProps<CoprScatterChartComponent>) {
 }
 
 export const Route = createFileRoute('/event/$eventKey')({
+  staticData: {
+    // Drawn in the server-rendered TOC placeholder. Matches aren't in the
+    // loader data, so this assumes the event has qualification matches.
+    tocPreview: () => ({ activeLabel: 'Qualification Matches' }),
+  },
   loader: async ({ params, context: { queryClient } }) => {
     if (!isValidEventKey(params.eventKey)) {
       throw notFound();
@@ -580,7 +585,7 @@ function EventPage() {
   const shouldPreviewDistrictPointsTab = isDistrictEvent && matches.length > 0;
 
   return (
-    <div className="py-2 md:py-8">
+    <div>
       <div className="mb-2 flex items-center gap-2">
         <h1 className="text-3xl font-medium">
           {event.name} {event.year}

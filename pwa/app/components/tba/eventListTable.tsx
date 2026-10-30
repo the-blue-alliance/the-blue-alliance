@@ -23,6 +23,10 @@ import {
 } from '~/lib/eventUtils';
 import { useOnlineEventWebcasts } from '~/lib/gameday/useOnlineEventWebcasts';
 
+// Swap the space in "Apr 2" for a non-breaking one so ranges only wrap at the dash.
+const keepMonthDayTogether = (dates: string) =>
+  dates.replace(/(\p{L}+) (\d)/gu, '$1 $2');
+
 export default function EventListTable({ events }: { events: Event[] }) {
   const isEventOnline = useOnlineEventWebcasts();
   const items = groupEventsByParent(events);
@@ -34,12 +38,13 @@ export default function EventListTable({ events }: { events: Event[] }) {
   );
 
   return (
-    <Table className="w-full">
+    <Table className="w-full table-fixed">
       <TableHeader>
         <TableRow>
-          <TableHead>Event</TableHead>
-          <TableHead className="hidden md:table-cell">Webcast</TableHead>
-          <TableHead>Dates</TableHead>
+          <TableHead className="h-9">Event</TableHead>
+          <TableHead className="hidden h-9 md:table-cell md:w-40">
+            Webcast
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -53,6 +58,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
           const districtColor = getDistrictColorBorderClass(
             event.district?.abbreviation,
           );
+          const dates = keepMonthDayTogether(getEventCompactDateString(event));
           const watchButtonContent = (
             <InlineIcon iconSize="large">
               <MdiVideo />
@@ -99,9 +105,13 @@ export default function EventListTable({ events }: { events: Event[] }) {
                       )
                     : event.name}
                 </Link>
-                {!isDivision && (
-                  <div className="text-sm text-neutral-600">
+                {isDivision ? (
+                  <div className="text-sm text-foreground/50">{dates}</div>
+                ) : (
+                  <div className="text-sm text-foreground/50">
                     {event.city}, {event.state_prov}, {event.country}
+                    {' · '}
+                    {dates}
                   </div>
                 )}
               </TableCell>
@@ -124,9 +134,6 @@ export default function EventListTable({ events }: { events: Event[] }) {
                       {watchButtonContent}
                     </Button>
                   ))}
-              </TableCell>
-              <TableCell className="py-2 whitespace-nowrap md:py-1.5">
-                {getEventCompactDateString(event)}
               </TableCell>
             </TableRow>
           );

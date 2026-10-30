@@ -84,7 +84,7 @@ describe('TeamPageTeamInfo', () => {
       screen.getByRole('heading', { name: 'Team 254 - The Cheesy Poofs' }),
     ).toBeTruthy();
     expect(screen.getByRole('img', { name: 'Team Avatar' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Favorite' })).toBeTruthy();
+    expect(screen.getAllByRole('button', { name: 'Favorite' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'San Jose' })).toBeTruthy();
     expect(
       screen.getByRole('link', { name: 'California' }).getAttribute('href'),

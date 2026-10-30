@@ -104,7 +104,7 @@ function SuggestEventMedia(): JSX.Element {
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 py-8">
+    <div className="mx-auto max-w-3xl space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Add Event Media</h1>
         <p className="text-lg text-muted-foreground">
