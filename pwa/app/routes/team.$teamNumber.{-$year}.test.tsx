@@ -58,6 +58,7 @@ function load(year: string | undefined, responses: Record<string, unknown>) {
         ? Promise.resolve(responses[queryKey[0]._id])
         : Promise.reject(new Error('500')),
     ),
+    prefetchQuery: vi.fn<() => Promise<void>>(() => Promise.resolve()),
   } as unknown as QueryClient;
   return runLoader(Route, {
     params: { teamNumber: '254', year },
@@ -116,30 +117,15 @@ describe('team route loader', () => {
     });
   });
 
-  test('tolerates failed socials and team statuses', async () => {
+  test('loads the page when media, awards, and districts fail to load', async () => {
     await expect(
       load('2024', {
         getTeam: team,
         getTeamYearsParticipated: [2024],
-        getTeamMediaByYear: [],
         getTeamMatchesByYear: [],
-        getTeamAwardsByYear: [],
         getTeamEventsByYear: [],
-        getTeamDistricts: [],
       }),
     ).resolves.toMatchObject({ year: 2024 });
-  });
-
-  test('loads the page when remapped robot data fails to load', async () => {
-    await expect(
-      load('2026', {
-        getTeam: team,
-        getTeamYearsParticipated: [2026],
-        getTeamEventsByYear: [
-          { key: '2026nhmm', remap_teams: { frc9997: 'frc254B' } },
-        ],
-      }),
-    ).resolves.toMatchObject({ year: 2026 });
   });
 });
 
@@ -267,6 +253,54 @@ describe('StatsSection', () => {
 
     expect(screen.getByText('1-0')).toBeTruthy();
     expect(screen.queryByText(/average qual score/)).toBeNull();
+  });
+
+  test('shows a ranking placeholder while the ranking loads', () => {
+    render(
+      <StatsSection
+        events={
+          [
+            { key: '2024nytr', event_type: EventType.REGIONAL, year: 2024 },
+          ] as Parameters<typeof StatsSection>[0]['events']
+        }
+        team={team2791}
+        year={2024}
+        rankingLoading
+        remappedRobots={[]}
+        matches={[makeMatch({ key: '2024nytr_qm1' })]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('status', { name: 'Loading ranking' }),
+    ).toBeTruthy();
+  });
+
+  test('shows an overall record placeholder while remapped robot matches load', () => {
+    render(
+      <StatsSection
+        events={
+          [
+            { key: '2024nytr', event_type: EventType.REGIONAL, year: 2024 },
+          ] as Parameters<typeof StatsSection>[0]['events']
+        }
+        team={team2791}
+        year={2024}
+        remappedRobots={[
+          {
+            robotKey: 'frc2791B',
+            status: undefined,
+            matches: undefined,
+            awards: undefined,
+          },
+        ]}
+        matches={[makeMatch({ key: '2024nytr_qm1' })]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('status', { name: 'Loading overall record' }),
+    ).toBeTruthy();
   });
 });
 

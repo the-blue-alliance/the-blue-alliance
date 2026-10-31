@@ -14,6 +14,7 @@ import { District, Media, MediaAvatar, Team } from '~/api/tba/read';
 import DetailEntity from '~/components/tba/detailEntity';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { DistrictLink, TeamLocationLink } from '~/components/tba/links';
+import LoadingSkeleton from '~/components/tba/loadingSkeleton';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import TeamSocialMediaList from '~/components/tba/teamSocialMediaList';
 import {
@@ -35,12 +36,16 @@ export default function TeamPageTeamInfo({
   socials,
   district,
   favoriteButton,
+  avatarLoading = false,
+  socialsLoading = false,
 }: {
   team: Team;
   maybeAvatar: MediaAvatar | undefined;
   socials: Media[];
   district?: District;
   favoriteButton?: ReactNode;
+  avatarLoading?: boolean;
+  socialsLoading?: boolean;
 }) {
   const sponsors = attemptToParseSponsors(team.name, team.school_name);
   const schoolName =
@@ -50,7 +55,14 @@ export default function TeamPageTeamInfo({
     <>
       <div>
         <div className="mb-2 flex items-center gap-2">
-          <TeamAvatar media={maybeAvatar} className="shrink-0" />
+          {avatarLoading ? (
+            <LoadingSkeleton
+              label="Loading avatar"
+              className="size-12 shrink-0"
+            />
+          ) : (
+            <TeamAvatar media={maybeAvatar} className="shrink-0" />
+          )}
           <h1 className="text-2xl font-medium md:text-3xl">
             Team {team.team_number} - {team.nickname}
           </h1>
@@ -145,6 +157,12 @@ export default function TeamPageTeamInfo({
 
       <div className="flex flex-wrap justify-center md:justify-start">
         <TeamSocialMediaList socials={socials}>
+          {socialsLoading && (
+            <LoadingSkeleton
+              label="Loading social media"
+              className="h-5 w-48 rounded-full"
+            />
+          )}
           <Badge variant="secondary">
             <Link
               to="/suggest/team/social_media"

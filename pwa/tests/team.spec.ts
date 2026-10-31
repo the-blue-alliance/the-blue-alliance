@@ -13,6 +13,21 @@ test('shows the team name while event alliances are still loading', async ({
   await expect(page.locator('h1')).toHaveText('Team 604 - Quixilver');
 });
 
+test('shows a social media placeholder while team social media is loading', async ({
+  page,
+}) => {
+  await page.route(
+    /\/api\/v3\/team\/frc604\/social_media/,
+    () => new Promise(() => {}),
+  );
+
+  await page.goto('/team/604/2024');
+
+  await expect(
+    page.getByRole('status', { name: 'Loading social media' }),
+  ).toBeVisible();
+});
+
 [
   ['history', '/team/604/history', 'History'],
   ['stats', '/team/604/stats', 'Stats'],
@@ -430,7 +445,7 @@ test.describe('/team/6324/history', () => {
 });
 
 function isImgurThumb(url: string): boolean {
-  return /i\.imgur\.com\/[A-Za-z0-9]{7}[lh]\.\w+(\?.*)?$/.test(url);
+  return /i\.imgur\.com\/[A-Za-z0-9]{7}[mlh]\.\w+(\?.*)?$/.test(url);
 }
 
 function isImgurOriginal(url: string): boolean {
@@ -456,7 +471,7 @@ test.describe('/team/254/2026', () => {
   });
 
   [
-    ['first', 'eager', 'high'],
+    ['first', 'eager', 'auto'],
     ['next', 'lazy', 'low'],
   ].forEach(([position, loading, fetchPriority], index) => {
     test(`loads the ${position} robot picture with the expected priority`, async ({
@@ -511,9 +526,7 @@ test.describe('/team/254/2026', () => {
     await expect(lastSlide.locator('img')).toHaveCount(0);
   });
 
-  test('links the first robot picture to its original media', async ({
-    page,
-  }) => {
+  test('links the first robot picture to a larger image', async ({ page }) => {
     await expect(
       page
         .locator('[aria-roledescription="carousel"]')

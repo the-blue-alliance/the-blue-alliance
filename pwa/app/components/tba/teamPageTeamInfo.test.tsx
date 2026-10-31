@@ -146,6 +146,32 @@ describe('TeamPageTeamInfo', () => {
     ).toBeTruthy();
   });
 
+  test('shows an avatar placeholder while the avatar loads', () => {
+    render(
+      <TeamPageTeamInfo
+        team={team}
+        maybeAvatar={undefined}
+        socials={[]}
+        avatarLoading
+      />,
+    );
+    expect(screen.getByRole('status', { name: 'Loading avatar' })).toBeTruthy();
+  });
+
+  test('shows a social media placeholder while socials load', () => {
+    render(
+      <TeamPageTeamInfo
+        team={team}
+        maybeAvatar={undefined}
+        socials={[]}
+        socialsLoading
+      />,
+    );
+    expect(
+      screen.getByRole('status', { name: 'Loading social media' }),
+    ).toBeTruthy();
+  });
+
   test('links to the social media suggestion form for the team', () => {
     render(
       <TeamPageTeamInfo team={team} maybeAvatar={undefined} socials={[]} />,

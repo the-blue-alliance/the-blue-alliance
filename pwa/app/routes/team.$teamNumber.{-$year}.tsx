@@ -20,6 +20,7 @@ import {
   RegionalAdvancement,
   RegionalRanking,
   Team,
+  TeamEventStatus,
 } from '~/api/tba/read';
 import {
   getDistrictRankingsOptions,
@@ -44,6 +45,7 @@ import {
 import { AwardBanner } from '~/components/tba/banner';
 import FavoriteButton from '~/components/tba/favoriteButton';
 import { DistrictLink } from '~/components/tba/links';
+import LoadingSkeleton from '~/components/tba/loadingSkeleton';
 import {
   TableOfContents,
   TableOfContentsSection,
@@ -80,6 +82,13 @@ import {
 
 const FIRST_REGIONAL_POOL_YEAR = 2025;
 
+function settledData<T, F>(
+  result: { isPending: boolean; data: T | undefined },
+  fallback: F,
+): T | F | undefined {
+  return result.isPending ? undefined : (result.data ?? fallback);
+}
+
 export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
   staticData: {
     // Drawn in the server-rendered TOC placeholder; mirrors the real bar below.
@@ -109,138 +118,47 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
 
     const yearStaleTime = staleTimeForYear(year);
 
-    // spawn these now, we don't need to await them yet though
-    const teamMediaQuery = queryClient
-      .ensureQueryData({
-        ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
-        staleTime: yearStaleTime,
-      })
-      .catch(() => []);
-    const teamSocialsQuery = queryClient
-      .ensureQueryData(
-        getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
-      )
-      .catch(() => ({}));
-    const teamMatchesQuery = queryClient
-      .ensureQueryData({
-        ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
-        staleTime: yearStaleTime,
-      })
-      .catch(() => []);
-    const teamStatusesQuery = queryClient
-      .ensureQueryData({
-        ...getTeamEventsStatusesByYearOptions({
-          path: { team_key: teamKey, year },
-        }),
-        staleTime: yearStaleTime,
-      })
-      .catch(() => ({}));
-    const teamAwardsQuery = queryClient
-      .ensureQueryData({
-        ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
-        staleTime: yearStaleTime,
-      })
-      .catch(() => []);
     const teamEventsQuery = queryClient
       .ensureQueryData({
         ...getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
         staleTime: yearStaleTime,
       })
       .catch(() => []);
+    const teamMatchesQuery = queryClient
+      .ensureQueryData({
+        ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
+      .catch(() => []);
+    const teamAwardsQuery = queryClient
+      .ensureQueryData({
+        ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
+      .catch(() => []);
     const teamDistrictsQuery = queryClient
       .ensureQueryData(getTeamDistrictsOptions({ path: { team_key: teamKey } }))
       .catch(() => []);
-    void teamEventsQuery.then((events) =>
-      events.forEach((e) => {
-        const robots = getRemappedRobots(e, teamKey);
-        if (robots.length === 0) {
-          return;
-        }
-        void queryClient
-          .ensureQueryData({
-            ...getEventMatchesOptions({ path: { event_key: e.key } }),
-            staleTime: yearStaleTime,
-          })
-          .catch(() => undefined);
-        void queryClient
-          .ensureQueryData({
-            ...getEventAwardsOptions({ path: { event_key: e.key } }),
-            staleTime: yearStaleTime,
-          })
-          .catch(() => undefined);
-        robots.forEach((r) => {
-          void queryClient
-            .ensureQueryData({
-              ...getTeamEventStatusOptions({
-                path: { team_key: r.sourceTeamKey, event_key: e.key },
-              }),
-              staleTime: yearStaleTime,
-            })
-            .catch(() => undefined);
-        });
-      }),
-    );
-    void Promise.all([teamEventsQuery, teamDistrictsQuery]).then(
-      ([events, districts]) => {
-        events.forEach((e) => {
-          void queryClient
-            .ensureQueryData({
-              ...getEventAlliancesOptions({ path: { event_key: e.key } }),
-              staleTime: yearStaleTime,
-            })
-            .catch(() => undefined);
-          if (DISTRICT_EVENT_TYPES.has(e.event_type)) {
-            void queryClient
-              .ensureQueryData({
-                ...getEventDistrictPointsOptions({
-                  path: { event_key: e.key },
-                }),
-                staleTime: yearStaleTime,
-              })
-              .catch(() => undefined);
-          }
-          if (e.event_type === EventType.REGIONAL) {
-            void queryClient
-              .ensureQueryData({
-                ...getRegionalChampsPoolPointsOptions({
-                  path: { event_key: e.key },
-                }),
-                staleTime: yearStaleTime,
-              })
-              .catch(() => undefined);
-          }
-        });
-        if (
-          year >= FIRST_REGIONAL_POOL_YEAR &&
-          events.some((e) => e.event_type === EventType.REGIONAL)
-        ) {
-          void queryClient
-            .ensureQueryData({
-              ...getRegionalAdvancementOptions({ path: { year } }),
-              staleTime: yearStaleTime,
-            })
-            .catch(() => undefined);
-        }
-        const district = districts.find((d) => d.year === year);
-        if (district) {
-          void queryClient
-            .ensureQueryData({
-              ...getDistrictRankingsOptions({
-                path: { district_key: district.key },
-              }),
-              staleTime: yearStaleTime,
-            })
-            .catch(() => undefined);
-        } else if (year >= FIRST_REGIONAL_POOL_YEAR) {
-          void queryClient
-            .ensureQueryData({
-              ...getRegionalRankingsOptions({ path: { year } }),
-              staleTime: yearStaleTime,
-            })
-            .catch(() => undefined);
-        }
-      },
-    );
+    const teamMediaQuery = queryClient
+      .ensureQueryData({
+        ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
+      .catch(() => []);
+
+    // App Engine buffers SSR responses, so anything fetched on the server
+    // delays the first byte. Non-blocking data loads in the browser only.
+    if (!import.meta.env.SSR) {
+      void queryClient.prefetchQuery(
+        getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+      );
+      void queryClient.prefetchQuery({
+        ...getTeamEventsStatusesByYearOptions({
+          path: { team_key: teamKey, year },
+        }),
+        staleTime: yearStaleTime,
+      });
+    }
 
     // these need to be awaited so we can validate the year
     const [team, yearsParticipated] = await Promise.all([
@@ -273,25 +191,21 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       yearsParticipated,
       currentSeason,
     );
-    const avatarMediaQuery = queryClient
-      .ensureQueryData({
+    if (!import.meta.env.SSR) {
+      void queryClient.prefetchQuery({
         ...getTeamMediaByYearOptions({
           path: { team_key: teamKey, year: avatarYear },
         }),
         staleTime: staleTimeForYear(avatarYear),
-      })
-      .catch(() => []);
+      });
+    }
 
     await Promise.all([
-      // await the earlier queries
-      teamMediaQuery,
-      avatarMediaQuery,
-      teamSocialsQuery,
-      teamMatchesQuery,
-      teamStatusesQuery,
-      teamAwardsQuery,
       teamEventsQuery,
+      teamMatchesQuery,
+      teamAwardsQuery,
       teamDistrictsQuery,
+      teamMediaQuery,
     ]);
 
     const endTime = Temporal.Now.instant().epochMilliseconds;
@@ -487,7 +401,8 @@ const TeamPageContent = memo(function TeamPageContent({
     }),
     staleTime: yearStaleTime,
   });
-  const statuses = statusesQuery.data ?? {};
+  const statuses: Record<string, TeamEventStatus | null> | undefined =
+    settledData(statusesQuery, {});
   const awardsQuery = useQuery({
     ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
     staleTime: yearStaleTime,
@@ -500,7 +415,7 @@ const TeamPageContent = memo(function TeamPageContent({
 
   const currentDistrict = districts.find((d) => d.year === year);
 
-  const { data: districtRankings } = useQuery({
+  const districtRankingsQuery = useQuery({
     ...getDistrictRankingsOptions({
       path: { district_key: currentDistrict?.key ?? '' },
     }),
@@ -508,19 +423,25 @@ const TeamPageContent = memo(function TeamPageContent({
     enabled: !!currentDistrict,
   });
 
-  const teamDistrictRanking = districtRankings?.find(
+  const teamDistrictRanking = districtRankingsQuery.data?.find(
     (r) => r.team_key === teamKey,
   );
 
-  const { data: regionalRankings } = useQuery({
+  const regionalRankingsEnabled =
+    !currentDistrict && year >= FIRST_REGIONAL_POOL_YEAR;
+  const regionalRankingsQuery = useQuery({
     ...getRegionalRankingsOptions({ path: { year } }),
     staleTime: yearStaleTime,
-    enabled: !currentDistrict,
+    enabled: regionalRankingsEnabled,
   });
 
-  const teamRegionalRanking = regionalRankings?.find(
+  const teamRegionalRanking = regionalRankingsQuery.data?.find(
     (r) => r.team_key === teamKey,
   );
+
+  const rankingLoading = currentDistrict
+    ? districtRankingsQuery.isPending
+    : regionalRankingsEnabled && regionalRankingsQuery.isPending;
 
   const hasRegionalEvents = sortedEvents.some(
     (e) => e.event_type === EventType.REGIONAL,
@@ -529,37 +450,45 @@ const TeamPageContent = memo(function TeamPageContent({
   const { data: regionalAdvancement } = useQuery({
     ...getRegionalAdvancementOptions({ path: { year } }),
     staleTime: yearStaleTime,
-    enabled: hasRegionalEvents,
+    enabled: hasRegionalEvents && year >= FIRST_REGIONAL_POOL_YEAR,
   });
 
   const teamRegionalAdvancement: RegionalAdvancement | undefined =
     regionalAdvancement?.[teamKey];
 
+  const hasDistrictPoints = (e: Event) =>
+    DISTRICT_EVENT_TYPES.has(e.event_type);
   const eventDistrictPtsQueries = useQueries({
     queries: sortedEvents.map((e) => ({
       ...getEventDistrictPointsOptions({ path: { event_key: e.key } }),
       staleTime: yearStaleTime,
-      enabled: DISTRICT_EVENT_TYPES.has(e.event_type),
+      enabled: hasDistrictPoints(e),
     })),
     combine: (results) =>
       Object.fromEntries(
         results.map((result, index) => [
           sortedEvents[index].key,
-          result.data ?? null,
+          hasDistrictPoints(sortedEvents[index])
+            ? settledData(result, null)
+            : null,
         ]),
       ),
   });
+  const hasRegionalPoolPoints = (e: Event) =>
+    e.event_type === EventType.REGIONAL && year >= FIRST_REGIONAL_POOL_YEAR;
   const regionalPoolPtsQueries = useQueries({
     queries: sortedEvents.map((e) => ({
       ...getRegionalChampsPoolPointsOptions({ path: { event_key: e.key } }),
       staleTime: yearStaleTime,
-      enabled: e.event_type === EventType.REGIONAL,
+      enabled: hasRegionalPoolPoints(e),
     })),
     combine: (results) =>
       Object.fromEntries(
         results.map((result, index) => [
           sortedEvents[index].key,
-          result.data ?? null,
+          hasRegionalPoolPoints(sortedEvents[index])
+            ? settledData(result, null)
+            : null,
         ]),
       ),
   });
@@ -572,7 +501,7 @@ const TeamPageContent = memo(function TeamPageContent({
       Object.fromEntries(
         results.map((result, index) => [
           sortedEvents[index].key,
-          result.data ?? null,
+          settledData(result, null),
         ]),
       ),
   });
@@ -591,7 +520,7 @@ const TeamPageContent = memo(function TeamPageContent({
       Object.fromEntries(
         results.map((result, index) => [
           remappedEventKeys[index],
-          result.data ?? [],
+          settledData(result, []),
         ]),
       ),
   });
@@ -604,7 +533,7 @@ const TeamPageContent = memo(function TeamPageContent({
       Object.fromEntries(
         results.map((result, index) => [
           remappedEventKeys[index],
-          result.data ?? [],
+          settledData(result, []),
         ]),
       ),
   });
@@ -615,7 +544,7 @@ const TeamPageContent = memo(function TeamPageContent({
       }),
       staleTime: yearStaleTime,
     })),
-    combine: (results) => results.map((result) => result.data ?? null),
+    combine: (results) => results.map((result) => settledData(result, null)),
   });
   const remappedRobotsByEvent: Record<string, RobotAppearance[]> = {};
   remappedRobotKeys.forEach((r, index) => {
@@ -623,12 +552,12 @@ const TeamPageContent = memo(function TeamPageContent({
       robotKey: r.robotKey,
       sourceTeamKey: r.sourceTeamKey,
       status: remappedStatuses[index],
-      matches: remappedEventMatches[r.eventKey].filter((m) =>
+      matches: remappedEventMatches[r.eventKey]?.filter((m) =>
         [...m.alliances.red.team_keys, ...m.alliances.blue.team_keys].includes(
           r.robotKey,
         ),
       ),
-      awards: remappedEventAwards[r.eventKey].filter((a) =>
+      awards: remappedEventAwards[r.eventKey]?.filter((a) =>
         a.recipient_list.some((recipient) => recipient.team_key === r.robotKey),
       ),
     });
@@ -664,7 +593,9 @@ const TeamPageContent = memo(function TeamPageContent({
                 team={team}
                 socials={socials}
                 maybeAvatar={maybeAvatar}
-                district={districts.find((d) => d.year === year)}
+                district={currentDistrict}
+                avatarLoading={avatarMediaQuery.isPending}
+                socialsLoading={socialsQuery.isPending}
                 favoriteButton={
                   <FavoriteButton
                     modelKey={teamKey}
@@ -690,6 +621,7 @@ const TeamPageContent = memo(function TeamPageContent({
           district={currentDistrict}
           districtRanking={teamDistrictRanking}
           regionalRanking={teamRegionalRanking}
+          rankingLoading={rankingLoading}
           remappedRobots={Object.values(remappedRobotsByEvent).flat()}
         />
 
@@ -714,7 +646,7 @@ const TeamPageContent = memo(function TeamPageContent({
             <TeamEventAppearance
               event={e}
               matches={matches.filter((m) => m.event_key === e.key)}
-              status={statuses[e.key]}
+              status={statuses && (statuses[e.key] ?? null)}
               team={team}
               awards={awards.filter((a) => a.event_key === e.key)}
               maybeDistrictPoints={eventDistrictPtsQueries[e.key]}
@@ -754,6 +686,7 @@ export function StatsSection({
   district,
   districtRanking,
   regionalRanking,
+  rankingLoading = false,
   remappedRobots,
 }: {
   events: Event[];
@@ -763,6 +696,7 @@ export function StatsSection({
   district?: District;
   districtRanking?: DistrictRanking;
   regionalRanking?: RegionalRanking;
+  rankingLoading?: boolean;
   remappedRobots: RobotAppearance[];
 }) {
   const officialEvents = events.filter((e) =>
@@ -805,9 +739,16 @@ export function StatsSection({
   const officialRecord = addRecords(officialQuals, officialPlayoff);
   const unofficialRecord = addRecords(
     addRecords(unofficialQuals, unofficialPlayoff),
-    calculateRobotsRecord(remappedRobots),
+    calculateRobotsRecord(
+      remappedRobots.map((r) => ({
+        robotKey: r.robotKey,
+        matches: r.matches ?? [],
+      })),
+    ),
   );
-  const hasUnofficialMatches = hasAnyMatches(unofficialRecord);
+  const remappedLoading = remappedRobots.some((r) => r.matches === undefined);
+  const hasUnofficialMatches =
+    remappedLoading || hasAnyMatches(unofficialRecord);
 
   const yearAvgScore = useMemo(
     () => (year === 2015 ? calculateTeamAvgScore(team.key, matches) : null),
@@ -866,13 +807,20 @@ export function StatsSection({
             {hasUnofficialMatches ? (
               <>
                 in official play and{' '}
-                <span className="font-semibold">
-                  {officialRecord.wins + unofficialRecord.wins}-
-                  {officialRecord.losses + unofficialRecord.losses}
-                  {officialRecord.ties + unofficialRecord.ties > 0
-                    ? `-${officialRecord.ties + unofficialRecord.ties}`
-                    : ''}
-                </span>{' '}
+                {remappedLoading ? (
+                  <LoadingSkeleton
+                    label="Loading overall record"
+                    className="inline-block h-4 w-12 align-middle"
+                  />
+                ) : (
+                  <span className="font-semibold">
+                    {officialRecord.wins + unofficialRecord.wins}-
+                    {officialRecord.losses + unofficialRecord.losses}
+                    {officialRecord.ties + unofficialRecord.ties > 0
+                      ? `-${officialRecord.ties + unofficialRecord.ties}`
+                      : ''}
+                  </span>
+                )}{' '}
                 overall in {year}.
               </>
             ) : (
@@ -912,6 +860,15 @@ export function StatsSection({
             <span className="font-semibold">#{regionalRanking.rank}</span> with{' '}
             <span className="font-semibold">{regionalRanking.point_total}</span>{' '}
             points.
+          </>
+        )}
+        {rankingLoading && (
+          <>
+            {' '}
+            <LoadingSkeleton
+              label="Loading ranking"
+              className="inline-block h-4 w-64 max-w-full align-middle"
+            />
           </>
         )}
       </div>

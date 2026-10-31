@@ -8,8 +8,9 @@ import {
   getImageMedia,
   getMediaImageUrl,
   getMediaLinkUrl,
-  getMediaThumbSrcSet,
   getMediaThumbUrl,
+  getRobotPicLinkUrl,
+  getRobotPicUrl,
   getSmugmugAlbums,
   getTeamPreferredRobotPicMedium,
 } from '~/lib/mediaUtils';
@@ -205,21 +206,43 @@ describe('getMediaThumbUrl', () => {
   });
 });
 
-describe('getMediaThumbSrcSet', () => {
-  test('imgur returns 1x/2x descriptors', () => {
-    expect(getMediaThumbSrcSet(imgurMedia())).toBe(
-      'https://i.imgur.com/aB3d9Xkl.jpg 1x, https://i.imgur.com/aB3d9Xkh.jpg 2x',
+describe('getRobotPicUrl', () => {
+  test('uses the medium imgur thumbnail', () => {
+    expect(getRobotPicUrl(imgurMedia())).toBe(
+      'https://i.imgur.com/aB3d9Xkm.jpg',
     );
   });
 
-  test('imgur without a usable direct_url returns undefined', () => {
+  test('falls back to the direct url for an imgur url it cannot resize', () => {
     expect(
-      getMediaThumbSrcSet(imgurMedia({ direct_url: 'https://imgur.com/x' })),
-    ).toBeUndefined();
+      getRobotPicUrl(imgurMedia({ direct_url: 'https://imgur.com/x' })),
+    ).toBe('https://imgur.com/x');
   });
 
-  test('non-imgur media returns undefined', () => {
-    expect(getMediaThumbSrcSet(smugmugPhoto())).toBeUndefined();
+  test('uses the regular thumbnail for non-imgur media', () => {
+    expect(getRobotPicUrl(smugmugPhoto())).toBe(
+      getMediaThumbUrl(smugmugPhoto()),
+    );
+  });
+});
+
+describe('getRobotPicLinkUrl', () => {
+  test('links to the huge imgur thumbnail', () => {
+    expect(getRobotPicLinkUrl(imgurMedia())).toBe(
+      'https://i.imgur.com/aB3d9Xkh.jpg',
+    );
+  });
+
+  test('falls back to the imgur page for an imgur url it cannot resize', () => {
+    expect(
+      getRobotPicLinkUrl(imgurMedia({ direct_url: 'https://imgur.com/x' })),
+    ).toBe('https://imgur.com/aB3d9Xk');
+  });
+
+  test('uses the regular link for non-imgur media', () => {
+    expect(getRobotPicLinkUrl(smugmugPhoto())).toBe(
+      getMediaLinkUrl(smugmugPhoto()),
+    );
   });
 });
 
