@@ -15,6 +15,7 @@ export {
   type AcceptModerationSuggestionResponses,
   type AcceptRequest,
   type AcceptResponse,
+  type AuthorWriteKey,
   type AuthTypeInfo,
   type CandidateMedia,
   type ClientOptions,

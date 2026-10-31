@@ -1309,6 +1309,79 @@ describe('SuggestionReviewCard api write details', () => {
     ]);
   });
 
+  test("lists the requester's past write keys", () => {
+    renderWith(
+      apiWrite({
+        author_write_keys: [
+          {
+            event_keys: ['2025casj'],
+            auth_types: [
+              { type: 3, name: 'event matches' },
+              { type: 5, name: 'match video' },
+            ],
+            created: '2025-03-01T10:00:00',
+            expiration: '2025-03-15T00:00:00',
+          },
+          {
+            event_keys: ['2024cc', '2024casf'],
+            auth_types: [{ type: 3, name: 'event matches' }],
+            created: '2024-10-01T10:00:00',
+            expiration: null,
+          },
+        ],
+      }),
+    );
+
+    const list = screen.getByRole('list', { name: 'Past write keys' });
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map((li) => li.textContent),
+    ).toEqual([
+      '2025casj (event matches, match video) · granted 2025-03-01 · until 2025-03-15',
+      '2024cc, 2024casf (event matches) · granted 2024-10-01 · no expiration',
+    ]);
+  });
+
+  test('says when the requester has no past write keys', () => {
+    renderWith(apiWrite({ author_write_keys: [] }));
+
+    expect(fieldValue('Past write keys')).toBe('None');
+  });
+
+  test('badges earlier years the requester had keys for this event', () => {
+    renderWith(
+      apiWrite({
+        author_write_keys: [
+          { event_keys: ['2025casj'] },
+          { event_keys: ['2024casj'] },
+        ],
+      }),
+    );
+
+    expect(
+      screen.getByText('Had write keys for this event in 2024, 2025'),
+    ).toBeTruthy();
+  });
+
+  test('summarizes past write keys beyond the first five', () => {
+    renderWith(
+      apiWrite({
+        author_write_keys: [
+          { event_keys: ['2025a'] },
+          { event_keys: ['2025b'] },
+          { event_keys: ['2025c'] },
+          { event_keys: ['2025d'] },
+          { event_keys: ['2025e'] },
+          { event_keys: ['2025f'] },
+          { event_keys: ['2025g'] },
+        ],
+      }),
+    );
+
+    expect(screen.getByText('and 2 more')).toBeTruthy();
+  });
+
   test('shows an unknown requester', () => {
     renderWith(apiWrite({ author: undefined }));
 

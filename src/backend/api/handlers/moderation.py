@@ -311,6 +311,8 @@ def _serialize_suggestion(
             {
                 "nickname": author.nickname,
                 "email": author.email,
+                # Account age is a reputation signal: old accounts are rarely spam
+                "created": author.created.isoformat() if author.created else None,
                 **(author_review_counts or {}),
             }
             if author
@@ -605,11 +607,44 @@ def _add_offseason_metadata(
         )
 
 
+def _serialize_author_write_keys(keys: List[ApiAuthAccess]) -> List[Dict[str, Any]]:
+    write_keys = sorted(
+        (key for key in keys if key.auth_types_enum and key.is_write_key),
+        key=lambda key: key.created.timestamp() if key.created else 0,
+        reverse=True,
+    )
+    return [
+        {
+            "event_keys": [str(event.id()) for event in key.event_list],
+            "auth_types": [
+                {"type": int(t), "name": WRITE_TYPE_NAMES[t]}
+                for t in key.auth_types_enum
+                if t in WRITE_TYPE_NAMES
+            ],
+            "created": key.created.isoformat() if key.created else None,
+            "expiration": key.expiration.isoformat() if key.expiration else None,
+        }
+        for key in write_keys
+    ]
+
+
 def _add_apiwrite_metadata(
     suggestions: List[Suggestion], serialized: List[Dict[str, Any]]
 ) -> None:
-    """The event, requested auth types by name, and existing keys for the event."""
+    """The event, requested auth types by name, existing keys for the event,
+    and every write key the author has held (expired ones included), so
+    reviewers can spot requesters who've been trusted with keys before."""
+    author_keys = list({s.author for s in suggestions})
+    author_key_futures = {
+        author_key: ApiAuthAccess.query(ApiAuthAccess.owner == author_key).fetch_async()
+        for author_key in author_keys
+    }
+    author_write_keys = {
+        author_key: _serialize_author_write_keys(future.get_result())
+        for author_key, future in author_key_futures.items()
+    }
     for i, suggestion in enumerate(suggestions):
+        serialized[i]["author_write_keys"] = author_write_keys[suggestion.author]
         event_key = suggestion.contents["event_key"]
         serialized[i]["event"] = _serialize_reference(Event.get_by_id(event_key))
         serialized[i]["requested_auth_types"] = [
