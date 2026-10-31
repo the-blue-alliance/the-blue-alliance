@@ -18,6 +18,7 @@ import { AwardBanner } from '~/components/tba/banner';
 import DetailEntity from '~/components/tba/detailEntity';
 import EventRankTooltip from '~/components/tba/eventRankTooltip';
 import { EventLink, EventLocationLink, TeamLink } from '~/components/tba/links';
+import LoadingSkeleton from '~/components/tba/loadingSkeleton';
 import {
   CHANGE_IN_COMP_LEVEL_BREAKER,
   END_OF_DAY_BREAKER,
@@ -26,6 +27,7 @@ import {
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import { Badge } from '~/components/ui/badge';
 import { Separator } from '~/components/ui/separator';
+import { Skeleton } from '~/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
@@ -56,6 +58,19 @@ function StatChip({
       <div className="mt-1 text-2xl leading-none font-bold">{value}</div>
       {sub && <div className="mt-1 text-xs text-muted-foreground">{sub}</div>}
     </div>
+  );
+}
+
+function StatChipSkeleton({ label }: { label: string }) {
+  return <LoadingSkeleton label={label} className="h-17 rounded-lg" />;
+}
+
+function SectionSkeleton({ label }: { label: string }) {
+  return (
+    <output aria-label={label} className="block space-y-2">
+      <Skeleton className="h-4 w-24" />
+      <Skeleton className="h-4 w-full" />
+    </output>
   );
 }
 
@@ -140,9 +155,9 @@ function Section({
 export interface RobotAppearance {
   robotKey: string;
   sourceTeamKey?: string;
-  status: TeamEventStatus | null;
-  matches: Match[];
-  awards: Award[];
+  status: TeamEventStatus | null | undefined;
+  matches: Match[] | undefined;
+  awards: Award[] | undefined;
 }
 
 interface RobotTab {
@@ -165,12 +180,12 @@ export default function TeamEventAppearance({
 }: {
   event: Event;
   matches: Match[];
-  status: TeamEventStatus | null;
+  status: TeamEventStatus | null | undefined;
   team: Team;
   awards: Award[];
-  maybeDistrictPoints: EventDistrictPoints | null;
-  maybeRegionalPoolPoints: EventDistrictPoints | null;
-  maybeAlliances: EliminationAlliance[] | null;
+  maybeDistrictPoints: EventDistrictPoints | null | undefined;
+  maybeRegionalPoolPoints: EventDistrictPoints | null | undefined;
+  maybeAlliances: EliminationAlliance[] | null | undefined;
   teamRegionalAdvancement?: RegionalAdvancement;
   remappedRobots?: RobotAppearance[];
 }): React.JSX.Element {
@@ -191,22 +206,25 @@ export default function TeamEventAppearance({
     { value: 'combined', label: 'Combined', robots },
   ];
 
-  const matchList = (tab: RobotTab) => (
-    <SimpleMatchRowsWithBreaks
-      matches={[
-        ...new Map(
-          tab.robots.flatMap((r) => r.matches).map((m) => [m.key, m]),
-        ).values(),
-      ].sort(sortMatchComparator)}
-      event={event}
-      breakers={[
-        START_OF_QUALS_BREAKER,
-        END_OF_DAY_BREAKER,
-        CHANGE_IN_COMP_LEVEL_BREAKER,
-      ]}
-      focusTeamKeys={tab.robots.map((r) => r.robotKey)}
-    />
-  );
+  const matchList = (tab: RobotTab) =>
+    tab.robots.some((r) => r.matches === undefined) ? (
+      <LoadingSkeleton label="Loading matches" className="h-48 w-full" />
+    ) : (
+      <SimpleMatchRowsWithBreaks
+        matches={[
+          ...new Map(
+            tab.robots.flatMap((r) => r.matches ?? []).map((m) => [m.key, m]),
+          ).values(),
+        ].sort(sortMatchComparator)}
+        event={event}
+        breakers={[
+          START_OF_QUALS_BREAKER,
+          END_OF_DAY_BREAKER,
+          CHANGE_IN_COMP_LEVEL_BREAKER,
+        ]}
+        focusTeamKeys={tab.robots.map((r) => r.robotKey)}
+      />
+    );
 
   return (
     <div className="relative min-[1550px]:grid" id={event.key}>
@@ -304,21 +322,26 @@ export function TeamEventRecord({
   status,
   record,
   avgScore,
+  recordLoading = false,
 }: {
   event: Event;
   teamKey: string;
-  status: TeamEventStatus | null;
+  status: TeamEventStatus | null | undefined;
   record: WltRecord | undefined;
   avgScore?: TeamAvgScore;
+  recordLoading?: boolean;
 }) {
   const rank = status?.qual?.ranking?.rank;
-  if (!rank && !record && !avgScore) {
+  const rankLoading = status === undefined;
+  if (!rank && !record && !avgScore && !rankLoading && !recordLoading) {
     return null;
   }
-  const rankingPoints = getTotalRankingPoints(event, status);
+  const rankingPoints = getTotalRankingPoints(event, status ?? null);
 
   return (
     <div className="grid grid-cols-2 gap-2">
+      {rankLoading && <StatChipSkeleton label="Loading rank" />}
+      {recordLoading && <StatChipSkeleton label="Loading record" />}
       {rank && (
         <EventRankTooltip
           eventKey={event.key}
@@ -353,32 +376,46 @@ export function TeamStatus({
   teamRegionalAdvancement,
 }: {
   event: Event;
-  matches: Match[];
-  status: TeamEventStatus | null;
+  matches: Match[] | undefined;
+  status: TeamEventStatus | null | undefined;
   teamKey: string;
-  awards: Award[];
-  maybeDistrictPoints: EventDistrictPoints | null;
-  maybeRegionalPoolPoints: EventDistrictPoints | null;
-  maybeAlliances: EliminationAlliance[] | null;
+  awards: Award[] | undefined;
+  maybeDistrictPoints: EventDistrictPoints | null | undefined;
+  maybeRegionalPoolPoints: EventDistrictPoints | null | undefined;
+  maybeAlliances: EliminationAlliance[] | null | undefined;
   teamRegionalAdvancement?: RegionalAdvancement;
 }) {
   const hasRank = status?.qual?.ranking?.rank;
-  const record = getTeamEventRecord(event, teamKey, matches);
-  const avgScore = getTeamEventAvgScore(event, teamKey, matches);
+  const record = matches && getTeamEventRecord(event, teamKey, matches);
+  const avgScore = matches && getTeamEventAvgScore(event, teamKey, matches);
   const hasAlliance =
     status?.alliance && maybeAlliances && maybeAlliances.length > 0;
-  const hasAwards = awards.length > 0;
+  const allianceRuledOut =
+    status === null ||
+    status?.alliance === null ||
+    maybeAlliances === null ||
+    (maybeAlliances !== undefined &&
+      !maybeAlliances.some((a) => a.picks.includes(teamKey)));
+  const allianceLoading =
+    (status === undefined || maybeAlliances === undefined) && !allianceRuledOut;
+  const hasAwards = awards !== undefined && awards.length > 0;
+  const isDistrictEvent = DISTRICT_EVENT_TYPES.has(event.event_type);
+  const isRegionalEvent = event.event_type === EventType.REGIONAL;
   const hasDistrictPoints =
-    DISTRICT_EVENT_TYPES.has(event.event_type) &&
-    maybeDistrictPoints?.points[teamKey];
+    isDistrictEvent && maybeDistrictPoints?.points[teamKey];
   const hasRegionalPoolPoints =
-    event.event_type === EventType.REGIONAL &&
-    maybeRegionalPoolPoints?.points[teamKey];
+    isRegionalEvent && maybeRegionalPoolPoints?.points[teamKey];
 
   const sections = [];
 
   // Stats row (rank + record, or 2015 average scores)
-  if (hasRank || record || avgScore) {
+  if (
+    hasRank ||
+    record ||
+    avgScore ||
+    status === undefined ||
+    matches === undefined
+  ) {
     sections.push(
       <TeamEventRecord
         key="stats"
@@ -387,6 +424,7 @@ export function TeamStatus({
         status={status}
         record={record}
         avgScore={avgScore}
+        recordLoading={matches === undefined}
       />,
     );
   }
@@ -426,6 +464,8 @@ export function TeamStatus({
         </div>
       </div>,
     );
+  } else if (allianceLoading) {
+    sections.push(<SectionSkeleton key="alliance" label="Loading alliance" />);
   }
 
   // Awards section
@@ -458,6 +498,8 @@ export function TeamStatus({
         </div>
       </Section>,
     );
+  } else if (awards === undefined) {
+    sections.push(<SectionSkeleton key="awards" label="Loading awards" />);
   }
 
   // District Points section
@@ -468,6 +510,10 @@ export function TeamStatus({
           districtPoints={maybeDistrictPoints.points[teamKey]}
         />
       </Section>,
+    );
+  } else if (isDistrictEvent && maybeDistrictPoints === undefined) {
+    sections.push(
+      <SectionSkeleton key="district" label="Loading district points" />,
     );
   }
 
@@ -506,6 +552,13 @@ export function TeamStatus({
           districtPoints={maybeRegionalPoolPoints.points[teamKey]}
         />
       </Section>,
+    );
+  } else if (isRegionalEvent && maybeRegionalPoolPoints === undefined) {
+    sections.push(
+      <SectionSkeleton
+        key="regional-pool"
+        label="Loading regional pool points"
+      />,
     );
   }
 

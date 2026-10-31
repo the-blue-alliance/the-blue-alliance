@@ -14,6 +14,37 @@ test('fetches Nexus event data in the browser', async ({ page }) => {
   await expect.poll(() => nexusRequests.length).toBeGreaterThan(0);
 });
 
+test('shows the qualification matches while event teams are still loading', async ({
+  page,
+}) => {
+  await page.route(
+    /\/api\/v3\/event\/2024mil\/teams(\?|$)/,
+    () => new Promise(() => {}),
+  );
+
+  await page.goto('/event/2024mil');
+
+  await expect(
+    page.getByRole('heading', { name: 'Qualification Matches' }),
+  ).toBeVisible();
+});
+
+test('shows a team count placeholder while event teams are loading', async ({
+  page,
+}) => {
+  await page.route(
+    /\/api\/v3\/event\/2024mil\/teams(\?|$)/,
+    () => new Promise(() => {}),
+  );
+
+  await page.goto('/event/2024mil');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(
+    page.getByRole('status', { name: 'Loading team count' }),
+  ).toBeVisible();
+});
+
 [
   ['insights success rates', '/game_stats'],
   ['component OPRs', '/coprs'],

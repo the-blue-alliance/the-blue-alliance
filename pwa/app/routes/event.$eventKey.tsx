@@ -1,6 +1,4 @@
 import {
-  type EnsureQueryDataOptions,
-  type QueryKey,
   useQueries,
   useQuery,
   useQueryClient,
@@ -84,6 +82,7 @@ import {
   EventLocationLink,
   TeamLink,
 } from '~/components/tba/links';
+import LoadingSkeleton from '~/components/tba/loadingSkeleton';
 import {
   CHANGE_IN_COMP_LEVEL_BREAKER,
   CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER,
@@ -201,12 +200,14 @@ export const Route = createFileRoute('/event/$eventKey')({
         staleTime: eventStaleTime,
       })
       .catch(() => []);
-    const teamsQuery = queryClient
-      .ensureQueryData({
+    // App Engine buffers SSR responses, so anything fetched on the server
+    // delays the first byte. Non-blocking data loads in the browser only.
+    if (!import.meta.env.SSR) {
+      void queryClient.prefetchQuery({
         ...getEventTeamsOptions({ path: { event_key: params.eventKey } }),
         staleTime: eventStaleTime,
-      })
-      .catch(() => []);
+      });
+    }
 
     const event = await queryClient
       .ensureQueryData({
@@ -215,82 +216,7 @@ export const Route = createFileRoute('/event/$eventKey')({
       })
       .catch(doThrowNotFound);
 
-    // Greedily kick off parent/division event fetches so the dropdowns
-    // render immediately and populate client-side as data arrives.
-    if (event.parent_event_key) {
-      void queryClient
-        .ensureQueryData({
-          ...getEventOptions({ path: { event_key: event.parent_event_key } }),
-          staleTime: eventStaleTime,
-        })
-        .then((parentEvent) => {
-          // Also kick off sibling division fetches
-          for (const key of parentEvent.division_keys) {
-            if (key !== params.eventKey) {
-              void queryClient
-                .ensureQueryData({
-                  ...getEventSimpleOptions({ path: { event_key: key } }),
-                  staleTime: eventStaleTime,
-                })
-                .catch(() => undefined);
-            }
-          }
-        })
-        .catch(() => undefined);
-    }
-    for (const key of event.division_keys) {
-      void queryClient
-        .ensureQueryData({
-          ...getEventSimpleOptions({ path: { event_key: key } }),
-          staleTime: eventStaleTime,
-        })
-        .catch(() => undefined);
-    }
-
-    if (
-      ROUND_ROBIN_TYPES.has(event.playoff_type) ||
-      event.playoff_type === PlayoffType.AVG_SCORE_8_TEAM
-    ) {
-      void queryClient
-        .ensureQueryData({
-          ...getEventPlayoffAdvancementOptions({
-            path: { event_key: params.eventKey },
-          }),
-          staleTime: eventStaleTime,
-        })
-        .catch(() => undefined);
-    }
-
-    const startQuery = <
-      TQueryFnData,
-      TError,
-      TData,
-      TQueryKey extends QueryKey,
-    >(
-      options: EnsureQueryDataOptions<TQueryFnData, TError, TData, TQueryKey>,
-    ) =>
-      void queryClient
-        .ensureQueryData({ ...options, staleTime: eventStaleTime })
-        .catch(() => undefined);
-    const eventPath = { path: { event_key: params.eventKey } };
-    startQuery(getEventAwardsOptions(eventPath));
-    startQuery(getEventRankingsOptions(eventPath));
-    startQuery(getEventMediaOptions(eventPath));
-    if (event.year <= 2014) {
-      startQuery(getEventOprsOptions(eventPath));
-    }
-    if (SEASON_EVENT_TYPES.has(event.event_type) && event.year >= 2026) {
-      startQuery(getEventPracticeMatchesOptions(eventPath));
-    }
-    if (DISTRICT_EVENT_TYPES.has(event.event_type)) {
-      startQuery(getEventDistrictPointsOptions(eventPath));
-    }
-    if (event.event_type === EventType.REGIONAL) {
-      startQuery(getRegionalChampsPoolPointsOptions(eventPath));
-      startQuery(getRegionalAdvancementOptions({ path: { year: event.year } }));
-    }
-
-    await Promise.all([matchesQuery, alliancesQuery, teamsQuery]);
+    await Promise.all([matchesQuery, alliancesQuery]);
 
     // event needs to be returned so we can access it in meta
     return { eventKey: params.eventKey, event };
@@ -618,6 +544,13 @@ function EventPage() {
                   {stripParentPrefix(e.name, parentEventQuery.data?.name)}
                 </DropdownMenuItem>
               ))}
+              {(parentEventQuery.isPending ||
+                siblingDivisionQueries.some((q) => q.isPending)) && (
+                <LoadingSkeleton
+                  label="Loading divisions"
+                  className="m-1 h-6 w-40"
+                />
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -648,6 +581,12 @@ function EventPage() {
                   {stripParentPrefix(e.name, event.name)}
                 </DropdownMenuItem>
               ))}
+              {ownDivisionQueries.some((q) => q.isPending) && (
+                <LoadingSkeleton
+                  label="Loading divisions"
+                  className="m-1 h-6 w-40"
+                />
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -669,7 +608,14 @@ function EventPage() {
           <DetailEntity icon={<ParentEventIcon />}>
             Winners advance to{' '}
             <EventLink eventOrKey={event.parent_event_key}>
-              {parentEventQuery.data?.name ?? event.parent_event_key}
+              {parentEventQuery.isPending ? (
+                <LoadingSkeleton
+                  label="Loading parent event"
+                  className="inline-block h-4 w-40 align-middle"
+                />
+              ) : (
+                (parentEventQuery.data?.name ?? event.parent_event_key)
+              )}
             </EventLink>
           </DetailEntity>
         )}
@@ -791,7 +737,14 @@ function EventPage() {
               <TeamsIcon />
               Teams
               <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
-                {teamsQuery.data?.length ?? '-'}
+                {teamsQuery.isPending ? (
+                  <LoadingSkeleton
+                    label="Loading team count"
+                    className="h-3 w-4"
+                  />
+                ) : (
+                  (teamsQuery.data?.length ?? '-')
+                )}
               </Badge>
             </InlineIcon>
           </AnimatedTabsTrigger>
@@ -834,9 +787,16 @@ function EventPage() {
               <MediaIcon />
               Media
               <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
-                {eventMediaQuery.data
-                  ? eventMediaQuery.data.length + event.webcasts.length
-                  : '-'}
+                {eventMediaQuery.isPending ? (
+                  <LoadingSkeleton
+                    label="Loading media count"
+                    className="h-3 w-4"
+                  />
+                ) : eventMediaQuery.data ? (
+                  eventMediaQuery.data.length + event.webcasts.length
+                ) : (
+                  '-'
+                )}
               </Badge>
             </InlineIcon>
           </AnimatedTabsTrigger>
@@ -869,25 +829,41 @@ function EventPage() {
           />
         </TabsContent>
 
-        {rankingsQuery.data && !isCmpFinals && (
+        {!isCmpFinals && (
           <TabsContent value="rankings">
-            <RankingsTable
-              year={event.year}
-              rankings={rankingsQuery.data}
-              winners={
-                getFinalsResult(alliances, matches, isAfterEventEndDate(event))
-                  .winner?.picks ?? []
-              }
-              captains={alliances.map((a) => a.picks[0])}
-            />
+            {rankingsQuery.isPending ? (
+              <TabSkeleton label="Loading rankings" />
+            ) : (
+              rankingsQuery.data && (
+                <RankingsTable
+                  year={event.year}
+                  rankings={rankingsQuery.data}
+                  winners={
+                    getFinalsResult(
+                      alliances,
+                      matches,
+                      isAfterEventEndDate(event),
+                    ).winner?.picks ?? []
+                  }
+                  captains={alliances.map((a) => a.picks[0])}
+                />
+              )
+            )}
           </TabsContent>
         )}
 
         <TabsContent value="awards">
-          {awardsQuery.data && <AwardsTab awards={awardsQuery.data} />}
+          {awardsQuery.isPending ? (
+            <TabSkeleton label="Loading awards" />
+          ) : (
+            awardsQuery.data && <AwardsTab awards={awardsQuery.data} />
+          )}
         </TabsContent>
 
         <TabsContent value="teams">
+          {(teamsQuery.isPending || teamMediaQuery.isPending) && (
+            <TabSkeleton label="Loading teams" />
+          )}
           {teamsQuery.data && teamMediaQuery.data && (
             <EventTeamsTab
               event={event}
@@ -901,6 +877,7 @@ function EventPage() {
 
         <TabsContent value="insights">
           <div className="space-y-6">
+            {isInsightsPending && <TabSkeleton label="Loading insights" />}
             {oprsQuery.data && (
               <ComponentOprsTable
                 title="OPRs"
@@ -941,6 +918,9 @@ function EventPage() {
 
         {isDistrictEvent && (
           <TabsContent value="district-points">
+            {districtPointsQuery.isPending && (
+              <TabSkeleton label="Loading district points" />
+            )}
             {districtPointsQuery.data && (
               <DistrictPointsTab
                 districtPoints={districtPointsQuery.data}
@@ -953,14 +933,20 @@ function EventPage() {
         {event.event_type === EventType.REGIONAL &&
           (event.year >= 2025 || regionalAdvancementQuery.data != null) && (
             <TabsContent value="champs-qual-points">
-              <ChampsQualPointsTab
-                teams={teamsQuery.data ?? []}
-                champsPoolPoints={regionalChampsPoolPointsQuery.data ?? null}
-                advancement={regionalAdvancementQuery.data ?? null}
-                eventKey={eventKey}
-                eventWeek={event.week}
-                year={event.year}
-              />
+              {teamsQuery.isPending ||
+              regionalChampsPoolPointsQuery.isPending ||
+              regionalAdvancementQuery.isPending ? (
+                <TabSkeleton label="Loading champs qual points" />
+              ) : (
+                <ChampsQualPointsTab
+                  teams={teamsQuery.data ?? []}
+                  champsPoolPoints={regionalChampsPoolPointsQuery.data ?? null}
+                  advancement={regionalAdvancementQuery.data ?? null}
+                  eventKey={eventKey}
+                  eventWeek={event.week}
+                  year={event.year}
+                />
+              )}
             </TabsContent>
           )}
 
@@ -970,9 +956,13 @@ function EventPage() {
             media={eventMediaQuery.data ?? []}
             eventKey={event.key}
           />
+          {eventMediaQuery.isPending && <TabSkeleton label="Loading media" />}
         </TabsContent>
 
         <TabsContent value="scouting">
+          {(teamsQuery.isPending || teamMediaQuery.isPending) && (
+            <TabSkeleton label="Loading scouting" />
+          )}
           {teamsQuery.data && teamMediaQuery.data && (
             <ScoutingTab
               teams={teamsQuery.data}
@@ -985,6 +975,9 @@ function EventPage() {
         </TabsContent>
 
         <TabsContent value="practice">
+          {canHavePracticeMatches && practiceMatchesQuery.isPending && (
+            <TabSkeleton label="Loading practice matches" />
+          )}
           {practiceMatches.length > 0 && (
             <EventPracticeTab event={event} matches={practiceMatches} />
           )}
@@ -1092,6 +1085,12 @@ function ResultsTab({
         year={event.year}
         remapTeams={event.remap_teams}
       />
+      {isRoundRobin && playoffAdvancementQuery.isPending && (
+        <LoadingSkeleton
+          label="Loading round robin rankings"
+          className="mt-4 h-48 w-full"
+        />
+      )}
       {roundRobinAdvancement && (
         <RoundRobinRankingsTable
           advancement={roundRobinAdvancement}
@@ -1106,6 +1105,12 @@ function ResultsTab({
     <TableOfContentsSection id="playoff-matches" setInView={setInView}>
       <h2 className="mb-2 text-xl font-medium">Playoff Matches</h2>
       {rightSideElims}
+      {isAverageScorePlayoff && playoffAdvancementQuery.isPending && (
+        <LoadingSkeleton
+          label="Loading playoff advancement"
+          className="h-48 w-full"
+        />
+      )}
       {isAverageScorePlayoff && playoffAdvancementQuery.data && (
         <PlayoffAdvancement2015Table
           advancements={playoffAdvancementQuery.data}
@@ -1179,6 +1184,10 @@ function ResultsTab({
       )}
     </>
   );
+}
+
+function TabSkeleton({ label }: { label: string }) {
+  return <LoadingSkeleton label={label} className="h-64 w-full" />;
 }
 
 function AwardsTab({ awards }: { awards: Award[] }) {

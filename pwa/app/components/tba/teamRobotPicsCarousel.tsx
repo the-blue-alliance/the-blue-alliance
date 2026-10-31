@@ -8,11 +8,7 @@ import {
   CarouselItem,
   CarouselNavigation,
 } from '~/components/ui/carousel';
-import {
-  getMediaLinkUrl,
-  getMediaThumbSrcSet,
-  getMediaThumbUrl,
-} from '~/lib/mediaUtils';
+import { getRobotPicLinkUrl, getRobotPicUrl } from '~/lib/mediaUtils';
 
 function neighbors(index: number, length: number): number[] {
   return [index - 1, index, index + 1].filter((i) => i >= 0 && i < length);
@@ -25,7 +21,7 @@ export default function TeamRobotPicsCarousel({
 }): React.JSX.Element | null {
   const [failed, setFailed] = useState<ReadonlySet<string>>(() => new Set());
   const slides = media.flatMap((m) => {
-    const url = getMediaThumbUrl(m);
+    const url = getRobotPicUrl(m);
     return url && !failed.has(url) ? [{ media: m, url }] : [];
   });
   const [selected, setSelected] = useState(0);
@@ -66,7 +62,7 @@ export default function TeamRobotPicsCarousel({
     >
       <CarouselContent className="mb-6 items-center">
         {slides.map(({ media: m, url }, i) => {
-          const linkUrl = getMediaLinkUrl(m);
+          const linkUrl = getRobotPicLinkUrl(m);
           const isFirst = i === 0;
           const img =
             nearby.includes(i) || visited.has(url) ? (
@@ -78,14 +74,12 @@ export default function TeamRobotPicsCarousel({
                   if (el?.complete && el.naturalWidth === 0) markFailed(url);
                 }}
                 onError={() => markFailed(url)}
-                srcSet={getMediaThumbSrcSet(m)}
-                sizes="320px"
                 width={320}
                 height={250}
                 alt=""
                 decoding="async"
                 loading={isFirst ? 'eager' : 'lazy'}
-                fetchPriority={isFirst ? 'high' : 'low'}
+                fetchPriority={isFirst ? 'auto' : 'low'}
               />
             ) : (
               <div className="h-[250px] w-full" />

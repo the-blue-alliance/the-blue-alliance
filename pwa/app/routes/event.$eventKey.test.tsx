@@ -15,7 +15,8 @@ function fakeQueryClient(
   const ensureQueryData = vi.fn<(options: QueryOptions) => Promise<unknown>>(
     ({ queryKey }) => respond(queryKey[0]._id, queryKey[0].path.event_key),
   );
-  return { ensureQueryData } as unknown as QueryClient;
+  const prefetchQuery = vi.fn<() => Promise<void>>(() => Promise.resolve());
+  return { ensureQueryData, prefetchQuery } as unknown as QueryClient;
 }
 
 function load(eventKey: string, queryClient: QueryClient) {
@@ -53,7 +54,7 @@ describe('event route loader', () => {
     });
   });
 
-  test('tolerates failed match, alliance, and team fetches', async () => {
+  test('tolerates failed match and alliance fetches', async () => {
     const queryClient = fakeQueryClient((id) =>
       id === 'getEvent'
         ? Promise.resolve(event)
@@ -62,45 +63,6 @@ describe('event route loader', () => {
     await expect(load('2024casj', queryClient)).resolves.toEqual({
       eventKey: '2024casj',
       event,
-    });
-  });
-
-  test('swallows a failed parent event fetch', async () => {
-    const queryClient = fakeQueryClient((id, eventKey) => {
-      if (id !== 'getEvent') return Promise.resolve([]);
-      return eventKey === '2024cur'
-        ? Promise.resolve({ ...event, parent_event_key: '2024cmptx' })
-        : Promise.reject(new Error('500'));
-    });
-    await expect(load('2024cur', queryClient)).resolves.toMatchObject({
-      eventKey: '2024cur',
-    });
-  });
-
-  test('swallows a failed division fetch', async () => {
-    const queryClient = fakeQueryClient((id) => {
-      if (id === 'getEventSimple') return Promise.reject(new Error('500'));
-      return Promise.resolve(
-        id === 'getEvent' ? { ...event, division_keys: ['2024cur'] } : [],
-      );
-    });
-    await expect(load('2024cmptx', queryClient)).resolves.toMatchObject({
-      eventKey: '2024cmptx',
-    });
-  });
-
-  test('swallows failed sibling division fetches', async () => {
-    const queryClient = fakeQueryClient((id, eventKey) => {
-      if (id === 'getEventSimple') return Promise.reject(new Error('500'));
-      if (id !== 'getEvent') return Promise.resolve([]);
-      return Promise.resolve(
-        eventKey === '2024cur'
-          ? { ...event, parent_event_key: '2024cmptx' }
-          : { ...event, division_keys: ['2024gal'] },
-      );
-    });
-    await expect(load('2024cur', queryClient)).resolves.toMatchObject({
-      eventKey: '2024cur',
     });
   });
 });

@@ -527,6 +527,35 @@ describe('TeamEventAppearance with a remapped robot', () => {
     );
   });
 
+  test('shows a matches placeholder on the remapped robot tab while its matches load', () => {
+    render(
+      <TeamEventAppearance
+        event={{ ...fullEvent, event_type: EventType.OFFSEASON, week: null }}
+        matches={[makeMatch('2026casj_qm1', 'qm', 1, ['frc254'])]}
+        status={fullStatus}
+        team={team}
+        awards={[]}
+        maybeDistrictPoints={null}
+        maybeRegionalPoolPoints={null}
+        maybeAlliances={null}
+        remappedRobots={[
+          {
+            robotKey: 'frc254B',
+            sourceTeamKey: 'frc9997',
+            status: robotStatus,
+            matches: undefined,
+            awards: [],
+          },
+        ]}
+      />,
+    );
+    fireEvent.click(screen.getByRole('tab', { name: '254B' }));
+
+    expect(
+      screen.getByRole('status', { name: 'Loading matches' }),
+    ).toBeTruthy();
+  });
+
   test('keeps the rank of both robots when a robot tab is selected', () => {
     renderWithRobot();
     fireEvent.click(screen.getByRole('tab', { name: '254B' }));
@@ -714,6 +743,64 @@ describe('TeamStatus sections', () => {
     });
 
     expect(screen.queryByText('Regional Pool Points')).toBeNull();
+  });
+
+  test('shows a rank placeholder while the team status loads', () => {
+    renderStatus({ status: undefined });
+
+    expect(screen.getByRole('status', { name: 'Loading rank' })).toBeTruthy();
+  });
+
+  test('shows a record placeholder while the robot matches load', () => {
+    renderStatus({ matches: undefined });
+
+    expect(screen.getByRole('status', { name: 'Loading record' })).toBeTruthy();
+  });
+
+  test('shows an alliance placeholder while alliances load', () => {
+    renderStatus({ maybeAlliances: undefined });
+
+    expect(
+      screen.getByRole('status', { name: 'Loading alliance' }),
+    ).toBeTruthy();
+  });
+
+  test('omits the alliance placeholder once alliances show the team was not picked', () => {
+    renderStatus({
+      status: undefined,
+      maybeAlliances: [
+        { name: 'Alliance 1', picks: ['frc1678'], declines: [] },
+      ],
+    });
+
+    expect(
+      screen.queryByRole('status', { name: 'Loading alliance' }),
+    ).toBeNull();
+  });
+
+  test('shows an awards placeholder while awards load', () => {
+    renderStatus({ awards: undefined });
+
+    expect(screen.getByRole('status', { name: 'Loading awards' })).toBeTruthy();
+  });
+
+  test('shows a district points placeholder while points load at district events', () => {
+    renderStatus({
+      event: { ...fullEvent, event_type: EventType.DISTRICT },
+      maybeDistrictPoints: undefined,
+    });
+
+    expect(
+      screen.getByRole('status', { name: 'Loading district points' }),
+    ).toBeTruthy();
+  });
+
+  test('shows a regional pool points placeholder while points load at regionals', () => {
+    renderStatus({ maybeRegionalPoolPoints: undefined });
+
+    expect(
+      screen.getByRole('status', { name: 'Loading regional pool points' }),
+    ).toBeTruthy();
   });
 
   test('marks the event where the team earned its pool invitation', () => {
