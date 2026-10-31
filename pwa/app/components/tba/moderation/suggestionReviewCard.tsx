@@ -10,7 +10,7 @@ import type {
 } from '~/api/tba/moderation/types.gen';
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
 import { EventType } from '~/api/tba/read';
-import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
+import { TwitchEmbed, YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Card, CardHeader, CardTitle } from '~/components/ui/card';
@@ -777,6 +777,33 @@ function EventMediaDetails({
   );
 }
 
+// Previews whatever the moderator is about to accept, so a corrected
+// type or channel updates the player.
+function webcastPreview(
+  type: string,
+  channel: string,
+  eventName: string,
+): JSX.Element | null {
+  const title = `Suggested webcast for ${eventName}`;
+  if (!channel) {
+    return null;
+  }
+  if (type === 'youtube') {
+    return (
+      <YoutubeEmbed
+        videoId={channel}
+        title={title}
+        className="max-w-sm"
+        clickToPlay
+      />
+    );
+  }
+  if (type === 'twitch') {
+    return <TwitchEmbed channel={channel} title={title} className="max-w-sm" />;
+  }
+  return null;
+}
+
 function WebcastDetails({
   suggestion,
   overrides,
@@ -791,8 +818,16 @@ function WebcastDetails({
     suggestion.event?.start_date,
     suggestion.event?.end_date,
   );
-  return (
-    <div className="flex flex-col gap-3">
+  const webcastType = overrides.webcast_type ?? webcastDict?.type ?? '';
+  const webcastChannel =
+    overrides.webcast_channel ?? webcastDict?.channel ?? '';
+  const preview = webcastPreview(
+    webcastType,
+    webcastChannel,
+    suggestion.event?.name ?? suggestion.target_key ?? '',
+  );
+  const fields = (
+    <>
       {!hideEventContext && (
         <>
           <FieldRow label="Event">
@@ -831,7 +866,7 @@ function WebcastDetails({
           <select
             className="h-9 rounded-md border border-input bg-transparent px-3
               text-sm"
-            value={overrides.webcast_type ?? webcastDict?.type ?? ''}
+            value={webcastType}
             onChange={(e) =>
               onOverridesChange({ ...overrides, webcast_type: e.target.value })
             }
@@ -846,7 +881,7 @@ function WebcastDetails({
         </label>
         <LabeledInput
           label="Channel"
-          value={overrides.webcast_channel ?? webcastDict?.channel ?? ''}
+          value={webcastChannel}
           onChange={(value) =>
             onOverridesChange({ ...overrides, webcast_channel: value })
           }
@@ -869,7 +904,14 @@ function WebcastDetails({
           }
         />
       </div>
-    </div>
+    </>
+  );
+  return preview ? (
+    <PreviewLayout previewSide="right" preview={preview}>
+      {fields}
+    </PreviewLayout>
+  ) : (
+    <div className="flex flex-col gap-3">{fields}</div>
   );
 }
 

@@ -51,6 +51,11 @@ vi.mock('~/components/tba/videoEmbeds', () => ({
       {title}
     </div>
   ),
+  TwitchEmbed: ({ channel, title }: { channel: string; title: string }) => (
+    <div data-testid="twitch-embed" data-channel={channel}>
+      {title}
+    </div>
+  ),
 }));
 
 vi.mock('react-social-media-embed', () => ({
@@ -1151,6 +1156,47 @@ describe('SuggestionReviewCard webcast', () => {
     expect(
       (screen.getByLabelText('Date (optional)') as HTMLInputElement).value,
     ).toBe('2026-03-08');
+  });
+});
+
+describe('SuggestionReviewCard webcast preview', () => {
+  const webcastOf = (dict: Record<string, string>) =>
+    suggestionOf({
+      target_model: SuggestionType.EVENT,
+      event: EVENT_REFERENCE,
+      contents: { webcast_dict: dict },
+    });
+
+  test('previews a suggested YouTube webcast', () => {
+    renderWith(webcastOf({ type: 'youtube', channel: 'V4lDQSlvi7Q' }));
+
+    expect(
+      screen.getByTestId('youtube-embed').getAttribute('data-video-id'),
+    ).toBe('V4lDQSlvi7Q');
+  });
+
+  test('previews the moderator-corrected channel', () => {
+    renderWith(webcastOf({ type: 'youtube', channel: 'wrong' }), {
+      overrides: { webcast_channel: 'V4lDQSlvi7Q' },
+    });
+
+    expect(
+      screen.getByTestId('youtube-embed').getAttribute('data-video-id'),
+    ).toBe('V4lDQSlvi7Q');
+  });
+
+  test('previews a suggested Twitch webcast', () => {
+    renderWith(webcastOf({ type: 'twitch', channel: 'firstinspires' }));
+
+    expect(
+      screen.getByTestId('twitch-embed').getAttribute('data-channel'),
+    ).toBe('firstinspires');
+  });
+
+  test('shows no preview for webcast types without a player', () => {
+    renderWith(webcastOf({ type: 'iframe', channel: '<iframe>' }));
+
+    expect(screen.queryByText(/Suggested webcast for/)).toBeNull();
   });
 });
 
