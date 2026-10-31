@@ -47,6 +47,22 @@ tests/                 # Playwright E2E tests
 - **Use `Temporal` instead of `Date`** - the Temporal polyfill is available; prefer `Temporal.PlainDate`, `Temporal.ZonedDateTime`, etc. over `Date` for all datetime handling
 - **Analytics page views are tracked at the router level** - `router.subscribe('onResolved', ...)` in `app/router.tsx` fires a `page_view` event on every client-side navigation. Do not add duplicate page view tracking elsewhere. Make sure all logged events are tagged with the client platform via `client_platform: 'pwa'`.
 
+## Data Loading and Performance
+
+Design for a phone on a weak or congested mobile connection. The page should show its main content quickly, stay still while the rest loads, and respond to taps as soon as possible.
+
+- **App Engine does not stream SSR responses.** It sends the whole response only when the server is done. With `@tanstack/react-router-ssr-query`, every query started during SSR delays the first byte, awaited or not, and its data is written into the HTML. "Start it now, don't await it" does not help on the server.
+- **Decide which queries block.** A loader should await only the data the user came to see. Today the team page blocks on team, years participated, events, matches, awards, districts and media. The event page blocks on event, matches and alliances.
+- **Keep blocking queries in one parallel round.** A query that needs another query's result (for example, per-event data that needs the event list) adds a full round trip to every page load. Make it non-blocking.
+- **Load non-blocking data in the browser only.** Either let the component's `useQuery` fetch it, or prefetch it in the loader inside `if (!import.meta.env.SSR)` with `queryClient.prefetchQuery`.
+- **Show a skeleton for every pending request.** Use `LoadingSkeleton` from `~/components/tba/loadingSkeleton` with a `label` such as `"Loading rank"`. It renders `<output aria-label>`, so screen readers announce it and tests can find it with `getByRole('status', { name: 'Loading rank' })`.
+  - A disabled query (`enabled: false`) reports `isPending` forever. Check that the query is enabled before showing its skeleton.
+  - A failed query should render as loaded and empty, so a skeleton never stays on screen.
+- **Avoid layout shift.** Size each skeleton like the content it replaces. If a skeleton often collapses to nothing (a 250 px photo placeholder for a team with no photos) or the content's height is hard to predict, and the data is small and fits in the first parallel round, block on it instead. Keep layout shift in the first screen near 0.
+- **Keep hydration fast.** Taps, tabs and menus do nothing until React hydrates, and hydration waits for the JavaScript to download. On Slow 4G, every 100 KB of gzipped JS adds about 0.5 s. Lazy-load anything not needed on the first screen, and avoid adding to the entry chunk.
+- **Images share bandwidth with the JavaScript.** Serve images in the first screen at their display size, not a larger `srcset` option. Use `fetchPriority="high"` only for a small image that is the LCP element.
+- **When you change what a page fetches or when, measure it** against a production build on a throttled phone profile, not the dev server. For example: Slow 4G (150 ms latency, 1.6 Mbps down) with a 4× CPU slowdown.
+
 ## Linting & Formatting
 
 ### Oxlint
