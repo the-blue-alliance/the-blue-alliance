@@ -1,5 +1,6 @@
 import { useQueries, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { useMemo } from 'react';
 
 import type { DistrictAdvancementCutoffs } from '~/api/tba/read';
@@ -24,6 +25,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
+import { getDistrictColorBorderClass } from '~/lib/districtUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import {
   parseParamsForYearElseDefault,
@@ -141,6 +143,10 @@ function CutoffCell({
   );
 }
 
+function sortableDistrictName(displayName: string) {
+  return displayName.replace(/^FIRST (in )?/i, '');
+}
+
 function DistrictsPage() {
   const { year } = Route.useLoaderData();
   const yearStaleTime = staleTimeForYear(year);
@@ -152,7 +158,9 @@ function DistrictsPage() {
   const sortedDistricts = useMemo(
     () =>
       [...districts].sort((a, b) =>
-        a.display_name.localeCompare(b.display_name),
+        sortableDistrictName(a.display_name).localeCompare(
+          sortableDistrictName(b.display_name),
+        ),
       ),
     [districts],
   );
@@ -238,7 +246,6 @@ function DistrictsPage() {
         <TableHeader>
           <TableRow>
             <TableHead>District</TableHead>
-            <TableHead>Key</TableHead>
             <TableHead className="text-right">Teams</TableHead>
             <TableHead className="text-right">DCMP Slots</TableHead>
             <TableHead className="text-right">DCMP Cutoff</TableHead>
@@ -247,52 +254,63 @@ function DistrictsPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedDistricts.map((district) => (
-            <TableRow key={district.key}>
-              <TableCell>
-                <DistrictLink
-                  districtAbbreviation={district.abbreviation}
-                  year={year}
-                >
-                  {district.display_name}
-                </DistrictLink>
-              </TableCell>
-              <TableCell className="font-mono text-muted-foreground">
-                {district.abbreviation}
-              </TableCell>
-              <TableCell className="text-right numeric-data">
-                {teamCountPendingByDistrict.get(district.key) ? (
-                  <Skeleton className="ml-auto h-4 w-8" />
-                ) : (
-                  (teamCountByDistrict.get(district.key) ?? '-')
-                )}
-              </TableCell>
-              <AdvancementCountCell
-                slots={district.official_advancement_counts.dcmp}
-                teamCount={teamCountByDistrict.get(district.key)}
-              />
-              <CutoffCell
-                original={cutoffsByDistrict.get(district.key)?.dcmp_original}
-                effective={cutoffsByDistrict.get(district.key)?.dcmp_effective}
-                declines={
-                  cutoffsByDistrict.get(district.key)?.dcmp_declines.length
-                }
-                isLoading={cutoffsPendingByDistrict.get(district.key) ?? false}
-              />
-              <AdvancementCountCell
-                slots={district.official_advancement_counts.cmp}
-                teamCount={teamCountByDistrict.get(district.key)}
-              />
-              <CutoffCell
-                original={cutoffsByDistrict.get(district.key)?.cmp_original}
-                effective={cutoffsByDistrict.get(district.key)?.cmp_effective}
-                declines={
-                  cutoffsByDistrict.get(district.key)?.cmp_declines.length
-                }
-                isLoading={cutoffsPendingByDistrict.get(district.key) ?? false}
-              />
-            </TableRow>
-          ))}
+          {sortedDistricts.map((district) => {
+            const districtColor = getDistrictColorBorderClass(
+              district.abbreviation,
+            );
+            return (
+              <TableRow
+                key={district.key}
+                className={cn(districtColor && 'border-l-4', districtColor)}
+              >
+                <TableCell>
+                  <DistrictLink
+                    districtAbbreviation={district.abbreviation}
+                    year={year}
+                  >
+                    {district.display_name}
+                  </DistrictLink>
+                </TableCell>
+                <TableCell className="text-right numeric-data">
+                  {teamCountPendingByDistrict.get(district.key) ? (
+                    <Skeleton className="ml-auto h-4 w-8" />
+                  ) : (
+                    (teamCountByDistrict.get(district.key) ?? '-')
+                  )}
+                </TableCell>
+                <AdvancementCountCell
+                  slots={district.official_advancement_counts.dcmp}
+                  teamCount={teamCountByDistrict.get(district.key)}
+                />
+                <CutoffCell
+                  original={cutoffsByDistrict.get(district.key)?.dcmp_original}
+                  effective={
+                    cutoffsByDistrict.get(district.key)?.dcmp_effective
+                  }
+                  declines={
+                    cutoffsByDistrict.get(district.key)?.dcmp_declines.length
+                  }
+                  isLoading={
+                    cutoffsPendingByDistrict.get(district.key) ?? false
+                  }
+                />
+                <AdvancementCountCell
+                  slots={district.official_advancement_counts.cmp}
+                  teamCount={teamCountByDistrict.get(district.key)}
+                />
+                <CutoffCell
+                  original={cutoffsByDistrict.get(district.key)?.cmp_original}
+                  effective={cutoffsByDistrict.get(district.key)?.cmp_effective}
+                  declines={
+                    cutoffsByDistrict.get(district.key)?.cmp_declines.length
+                  }
+                  isLoading={
+                    cutoffsPendingByDistrict.get(district.key) ?? false
+                  }
+                />
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

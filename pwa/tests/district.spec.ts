@@ -104,6 +104,42 @@ test.describe('/district/fim/2024 rankings', () => {
   });
 });
 
+test.describe('/district/fim/2024 teams tab', () => {
+  test('does not request the full team list on page load', async ({ page }) => {
+    const requestUrls: string[] = [];
+    page.on('request', (request) => requestUrls.push(request.url()));
+
+    await page.goto('/district/fim/2024');
+    await page.locator('body[data-hydrated]').waitFor();
+    await page.waitForLoadState('networkidle');
+
+    expect(
+      requestUrls.filter((url) => /\/district\/2024fim\/teams(\?|$)/.test(url)),
+    ).toHaveLength(0);
+  });
+
+  test('shows a placeholder while the teams load', async ({ page }) => {
+    await page.route(
+      /\/api\/v3\/district\/2024fim\/teams(\?|$)/,
+      () => new Promise(() => {}),
+    );
+
+    await page.goto('/district/fim/2024#teams');
+    await page.locator('body[data-hydrated]').waitFor();
+
+    await expect(
+      page.getByRole('status', { name: 'Loading teams' }),
+    ).toBeVisible();
+  });
+
+  test('lists district teams once they load', async ({ page }) => {
+    await page.goto('/district/fim/2024#teams');
+    await page.locator('body[data-hydrated]').waitFor();
+
+    await expect(page.getByRole('link', { name: /^33 - / })).toBeVisible();
+  });
+});
+
 test.describe('district page tabs and the URL hash', () => {
   test('clicking a tab puts it in the hash', async ({ page }) => {
     await page.goto('/district/fim/2024');

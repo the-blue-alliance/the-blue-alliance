@@ -14,19 +14,19 @@ test.describe('/districts/2024', () => {
     });
   });
 
-  test('shows seven district table columns', async ({ page }) => {
-    await expect(page.getByRole('columnheader')).toHaveCount(7);
+  test('shows six district table columns', async ({ page }) => {
+    await expect(page.getByRole('columnheader')).toHaveCount(6);
   });
 
-  test('shows seven values in each district row', async ({ page }) => {
-    await expect(page.getByRole('row').nth(1).getByRole('cell')).toHaveCount(7);
+  test('shows six values in each district row', async ({ page }) => {
+    await expect(page.getByRole('row').nth(1).getByRole('cell')).toHaveCount(6);
   });
 
   (
     [
-      ['team count', 2],
-      ['DCMP cutoff', 4],
-      ['CMP cutoff', 6],
+      ['team count', 1],
+      ['DCMP cutoff', 3],
+      ['CMP cutoff', 5],
     ] as const
   ).forEach(([name, index]) => {
     test(`shows the ${name} for each district`, async ({ page }) => {

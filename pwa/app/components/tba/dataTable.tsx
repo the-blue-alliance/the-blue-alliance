@@ -143,7 +143,10 @@ function VirtualizedRows<TData extends RowData>({
           key={rows[item.index].id}
           ref={virtualizer.measureElement}
           data-index={item.index}
-          className={conditionalRowStyling?.(rows[item.index])}
+          className={cn(
+            item.index % 2 === 0 ? 'bg-muted/30' : 'odd:bg-transparent',
+            conditionalRowStyling?.(rows[item.index]),
+          )}
         >
           {rows[item.index].getVisibleCells().map((cell) => (
             <TableCell key={cell.id} className="text-center">

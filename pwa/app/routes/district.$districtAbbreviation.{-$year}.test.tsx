@@ -15,7 +15,7 @@ const activeRanking = {
   event_points: [{ total: 50 }],
 };
 
-const teams = [{ key: 'frc195' }, { key: 'frc2168' }];
+const teamKeys = ['frc195', 'frc2168'];
 
 function load(responses: Record<string, unknown>, year: string | undefined) {
   const queryClient = {
@@ -57,9 +57,10 @@ describe('district route loader', () => {
       abbreviation: 'ne',
       currentSeason: 2026,
       year: 2026,
+      districtKey: '2026ne',
       districtHistory: history,
       rankings: null,
-      teams: [],
+      teamKeys: [],
       events: [],
       awards: [],
       advancementCutoffs: null,
@@ -86,12 +87,12 @@ describe('district route loader', () => {
       {
         getDistrictHistory: history,
         getDistrictRankings: [activeRanking],
-        getDistrictTeams: teams,
+        getDistrictTeamsKeys: teamKeys,
         getDistrictEvents: [{ end_date: '2024-04-01' }],
       },
       '2024',
     );
-    expect(result?.teams).toEqual([{ key: 'frc195' }]);
+    expect(result?.teamKeys).toEqual(['frc195']);
   });
 
   test('keeps every team while the season is in progress', async () => {
@@ -99,12 +100,12 @@ describe('district route loader', () => {
       {
         getDistrictHistory: history,
         getDistrictRankings: [activeRanking],
-        getDistrictTeams: teams,
+        getDistrictTeamsKeys: teamKeys,
         getDistrictEvents: [{ end_date: '2999-04-01' }],
       },
       '2024',
     );
-    expect(result?.teams).toEqual(teams);
+    expect(result?.teamKeys).toEqual(teamKeys);
   });
 
   test('returns the advancement cutoffs', async () => {

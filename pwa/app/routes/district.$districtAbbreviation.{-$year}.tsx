@@ -1,6 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { cn } from 'cn';
 import { sumBy } from 'lodash-es';
+import { Suspense, lazy } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
 import TeamsIcon from '~icons/lucide/bot';
@@ -16,7 +18,6 @@ import {
   DistrictRanking,
   Event,
   EventType,
-  Team,
 } from '~/api/tba/read';
 import {
   getDistrictAdvancementOptions,
@@ -24,11 +25,10 @@ import {
   getDistrictEventsOptions,
   getDistrictHistoryOptions,
   getDistrictRankingsOptions,
+  getDistrictTeamsKeysOptions,
   getDistrictTeamsOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { DataTable } from '~/components/tba/dataTable';
-import { DistrictChampsTab } from '~/components/tba/districtChampsTab';
-import { DistrictInsightsTab } from '~/components/tba/districtInsightsTab';
 import InlineIcon from '~/components/tba/inlineIcon';
 import {
   EventLink,
@@ -36,12 +36,14 @@ import {
   TeamLink,
   TeamLocationLink,
 } from '~/components/tba/links';
+import LoadingSkeleton from '~/components/tba/loadingSkeleton';
 import { YearSelector } from '~/components/tba/yearSelector';
 import {
   AnimatedTabs,
   AnimatedTabsTrigger,
 } from '~/components/ui/animated-tabs';
 import { Badge } from '~/components/ui/badge';
+import { Spinner } from '~/components/ui/spinner';
 import {
   Table,
   TableBody,
@@ -75,6 +77,17 @@ import {
   publicCacheControlHeaders,
 } from '~/lib/utils';
 
+const DistrictChampsTab = lazy(() =>
+  import('~/components/tba/districtChampsTab').then((module) => ({
+    default: module.DistrictChampsTab,
+  })),
+);
+const DistrictInsightsTab = lazy(() =>
+  import('~/components/tba/districtInsightsTab').then((module) => ({
+    default: module.DistrictInsightsTab,
+  })),
+);
+
 export const Route = createFileRoute(
   '/district/$districtAbbreviation/{-$year}',
 )({
@@ -87,7 +100,7 @@ export const Route = createFileRoute(
     const districtKey = `${year}${params.districtAbbreviation}`;
     const yearStaleTime = staleTimeForYear(year);
 
-    const [districtHistory, rankings, teams, events, awards, advancement] =
+    const [districtHistory, rankings, teamKeys, events, awards, advancement] =
       await Promise.all([
         queryClient
           .ensureQueryData({
@@ -107,7 +120,9 @@ export const Route = createFileRoute(
           .catch(() => null),
         queryClient
           .ensureQueryData({
-            ...getDistrictTeamsOptions({ path: { district_key: districtKey } }),
+            ...getDistrictTeamsKeysOptions({
+              path: { district_key: districtKey },
+            }),
             staleTime: yearStaleTime,
           })
           .catch(() => []),
@@ -158,20 +173,21 @@ export const Route = createFileRoute(
 
     // If the season is done, show only the teams that were actually active (in the rankings)
     // Otherwise, show all teams (since it may be mid-season and some may not have played yet, thus have no ranking)
-    const actuallyActiveTeams =
+    const actuallyActiveTeamKeys =
       actuallyActiveRankings === null || !seasonIsComplete
-        ? teams
-        : teams.filter((team) =>
-            actuallyActiveRankings.find((r) => r.team_key === team.key),
+        ? teamKeys
+        : teamKeys.filter((teamKey) =>
+            actuallyActiveRankings.find((r) => r.team_key === teamKey),
           );
 
     return {
       abbreviation: params.districtAbbreviation,
       currentSeason,
       year,
+      districtKey,
       districtHistory,
       rankings: actuallyActiveRankings,
-      teams: actuallyActiveTeams,
+      teamKeys: actuallyActiveTeamKeys,
       events,
       awards,
       advancementCutoffs: advancement?.cutoffs ?? null,
@@ -214,9 +230,10 @@ function DistrictPage() {
     awards,
     currentSeason,
     districtHistory,
+    districtKey,
     events,
     rankings,
-    teams,
+    teamKeys,
     year,
   } = Route.useLoaderData();
 
@@ -254,7 +271,7 @@ function DistrictPage() {
             className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm
               text-muted-foreground"
           >
-            <span>{teams.length} teams</span>
+            <span>{teamKeys.length} teams</span>
             <span aria-hidden="true">&middot;</span>
             <span>{eventCount.length} events</span>
             {parentDCMPEvents.map((event) => (
@@ -436,17 +453,25 @@ function DistrictPage() {
           <DistrictEventsTable awards={awards} events={events} />
         </TabsContent>
         <TabsContent value="teams" className="pt-2">
-          <DistrictTeamsTable teams={teams} year={year} />
-        </TabsContent>
-        <TabsContent value="champs" className="pt-2">
-          <DistrictChampsTab
-            abbreviation={abbreviation}
-            currentSeason={currentSeason}
+          <DistrictTeamsTable
+            districtKey={districtKey}
+            teamKeys={teamKeys}
             year={year}
           />
         </TabsContent>
+        <TabsContent value="champs" className="pt-2">
+          <Suspense fallback={<Spinner className="mx-auto mt-16 size-8" />}>
+            <DistrictChampsTab
+              abbreviation={abbreviation}
+              currentSeason={currentSeason}
+              year={year}
+            />
+          </Suspense>
+        </TabsContent>
         <TabsContent value="insights" className="pt-2">
-          <DistrictInsightsTab abbreviation={abbreviation} year={year} />
+          <Suspense fallback={<Spinner className="mx-auto mt-16 size-8" />}>
+            <DistrictInsightsTab abbreviation={abbreviation} year={year} />
+          </Suspense>
         </TabsContent>
       </AnimatedTabs>
     </div>
@@ -597,7 +622,29 @@ function DistrictEventsTable({
   );
 }
 
-function DistrictTeamsTable({ teams, year }: { teams: Team[]; year: number }) {
+function DistrictTeamsTable({
+  districtKey,
+  teamKeys,
+  year,
+}: {
+  districtKey: string;
+  teamKeys: string[];
+  year: number;
+}) {
+  const teamsQuery = useQuery({
+    ...getDistrictTeamsOptions({ path: { district_key: districtKey } }),
+    staleTime: staleTimeForYear(year),
+  });
+
+  if (teamsQuery.isPending) {
+    return <LoadingSkeleton label="Loading teams" className="h-64 w-full" />;
+  }
+
+  const activeTeamKeys = new Set(teamKeys);
+  const teams = (teamsQuery.data ?? []).filter((team) =>
+    activeTeamKeys.has(team.key),
+  );
+
   return (
     <Table>
       <TableHeader>
