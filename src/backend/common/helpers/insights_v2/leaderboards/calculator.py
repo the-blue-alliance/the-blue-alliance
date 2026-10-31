@@ -371,7 +371,7 @@ class MatchAllianceLeaderboardV2Calculator(LeaderboardV2Calculator):
             alliance=alliance,
         )
         if district:
-            self._match_districts[match_key] = RenamedDistricts.get_latest_code(
+            self._match_districts[match_key] = RenamedDistricts.get_canonical_code(
                 district
             )
 

@@ -39,6 +39,23 @@ def test_found_with_renamed_district() -> None:
     assert district == d
 
 
+def test_returns_that_years_code_over_a_stray_district() -> None:
+    tx = District(id="2026tx", year=2026, abbreviation="tx")
+    tx.put()
+    District(id="2026fit", year=2026, abbreviation="fit").put()
+
+    district = DistrictQuery(district_key="2026fit").fetch()
+    assert district == tx
+
+
+def test_texas_uses_fit_between_2021_and_2025() -> None:
+    fit = District(id="2025fit", year=2025, abbreviation="fit")
+    fit.put()
+
+    district = DistrictQuery(district_key="2025tx").fetch()
+    assert district == fit
+
+
 def test_all_district_teams() -> None:
     dt = DistrictTeam(
         id="2019ne_frc254",

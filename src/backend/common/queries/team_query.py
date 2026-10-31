@@ -2,6 +2,7 @@ from typing import Any, Generator, List, Optional, Set
 
 from google.appengine.ext import ndb
 
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
@@ -85,7 +86,7 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, district_key: DistrictKey) -> None:
-        super().__init__(district_key=district_key)
+        super().__init__(district_key=RenamedDistricts.get_key_for_year(district_key))
 
     @typed_tasklet
     def _query_async(

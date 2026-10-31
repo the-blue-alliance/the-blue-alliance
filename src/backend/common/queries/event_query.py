@@ -6,6 +6,7 @@ from backend.common.consts.event_type import (
     EventType,
     SEASON_EVENT_TYPES,
 )
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
@@ -55,7 +56,7 @@ class DistrictEventsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
     DICT_CONVERTER = EventConverter
 
     def __init__(self, district_key: DistrictKey) -> None:
-        super().__init__(district_key=district_key)
+        super().__init__(district_key=RenamedDistricts.get_key_for_year(district_key))
 
     @typed_tasklet
     def _query_async(

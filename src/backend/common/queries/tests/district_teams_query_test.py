@@ -48,3 +48,11 @@ def test_get_teams() -> None:
 
     teams = DistrictTeamsQuery(district_key="2019ne").fetch()
     assert len(teams) == len(stored_teams)
+
+
+def test_other_code_returns_teams_under_that_years_code() -> None:
+    preseed_district_teams(preseed_teams(1, 3), "2026tx")
+    preseed_district_teams(preseed_teams(4), "2026fit")
+
+    teams = DistrictTeamsQuery(district_key="2026fit").fetch()
+    assert {t.key.id() for t in teams} == {"frc1", "frc2", "frc3"}

@@ -411,7 +411,7 @@ class InsightsHelper(object):
         Calculate district insights for all districts. Returns a list of Insights.
         """
         insights: List[Insight] = []
-        for district_abbreviation in RenamedDistricts.get_latest_codes():
+        for district_abbreviation in RenamedDistricts.get_canonical_codes():
             insights.extend(
                 cls.doDistrictInsightsForAbbreviation(district_abbreviation)
             )

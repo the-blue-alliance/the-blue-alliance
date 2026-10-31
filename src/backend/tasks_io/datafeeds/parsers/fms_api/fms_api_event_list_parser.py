@@ -11,6 +11,7 @@ from tzlocal.windows_tz import win_tz as WINDOWS_TO_IANA
 from backend.common.consts.event_code_exceptions import EVENT_CODE_EXCEPTIONS
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.types import (
     SeasonEventListModelV31,
@@ -94,6 +95,13 @@ class FMSAPIEventListParser(
 
         return playoff_type
 
+    def _district_code(self, api_district_code: Optional[str]) -> Optional[str]:
+        if not api_district_code:
+            return None
+        return RenamedDistricts.get_code_for_year(
+            api_district_code.lower(), self.season
+        )
+
     def _bootstrap_sync_overrides(
         self,
         event_type: EventType,
@@ -176,12 +184,12 @@ class FMSAPIEventListParser(
                 continue
 
             parsed_event_type = self.EVENT_TYPES.get(api_event_type, None)
-            if parsed_event_type == EventType.DISTRICT_CMP_DIVISION and api_event.get(
-                "districtCode"
-            ):
-                district_cmp_division_districts.add(
-                    none_throws(api_event["districtCode"]).lower()
+            if parsed_event_type == EventType.DISTRICT_CMP_DIVISION and (
+                division_district_code := self._district_code(
+                    api_event.get("districtCode")
                 )
+            ):
+                district_cmp_division_districts.add(division_district_code)
             elif parsed_event_type == EventType.CMP_DIVISION:
                 cmp_division_end_dates.append(
                     datetime.datetime.strptime(
@@ -243,10 +251,9 @@ class FMSAPIEventListParser(
                 year=self.season,
             )
 
-            if api_district_code := event["districtCode"]:
-                district_key = District.render_key_name(
-                    self.season, api_district_code.lower()
-                )
+            district_code = self._district_code(event["districtCode"])
+            if district_code:
+                district_key = District.render_key_name(self.season, district_code)
             else:
                 district_key = None
 
@@ -306,11 +313,9 @@ class FMSAPIEventListParser(
                 ).fetch(1, keys_only=True)
                 has_division_teams_assigned = bool(division_teams)
 
-            if event_type == EventType.DISTRICT_CMP and (
-                district_code := event.get("districtCode")
-            ):
+            if event_type == EventType.DISTRICT_CMP and district_code:
                 has_divisions = has_divisions or (
-                    district_code.lower() in district_cmp_division_districts
+                    district_code in district_cmp_division_districts
                 )
             elif event_type == EventType.CMP_FINALS:
                 has_divisions = has_divisions or any(
@@ -386,15 +391,11 @@ class FMSAPIEventListParser(
             )
 
             # Build District Model
-            if (
-                (district_code := event["districtCode"])
-                and district_key
-                and district_key not in districts
-            ):
+            if district_code and district_key and district_key not in districts:
                 districts[district_key] = District(
                     id=district_key,
                     year=self.season,
-                    abbreviation=district_code.lower(),
+                    abbreviation=district_code,
                 )
 
         # Prep for division <-> parent associations

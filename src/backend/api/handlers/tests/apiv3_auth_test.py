@@ -345,9 +345,9 @@ def test_district_key_valid(ndb_stub, api_client: Client) -> None:
         auth_types_enum=[AuthType.READ_API],
     ).put()
     District(
-        id="2020mar",
+        id="2020fma",
         year=2020,
-        abbreviation="mar",
+        abbreviation="fma",
     ).put()
 
     # Test model return
