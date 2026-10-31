@@ -200,12 +200,41 @@ export function summarizeReviewOutcomes(result: {
 export function formatAuthorReputation(author: {
   accepted_count?: number;
   rejected_count?: number;
+  created?: string | null;
 }): string | undefined {
   const accepted = author.accepted_count;
   const rejected = author.rejected_count;
   if (accepted === undefined || rejected === undefined) return undefined;
-  if (accepted === 0 && rejected === 0) return 'first-time suggester';
-  return `${accepted} accepted · ${rejected} rejected`;
+  const counts =
+    accepted === 0 && rejected === 0
+      ? 'first-time suggester'
+      : `${accepted} accepted · ${rejected} rejected`;
+  return author.created
+    ? `${counts} · account since ${author.created.slice(0, 10)}`
+    : counts;
+}
+
+/**
+ * Earlier years in which the requester held a write key for the same event
+ * (same event code), e.g. [2024, 2025] for a 2026pahor request. A strong
+ * trust signal: they ran this event's data before.
+ */
+export function pastYearsWithEventKeys(
+  writeKeys: { event_keys?: string[] }[],
+  eventKey: string,
+): number[] {
+  const year = Number(eventKey.slice(0, 4));
+  const code = eventKey.slice(4);
+  const years = new Set<number>();
+  for (const key of writeKeys) {
+    for (const keyEvent of key.event_keys ?? []) {
+      const keyYear = Number(keyEvent.slice(0, 4));
+      if (keyEvent.slice(4) === code && keyYear < year) {
+        years.add(keyYear);
+      }
+    }
+  }
+  return [...years].sort((a, b) => a - b);
 }
 
 const MATCH_KEY_COMP_LEVELS = ['qm', 'ef', 'qf', 'sf', 'f'] as const;

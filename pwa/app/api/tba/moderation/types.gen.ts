@@ -68,6 +68,10 @@ export type SuggestionAuthor = {
    * Lifetime count of this author's rejected suggestions (reputation signal)
    */
   rejected_count?: number;
+  /**
+   * When the author's account was created (reputation signal)
+   */
+  created?: string | null;
 };
 
 /**
@@ -136,6 +140,16 @@ export type ExistingAuth = {
   auth_types?: Array<AuthTypeInfo>;
 };
 
+export type AuthorWriteKey = {
+  event_keys?: Array<string>;
+  auth_types?: Array<AuthTypeInfo>;
+  created?: string | null;
+  /**
+   * Null if the key never expires
+   */
+  expiration?: string | null;
+};
+
 export type SimilarEvent = {
   key?: string;
   name?: string;
@@ -172,6 +186,10 @@ export type ModerationSuggestion = {
   similar_events_last_year?: Array<SimilarEvent>;
   requested_auth_types?: Array<AuthTypeInfo>;
   existing_auth?: Array<ExistingAuth>;
+  /**
+   * Every write key the author has held, newest first, expired ones included (api_auth_access only)
+   */
+  author_write_keys?: Array<AuthorWriteKey>;
   /**
    * match: the event has a FIRST official webcast; suggested videos may be stream rips
    */

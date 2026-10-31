@@ -264,6 +264,19 @@ def test_queue_counts_admin_sees_all(api_client: Client, moderator) -> None:
 # ---------------------------------------------------------------------------
 
 
+def test_list_suggestions_includes_author_account_created(
+    api_client: Client, moderator, author: Account, event: Event, match: Match
+) -> None:
+    moderator([AccountPermission.REVIEW_MEDIA])
+    create_match_video_suggestion(author)
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/match")
+    assert (
+        resp.json["suggestions"][0]["author"]["created"]
+        == none_throws(author.created).isoformat()
+    )
+
+
 def test_list_match_suggestions(
     api_client: Client, moderator, author: Account, event: Event, match: Match
 ) -> None:
@@ -839,6 +852,96 @@ def test_list_apiwrite_suggestions_includes_event_and_existing_keys(
             "auth_types": [{"type": int(AuthType.EVENT_INFO), "name": "event info"}],
         },
     ]
+
+
+def create_apiwrite_suggestion(author: Account) -> None:
+    create_suggestion(
+        author,
+        "api_auth_access",
+        "2016necmp",
+        {
+            "event_key": "2016necmp",
+            "affiliation": "Team 1124",
+            "auth_types": [int(AuthType.MATCH_VIDEO)],
+        },
+    )
+
+
+def test_list_apiwrite_suggestions_includes_author_past_write_keys(
+    api_client: Client, moderator, author: Account, event: Event
+) -> None:
+    moderator([AccountPermission.REVIEW_APIWRITE])
+    past_key = ApiAuthAccess(
+        id="author_2015",
+        auth_types_enum=[AuthType.MATCH_VIDEO, AuthType.EVENT_INFO],
+        event_list=[ndb.Key(Event, "2015necmp")],
+        owner=author.key,
+        expiration=datetime(2015, 4, 20),
+    )
+    past_key.put()
+    create_apiwrite_suggestion(author)
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/api_auth_access")
+    assert resp.json["suggestions"][0]["author_write_keys"] == [
+        {
+            "event_keys": ["2015necmp"],
+            "auth_types": [
+                {"type": int(AuthType.MATCH_VIDEO), "name": "match video"},
+                {"type": int(AuthType.EVENT_INFO), "name": "event info"},
+            ],
+            "created": none_throws(past_key.created).isoformat(),
+            "expiration": "2015-04-20T00:00:00",
+        }
+    ]
+
+
+def test_list_apiwrite_suggestions_lists_newest_author_write_key_first(
+    api_client: Client, moderator, author: Account, event: Event
+) -> None:
+    moderator([AccountPermission.REVIEW_APIWRITE])
+    for year in (2014, 2015):
+        ApiAuthAccess(
+            id=f"author_{year}",
+            auth_types_enum=[AuthType.MATCH_VIDEO],
+            event_list=[ndb.Key(Event, f"{year}necmp")],
+            owner=author.key,
+        ).put()
+    create_apiwrite_suggestion(author)
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/api_auth_access")
+    keys = resp.json["suggestions"][0]["author_write_keys"]
+    assert [k["event_keys"] for k in keys] == [["2015necmp"], ["2014necmp"]]
+
+
+def test_list_apiwrite_suggestions_omits_author_read_keys(
+    api_client: Client, moderator, author: Account, event: Event
+) -> None:
+    moderator([AccountPermission.REVIEW_APIWRITE])
+    ApiAuthAccess(
+        id="author_read",
+        auth_types_enum=[AuthType.READ_API],
+        owner=author.key,
+    ).put()
+    create_apiwrite_suggestion(author)
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/api_auth_access")
+    assert resp.json["suggestions"][0]["author_write_keys"] == []
+
+
+def test_list_apiwrite_suggestions_omits_other_accounts_write_keys(
+    api_client: Client, moderator, author: Account, event: Event
+) -> None:
+    moderator([AccountPermission.REVIEW_APIWRITE])
+    ApiAuthAccess(
+        id="someone_else",
+        auth_types_enum=[AuthType.MATCH_VIDEO],
+        event_list=[ndb.Key(Event, "2015necmp")],
+        owner=ndb.Key(Account, "other_uid"),
+    ).put()
+    create_apiwrite_suggestion(author)
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/api_auth_access")
+    assert resp.json["suggestions"][0]["author_write_keys"] == []
 
 
 def test_list_apiwrite_suggestions_missing_event(

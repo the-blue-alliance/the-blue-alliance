@@ -83,6 +83,14 @@
           "rejected_count": {
             "type": "integer",
             "description": "Lifetime count of this author's rejected suggestions (reputation signal)"
+          },
+          "created": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the author's account was created (reputation signal)"
           }
         }
       },
@@ -224,6 +232,38 @@
           }
         }
       },
+      "AuthorWriteKey": {
+        "type": "object",
+        "properties": {
+          "event_keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "auth_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuthTypeInfo"
+            }
+          },
+          "created": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "expiration": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Null if the key never expires"
+          }
+        }
+      },
       "SimilarEvent": {
         "type": "object",
         "properties": {
@@ -310,6 +350,13 @@
               "$ref": "#/components/schemas/ExistingAuth"
             }
           },
+          "author_write_keys": {
+            "type": "array",
+            "description": "Every write key the author has held, newest first, expired ones included (api_auth_access only)",
+            "items": {
+              "$ref": "#/components/schemas/AuthorWriteKey"
+            }
+          },
           "has_first_official_webcast": {
             "type": "boolean",
             "description": "match: the event has a FIRST official webcast; suggested videos may be stream rips"
@@ -384,7 +431,7 @@
           },
           "set_preferred": {
             "type": "boolean",
-            "description": "media: set as preferred team image (defaults to the suggester\u2019s default_preferred request)"
+            "description": "media: set as preferred team image (defaults to the suggester’s default_preferred request)"
           },
           "replace_preferred_media_key": {
             "type": "string",

@@ -14,6 +14,7 @@ import {
   isNotModeratorResponse,
   matchVideoDurationWarning,
   matchVideoTitleWarning,
+  pastYearsWithEventKeys,
   resolveUserMessage,
   socialProfileWarning,
   suggestionTypeOrderComparator,
@@ -284,6 +285,39 @@ describe('formatAuthorReputation', () => {
 
   test('undefined when counts are unavailable', () => {
     expect(formatAuthorReputation({})).toBeUndefined();
+  });
+
+  test('includes the account creation date', () => {
+    expect(
+      formatAuthorReputation({
+        accepted_count: 3,
+        rejected_count: 0,
+        created: '2019-03-02T18:04:11.123456',
+      }),
+    ).toBe('3 accepted · 0 rejected · account since 2019-03-02');
+  });
+});
+
+describe('pastYearsWithEventKeys', () => {
+  test('lists earlier years with keys for the same event code', () => {
+    expect(
+      pastYearsWithEventKeys(
+        [
+          { event_keys: ['2025pahor'] },
+          { event_keys: ['2024paca', '2024pahor'] },
+        ],
+        '2026pahor',
+      ),
+    ).toEqual([2024, 2025]);
+  });
+
+  test('ignores other events and the requested year itself', () => {
+    expect(
+      pastYearsWithEventKeys(
+        [{ event_keys: ['2025paca', '2026pahor'] }],
+        '2026pahor',
+      ),
+    ).toEqual([]);
   });
 });
 
