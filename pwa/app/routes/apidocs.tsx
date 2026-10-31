@@ -41,7 +41,7 @@ function ApiDocs(): React.JSX.Element {
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <TableOfContents tocItems={tocItems} inView={inView} />
-      <div className="basis-full py-8 md:basis-5/6">
+      <div className="basis-full md:basis-5/6">
         <div>
           <section>
             <h1 className="mb-2 text-3xl font-medium">

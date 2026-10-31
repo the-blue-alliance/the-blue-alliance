@@ -217,7 +217,7 @@ test.describe('/team/604/2024', () => {
         .locator('a[aria-current="page"]')
         .filter({ hasText: /^604$/ })
         .locator('div'),
-    ).toHaveClass(/bg-secondary/);
+    ).toHaveClass(/bg-primary/);
   });
 
   test('does not mark an alliance partner as the current page', async ({

@@ -215,7 +215,7 @@ function DistrictsPage() {
   }, [districts, cutoffs]);
 
   return (
-    <div className="py-8">
+    <div>
       <div className="mb-4 flex items-center gap-4">
         <h1 className="text-3xl font-medium">
           {year} <i>FIRST</i> Robotics Competition Districts{' '}

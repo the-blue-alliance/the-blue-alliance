@@ -85,28 +85,25 @@ describe('EventListTable', () => {
 
     expect(
       screen.getAllByRole('columnheader').map((cell) => cell.textContent),
-    ).toEqual(['Event', 'Webcast', 'Dates']);
+    ).toEqual(['Event', 'Webcast']);
   });
 
-  test('links to an event and shows its location', () => {
+  test('links to an event', () => {
     render(<EventListTable events={[makeEvent()]} />);
 
-    const link = screen.getByRole('link', {
-      name: 'Kettering University Event #1',
-    });
-    expect({
-      href: link.getAttribute('href'),
-      location: screen.getByText('Flint, MI, USA').textContent,
-    }).toEqual({
-      href: '/event/2026miket',
-      location: 'Flint, MI, USA',
-    });
+    expect(
+      screen
+        .getByRole('link', { name: 'Kettering University Event #1' })
+        .getAttribute('href'),
+    ).toBe('/event/2026miket');
   });
 
-  test('shows the event date range', () => {
+  test('shows the location and date range on one line', () => {
     render(<EventListTable events={[makeEvent()]} />);
 
-    expect(screen.getByText('Mar 1–3').textContent).toBe('Mar 1–3');
+    expect(screen.getByText(/^Flint, MI, USA/).textContent).toBe(
+      'Flint, MI, USA · Mar 1–3',
+    );
   });
 
   test('groups divisions after their parent and trims parent name prefixes', () => {

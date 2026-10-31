@@ -81,6 +81,19 @@ import {
 const FIRST_REGIONAL_POOL_YEAR = 2025;
 
 export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
+  staticData: {
+    // Drawn in the server-rendered TOC placeholder; mirrors the real bar below.
+    tocPreview: ({ year }) => ({
+      activeLabel: 'Team Info',
+      action: (
+        <YearSelector
+          currentLabel={String(year)}
+          triggerClassName="w-[180px]"
+          options={[]}
+        />
+      ),
+    }),
+  },
   loader: async ({ params, context: { queryClient, currentSeason } }) => {
     const startTime = Temporal.Now.instant().epochMilliseconds;
     const teamKey = `frc${params.teamNumber}`;
@@ -639,7 +652,7 @@ const TeamPageContent = memo(function TeamPageContent({
   );
 
   return (
-    <div className="mt-2 w-full md:mt-8">
+    <div className="w-full">
       <TableOfContentsSection id="team-info" setInView={setInView}>
         <div
           className="flex flex-wrap justify-center sm:flex-nowrap

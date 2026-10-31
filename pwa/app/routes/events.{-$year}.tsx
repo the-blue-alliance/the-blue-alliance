@@ -40,6 +40,13 @@ import {
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/events/{-$year}')({
+  staticData: {
+    // Drawn in the server-rendered TOC placeholder; mirrors the real bar below.
+    tocPreview: ({ year }: { year: number }) => ({
+      activeLabel: 'Week 1',
+      action: <EventsTocActionsPreview year={year} />,
+    }),
+  },
   beforeLoad: ({ params }) => {
     if (params.year !== undefined && Number.isNaN(Number(params.year))) {
       throw redirect({
@@ -101,6 +108,26 @@ export const Route = createFileRoute('/events/{-$year}')({
 const compactTriggerClassName = `max-lg:h-8 max-lg:w-auto max-lg:border-none
   max-lg:px-2 max-lg:text-foreground max-lg:hover:bg-accent`;
 
+function EventsTocActionsPreview({ year }: { year: number }) {
+  return (
+    <div className="flex items-center gap-1">
+      <YearSelector
+        currentLabel={String(year)}
+        triggerClassName={compactTriggerClassName}
+        options={[]}
+      />
+      <Select
+        items={[{ value: 'all', label: 'All Events' }]}
+        defaultValue="all"
+      >
+        <SelectTrigger className={cn(compactTriggerClassName, 'gap-2')}>
+          <SelectValue />
+        </SelectTrigger>
+      </Select>
+    </div>
+  );
+}
+
 function YearEventsPage() {
   const { year } = Route.useLoaderData();
   const yearStaleTime = staleTimeForYear(year);
@@ -120,6 +147,10 @@ function YearEventsPage() {
   const groupedEvents = groupEventsBySections(sortedEvents);
   const officialGroups = groupedEvents.filter((group) => group.isOfficial);
   const unofficialGroups = groupedEvents.filter((group) => !group.isOfficial);
+  const officialEventCount = officialGroups.reduce(
+    (acc, group) => acc + group.events.length,
+    0,
+  );
 
   const tocItems = useMemo(() => {
     const tocNodes: TocNode[] = [];
@@ -200,25 +231,18 @@ function YearEventsPage() {
           </Select>
         </div>
       </TableOfContents>
-      <div className="basis-full py-8 lg:basis-5/6">
-        <h1 className="mb-3 text-3xl font-medium">
+      <div className="basis-full lg:basis-5/6">
+        <h1 className="mb-1 text-2xl font-medium md:text-3xl">
           {year} <i>FIRST</i> Robotics Competition Events{' '}
-          <small className="text-xl text-muted-foreground">
-            {events.length} Events
+          <small
+            className="block text-base font-normal text-muted-foreground
+              md:inline md:text-xl"
+          >
+            {events.length} events ({officialEventCount} official)
           </small>
         </h1>
         {officialGroups.length > 0 && (
-          <>
-            <h2 id="official" className="mt-5 text-3xl">
-              Official Events{' '}
-              <small className="text-xl text-muted-foreground">
-                {officialGroups.reduce(
-                  (acc, group) => acc + group.events.length,
-                  0,
-                )}{' '}
-                Events
-              </small>
-            </h2>
+          <div id="official">
             {officialGroups.map((group) => (
               <EventGroupSection
                 key={group.slug}
@@ -226,13 +250,16 @@ function YearEventsPage() {
                 setInView={setInView}
               />
             ))}
-          </>
+          </div>
         )}
         {unofficialGroups.length > 0 && (
           <>
-            <h2 id="unofficial" className="mt-5 text-3xl">
+            <h2
+              id="unofficial"
+              className="mt-3 text-xl font-medium md:text-2xl"
+            >
               Unofficial Events{' '}
-              <small className="text-xl text-muted-foreground">
+              <small className="text-base font-normal text-muted-foreground">
                 {unofficialGroups.reduce(
                   (acc, group) => acc + group.events.length,
                   0,
@@ -267,9 +294,9 @@ function EventGroupSection({
       id={group.slug}
       setInView={setInView}
     >
-      <h2 className="mt-5 text-2xl">
+      <h2 className="mt-2 text-lg font-medium md:text-xl">
         {group.groupName}{' '}
-        <small className="text-muted-foreground">
+        <small className="text-sm font-normal text-muted-foreground">
           {pluralize(group.events.length, 'Event', 'Events')}
         </small>
       </h2>

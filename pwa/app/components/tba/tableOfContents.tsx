@@ -1,4 +1,4 @@
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, useRouterState } from '@tanstack/react-router';
 import {
   createContext,
   startTransition,
@@ -37,10 +37,69 @@ export function TOCRendererProvider({
   return (
     <TOCRendererContext.Provider value={setContent}>
       {/* Render the TOC header below navbar */}
-      {content}
+      {/* The real bar is only set by an effect, so it is missing from the server HTML. The placeholder holds its space until then. */}
+      {content ?? <TOCPlaceholder />}
       {/* Render the provider outlet children */}
       {children}
     </TOCRendererContext.Provider>
+  );
+}
+
+export interface TocPreview {
+  activeLabel: string;
+  action?: React.ReactNode;
+}
+
+declare module '@tanstack/react-router' {
+  interface StaticDataRouteOption {
+    // The provider sits above the route, so it cannot see the route's
+    // components during server rendering. A route that declares this gets its
+    // label and action drawn in the placeholder, so the first paint matches
+    // the real bar.
+    tocPreview?: (loaderData: never) => TocPreview;
+  }
+}
+
+function TOCPlaceholder() {
+  const match = useRouterState({ select: (s) => s.matches.at(-1) });
+  const tocPreview = match?.staticData.tocPreview as
+    ((loaderData: unknown) => TocPreview) | undefined;
+  const preview = tocPreview?.(match?.loaderData);
+
+  return (
+    <div
+      data-toc-placeholder
+      inert
+      aria-hidden
+      className="h-(--toc-bar-height) items-center justify-between gap-8
+        border-b px-4"
+    >
+      {preview && (
+        <>
+          <div className="flex h-8 items-center gap-1.5 px-2 text-foreground">
+            <TOCTriggerContent label={preview.activeLabel} />
+          </div>
+          {preview.action}
+        </>
+      )}
+    </div>
+  );
+}
+
+function firstLeafLabel(nodes: TocNode[]): string | undefined {
+  let node = nodes[0];
+  while (node?.children?.length) {
+    node = node.children[0];
+  }
+  return node?.label;
+}
+
+function TOCTriggerContent({ label }: { label: string | undefined }) {
+  return (
+    <>
+      <TableOfContentsIcon className="size-5" />
+      <span className="text-sm">{label}</span>
+    </>
   );
 }
 
@@ -111,10 +170,14 @@ export function TableOfContents({
 
   return (
     <>
+      {/* Lets CSS show the placeholder only on pages that have a TOC (see tailwind.css). */}
+      <span data-toc-marker hidden />
       {/* Desktop TOC - Split screen */}
       {!mobileOnly && (
         <div className="basis-full max-lg:hidden lg:basis-1/6">
-          <div className="sticky top-(--header-height) space-y-6 pt-8">
+          <div
+            className="sticky top-[calc(var(--header-height)+0.5rem)] space-y-6"
+          >
             {children}
             <TOCContent tocItems={tocItems} activeItem={activeItem} />
           </div>
@@ -142,8 +205,11 @@ export function TableOfContents({
                   />
                 }
               >
-                <TableOfContentsIcon className="size-5" />
-                <span className="text-sm">{activeItem?.label}</span>
+                <TOCTriggerContent
+                  // Falls back to the first section so the label matches the
+                  // placeholder instead of going blank until the observer fires.
+                  label={activeItem?.label ?? firstLeafLabel(tocItems)}
+                />
               </PopoverTrigger>
               <PopoverContent
                 side="top"
