@@ -1,7 +1,7 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
-import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
+import { TwitchEmbed, YoutubeEmbed } from '~/components/tba/videoEmbeds';
 
 function setDocumentReadyState(state: DocumentReadyState) {
   vi.spyOn(document, 'readyState', 'get').mockReturnValue(state);
@@ -138,5 +138,41 @@ describe('YoutubeEmbed', () => {
     window.dispatchEvent(new Event('load'));
 
     expect(requestIdleCallback).not.toHaveBeenCalled();
+  });
+});
+
+describe('YoutubeEmbed click to play', () => {
+  test('waits for a click before loading the player', () => {
+    render(<YoutubeEmbed videoId="V4lDQSlvi7Q" title="Webcast" clickToPlay />);
+
+    expect(screen.queryByTitle('Webcast')).toBeNull();
+  });
+
+  test('plays the video when clicked', () => {
+    render(<YoutubeEmbed videoId="V4lDQSlvi7Q" title="Webcast" clickToPlay />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Play Webcast' }));
+
+    expect(screen.getByTitle('Webcast').getAttribute('src')).toBe(
+      'https://www.youtube.com/embed/V4lDQSlvi7Q?autoplay=1',
+    );
+  });
+});
+
+describe('TwitchEmbed', () => {
+  test('waits for a click before loading the player', () => {
+    render(<TwitchEmbed channel="firstinspires" title="Webcast" />);
+
+    expect(screen.queryByTitle('Webcast')).toBeNull();
+  });
+
+  test('plays the channel when clicked', () => {
+    render(<TwitchEmbed channel="firstinspires" title="Webcast" />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Play Webcast' }));
+
+    expect(screen.getByTitle('Webcast').getAttribute('src')).toBe(
+      'https://player.twitch.tv/?channel=firstinspires&parent=localhost',
+    );
   });
 });
