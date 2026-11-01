@@ -13,6 +13,7 @@ from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
+from backend.common.models.event_predictions_v2 import EventPredictionsV2
 from backend.common.models.event_team import EventTeam
 from backend.common.models.insight import Insight
 from backend.common.models.match import Match
@@ -21,6 +22,7 @@ from backend.common.queries import (
     award_query,
     district_query,
     event_details_query,
+    event_predictions_v2_query,
     event_query,
     insight_query,
     insight_v2_query,
@@ -205,6 +207,23 @@ class TestDatabaseCacheClearer(unittest.TestCase):
         assert cache_keys == {
             event_details_query.EventDetailsQuery("2015casj").cache_key,
             event_details_query.EventDetailsQuery("2015cama").cache_key,
+        }
+
+    def test_event_predictions_v2_updated(self) -> None:
+        affected_refs = {
+            "key": {
+                ndb.Key(EventPredictionsV2, "2015casj"),
+                ndb.Key(EventPredictionsV2, "2015cama"),
+            },
+        }
+        cache_keys = {
+            q[0]
+            for q in get_affected_queries.event_predictions_v2_updated(affected_refs)
+        }
+
+        assert cache_keys == {
+            event_predictions_v2_query.EventPredictionsV2Query("2015casj").cache_key,
+            event_predictions_v2_query.EventPredictionsV2Query("2015cama").cache_key,
         }
 
     def test_match_updated(self) -> None:

@@ -12,6 +12,7 @@ from backend.common.queries import (
     award_query,
     district_query,
     event_details_query,
+    event_predictions_v2_query,
     event_query,
     insight_query,
     match_query,
@@ -119,6 +120,18 @@ def event_details_updated(
     queries: List[CachedDatabaseQuery] = []
     for event_details_key in event_details_keys:
         queries.append(event_details_query.EventDetailsQuery(event_details_key.id()))
+
+    return _queries_to_cache_keys_and_queries(queries)
+
+
+def event_predictions_v2_updated(
+    affected_refs: TAffectedReferences,
+) -> List[TCacheKeyAndQuery]:
+    keys = _filter(affected_refs["key"])
+
+    queries: List[CachedDatabaseQuery] = []
+    for key in keys:
+        queries.append(event_predictions_v2_query.EventPredictionsV2Query(key.id()))
 
     return _queries_to_cache_keys_and_queries(queries)
 
