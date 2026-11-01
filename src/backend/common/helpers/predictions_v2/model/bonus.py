@@ -104,6 +104,22 @@ TIER_THRESHOLDS: Dict[Year, Dict[str, Dict[str, int]]] = {
     },
 }
 
+# Breakdown flag of each bonus RP key, in key order ("rp_1", "rp_2", ...). The order
+# follows the rules above, which is not always the game_specific order (2020).
+BONUS_RP_FIELDS: Dict[Year, Tuple[str, ...]] = {
+    2016: ("teleopDefensesBreached", "teleopTowerCaptured"),
+    2017: ("kPaRankingPointAchieved", "rotorRankingPointAchieved"),
+    2018: ("autoQuestRankingPoint", "faceTheBossRankingPoint"),
+    2019: ("completeRocketRankingPoint", "habDockingRankingPoint"),
+    2020: ("shieldOperationalRankingPoint", "shieldEnergizedRankingPoint"),
+    2021: ("shieldOperationalRankingPoint", "shieldEnergizedRankingPoint"),
+    2022: ("cargoBonusRankingPoint", "hangarBonusRankingPoint"),
+    2023: ("sustainabilityBonusAchieved", "activationBonusAchieved"),
+    2024: ("melodyBonusAchieved", "ensembleBonusAchieved"),
+    2025: ("autoBonusAchieved", "coralBonusAchieved", "bargeBonusAchieved"),
+    2026: ("energizedAchieved", "superchargedAchieved", "traversalAchieved"),
+}
+
 SUPPORTED_BONUS_SEASONS = frozenset(
     {2016, 2017, 2018, 2019, 2020, 2022, 2023, 2024, 2025, 2026}
 )

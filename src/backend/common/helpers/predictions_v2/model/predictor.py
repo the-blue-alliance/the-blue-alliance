@@ -45,6 +45,7 @@ import numpy as np
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.predictions_v2.model import state
 from backend.common.helpers.predictions_v2.model.bonus import (
+    BONUS_RP_FIELDS,
     RuleBonusModel,
     tier_of,
     TIER_THRESHOLDS,
@@ -109,6 +110,7 @@ def model_fingerprint(cfg: HKFConfig) -> str:
         SCORE_COMPONENTS,
         sorted(ROBOT_POINT_SEASONS),
         TIER_THRESHOLDS,
+        BONUS_RP_FIELDS,
     )
 
 
