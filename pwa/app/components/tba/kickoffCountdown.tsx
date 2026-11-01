@@ -85,8 +85,8 @@ export function KickoffCountdown({
 
   return (
     <div
-      className="mx-auto max-w-[600px] rounded-xl border border-border bg-card
-        p-6 text-card-foreground shadow-lg"
+      className="mx-auto mb-4 max-w-[600px] rounded-xl border border-border
+        bg-card p-6 text-card-foreground shadow-lg"
     >
       <h2
         className="mb-4 text-center text-2xl font-bold text-foreground
