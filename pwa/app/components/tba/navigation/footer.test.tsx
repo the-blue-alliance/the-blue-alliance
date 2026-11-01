@@ -21,6 +21,8 @@ vi.mock('@tanstack/react-router', () => ({
   ),
 }));
 
+vi.mock('~/lib/appShell', () => ({ useIsHydratingAppShell: () => false }));
+
 describe('Footer', () => {
   test('links to internal pages and external sites', () => {
     render(<Footer />);

@@ -22,6 +22,10 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+
+    /* The service worker answers repeat page loads with the app shell instead
+     * of SSR. Specs opt in with `test.use({ serviceWorkers: 'allow' })`. */
+    serviceWorkers: 'block',
   },
 
   /* Configure projects for major browsers */

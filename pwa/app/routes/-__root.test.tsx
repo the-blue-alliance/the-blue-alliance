@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import type { ComponentType, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
@@ -7,6 +7,8 @@ type Interceptor = (...args: never[]) => unknown;
 
 const mocks = vi.hoisted(() => ({
   pathname: '/',
+  isShell: false,
+  fetchStatus: vi.fn<() => Promise<unknown>>(),
   loggerDebug: vi.fn<(data: unknown, message: string) => void>(),
   createCachedFetch: vi.fn<(options: unknown) => unknown>(),
 }));
@@ -42,6 +44,7 @@ vi.mock('@tanstack/react-router', () => ({
   Scripts: () => <span data-testid="scripts" />,
   Outlet: () => <main>Outlet</main>,
   useLocation: () => ({ pathname: mocks.pathname }),
+  useRouter: () => ({ isShell: () => mocks.isShell }),
 }));
 
 vi.mock('~/api/tba/read/client.gen', () => ({
@@ -58,7 +61,10 @@ vi.mock('~/api/colors/client.gen', () => ({
 }));
 
 vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
-  getStatusOptions: () => ({ queryKey: ['status'] }),
+  getStatusOptions: () => ({
+    queryKey: ['status'],
+    queryFn: mocks.fetchStatus,
+  }),
 }));
 
 vi.mock('~/lib/logger', () => ({
@@ -122,9 +128,17 @@ function registered<T extends Interceptor>(
   return use.mock.calls[0][0] as unknown as T;
 }
 
-function renderRoot(Component: ComponentType) {
+function renderRoot(
+  Component: ComponentType,
+  queryClient: QueryClient = new QueryClient(),
+) {
   // RootComponent renders <html>; mount it as the document's children.
-  return render(<Component />, { container: document });
+  return render(<Component />, {
+    container: document,
+    wrapper: ({ children }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    ),
+  });
 }
 
 describe('root route module setup', () => {
@@ -315,7 +329,44 @@ describe('root route options', () => {
 describe('RootComponent', () => {
   beforeEach(() => {
     mocks.pathname = '/';
+    mocks.isShell = false;
+    mocks.fetchStatus.mockResolvedValue({ current_season: 2026 });
     document.body.removeAttribute('data-hydrated');
+  });
+
+  test('marks the document when prerendering the app shell', async () => {
+    mocks.isShell = true;
+    const { component: Root } = await loadRoot();
+
+    renderRoot(Root);
+
+    expect(document.documentElement.hasAttribute('data-app-shell')).toBe(true);
+  });
+
+  test('does not mark a server-rendered page as the app shell', async () => {
+    const { component: Root } = await loadRoot();
+
+    renderRoot(Root);
+
+    expect(document.documentElement.hasAttribute('data-app-shell')).toBe(false);
+  });
+
+  test('replaces a stale status with a fresh one', async () => {
+    const { component: Root } = await loadRoot();
+    const queryClient = new QueryClient();
+    queryClient.setQueryData(
+      ['status'],
+      { current_season: 2025 },
+      { updatedAt: 0 },
+    );
+
+    renderRoot(Root, queryClient);
+
+    await waitFor(() =>
+      expect(queryClient.getQueryData(['status'])).toEqual({
+        current_season: 2026,
+      }),
+    );
   });
 
   test('renders the site chrome around the outlet', async () => {

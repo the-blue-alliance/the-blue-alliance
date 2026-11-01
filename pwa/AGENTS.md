@@ -63,6 +63,16 @@ Design for a phone on a weak or congested mobile connection. The page should sho
 - **Images share bandwidth with the JavaScript.** Serve images in the first screen at their display size, not a larger `srcset` option. Use `fetchPriority="high"` only for a small image that is the LCP element.
 - **When you change what a page fetches or when, measure it** against a production build on a throttled phone profile, not the dev server. For example: Slow 4G (150 ms latency, 1.6 Mbps down) with a 4× CPU slowdown.
 
+## App Shell (Repeat Visits)
+
+Only the first visit is server-rendered. After that, the service worker answers every page load with `/_shell.html`: the root layout prerendered once at `/`, with no route data (`spa` in `vite.config.ts`, `navigateFallback` in `scripts/generate-sw.ts`). The router then runs the page's loaders in the browser behind `PageLoadingSkeleton`, the router's `defaultPendingComponent`.
+
+- **Anything in the root layout that depends on the URL** (active links, URLs built from the pathname) hydrates against `/`'s markup. React keeps mismatched attributes when it hydrates, so key that subtree on `useIsHydratingAppShell()` from `~/lib/appShell` to remount it afterwards, as the navbar and footer do.
+- **Routes that change the root layout** go in `~/lib/layoutRoutes`. The service worker sends those page loads to the server instead.
+- **Do not give a route its own `pendingComponent`.** The shell contains the default one, so a different one would not match it during hydration.
+- **Loaders and `staticData` callbacks must handle a page that is still loading.** On a repeat visit, the page's match is pending, with no loader data, while the root layout renders.
+- **`pnpm dev` always server-renders.** To see the shell, run `pnpm build && pnpm start` and load a page twice. Playwright specs block service workers unless they opt in with `test.use({ serviceWorkers: 'allow' })`, as `tests/app-shell.spec.ts` does.
+
 ## Linting & Formatting
 
 ### Oxlint

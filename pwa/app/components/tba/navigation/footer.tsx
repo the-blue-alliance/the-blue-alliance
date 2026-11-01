@@ -6,6 +6,7 @@ import { Temporal } from 'temporal-polyfill';
 import GithubIcon from '~icons/simple-icons/github';
 
 import andymarkLogo from '~/images/images/andymark-logo.png';
+import { useIsHydratingAppShell } from '~/lib/appShell';
 import { useIsHydrated } from '~/lib/hooks';
 
 type InternalLink = {
@@ -61,6 +62,9 @@ function formatRenderTime(): string {
 
 export const Footer = () => {
   const hydrated = useIsHydrated();
+  // The app shell's footer was rendered at `/`, so its links' active state is
+  // `/`'s. Remount it once hydration is done.
+  const appShellKey = useIsHydratingAppShell() ? 'app-shell' : 'page';
   const renderTime = useMemo(
     () => (hydrated ? formatRenderTime() : null),
     [hydrated],
@@ -68,6 +72,7 @@ export const Footer = () => {
 
   return (
     <footer
+      key={appShellKey}
       className="mt-(--footer-inset-top) flex flex-col space-y-3 border-t
         bg-surface-subtle"
     >

@@ -13,6 +13,7 @@ import {
   NavigationMenuViewport,
 } from '~/components/ui/navigation-menu';
 import lamp from '~/images/tba/tba-lamp.svg';
+import { useIsHydratingAppShell } from '~/lib/appShell';
 import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
 
 export function Navbar() {
@@ -22,6 +23,9 @@ export function Navbar() {
   const [selected, setSelected] = useState<string | null>(null);
   const router = useRouter();
   const { pathname } = useLocation();
+  // The app shell's menu was rendered at `/`: its active link and "Leave
+  // beta" URL are `/`'s. Remount it once hydration is done.
+  const appShellKey = useIsHydratingAppShell() ? 'app-shell' : 'page';
 
   useEffect(() => {
     const unsubscribe = router.subscribe('onBeforeNavigate', () => {
@@ -34,6 +38,7 @@ export function Navbar() {
     <>
       <GlobalLoadingProgress />
       <NavigationMenu
+        key={appShellKey}
         value={selected}
         onValueChange={(value, eventDetails) => {
           // Base UI opens NavigationMenu triggers on hover (~50ms delay)

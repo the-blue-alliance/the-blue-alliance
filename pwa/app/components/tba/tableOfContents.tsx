@@ -64,7 +64,9 @@ function TOCPlaceholder() {
   const match = useRouterState({ select: (s) => s.matches.at(-1) });
   const tocPreview = match?.staticData.tocPreview as
     ((loaderData: unknown) => TocPreview) | undefined;
-  const preview = tocPreview?.(match?.loaderData);
+  // A page loading from the app shell has no loader data yet.
+  const preview =
+    match?.status === 'success' ? tocPreview?.(match.loaderData) : undefined;
 
   return (
     <div

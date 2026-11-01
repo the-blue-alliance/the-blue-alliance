@@ -26,7 +26,7 @@ const staticRoutes = [
   '/thanks',
 ];
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   test: {
     environment: 'jsdom',
     exclude: [...configDefaults.exclude, 'tests/**', 'app/api/**'],
@@ -59,9 +59,16 @@ export default defineConfig({
         // route generator from treating them as routes.
         routeFileIgnorePattern: '\\.test\\.tsx?$',
       },
+      // Prerender the app shell (root layout, no route data) to
+      // /_shell.html. The service worker serves it for repeat visits; see
+      // scripts/generate-sw.ts. Build only: in `vite dev` this flag makes
+      // every request render the shell instead of SSR.
+      spa: { enabled: command === 'build' },
       prerender: {
         enabled: true,
-        filter: ({ path }) => staticRoutes.includes(path),
+        // The shell is prerendered as page '/'. It takes that slot, so the
+        // home page itself is not prerendered.
+        filter: ({ path }) => path === '/' || staticRoutes.includes(path),
       },
     }),
     react({ compiler: true }),
@@ -140,4 +147,4 @@ export default defineConfig({
   define: {
     __COMMIT_HASH__: JSON.stringify(getCommitHash()),
   },
-});
+}));

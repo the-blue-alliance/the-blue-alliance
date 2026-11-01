@@ -42,6 +42,8 @@ vi.mock('@tanstack/react-router', () => ({
   useRouter: () => mocks.router,
 }));
 
+vi.mock('~/lib/appShell', () => ({ useIsHydratingAppShell: () => false }));
+
 vi.mock('~/components/tba/globalLoadingProgress', () => ({
   default: () => <div>Loading progress</div>,
 }));

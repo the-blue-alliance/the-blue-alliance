@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import type { QueryClient } from '@tanstack/react-query';
+import { type QueryClient, useQuery } from '@tanstack/react-query';
 import {
   HeadContent,
   Outlet,
@@ -7,6 +7,7 @@ import {
   Scripts,
   createRootRouteWithContext,
   useLocation,
+  useRouter,
 } from '@tanstack/react-router';
 import { cn } from 'cn';
 import { Suspense, lazy, useEffect } from 'react';
@@ -27,12 +28,14 @@ import { Toaster } from '~/components/ui/sonner';
 import { TooltipProvider } from '~/components/ui/tooltip';
 import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?url&no-inline';
 import { mapClientError } from '~/lib/apiError';
+import { APP_SHELL_ATTRIBUTE } from '~/lib/appShell';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
 import {
   LOCAL_API_AUTH_KEY,
   LOCAL_API_BASE_URL,
   isLocalDataSource,
 } from '~/lib/dataSource';
+import { FULLSCREEN_ROUTES, FULLWIDTH_ROUTES } from '~/lib/layoutRoutes';
 import { STALE_TIME } from '~/lib/queryClient';
 import { THEME_INIT_SCRIPT, ThemeProvider } from '~/lib/theme';
 import { createLogger } from '~/lib/utils';
@@ -209,11 +212,14 @@ export const Route = createRootRouteWithContext<{
   component: RootComponent,
 });
 
-const FULLSCREEN_ROUTES = ['/gameday'];
-const FULLWIDTH_ROUTES = ['/match_suggestion'];
-
 function RootComponent() {
   const { pathname } = useLocation();
+  const router = useRouter();
+
+  // The app shell carries the /status from when it was built. Subscribing
+  // refetches it in the background once it is older than STALE_TIME.STATUS,
+  // so the next navigation's beforeLoad gets a fresh copy.
+  useQuery({ ...getStatusOptions({}), staleTime: STALE_TIME.STATUS });
 
   // Set data-hydrated on <body> after React mounts so Playwright tests can
   // wait for full client-side hydration before interacting with the page.
@@ -228,7 +234,11 @@ function RootComponent() {
   );
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      {...(router.isShell() && { [APP_SHELL_ATTRIBUTE]: '' })}
+    >
       <head>
         {/* This render-blocking script is necessary to ensure the correct theme is applied when the page is loaded. */}
         <ScriptOnce>{THEME_INIT_SCRIPT}</ScriptOnce>

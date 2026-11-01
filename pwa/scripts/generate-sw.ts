@@ -1,5 +1,7 @@
 import { generateSW } from 'workbox-build';
 
+import { FULLSCREEN_ROUTES, FULLWIDTH_ROUTES } from '~/lib/layoutRoutes';
+
 async function buildServiceWorker() {
   try {
     console.log('🔧 Generating service worker with Workbox...');
@@ -9,7 +11,23 @@ async function buildServiceWorker() {
       globDirectory: 'build/client',
 
       // Patterns to match files for precaching
-      globPatterns: ['**/*.{js,css,png,jpg,jpeg,svg,woff,woff2,ico}'],
+      globPatterns: [
+        '**/*.{js,css,png,jpg,jpeg,svg,woff,woff2,ico}',
+        '_shell.html',
+      ],
+
+      // Answer repeat visits with the app shell (see `spa` in
+      // vite.config.ts) so page loads never reach the server; the router
+      // then loads the page and its data in the browser.
+      navigateFallback: '/_shell.html',
+      navigateFallbackDenylist: [
+        // The shell has the default root layout, which these routes change.
+        ...[...FULLSCREEN_ROUTES, ...FULLWIDTH_ROUTES].map(
+          (prefix) => new RegExp(`^${prefix}`),
+        ),
+        // Files opened directly, such as /robots.txt.
+        /^[^?]*\.[^/?]*(\?|$)/,
+      ],
 
       // Output location for the generated service worker
       swDest: 'build/client/sw.js',

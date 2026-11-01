@@ -157,6 +157,7 @@ describe('TableOfContents', () => {
 
   test('shows the route preview in the placeholder before the mobile header mounts', () => {
     router.match = {
+      status: 'success',
       staticData: {
         tocPreview: ({ year }: { year: number }) => ({
           activeLabel: 'Team Info',
@@ -168,6 +169,21 @@ describe('TableOfContents', () => {
     render(<TOCRendererProvider>{null}</TOCRendererProvider>);
     expect(screen.getByText('Team Info')).toBeTruthy();
     expect(screen.getByText('2026')).toBeTruthy();
+  });
+
+  test('leaves the placeholder empty while the page is loading', () => {
+    router.match = {
+      status: 'pending',
+      staticData: {
+        tocPreview: ({ year }: { year: number }) => ({
+          activeLabel: 'Team Info',
+          action: <span>{year}</span>,
+        }),
+      },
+      loaderData: undefined,
+    };
+    render(<TOCRendererProvider>{null}</TOCRendererProvider>);
+    expect(screen.queryByText('Team Info')).toBeNull();
   });
 
   test('clicking a desktop link without a target does not scroll', () => {

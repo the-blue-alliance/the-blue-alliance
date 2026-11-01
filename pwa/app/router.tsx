@@ -14,11 +14,15 @@ import { toast } from 'sonner';
 
 import ClipboardCopyIcon from '~icons/lucide/clipboard-copy';
 
+import PageLoadingSkeleton from '~/components/tba/pageLoadingSkeleton';
 import { Button } from '~/components/ui/button';
 import { getAnalyticsInstance } from '~/firebase/firebaseConfig';
 import { ApiError } from '~/lib/apiError';
+import { isAppShellDocument } from '~/lib/appShell';
 import { createQueryClient } from '~/lib/queryClient';
-import registerServiceWorker from '~/lib/serviceWorkerRegistration';
+import registerServiceWorker, {
+  isServiceWorkerUpdateReady,
+} from '~/lib/serviceWorkerRegistration';
 import { createLogger } from '~/lib/utils';
 import { routeTree } from '~/routeTree.gen';
 
@@ -81,6 +85,14 @@ export function getRouter() {
     caseSensitive: true,
     defaultErrorComponent: ErrorComponent,
     defaultNotFoundComponent: NotFoundComponent,
+    // Repeat visits load the app shell, which has no route data, so the page
+    // loads in the browser behind this skeleton. The shell is prerendered at
+    // `/` with it, so a route-level pendingComponent would not match the
+    // shell's markup during hydration.
+    defaultPendingComponent: PageLoadingSkeleton,
+    // Only the app shell shows it. Client-side navigations keep the current
+    // page on screen until the next one is ready, as they did before.
+    defaultPendingMs: Infinity,
   });
   setupRouterSsrQueryIntegration({
     router,
@@ -113,6 +125,18 @@ export function getRouter() {
     });
     void registerServiceWorker();
 
+    // A new deploy's service worker takes over open tabs, but each tab keeps
+    // running the code it loaded. Switch to the new version on the next page
+    // change with a full load, which the service worker answers from its
+    // cached app shell.
+    router.subscribe('onBeforeNavigate', ({ fromLocation, pathChanged }) => {
+      if (fromLocation && pathChanged && isServiceWorkerUpdateReady()) {
+        // The router writes the new URL to the address bar after this event,
+        // so reload once it has.
+        setTimeout(() => window.location.reload());
+      }
+    });
+
     router.subscribe(
       'onResolved',
       ({ toLocation }: { toLocation: ParsedLocation }) => {
@@ -120,15 +144,19 @@ export function getRouter() {
       },
     );
 
-    // onResolved doesn't fire for the initial hydration, so log it manually.
+    // onResolved doesn't fire for the initial hydration of a server-rendered
+    // page, so log it manually. The app shell loads its page in the browser
+    // after hydrating, which does fire onResolved.
     // Defer to idle so Firebase Analytics (gtag.js) stays off the hydration
     // critical path.
-    const logInitialPageView = () =>
-      void logPageView(window.location.pathname, window.location.href);
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(logInitialPageView);
-    } else {
-      setTimeout(logInitialPageView, 1);
+    if (!isAppShellDocument()) {
+      const logInitialPageView = () =>
+        void logPageView(window.location.pathname, window.location.href);
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(logInitialPageView);
+      } else {
+        setTimeout(logInitialPageView, 1);
+      }
     }
   }
 

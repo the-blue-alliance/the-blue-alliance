@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import registerServiceWorker from '~/lib/serviceWorkerRegistration';
+import registerServiceWorker, {
+  isServiceWorkerUpdateReady,
+} from '~/lib/serviceWorkerRegistration';
 
 type InstalledListener = (event: { isUpdate?: boolean }) => void;
 
@@ -32,16 +34,22 @@ vi.mock('workbox-window', () => ({
   },
 }));
 
+function stubServiceWorkerContainer(controller: object | null) {
+  const container = Object.assign(new EventTarget(), { controller });
+  Object.defineProperty(navigator, 'serviceWorker', {
+    configurable: true,
+    value: container,
+  });
+  return container;
+}
+
 describe('registerServiceWorker', () => {
   beforeEach(() => {
     mocks.scriptUrls.length = 0;
     mocks.listeners.clear();
     mocks.register.mockResolvedValue(undefined);
     vi.stubEnv('PROD', true);
-    Object.defineProperty(navigator, 'serviceWorker', {
-      configurable: true,
-      value: {},
-    });
+    stubServiceWorkerContainer(null);
   });
 
   test('does nothing outside production', async () => {
@@ -95,5 +103,53 @@ describe('registerServiceWorker', () => {
       { error },
       'Service Worker registration failed',
     );
+  });
+});
+
+describe('isServiceWorkerUpdateReady', () => {
+  // The update flag is module state, so load a fresh copy for each test.
+  async function loadFreshModule() {
+    vi.resetModules();
+    return import('~/lib/serviceWorkerRegistration');
+  }
+
+  beforeEach(() => {
+    mocks.register.mockResolvedValue(undefined);
+    vi.stubEnv('PROD', true);
+  });
+
+  test('is false before any new service worker takes over', () => {
+    expect(isServiceWorkerUpdateReady()).toBe(false);
+  });
+
+  test('is true once a new service worker takes over a controlled tab', async () => {
+    const container = stubServiceWorkerContainer({ state: 'activated' });
+    const module = await loadFreshModule();
+    await module.default();
+
+    container.dispatchEvent(new Event('controllerchange'));
+
+    expect(module.isServiceWorkerUpdateReady()).toBe(true);
+  });
+
+  test('is false after the first install takes over the tab', async () => {
+    const container = stubServiceWorkerContainer(null);
+    const module = await loadFreshModule();
+    await module.default();
+
+    container.dispatchEvent(new Event('controllerchange'));
+
+    expect(module.isServiceWorkerUpdateReady()).toBe(false);
+  });
+
+  test('is true once a deploy takes over after the first install', async () => {
+    const container = stubServiceWorkerContainer(null);
+    const module = await loadFreshModule();
+    await module.default();
+    container.dispatchEvent(new Event('controllerchange'));
+
+    container.dispatchEvent(new Event('controllerchange'));
+
+    expect(module.isServiceWorkerUpdateReady()).toBe(true);
   });
 });

@@ -2,7 +2,15 @@ import type { QueryClient } from '@tanstack/react-query';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { ComponentType } from 'react';
-import { type Mock, beforeEach, describe, expect, test, vi } from 'vitest';
+import {
+  type Mock,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 
 import { ApiError } from '~/lib/apiError';
 
@@ -11,6 +19,7 @@ interface RouterOptions {
   scrollRestoration: (args: { location: { pathname: string } }) => boolean;
   defaultErrorComponent: ComponentType<ErrorComponentProps>;
   defaultNotFoundComponent: ComponentType;
+  defaultPendingComponent: ComponentType;
   routeTree: unknown;
 }
 
@@ -18,8 +27,13 @@ type ResolvedListener = (event: {
   toLocation: { pathname: string; href: string };
 }) => void;
 
+type BeforeNavigateListener = (event: {
+  fromLocation?: { pathname: string };
+  pathChanged: boolean;
+}) => void;
+
 const mocks = vi.hoisted(() => ({
-  state: { isServer: false },
+  state: { isServer: false, appShell: false, updateReady: false },
   createRouter: vi.fn<(options: unknown) => unknown>(),
   subscribe: vi.fn<(event: string, listener: unknown) => void>(),
   setupRouterSsrQueryIntegration: vi.fn<(options: unknown) => void>(),
@@ -59,6 +73,11 @@ vi.mock('~/routeTree.gen', () => ({ routeTree: { id: 'root' } }));
 
 vi.mock('~/lib/serviceWorkerRegistration', () => ({
   default: mocks.registerServiceWorker,
+  isServiceWorkerUpdateReady: () => mocks.state.updateReady,
+}));
+
+vi.mock('~/lib/appShell', () => ({
+  isAppShellDocument: () => mocks.state.appShell,
 }));
 
 vi.mock('firebase/analytics', () => ({ logEvent: mocks.logEvent }));
@@ -90,6 +109,12 @@ function logger(name: string) {
   return found;
 }
 
+function listener<T>(event: string): T {
+  const call = mocks.subscribe.mock.calls.find(([name]) => name === event);
+  if (!call) throw new Error(`No ${event} listener`);
+  return call[1] as T;
+}
+
 function createAndCapture() {
   const router = getRouter() as { isServer: boolean };
   const options = mocks.createRouter.mock.calls[0][0] as RouterOptions;
@@ -99,6 +124,8 @@ function createAndCapture() {
 describe('getRouter', () => {
   beforeEach(() => {
     mocks.state.isServer = false;
+    mocks.state.appShell = false;
+    mocks.state.updateReady = false;
     mocks.createRouter.mockImplementation(() => ({
       get isServer() {
         return mocks.state.isServer;
@@ -244,7 +271,7 @@ describe('getRouter', () => {
       'onResolved',
       expect.any(Function),
     );
-    const onResolved = mocks.subscribe.mock.calls[0][1] as ResolvedListener;
+    const onResolved = listener<ResolvedListener>('onResolved');
     onResolved({
       toLocation: { pathname: '/team/254', href: '/team/254?year=2026' },
     });
@@ -266,7 +293,7 @@ describe('getRouter', () => {
     mocks.getAnalyticsInstance.mockResolvedValue(null);
     vi.stubGlobal('requestIdleCallback', vi.fn<() => void>());
     createAndCapture();
-    const onResolved = mocks.subscribe.mock.calls[0][1] as ResolvedListener;
+    const onResolved = listener<ResolvedListener>('onResolved');
 
     onResolved({ toLocation: { pathname: '/', href: '/' } });
 
@@ -275,6 +302,125 @@ describe('getRouter', () => {
     );
     await Promise.resolve();
     expect(mocks.logEvent).not.toHaveBeenCalled();
+  });
+});
+
+describe('getRouter on app shell loads', () => {
+  beforeEach(() => {
+    mocks.state.isServer = false;
+    mocks.state.appShell = true;
+    mocks.state.updateReady = false;
+    mocks.createRouter.mockImplementation(() => ({
+      get isServer() {
+        return mocks.state.isServer;
+      },
+      subscribe: mocks.subscribe,
+    }));
+    mocks.registerServiceWorker.mockResolvedValue();
+    mocks.getAnalyticsInstance.mockResolvedValue({ name: 'analytics' });
+  });
+
+  test('logs one page view for the initial load', async () => {
+    vi.stubGlobal(
+      'requestIdleCallback',
+      vi.fn<(callback: () => void) => void>((callback) => callback()),
+    );
+    createAndCapture();
+
+    listener<ResolvedListener>('onResolved')({
+      toLocation: { pathname: '/events', href: '/events' },
+    });
+    await waitFor(() => expect(mocks.logEvent).toHaveBeenCalled());
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    expect(mocks.logEvent.mock.calls.map(([, , params]) => params)).toEqual([
+      {
+        page_path: '/events',
+        page_location: '/events',
+        client_platform: 'pwa',
+      },
+    ]);
+  });
+
+  test('shows the page loading skeleton while a page loads', () => {
+    const { options } = createAndCapture();
+    const Pending = options.defaultPendingComponent;
+
+    render(<Pending />);
+
+    expect(screen.getByRole('status', { name: 'Loading page' })).toBeTruthy();
+  });
+});
+
+describe('getRouter after a service worker update', () => {
+  const reload = vi.fn<() => void>();
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    mocks.state.isServer = false;
+    mocks.state.updateReady = true;
+    mocks.createRouter.mockImplementation(() => ({
+      get isServer() {
+        return mocks.state.isServer;
+      },
+      subscribe: mocks.subscribe,
+    }));
+    mocks.registerServiceWorker.mockResolvedValue();
+    vi.stubGlobal('requestIdleCallback', vi.fn<() => void>());
+    reload.mockReset();
+    vi.stubGlobal('location', { href: 'http://localhost/', reload });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test('reloads the page on the next page change', () => {
+    createAndCapture();
+
+    listener<BeforeNavigateListener>('onBeforeNavigate')({
+      fromLocation: { pathname: '/events' },
+      pathChanged: true,
+    });
+    vi.runAllTimers();
+
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  test('keeps the page on a search or hash change', () => {
+    createAndCapture();
+
+    listener<BeforeNavigateListener>('onBeforeNavigate')({
+      fromLocation: { pathname: '/events' },
+      pathChanged: false,
+    });
+    vi.runAllTimers();
+
+    expect(reload).not.toHaveBeenCalled();
+  });
+
+  test('keeps the page while the first page loads', () => {
+    createAndCapture();
+
+    listener<BeforeNavigateListener>('onBeforeNavigate')({
+      pathChanged: true,
+    });
+    vi.runAllTimers();
+
+    expect(reload).not.toHaveBeenCalled();
+  });
+
+  test('keeps the page on a page change without an update', () => {
+    mocks.state.updateReady = false;
+    createAndCapture();
+
+    listener<BeforeNavigateListener>('onBeforeNavigate')({
+      fromLocation: { pathname: '/events' },
+      pathChanged: true,
+    });
+    vi.runAllTimers();
+
+    expect(reload).not.toHaveBeenCalled();
   });
 });
 
