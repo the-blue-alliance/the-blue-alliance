@@ -38,6 +38,7 @@ export function SearchModal() {
   const [query, setQuery] = useState<string>('');
   const [searchIntended, setSearchIntended] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const keyboardProxyRef = useRef<HTMLInputElement>(null);
   const searchIndexQuery = useQuery({
     ...getSearchIndexOptions({}),
     staleTime: STALE_TIME.SEARCH_INDEX,
@@ -114,9 +115,17 @@ export function SearchModal() {
         </ClientOnly>
       </DialogTrigger>
 
+      <input
+        ref={keyboardProxyRef}
+        aria-hidden
+        tabIndex={-1}
+        inputMode="search"
+        className="pointer-events-none fixed top-0 left-0 size-px opacity-0"
+      />
       <DialogTrigger
         onPointerEnter={intendSearch}
         onFocus={intendSearch}
+        onClick={() => keyboardProxyRef.current?.focus()}
         aria-label="Search"
         className="z-30 cursor-pointer rounded-full p-2 text-white
           transition-colors duration-200 hover:bg-black/20 xl:hidden"
@@ -146,7 +155,10 @@ export function SearchModal() {
         >
           <div className="relative">
             <CommandInput
-              ref={inputRef}
+              ref={(node) => {
+                inputRef.current = node;
+                node?.focus();
+              }}
               placeholder="Search teams and events..."
               value={query}
               onValueChange={setQuery}
