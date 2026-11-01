@@ -8,12 +8,12 @@ import copy
 import gzip
 import json
 import os
-from typing import Dict, List, Tuple
+from typing import Dict, List, Set, Tuple
 
 from google.appengine.ext import ndb
 
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey
+from backend.common.models.keys import EventKey, Year
 from backend.common.models.match import Match
 from backend.common.queries.dict_converters.event_converter import EventConverter
 from backend.common.queries.dict_converters.match_converter import MatchConverter
@@ -36,4 +36,13 @@ def load_api_fixture() -> Tuple[Dict[EventKey, Event], List[Match]]:
         for event_matches in data["matches"].values()
         for m in event_matches
     ]
+    return events, matches
+
+
+def store_api_fixture(years: Set[Year]) -> Tuple[Dict[EventKey, Event], List[Match]]:
+    """Store the fixture's events and matches of ``years`` in the test datastore."""
+    events, matches = load_api_fixture()
+    events = {k: e for k, e in events.items() if e.year in years}
+    matches = [m for m in matches if m.event_key_name in events]
+    ndb.put_multi(matches)
     return events, matches

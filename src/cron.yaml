@@ -55,6 +55,16 @@ cron:
     schedule: every day 01:00
     timezone: America/Los_Angeles
 
+  # Predictions V2 (no-ops unless the predictions_v2_config sitevar is enabled)
+  - description: Predictions V2 Advance
+    url: /backend-tasks-b2/enqueue/math/predictions_v2/advance
+    schedule: every 2 minutes
+
+  - description: Predictions V2 Reconcile
+    url: /backend-tasks-b2/enqueue/math/predictions_v2/reconcile
+    schedule: every day 04:00
+    timezone: America/Los_Angeles
+
   # Insights V2
   - description: Insights V2 Calculation
     url: /backend-tasks-b2/enqueue/math/insights_v2

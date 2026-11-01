@@ -231,3 +231,18 @@ def build_stream(
         if item is not None:
             items.append(item)
     return [items[i] for i in event_block_order([it.slot for it in items])]
+
+
+def event_digest(matches: Iterable[Match]) -> str:
+    """Digest of an event's results and schedule. It changes when a match is played,
+    corrected, deleted, added or rescheduled with other teams."""
+    lines = []
+    for m in matches:
+        if m.comp_level == CompLevel.PM:
+            continue
+        if m.has_been_played:
+            lines.append(f"{m.key_name}|{outcome_fingerprint(m)}")
+        else:
+            teams = ",".join(m.team_key_names or [])
+            lines.append(f"{m.key_name}|unplayed|{teams}")
+    return hashlib.sha1("\n".join(sorted(lines)).encode()).hexdigest()
