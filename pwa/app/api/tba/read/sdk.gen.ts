@@ -105,6 +105,9 @@ import type {
   GetEventPredictionsData,
   GetEventPredictionsErrors,
   GetEventPredictionsResponses,
+  GetEventPredictionsV2Data,
+  GetEventPredictionsV2Errors,
+  GetEventPredictionsV2Responses,
   GetEventRankingsData,
   GetEventRankingsErrors,
   GetEventRankingsResponses,
@@ -377,6 +380,9 @@ import {
   zGetEventPredictionsHeaders,
   zGetEventPredictionsPath,
   zGetEventPredictionsResponse,
+  zGetEventPredictionsV2Headers,
+  zGetEventPredictionsV2Path,
+  zGetEventPredictionsV2Response,
   zGetEventRankingsHeaders,
   zGetEventRankingsPath,
   zGetEventRankingsResponse,
@@ -1546,6 +1552,37 @@ export const getEventPredictions = <ThrowOnError extends boolean = false>(
       await zGetEventPredictionsResponse.parseAsync(data),
     security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/predictions',
+    ...options,
+  });
+
+/**
+ * Gets the predictions_v2 match predictions for the given Event: the red alliance's win probability, each alliance's score distribution, and qualification ranking points. Played matches carry the prediction made before the match; unplayed matches carry a forecast from the latest results. Returns null if the event has no predictions. *WARNING* This endpoint is experimental and may change at any time.
+ */
+export const getEventPredictionsV2 = <ThrowOnError extends boolean = false>(
+  options: Options<GetEventPredictionsV2Data, ThrowOnError>,
+): RequestResult<
+  GetEventPredictionsV2Responses,
+  GetEventPredictionsV2Errors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetEventPredictionsV2Responses,
+    GetEventPredictionsV2Errors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetEventPredictionsV2Headers.optional(),
+          path: zGetEventPredictionsV2Path,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventPredictionsV2Response.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/event/{event_key}/predictions_v2',
     ...options,
   });
 

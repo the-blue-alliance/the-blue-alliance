@@ -44,6 +44,7 @@ from backend.common.queries.dict_converters.match_converter import MatchDict
 from backend.common.queries.dict_converters.media_converter import MediaDict
 from backend.common.queries.dict_converters.team_converter import TeamDict
 from backend.common.queries.event_details_query import EventDetailsQuery
+from backend.common.queries.event_predictions_v2_query import EventPredictionsV2Query
 from backend.common.queries.event_query import (
     EventListQuery,
     EventQuery,
@@ -131,6 +132,22 @@ def event_detail(event_key: EventKey, detail_type: str) -> TypedFlaskResponse[An
         add_alliance_status(event_key, detail)
 
     return profiled_jsonify(detail)
+
+
+@api_authenticated
+@cached_public(query_string=False)
+@validate_etag
+@validate_keys
+def event_predictions_v2(event_key: EventKey) -> TypedFlaskResponse[Any]:
+    """
+    Returns the predictions_v2 match predictions of one event (experimental).
+    """
+    track_call_after_response("event/predictions_v2", event_key)
+
+    predictions = EventPredictionsV2Query(event_key=event_key).fetch_dict(
+        ApiMajorVersion.API_V3
+    )
+    return profiled_jsonify(predictions)
 
 
 @api_authenticated

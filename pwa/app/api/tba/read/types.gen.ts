@@ -1657,6 +1657,102 @@ export type EventPredictions = {
   [key: string]: unknown;
 };
 
+/**
+ * predictions_v2 match predictions for an event. *Experimental*: the fields may change.
+ */
+export type EventPredictionsV2 = {
+  /**
+   * TBA event key.
+   */
+  event_key: string;
+  /**
+   * Version of the model that made the predictions.
+   */
+  model_version: string;
+  /**
+   * True for offseason and preseason events. The model does not learn from their results, so its predictions do not adapt during the event.
+   */
+  forecast_only: boolean;
+  /**
+   * UNIX timestamp (seconds) of the last update of the predictions.
+   */
+  last_updated: number | null;
+  /**
+   * Prediction of each match, keyed by match key. Practice matches are not included.
+   */
+  matches: {
+    [key: string]: MatchPredictionV2;
+  };
+};
+
+export type MatchPredictionV2 = {
+  /**
+   * `pre_match`: made before the match was played, from the results before it. `forecast`: the match is unplayed; made from the latest results.
+   */
+  kind: 'pre_match' | 'forecast';
+  /**
+   * Probability that the red alliance wins, from 0 to 1. A tie counts as half a win.
+   */
+  red_win_prob: number;
+  red: AlliancePredictionV2;
+  blue: AlliancePredictionV2;
+};
+
+export type AlliancePredictionV2 = {
+  score: ScorePredictionV2;
+  /**
+   * Ranking points of a qualification match, null in playoff matches and in seasons without ranking point predictions.
+   */
+  ranking_points: RankingPointsPredictionV2 | null;
+};
+
+/**
+ * Distribution of the alliance's score, including penalty points.
+ */
+export type ScorePredictionV2 = {
+  /**
+   * Expected score.
+   */
+  mean: number;
+  /**
+   * Standard deviation of the score.
+   */
+  sd: number;
+  /**
+   * 10th percentile of the score.
+   */
+  p10: number;
+  /**
+   * Median score.
+   */
+  p50: number;
+  /**
+   * 90th percentile of the score.
+   */
+  p90: number;
+};
+
+export type RankingPointsPredictionV2 = {
+  /**
+   * Expected ranking points earned.
+   */
+  expected_rp: number;
+  /**
+   * Median ranking points earned.
+   */
+  median_rp: number;
+  /**
+   * Probability of earning the win ranking points.
+   */
+  win_rp_prob: number;
+  /**
+   * Probability of each bonus ranking point, keyed by its score breakdown field (for example `melodyBonusAchieved` in 2024).
+   */
+  bonus_rp_probs: {
+    [key: string]: number;
+  };
+};
+
 export type EventRanking = {
   /**
    * List of rankings at the event.
@@ -5437,6 +5533,53 @@ export type GetEventPredictionsResponses = {
 
 export type GetEventPredictionsResponse =
   GetEventPredictionsResponses[keyof GetEventPredictionsResponses];
+
+export type GetEventPredictionsV2Data = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/predictions_v2';
+};
+
+export type GetEventPredictionsV2Errors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventPredictionsV2Error =
+  GetEventPredictionsV2Errors[keyof GetEventPredictionsV2Errors];
+
+export type GetEventPredictionsV2Responses = {
+  /**
+   * Successful response
+   */
+  200: EventPredictionsV2 | null;
+};
+
+export type GetEventPredictionsV2Response =
+  GetEventPredictionsV2Responses[keyof GetEventPredictionsV2Responses];
 
 export type GetEventRankingsData = {
   body?: never;

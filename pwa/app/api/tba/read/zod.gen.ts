@@ -532,6 +532,47 @@ export const zEventOprs = z.object({
  */
 export const zEventPredictions = z.record(z.string(), z.unknown());
 
+/**
+ * Distribution of the alliance's score, including penalty points.
+ */
+export const zScorePredictionV2 = z.object({
+  mean: z.number(),
+  sd: z.number(),
+  p10: z.int(),
+  p50: z.int(),
+  p90: z.int(),
+});
+
+export const zRankingPointsPredictionV2 = z.object({
+  expected_rp: z.number(),
+  median_rp: z.number(),
+  win_rp_prob: z.number(),
+  bonus_rp_probs: z.record(z.string(), z.number()),
+});
+
+export const zAlliancePredictionV2 = z.object({
+  score: zScorePredictionV2,
+  ranking_points: zRankingPointsPredictionV2.nullable(),
+});
+
+export const zMatchPredictionV2 = z.object({
+  kind: z.enum(['pre_match', 'forecast']),
+  red_win_prob: z.number(),
+  red: zAlliancePredictionV2,
+  blue: zAlliancePredictionV2,
+});
+
+/**
+ * predictions_v2 match predictions for an event. *Experimental*: the fields may change.
+ */
+export const zEventPredictionsV2 = z.object({
+  event_key: z.string(),
+  model_version: z.string(),
+  forecast_only: z.boolean(),
+  last_updated: z.int().nullable(),
+  matches: z.record(z.string(), zMatchPredictionV2),
+});
+
 export const zEventSimple = z.object({
   key: z.string(),
   name: z.string(),
@@ -2717,6 +2758,19 @@ export const zGetEventPredictionsPath = z.object({
  * Successful response
  */
 export const zGetEventPredictionsResponse = zEventPredictions.nullable();
+
+export const zGetEventPredictionsV2Headers = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetEventPredictionsV2Path = z.object({
+  event_key: z.string(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetEventPredictionsV2Response = zEventPredictionsV2.nullable();
 
 export const zGetEventRankingsHeaders = z.object({
   'If-None-Match': z.string().optional(),

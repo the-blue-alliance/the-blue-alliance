@@ -36,6 +36,7 @@ import {
   getEventPracticeMatchesKeys,
   getEventPracticeMatchesSimple,
   getEventPredictions,
+  getEventPredictionsV2,
   getEventRankings,
   getEventSimple,
   getEventTeamMedia,
@@ -191,6 +192,9 @@ import type {
   GetEventPredictionsData,
   GetEventPredictionsError,
   GetEventPredictionsResponse,
+  GetEventPredictionsV2Data,
+  GetEventPredictionsV2Error,
+  GetEventPredictionsV2Response,
   GetEventRankingsData,
   GetEventRankingsError,
   GetEventRankingsResponse,
@@ -1287,6 +1291,34 @@ export const getEventPredictionsOptions = (
       return data;
     },
     queryKey: getEventPredictionsQueryKey(options),
+  });
+
+export const getEventPredictionsV2QueryKey = (
+  options: Options<GetEventPredictionsV2Data>,
+) => createQueryKey('getEventPredictionsV2', options);
+
+/**
+ * Gets the predictions_v2 match predictions for the given Event: the red alliance's win probability, each alliance's score distribution, and qualification ranking points. Played matches carry the prediction made before the match; unplayed matches carry a forecast from the latest results. Returns null if the event has no predictions. *WARNING* This endpoint is experimental and may change at any time.
+ */
+export const getEventPredictionsV2Options = (
+  options: Options<GetEventPredictionsV2Data>,
+) =>
+  queryOptions<
+    GetEventPredictionsV2Response,
+    GetEventPredictionsV2Error,
+    GetEventPredictionsV2Response,
+    ReturnType<typeof getEventPredictionsV2QueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventPredictionsV2({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventPredictionsV2QueryKey(options),
   });
 
 export const getEventRankingsQueryKey = (

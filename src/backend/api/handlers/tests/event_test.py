@@ -31,6 +31,13 @@ from backend.common.models.event_district_points import (
     EventRegionalChampsPoolPoints,
     TeamAtEventDistrictPoints,
 )
+from backend.common.models.event_predictions_v2 import (
+    AlliancePredictionV2,
+    EventPredictionsV2,
+    MatchPredictionV2,
+    RankingPointsPredictionV2,
+    ScorePredictionV2,
+)
 from backend.common.models.event_queue_status import (
     EventQueueStatus,
     NexusCurrentlyQueueing,
@@ -349,6 +356,76 @@ def test_event_details(ndb_stub, api_client: Client) -> None:
     )
     assert district_points_resp.status_code == 200
     assert district_points_resp.json == district_points
+
+
+def test_event_predictions_v2(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    for key in ("2024casj", "2024cafr"):
+        Event(
+            id=key, year=2024, event_short=key[4:], event_type_enum=EventType.REGIONAL
+        ).put()
+    score = ScorePredictionV2(mean=61.5, sd=12.3, p10=46, p50=61, p90=77)
+    prediction = MatchPredictionV2(
+        kind="pre_match",
+        red_win_prob=0.62,
+        red=AlliancePredictionV2(
+            score=score,
+            ranking_points=RankingPointsPredictionV2(
+                expected_rp=2.4,
+                median_rp=3.0,
+                win_rp_prob=0.6,
+                bonus_rp_probs={
+                    "melodyBonusAchieved": 0.3,
+                    "ensembleBonusAchieved": 0.2,
+                },
+            ),
+        ),
+        blue=AlliancePredictionV2(score=score, ranking_points=None),
+    )
+    EventPredictionsV2(
+        id="2024casj",
+        model_version="hkf-1",
+        forecast_only=False,
+        matches={"2024casj_qm1": prediction},
+        source_fingerprint="not served",
+    ).put()
+
+    # No predictions
+    resp = api_client.get(
+        "/api/v3/event/2024cafr/predictions_v2",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json is None
+
+    resp = api_client.get(
+        "/api/v3/event/2024casj/predictions_v2",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    body = resp.json
+    assert set(body) == {
+        "event_key",
+        "model_version",
+        "forecast_only",
+        "last_updated",
+        "matches",
+    }
+    assert body["event_key"] == "2024casj"
+    assert body["model_version"] == "hkf-1"
+    assert body["forecast_only"] is False
+    assert isinstance(body["last_updated"], int)
+    assert body["matches"] == {"2024casj_qm1": prediction}
+
+    # Bad event key
+    resp = api_client.get(
+        "/api/v3/event/2024casj_qm1/predictions_v2",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 404
 
 
 def test_event_teams(ndb_stub, api_client: Client) -> None:
