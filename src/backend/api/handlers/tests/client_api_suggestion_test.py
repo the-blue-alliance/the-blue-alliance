@@ -6,17 +6,30 @@ from pyre_extensions import none_throws
 from werkzeug.test import Client
 
 from backend.api.client_api_types import (
+    EventMatchVideo,
+    EventMatchVideosSuggestionMessage,
+    EventMatchVideosSuggestionResponse,
     EventMediaSuggestionMessage,
     EventMediaSuggestionResponse,
+    MatchVideoSuggestionMessage,
+    MatchVideoSuggestionResponse,
     MediaSuggestionMessage,
     TeamSocialMediaSuggestionMessage,
     TeamSocialMediaSuggestionResponse,
+    VideoPlaylistMessage,
+    VideoPlaylistResponse,
 )
 from backend.api.handlers.tests.clientapi_test_helper import make_clientapi_request
+from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.futures import InstantFuture
+from backend.common.helpers.youtube_video_helper import (
+    YouTubePlaylistItem,
+    YouTubeVideoHelper,
+)
 from backend.common.models.event import Event
+from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.team import Team
@@ -374,3 +387,245 @@ def test_suggest_team_social_media_reports_approved_media(
     resp = _suggest_team_social_media(api_client, "https://github.com/frc1124")
 
     assert (resp["code"], resp["status"]) == (304, "media_exists")
+
+
+def _put_match(youtube_videos: list[str] | None = None) -> None:
+    Match(
+        id="2016nyny_qm1",
+        event=ndb.Key(Event, "2016nyny"),
+        year=2016,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        alliances_json="{}",
+        youtube_videos=youtube_videos or [],
+    ).put()
+
+
+def _suggest_match_video(
+    api_client: Client, youtube_url: str, match_key: str = "2016nyny_qm1"
+) -> MatchVideoSuggestionResponse:
+    req = MatchVideoSuggestionMessage(match_key=match_key, youtube_url=youtube_url)
+    return make_clientapi_request(
+        api_client,
+        "/match/video/suggest",
+        req,
+        MatchVideoSuggestionResponse,
+    )
+
+
+def test_suggest_match_video_no_auth(api_client: Client) -> None:
+    resp = _suggest_match_video(
+        api_client, "https://www.youtube.com/watch?v=H-54KMwMKY0"
+    )
+
+    assert (resp["code"], resp["status"]) == (401, "unauthorized")
+
+
+def test_suggest_match_video_rejects_bad_match_key(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    resp = _suggest_match_video(
+        api_client, "https://www.youtube.com/watch?v=H-54KMwMKY0", "2016nyny"
+    )
+
+    assert (resp["code"], resp["status"]) == (404, "bad_match")
+
+
+def test_suggest_match_video_rejects_missing_match(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    resp = _suggest_match_video(
+        api_client, "https://www.youtube.com/watch?v=H-54KMwMKY0"
+    )
+
+    assert (resp["code"], resp["status"]) == (404, "bad_match")
+
+
+def test_suggest_match_video_rejects_non_youtube_url(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_match()
+
+    resp = _suggest_match_video(api_client, "https://example.com/video")
+
+    assert (resp["code"], resp["status"]) == (400, "bad_url")
+
+
+def test_suggest_match_video_adds_youtube_video(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_match()
+
+    resp = _suggest_match_video(api_client, "https://youtu.be/H-54KMwMKY0")
+
+    suggestion = Suggestion.get_by_id(
+        Suggestion.render_media_key_name(
+            2016, "match", "2016nyny_qm1", "youtube", "H-54KMwMKY0"
+        )
+    )
+    assert suggestion is not None
+    assert (resp["code"], resp["status"], suggestion.author) == (
+        200,
+        "success",
+        mock_clientapi_auth.account_key,
+    )
+
+
+def test_suggest_match_video_reports_pending_suggestion(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_match()
+    _suggest_match_video(api_client, "https://youtu.be/H-54KMwMKY0")
+
+    resp = _suggest_match_video(api_client, "https://youtu.be/H-54KMwMKY0")
+
+    assert (resp["code"], resp["status"]) == (304, "suggestion_exists")
+
+
+def test_suggest_match_video_reports_approved_video(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_match(youtube_videos=["H-54KMwMKY0"])
+
+    resp = _suggest_match_video(api_client, "https://youtu.be/H-54KMwMKY0")
+
+    assert (resp["code"], resp["status"]) == (304, "video_exists")
+
+
+def _resolve_video_playlist(
+    api_client: Client, playlist_id: str = "PLabc123"
+) -> VideoPlaylistResponse:
+    req = VideoPlaylistMessage(playlist_id=playlist_id)
+    return make_clientapi_request(
+        api_client,
+        "/event/video_playlist/resolve",
+        req,
+        VideoPlaylistResponse,
+    )
+
+
+def test_resolve_video_playlist_no_auth(api_client: Client) -> None:
+    resp = _resolve_video_playlist(api_client)
+
+    assert resp["code"] == 401
+
+
+def test_resolve_video_playlist_rejects_blank_playlist(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    resp = _resolve_video_playlist(api_client, "")
+
+    assert resp["code"] == 400
+
+
+def test_resolve_video_playlist_returns_videos_with_guessed_matches(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    video = YouTubePlaylistItem(
+        video_id="H-54KMwMKY0",
+        video_title="Qualification 1 - 2016 New York City Regional",
+        guessed_match_partial="qm1",
+    )
+
+    with patch.object(
+        YouTubeVideoHelper,
+        "videos_in_playlist",
+        return_value=InstantFuture([video]),
+    ):
+        resp = _resolve_video_playlist(api_client)
+
+    assert (resp["code"], resp["videos"]) == (200, [video])
+
+
+def test_resolve_video_playlist_reports_youtube_failure(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    with patch.object(
+        YouTubeVideoHelper,
+        "videos_in_playlist",
+        side_effect=Exception("YouTube API returned 404"),
+    ):
+        resp = _resolve_video_playlist(api_client)
+
+    assert (resp["code"], resp["videos"]) == (500, [])
+
+
+def _suggest_event_match_videos(
+    api_client: Client, videos: list[EventMatchVideo], event_key: str = "2016nyny"
+) -> EventMatchVideosSuggestionResponse:
+    req = EventMatchVideosSuggestionMessage(event_key=event_key, videos=videos)
+    return make_clientapi_request(
+        api_client,
+        "/event/match_videos/suggest",
+        req,
+        EventMatchVideosSuggestionResponse,
+    )
+
+
+def test_suggest_event_match_videos_no_auth(api_client: Client) -> None:
+    resp = _suggest_event_match_videos(
+        api_client, [EventMatchVideo(video_id="H-54KMwMKY0", match_partial="qm1")]
+    )
+
+    assert (resp["code"], resp["status"]) == (401, "unauthorized")
+
+
+def test_suggest_event_match_videos_rejects_missing_event(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    resp = _suggest_event_match_videos(
+        api_client, [EventMatchVideo(video_id="H-54KMwMKY0", match_partial="qm1")]
+    )
+
+    assert (resp["code"], resp["status"]) == (404, "bad_event")
+
+
+def test_suggest_event_match_videos_adds_video_for_event_match(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_event()
+    _put_match()
+
+    _suggest_event_match_videos(
+        api_client, [EventMatchVideo(video_id="H-54KMwMKY0", match_partial="qm1")]
+    )
+
+    suggestion = Suggestion.get_by_id(
+        Suggestion.render_media_key_name(
+            2016, "match", "2016nyny_qm1", "youtube", "H-54KMwMKY0"
+        )
+    )
+    assert suggestion is not None
+    assert suggestion.author == mock_clientapi_auth.account_key
+
+
+def test_suggest_event_match_videos_counts_added_suggestions(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_event()
+    _put_match()
+
+    resp = _suggest_event_match_videos(
+        api_client,
+        [
+            EventMatchVideo(video_id="H-54KMwMKY0", match_partial="qm1"),
+            EventMatchVideo(video_id="pRaKQ0yCLJY", match_partial="qm2"),
+            EventMatchVideo(video_id="MQ0VNzIvHx0", match_partial=""),
+        ],
+    )
+
+    assert (resp["code"], resp["status"], resp["num_added"]) == (200, "success", 1)
+
+
+def test_suggest_event_match_videos_skips_pending_suggestions(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_event()
+    _put_match()
+    videos = [EventMatchVideo(video_id="H-54KMwMKY0", match_partial="qm1")]
+    _suggest_event_match_videos(api_client, videos)
+
+    resp = _suggest_event_match_videos(api_client, videos)
+
+    assert resp["num_added"] == 0

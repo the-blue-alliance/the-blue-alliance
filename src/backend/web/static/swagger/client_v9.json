@@ -211,6 +211,172 @@
           }
         }
       },
+      "MatchVideoSuggestionMessage": {
+        "type": "object",
+        "required": [
+          "match_key",
+          "youtube_url"
+        ],
+        "properties": {
+          "match_key": {
+            "type": "string",
+            "description": "The match receiving the suggested video"
+          },
+          "youtube_url": {
+            "type": "string",
+            "description": "The URL of the YouTube video being suggested"
+          }
+        }
+      },
+      "MatchVideoSuggestionResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "status"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "suggestion_exists",
+              "video_exists",
+              "bad_url",
+              "bad_match",
+              "unauthorized"
+            ]
+          }
+        }
+      },
+      "VideoPlaylistMessage": {
+        "type": "object",
+        "required": [
+          "playlist_id"
+        ],
+        "properties": {
+          "playlist_id": {
+            "type": "string",
+            "description": "The ID of the YouTube playlist to list"
+          }
+        }
+      },
+      "VideoPlaylistItem": {
+        "type": "object",
+        "required": [
+          "video_id",
+          "video_title",
+          "guessed_match_partial"
+        ],
+        "properties": {
+          "video_id": {
+            "type": "string"
+          },
+          "video_title": {
+            "type": "string"
+          },
+          "guessed_match_partial": {
+            "type": "string",
+            "description": "The match ID guessed from the video title, like qm3 or sf1m1, or an empty string"
+          }
+        }
+      },
+      "VideoPlaylistResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "videos"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VideoPlaylistItem"
+            }
+          }
+        }
+      },
+      "EventMatchVideo": {
+        "type": "object",
+        "required": [
+          "video_id",
+          "match_partial"
+        ],
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "description": "The YouTube video ID"
+          },
+          "match_partial": {
+            "type": "string",
+            "description": "The match ID within the event, like qm3 or sf1m1"
+          }
+        }
+      },
+      "EventMatchVideosSuggestionMessage": {
+        "type": "object",
+        "required": [
+          "event_key",
+          "videos"
+        ],
+        "properties": {
+          "event_key": {
+            "type": "string",
+            "description": "The event whose matches receive the suggested videos"
+          },
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventMatchVideo"
+            }
+          }
+        }
+      },
+      "EventMatchVideosSuggestionResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "status",
+          "num_added"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "bad_event",
+              "unauthorized"
+            ]
+          },
+          "num_added": {
+            "type": "integer",
+            "description": "How many new suggestions were created"
+          }
+        }
+      },
       "SubscriptionMessage": {
         "type": "object",
         "required": [
@@ -529,6 +695,105 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TeamSocialMediaSuggestionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/match/video/suggest": {
+      "post": {
+        "summary": "Suggest a YouTube video for a match",
+        "operationId": "suggestMatchVideo",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MatchVideoSuggestionMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchVideoSuggestionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/event/video_playlist/resolve": {
+      "post": {
+        "summary": "List the videos in a YouTube playlist, with a guessed match for each",
+        "operationId": "resolveVideoPlaylist",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoPlaylistMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoPlaylistResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/event/match_videos/suggest": {
+      "post": {
+        "summary": "Suggest YouTube videos for several matches at an event",
+        "operationId": "suggestEventMatchVideos",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventMatchVideosSuggestionMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventMatchVideosSuggestionResponse"
                 }
               }
             }

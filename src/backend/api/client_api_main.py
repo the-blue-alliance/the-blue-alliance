@@ -10,7 +10,10 @@ from backend.api.handlers.client_api import (
     list_subscriptions,
     ping_mobile_client,
     register_mobile_client,
+    resolve_video_playlist,
+    suggest_event_match_videos,
     suggest_event_media,
+    suggest_match_video,
     suggest_team_media,
     suggest_team_social_media,
     unregister_mobile_client,
@@ -69,6 +72,21 @@ client_api.add_url_rule(
     "/team/social_media/suggest",
     methods=["POST"],
     view_func=suggest_team_social_media,
+)
+client_api.add_url_rule(
+    "/match/video/suggest",
+    methods=["POST"],
+    view_func=suggest_match_video,
+)
+client_api.add_url_rule(
+    "/event/video_playlist/resolve",
+    methods=["POST"],
+    view_func=resolve_video_playlist,
+)
+client_api.add_url_rule(
+    "/event/match_videos/suggest",
+    methods=["POST"],
+    view_func=suggest_event_match_videos,
 )
 client_api.add_url_rule(
     "/unregister",

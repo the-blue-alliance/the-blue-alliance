@@ -12,11 +12,15 @@ from backend.api.client_api_types import (
     ApiWriteKeyMessage,
     BaseResponse,
     DeleteApiReadKeyMessage,
+    EventMatchVideosSuggestionMessage,
+    EventMatchVideosSuggestionResponse,
     EventMediaSuggestionMessage,
     EventMediaSuggestionResponse,
     FavoriteCollection,
     FavoriteMessage,
     ListDevicesResponse,
+    MatchVideoSuggestionMessage,
+    MatchVideoSuggestionResponse,
     MediaSuggestionMessage,
     ModelPreferenceMessage,
     PingRequest,
@@ -27,6 +31,8 @@ from backend.api.client_api_types import (
     TeamSocialMediaSuggestionMessage,
     TeamSocialMediaSuggestionResponse,
     UpdatePreferencesInternalResponse,
+    VideoPlaylistMessage,
+    VideoPlaylistResponse,
     VoidRequest,
 )
 from backend.api.handlers.decorators import client_api_method
@@ -42,9 +48,11 @@ from backend.common.consts.notification_type import (
 from backend.common.helpers.mytba_helper import MyTBAHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.tbans_helper import TBANSHelper
+from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
+from backend.common.models.match import Match
 from backend.common.models.mobile_client import MobileClient
 from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
@@ -312,6 +320,136 @@ def suggest_team_social_media(
         code=400,
         message="Bad suggestion url",
         status="bad_url",
+    )
+
+
+@client_api_method(MatchVideoSuggestionMessage, MatchVideoSuggestionResponse)
+def suggest_match_video(
+    request: MatchVideoSuggestionMessage,
+) -> MatchVideoSuggestionResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return MatchVideoSuggestionResponse(
+            code=401,
+            message="Unauthorized to make suggestions",
+            status="unauthorized",
+        )
+
+    match_key = request["match_key"]
+    if not Match.validate_key_name(match_key) or Match.get_by_id(match_key) is None:
+        return MatchVideoSuggestionResponse(
+            code=404,
+            message="Match not found",
+            status="bad_match",
+        )
+
+    youtube_id = YouTubeVideoHelper.parse_id_from_url(request["youtube_url"])
+    if not youtube_id:
+        return MatchVideoSuggestionResponse(
+            code=400,
+            message="Bad suggestion url",
+            status="bad_url",
+        )
+
+    status = SuggestionCreator.createMatchVideoYouTubeSuggestion(
+        author_account_key=none_throws(current_user.account_key),
+        youtube_id=youtube_id,
+        match_key=match_key,
+    )
+
+    if status == SuggestionCreationStatus.SUCCESS:
+        return MatchVideoSuggestionResponse(
+            code=200,
+            message="Suggestion added",
+            status="success",
+        )
+    if status == SuggestionCreationStatus.SUGGESTION_EXISTS:
+        return MatchVideoSuggestionResponse(
+            code=304,
+            message="Suggestion is already pending review",
+            status="suggestion_exists",
+        )
+    return MatchVideoSuggestionResponse(
+        code=304,
+        message="Video is already approved",
+        status="video_exists",
+    )
+
+
+@client_api_method(VideoPlaylistMessage, VideoPlaylistResponse)
+def resolve_video_playlist(request: VideoPlaylistMessage) -> VideoPlaylistResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return VideoPlaylistResponse(
+            code=401,
+            message="Unauthorized to resolve playlists",
+            videos=[],
+        )
+
+    playlist_id = request["playlist_id"]
+    if not playlist_id:
+        return VideoPlaylistResponse(code=400, message="Missing playlist", videos=[])
+
+    try:
+        videos = YouTubeVideoHelper.videos_in_playlist(playlist_id).get_result()
+    except Exception:
+        return VideoPlaylistResponse(
+            code=500, message="Unable to load playlist", videos=[]
+        )
+
+    return VideoPlaylistResponse(code=200, message="Playlist loaded", videos=videos)
+
+
+@client_api_method(
+    EventMatchVideosSuggestionMessage, EventMatchVideosSuggestionResponse
+)
+def suggest_event_match_videos(
+    request: EventMatchVideosSuggestionMessage,
+) -> EventMatchVideosSuggestionResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return EventMatchVideosSuggestionResponse(
+            code=401,
+            message="Unauthorized to make suggestions",
+            status="unauthorized",
+            num_added=0,
+        )
+
+    event_key = request["event_key"]
+    if not Event.validate_key_name(event_key) or Event.get_by_id(event_key) is None:
+        return EventMatchVideosSuggestionResponse(
+            code=404,
+            message="Event not found",
+            status="bad_event",
+            num_added=0,
+        )
+
+    valid_match_keys = {
+        key.id()
+        for key in Match.query(Match.event == ndb.Key(Event, event_key)).fetch(
+            keys_only=True
+        )
+    }
+
+    num_added = 0
+    for video in request["videos"]:
+        match_key = f"{event_key}_{video['match_partial']}"
+        if not video["video_id"] or match_key not in valid_match_keys:
+            continue
+
+        status = SuggestionCreator.createMatchVideoYouTubeSuggestion(
+            author_account_key=none_throws(current_user.account_key),
+            youtube_id=video["video_id"],
+            match_key=match_key,
+        )
+        if status == SuggestionCreationStatus.SUCCESS:
+            num_added += 1
+
+    return EventMatchVideosSuggestionResponse(
+        code=200,
+        message=f"Added {num_added} suggestions",
+        status="success",
+        num_added=num_added,
     )
 
 
