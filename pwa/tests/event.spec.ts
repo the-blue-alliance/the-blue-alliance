@@ -323,6 +323,12 @@ test.describe('/event/2024mil', () => {
       'https://www.match13.com/event/2024mil',
     );
   });
+
+  test('links to the match video playlist form', async ({ page }) => {
+    await expect(
+      page.getByRole('link', { name: 'Add Match Videos' }),
+    ).toHaveAttribute('href', '/suggest/event/video?event_key=2024mil');
+  });
 });
 
 test('shows the closest team when hovering overlapping insights chart dots', async ({

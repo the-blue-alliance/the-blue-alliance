@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes } from 'react';
+import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
@@ -24,6 +24,23 @@ vi.mock('~/components/tba/teamTooltip', () => ({
   }: AnchorHTMLAttributes<HTMLAnchorElement> & TeamTooltipProps) => (
     <a href={`/team/${teamKey.substring(3)}/${year}`} {...props}>
       {teamKey.substring(3)}
+    </a>
+  ),
+}));
+
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({
+    children,
+    to,
+    search,
+    ...props
+  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
+    children?: ReactNode;
+    to: string;
+    search: Record<string, string>;
+  }) => (
+    <a href={`${to}?${new URLSearchParams(search).toString()}`} {...props}>
+      {children}
     </a>
   ),
 }));
@@ -167,7 +184,10 @@ describe('MatchDetails', () => {
     renderDetails(makeMatch());
 
     expect(
-      screen.getAllByRole('link').map((link) => link.getAttribute('href')),
+      screen
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('href'))
+        .filter((href) => href?.startsWith('/team/')),
     ).toEqual([
       '/team/254/2026',
       '/team/1114/2026',
@@ -246,6 +266,40 @@ describe('MatchDetails', () => {
     renderDetails(makeMatch({ videos: [{ type: 'tba', key: 'internal' }] }));
 
     expect(screen.queryByTitle(/Test Event/)).toBeNull();
+  });
+
+  test('links to the video suggestion form for the match', () => {
+    renderDetails(makeMatch());
+
+    expect(
+      screen.getByRole('link', { name: 'Add Video' }).getAttribute('href'),
+    ).toBe('/suggest/match/video?match_key=2026test_qm1');
+  });
+
+  test('links to a YouTube search for the match', () => {
+    renderDetails(makeMatch());
+
+    expect(
+      screen.getByRole('link', { name: 'Search YouTube' }).getAttribute('href'),
+    ).toBe(
+      'https://www.youtube.com/results?search_query=Quals%201%202026%20Test%20Event',
+    );
+  });
+
+  test('says no videos are known when the match has no YouTube videos', () => {
+    renderDetails(makeMatch({ videos: [{ type: 'tba', key: 'internal' }] }));
+
+    expect(
+      screen.getByText(/don't know about any videos for this match yet/),
+    ).toBeTruthy();
+  });
+
+  test('hides the no-videos message when the match has a YouTube video', () => {
+    renderDetails(makeMatch({ videos: [{ type: 'youtube', key: 'abc123' }] }));
+
+    expect(
+      screen.queryByText(/don't know about any videos for this match yet/),
+    ).toBeNull();
   });
 
   test('shows the match date in the event timezone', () => {

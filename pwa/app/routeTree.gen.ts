@@ -38,6 +38,8 @@ import { Route as DistrictDistrictAbbreviationChar123YearChar125RouteImport } fr
 import { Route as EventsDistrictAbbreviationYearRouteImport } from './routes/events.$districtAbbreviation.$year'
 import { Route as EventsRegionalChar123YearChar125RouteImport } from './routes/events.regional.{-$year}'
 import { Route as SuggestEventMediaRouteImport } from './routes/suggest.event.media'
+import { Route as SuggestEventVideoRouteImport } from './routes/suggest.event.video'
+import { Route as SuggestMatchVideoRouteImport } from './routes/suggest.match.video'
 import { Route as SuggestReviewIndexRouteImport } from './routes/suggest.review.index'
 import { Route as SuggestReviewSuggestionTypeRouteImport } from './routes/suggest.review.$suggestionType'
 import { Route as SuggestTeamMediaRouteImport } from './routes/suggest.team.media'
@@ -199,6 +201,16 @@ const SuggestEventMediaRoute = SuggestEventMediaRouteImport.update({
   path: '/suggest/event/media',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuggestEventVideoRoute = SuggestEventVideoRouteImport.update({
+  id: '/suggest/event/video',
+  path: '/suggest/event/video',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuggestMatchVideoRoute = SuggestMatchVideoRouteImport.update({
+  id: '/suggest/match/video',
+  path: '/suggest/match/video',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SuggestReviewIndexRoute = SuggestReviewIndexRouteImport.update({
   id: '/suggest/review/',
   path: '/suggest/review/',
@@ -267,6 +279,8 @@ export interface FileRoutesByFullPath {
   '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
   '/events/regional/{-$year}': typeof EventsRegionalChar123YearChar125Route
   '/suggest/event/media': typeof SuggestEventMediaRoute
+  '/suggest/event/video': typeof SuggestEventVideoRoute
+  '/suggest/match/video': typeof SuggestMatchVideoRoute
   '/suggest/review/$suggestionType': typeof SuggestReviewSuggestionTypeRoute
   '/suggest/team/media': typeof SuggestTeamMediaRoute
   '/suggest/team/social_media': typeof SuggestTeamSocial_mediaRoute
@@ -305,6 +319,8 @@ export interface FileRoutesByTo {
   '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
   '/events/regional/{-$year}': typeof EventsRegionalChar123YearChar125Route
   '/suggest/event/media': typeof SuggestEventMediaRoute
+  '/suggest/event/video': typeof SuggestEventVideoRoute
+  '/suggest/match/video': typeof SuggestMatchVideoRoute
   '/suggest/review/$suggestionType': typeof SuggestReviewSuggestionTypeRoute
   '/suggest/team/media': typeof SuggestTeamMediaRoute
   '/suggest/team/social_media': typeof SuggestTeamSocial_mediaRoute
@@ -344,6 +360,8 @@ export interface FileRoutesById {
   '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
   '/events/regional/{-$year}': typeof EventsRegionalChar123YearChar125Route
   '/suggest/event/media': typeof SuggestEventMediaRoute
+  '/suggest/event/video': typeof SuggestEventVideoRoute
+  '/suggest/match/video': typeof SuggestMatchVideoRoute
   '/suggest/review/$suggestionType': typeof SuggestReviewSuggestionTypeRoute
   '/suggest/team/media': typeof SuggestTeamMediaRoute
   '/suggest/team/social_media': typeof SuggestTeamSocial_mediaRoute
@@ -384,6 +402,8 @@ export interface FileRouteTypes {
     | '/events/$districtAbbreviation/$year'
     | '/events/regional/{-$year}'
     | '/suggest/event/media'
+    | '/suggest/event/video'
+    | '/suggest/match/video'
     | '/suggest/review/$suggestionType'
     | '/suggest/team/media'
     | '/suggest/team/social_media'
@@ -422,6 +442,8 @@ export interface FileRouteTypes {
     | '/events/$districtAbbreviation/$year'
     | '/events/regional/{-$year}'
     | '/suggest/event/media'
+    | '/suggest/event/video'
+    | '/suggest/match/video'
     | '/suggest/review/$suggestionType'
     | '/suggest/team/media'
     | '/suggest/team/social_media'
@@ -460,6 +482,8 @@ export interface FileRouteTypes {
     | '/events/$districtAbbreviation/$year'
     | '/events/regional/{-$year}'
     | '/suggest/event/media'
+    | '/suggest/event/video'
+    | '/suggest/match/video'
     | '/suggest/review/$suggestionType'
     | '/suggest/team/media'
     | '/suggest/team/social_media'
@@ -498,6 +522,8 @@ export interface RootRouteChildren {
   EventsDistrictAbbreviationYearRoute: typeof EventsDistrictAbbreviationYearRoute
   EventsRegionalChar123YearChar125Route: typeof EventsRegionalChar123YearChar125Route
   SuggestEventMediaRoute: typeof SuggestEventMediaRoute
+  SuggestEventVideoRoute: typeof SuggestEventVideoRoute
+  SuggestMatchVideoRoute: typeof SuggestMatchVideoRoute
   SuggestReviewSuggestionTypeRoute: typeof SuggestReviewSuggestionTypeRoute
   SuggestTeamMediaRoute: typeof SuggestTeamMediaRoute
   SuggestTeamSocial_mediaRoute: typeof SuggestTeamSocial_mediaRoute
@@ -712,6 +738,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuggestEventMediaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/suggest/event/video': {
+      id: '/suggest/event/video'
+      path: '/suggest/event/video'
+      fullPath: '/suggest/event/video'
+      preLoaderRoute: typeof SuggestEventVideoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/suggest/match/video': {
+      id: '/suggest/match/video'
+      path: '/suggest/match/video'
+      fullPath: '/suggest/match/video'
+      preLoaderRoute: typeof SuggestMatchVideoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/suggest/review/': {
       id: '/suggest/review/'
       path: '/suggest/review'
@@ -806,6 +846,8 @@ const rootRouteChildren: RootRouteChildren = {
   EventsDistrictAbbreviationYearRoute: EventsDistrictAbbreviationYearRoute,
   EventsRegionalChar123YearChar125Route: EventsRegionalChar123YearChar125Route,
   SuggestEventMediaRoute: SuggestEventMediaRoute,
+  SuggestEventVideoRoute: SuggestEventVideoRoute,
+  SuggestMatchVideoRoute: SuggestMatchVideoRoute,
   SuggestReviewSuggestionTypeRoute: SuggestReviewSuggestionTypeRoute,
   SuggestTeamMediaRoute: SuggestTeamMediaRoute,
   SuggestTeamSocial_mediaRoute: SuggestTeamSocial_mediaRoute,

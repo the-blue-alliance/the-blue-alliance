@@ -42,6 +42,8 @@ const allRoutes = defineAllRoutes([
   '/privacy',
   '/search',
   '/suggest/event/media',
+  '/suggest/event/video',
+  '/suggest/match/video',
   '/suggest/review/',
   '/suggest/review/$suggestionType',
   '/suggest/team/media',

@@ -1,5 +1,5 @@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { Link, createFileRoute, notFound } from '@tanstack/react-router';
 import { type JSX, useState } from 'react';
 import { z } from 'zod';
 
@@ -167,12 +167,13 @@ function SuggestEventMedia(): JSX.Element {
         <Guidance title="Please do not submit" tone="error">
           <li>
             Full match videos; submit those through the{' '}
-            <a
-              href={`https://www.thebluealliance.com/suggest/event/video?event_key=${event_key}`}
+            <Link
+              to="/suggest/event/video"
+              search={{ event_key }}
               className="underline underline-offset-4"
             >
               match video form
-            </a>
+            </Link>
           </li>
           <li>Videos of people dancing</li>
           <li>Long videos with little event-related content</li>
