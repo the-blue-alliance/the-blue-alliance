@@ -18,10 +18,16 @@ import type {
   ListFavoritesResponses,
   ListSubscriptionsData,
   ListSubscriptionsResponses,
+  ResolveVideoPlaylistData,
+  ResolveVideoPlaylistResponses,
   SetModelPreferencesData,
   SetModelPreferencesResponses,
+  SuggestEventMatchVideosData,
+  SuggestEventMatchVideosResponses,
   SuggestEventMediaData,
   SuggestEventMediaResponses,
+  SuggestMatchVideoData,
+  SuggestMatchVideoResponses,
   SuggestTeamMediaData,
   SuggestTeamMediaResponses,
   SuggestTeamSocialMediaData,
@@ -135,6 +141,66 @@ export const suggestTeamSocialMedia = <ThrowOnError extends boolean = false>(
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/team/social_media/suggest',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Suggest a YouTube video for a match
+ */
+export const suggestMatchVideo = <ThrowOnError extends boolean = false>(
+  options: Options<SuggestMatchVideoData, ThrowOnError>,
+): RequestResult<SuggestMatchVideoResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    SuggestMatchVideoResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/match/video/suggest',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * List the videos in a YouTube playlist, with a guessed match for each
+ */
+export const resolveVideoPlaylist = <ThrowOnError extends boolean = false>(
+  options: Options<ResolveVideoPlaylistData, ThrowOnError>,
+): RequestResult<ResolveVideoPlaylistResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    ResolveVideoPlaylistResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/event/video_playlist/resolve',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Suggest YouTube videos for several matches at an event
+ */
+export const suggestEventMatchVideos = <ThrowOnError extends boolean = false>(
+  options: Options<SuggestEventMatchVideosData, ThrowOnError>,
+): RequestResult<SuggestEventMatchVideosResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    SuggestEventMatchVideosResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/event/match_videos/suggest',
     ...options,
     headers: {
       'Content-Type': 'application/json',

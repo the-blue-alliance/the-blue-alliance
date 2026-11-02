@@ -108,6 +108,80 @@ export type TeamSocialMediaSuggestionResponse = {
     | 'unauthorized';
 };
 
+export type MatchVideoSuggestionMessage = {
+  /**
+   * The match receiving the suggested video
+   */
+  match_key: string;
+  /**
+   * The URL of the YouTube video being suggested
+   */
+  youtube_url: string;
+};
+
+export type MatchVideoSuggestionResponse = {
+  code: number;
+  message: string;
+  status:
+    | 'success'
+    | 'suggestion_exists'
+    | 'video_exists'
+    | 'bad_url'
+    | 'bad_match'
+    | 'unauthorized';
+};
+
+export type VideoPlaylistMessage = {
+  /**
+   * The ID of the YouTube playlist to list
+   */
+  playlist_id: string;
+};
+
+export type VideoPlaylistItem = {
+  video_id: string;
+  video_title: string;
+  /**
+   * The match ID guessed from the video title, like qm3 or sf1m1, or an empty string
+   */
+  guessed_match_partial: string;
+};
+
+export type VideoPlaylistResponse = {
+  code: number;
+  message: string;
+  videos: Array<VideoPlaylistItem>;
+};
+
+export type EventMatchVideo = {
+  /**
+   * The YouTube video ID
+   */
+  video_id: string;
+  /**
+   * The match ID within the event, like qm3 or sf1m1
+   */
+  match_partial: string;
+};
+
+export type EventMatchVideosSuggestionMessage = {
+  /**
+   * The event whose matches receive the suggested videos
+   */
+  event_key: string;
+  videos: Array<EventMatchVideo>;
+};
+
+export type EventMatchVideosSuggestionResponse = {
+  code: number;
+  message: string;
+  status: 'success' | 'bad_event' | 'unauthorized';
+  /**
+   * How many new suggestions were created
+   */
+  num_added: number;
+};
+
 export type SubscriptionMessage = {
   device_key?: string;
   model_key: string;
@@ -253,6 +327,57 @@ export type SuggestTeamSocialMediaResponses = {
 
 export type SuggestTeamSocialMediaResponse =
   SuggestTeamSocialMediaResponses[keyof SuggestTeamSocialMediaResponses];
+
+export type SuggestMatchVideoData = {
+  body: MatchVideoSuggestionMessage;
+  path?: never;
+  query?: never;
+  url: '/match/video/suggest';
+};
+
+export type SuggestMatchVideoResponses = {
+  /**
+   * Successful response
+   */
+  200: MatchVideoSuggestionResponse;
+};
+
+export type SuggestMatchVideoResponse =
+  SuggestMatchVideoResponses[keyof SuggestMatchVideoResponses];
+
+export type ResolveVideoPlaylistData = {
+  body: VideoPlaylistMessage;
+  path?: never;
+  query?: never;
+  url: '/event/video_playlist/resolve';
+};
+
+export type ResolveVideoPlaylistResponses = {
+  /**
+   * Successful response
+   */
+  200: VideoPlaylistResponse;
+};
+
+export type ResolveVideoPlaylistResponse =
+  ResolveVideoPlaylistResponses[keyof ResolveVideoPlaylistResponses];
+
+export type SuggestEventMatchVideosData = {
+  body: EventMatchVideosSuggestionMessage;
+  path?: never;
+  query?: never;
+  url: '/event/match_videos/suggest';
+};
+
+export type SuggestEventMatchVideosResponses = {
+  /**
+   * Successful response
+   */
+  200: EventMatchVideosSuggestionResponse;
+};
+
+export type SuggestEventMatchVideosResponse =
+  SuggestEventMatchVideosResponses[keyof SuggestEventMatchVideosResponses];
 
 export type ListSubscriptionsData = {
   body?: never;

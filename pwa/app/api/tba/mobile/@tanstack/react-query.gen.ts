@@ -8,8 +8,11 @@ import {
   listApiKeys,
   listFavorites,
   listSubscriptions,
+  resolveVideoPlaylist,
   setModelPreferences,
+  suggestEventMatchVideos,
   suggestEventMedia,
+  suggestMatchVideo,
   suggestTeamMedia,
   suggestTeamSocialMedia,
 } from '../sdk.gen';
@@ -24,10 +27,16 @@ import type {
   ListFavoritesResponse,
   ListSubscriptionsData,
   ListSubscriptionsResponse,
+  ResolveVideoPlaylistData,
+  ResolveVideoPlaylistResponse,
   SetModelPreferencesData,
   SetModelPreferencesResponse,
+  SuggestEventMatchVideosData,
+  SuggestEventMatchVideosResponse,
   SuggestEventMediaData,
   SuggestEventMediaResponse,
+  SuggestMatchVideoData,
+  SuggestMatchVideoResponse,
   SuggestTeamMediaData,
   SuggestTeamMediaResponse,
   SuggestTeamSocialMediaData,
@@ -159,6 +168,87 @@ export const suggestTeamSocialMediaMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await suggestTeamSocialMedia({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Suggest a YouTube video for a match
+ */
+export const suggestMatchVideoMutation = (
+  options?: Partial<Options<SuggestMatchVideoData>>,
+): UseMutationOptions<
+  SuggestMatchVideoResponse,
+  DefaultError,
+  Options<SuggestMatchVideoData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SuggestMatchVideoResponse,
+    DefaultError,
+    Options<SuggestMatchVideoData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await suggestMatchVideo({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * List the videos in a YouTube playlist, with a guessed match for each
+ */
+export const resolveVideoPlaylistMutation = (
+  options?: Partial<Options<ResolveVideoPlaylistData>>,
+): UseMutationOptions<
+  ResolveVideoPlaylistResponse,
+  DefaultError,
+  Options<ResolveVideoPlaylistData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ResolveVideoPlaylistResponse,
+    DefaultError,
+    Options<ResolveVideoPlaylistData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await resolveVideoPlaylist({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Suggest YouTube videos for several matches at an event
+ */
+export const suggestEventMatchVideosMutation = (
+  options?: Partial<Options<SuggestEventMatchVideosData>>,
+): UseMutationOptions<
+  SuggestEventMatchVideosResponse,
+  DefaultError,
+  Options<SuggestEventMatchVideosData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SuggestEventMatchVideosResponse,
+    DefaultError,
+    Options<SuggestEventMatchVideosData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await suggestEventMatchVideos({
         ...options,
         ...fnOptions,
         throwOnError: true,

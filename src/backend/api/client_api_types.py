@@ -1,6 +1,7 @@
 from typing import List, Optional, TypedDict
 
 from backend.common.consts.model_type import ModelType
+from backend.common.helpers.youtube_video_helper import YouTubePlaylistItem
 
 
 class VoidRequest(TypedDict):
@@ -61,6 +62,38 @@ class TeamSocialMediaSuggestionMessage(TypedDict):
 
 class TeamSocialMediaSuggestionResponse(BaseResponse):
     status: str
+
+
+class MatchVideoSuggestionMessage(TypedDict):
+    match_key: str
+    youtube_url: str
+
+
+class MatchVideoSuggestionResponse(BaseResponse):
+    status: str
+
+
+class VideoPlaylistMessage(TypedDict):
+    playlist_id: str
+
+
+class VideoPlaylistResponse(BaseResponse):
+    videos: List[YouTubePlaylistItem]
+
+
+class EventMatchVideo(TypedDict):
+    video_id: str
+    match_partial: str
+
+
+class EventMatchVideosSuggestionMessage(TypedDict):
+    event_key: str
+    videos: List[EventMatchVideo]
+
+
+class EventMatchVideosSuggestionResponse(BaseResponse):
+    status: str
+    num_added: int
 
 
 class FavoriteMessage(TypedDict):
