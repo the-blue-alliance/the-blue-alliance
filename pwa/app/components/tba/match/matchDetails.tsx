@@ -1,11 +1,13 @@
+import { Link } from '@tanstack/react-router';
 import { Suspense, lazy, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
-import { Event, Match } from '~/api/tba/read';
+import { Event, Match, PlayoffType } from '~/api/tba/read';
 import { SimpleMatchRow } from '~/components/tba/match/matchRows';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
+import { buttonVariants } from '~/components/ui/button';
 import { Checkbox } from '~/components/ui/checkbox';
-import { formatMatchTime } from '~/lib/matchUtils';
+import { formatMatchTime, matchTitleShort } from '~/lib/matchUtils';
 import {
   isScoreBreakdown2015,
   isScoreBreakdown2016,
@@ -133,6 +135,7 @@ export default function MatchDetails({
   const eventTimezone = event.timezone ?? 'UTC';
   const timezonesMatch = userTimezone === eventTimezone;
   const displayTimezone = showUserTimezone ? userTimezone : eventTimezone;
+  const youtubeVideos = match.videos.filter((v) => v.type === 'youtube');
 
   const matchTimestamp =
     match.actual_time ?? match.time ?? match.predicted_time;
@@ -313,16 +316,39 @@ export default function MatchDetails({
         </div>
       </div>
       <div className="order-1 flex w-full flex-col gap-2 md:order-2 md:w-xl">
-        {match.videos
-          .filter((v) => v.type === 'youtube')
-          .map((v) => (
-            <YoutubeEmbed
-              key={v.key}
-              videoId={v.key}
-              title={`${event.name} ${match.match_number} ${v.key}`}
-              deferUntilIdle
-            />
-          ))}
+        {youtubeVideos.map((v) => (
+          <YoutubeEmbed
+            key={v.key}
+            videoId={v.key}
+            title={`${event.name} ${match.match_number} ${v.key}`}
+            deferUntilIdle
+          />
+        ))}
+        {youtubeVideos.length === 0 && (
+          <p className="text-sm text-muted-foreground">
+            We don&apos;t know about any videos for this match yet. Help others
+            out by adding one!
+          </p>
+        )}
+        <div className="flex flex-wrap gap-2">
+          <Link
+            to="/suggest/match/video"
+            search={{ match_key: match.key }}
+            className={buttonVariants()}
+          >
+            Add Video
+          </Link>
+          <a
+            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(
+              `${matchTitleShort(match, event.playoff_type ?? PlayoffType.CUSTOM)} ${event.year} ${event.name}`,
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ variant: 'secondary' })}
+          >
+            Search YouTube
+          </a>
+        </div>
       </div>
     </div>
   );

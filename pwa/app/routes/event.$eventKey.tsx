@@ -592,102 +592,111 @@ function EventPage() {
         </div>
       )}
 
-      <div className="mb-4 space-y-1">
-        {event.district && (
-          <DetailEntity icon={<GlobeIcon />}>
-            <DistrictLink
-              districtAbbreviation={event.district.abbreviation}
-              year={event.district.year}
-            >
-              {event.district.display_name}
-            </DistrictLink>{' '}
-            Event
-          </DetailEntity>
-        )}
-        {event.parent_event_key && (
-          <DetailEntity icon={<ParentEventIcon />}>
-            Winners advance to{' '}
-            <EventLink eventOrKey={event.parent_event_key}>
-              {parentEventQuery.isPending ? (
-                <LoadingSkeleton
-                  label="Loading parent event"
-                  className="inline-block h-4 w-40 align-middle"
-                />
-              ) : (
-                (parentEventQuery.data?.name ?? event.parent_event_key)
-              )}
-            </EventLink>
-          </DetailEntity>
-        )}
-        <DetailEntity icon={<DateIcon />}>
-          {getEventDateString(event, 'long')}
-          <AddToCalendarLinks event={event} />
-          {getEventWeekString(event) && (
-            <Badge className="mx-2 h-[1.5em] align-text-top">
-              {getEventWeekString(event)}
-            </Badge>
-          )}
-        </DetailEntity>
-        <DetailEntity icon={<LocationIcon />}>
-          <EventLocationLink event={event} />
-        </DetailEntity>
-        {event.website && (
-          <DetailEntity icon={<GlobeIcon />}>
-            <a href={event.website} target="_blank" rel="noreferrer">
-              View event&apos;s website
-            </a>
-          </DetailEntity>
-        )}
-        {event.first_event_code && (
-          <DetailEntity icon={<SourceIcon />}>
-            Details on{' '}
-            <a
-              href={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              FRC Events
-            </a>
-          </DetailEntity>
-        )}
-        {(!hasEventEnded(event) || isEventWithinADay(event)) &&
-          getPublicAgendaUrl(event) && (
-            <DetailEntity icon={<AgendaIcon />}>
-              <a
-                href={getPublicAgendaUrl(event) ?? ''}
-                target="_blank"
-                rel="noreferrer"
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+        <div className="space-y-1">
+          {event.district && (
+            <DetailEntity icon={<GlobeIcon />}>
+              <DistrictLink
+                districtAbbreviation={event.district.abbreviation}
+                year={event.district.year}
               >
-                Public Agenda
+                {event.district.display_name}
+              </DistrictLink>{' '}
+              Event
+            </DetailEntity>
+          )}
+          {event.parent_event_key && (
+            <DetailEntity icon={<ParentEventIcon />}>
+              Winners advance to{' '}
+              <EventLink eventOrKey={event.parent_event_key}>
+                {parentEventQuery.isPending ? (
+                  <LoadingSkeleton
+                    label="Loading parent event"
+                    className="inline-block h-4 w-40 align-middle"
+                  />
+                ) : (
+                  (parentEventQuery.data?.name ?? event.parent_event_key)
+                )}
+              </EventLink>
+            </DetailEntity>
+          )}
+          <DetailEntity icon={<DateIcon />}>
+            {getEventDateString(event, 'long')}
+            <AddToCalendarLinks event={event} />
+            {getEventWeekString(event) && (
+              <Badge className="mx-2 h-[1.5em] align-text-top">
+                {getEventWeekString(event)}
+              </Badge>
+            )}
+          </DetailEntity>
+          <DetailEntity icon={<LocationIcon />}>
+            <EventLocationLink event={event} />
+          </DetailEntity>
+          {event.website && (
+            <DetailEntity icon={<GlobeIcon />}>
+              <a href={event.website} target="_blank" rel="noreferrer">
+                View event&apos;s website
               </a>
             </DetailEntity>
           )}
-        <div className="flex items-center gap-4">
-          <DetailEntity icon={<StatbotIcon />}>
-            <a
-              href={`https://www.statbotics.io/event/${event.key}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Statbotics
-            </a>
-          </DetailEntity>
-          <DetailEntity icon={<Match13Icon />}>
-            <a
-              href={`https://www.match13.com/event/${event.key}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Match13
-            </a>
-          </DetailEntity>
-        </div>
-        {event.webcasts.length > 0 &&
-          getCurrentWeekEvents([event]).length > 0 && (
-            <DetailEntity className="font-medium" icon={<LiveWebcastIcon />}>
-              Watch live on <a href={`/gameday/${eventKey}`}>TBA GameDay</a>
+          {event.first_event_code && (
+            <DetailEntity icon={<SourceIcon />}>
+              Details on{' '}
+              <a
+                href={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                FRC Events
+              </a>
             </DetailEntity>
           )}
+          {(!hasEventEnded(event) || isEventWithinADay(event)) &&
+            getPublicAgendaUrl(event) && (
+              <DetailEntity icon={<AgendaIcon />}>
+                <a
+                  href={getPublicAgendaUrl(event) ?? ''}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Public Agenda
+                </a>
+              </DetailEntity>
+            )}
+          <div className="flex items-center gap-4">
+            <DetailEntity icon={<StatbotIcon />}>
+              <a
+                href={`https://www.statbotics.io/event/${event.key}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Statbotics
+              </a>
+            </DetailEntity>
+            <DetailEntity icon={<Match13Icon />}>
+              <a
+                href={`https://www.match13.com/event/${event.key}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Match13
+              </a>
+            </DetailEntity>
+          </div>
+          {event.webcasts.length > 0 &&
+            getCurrentWeekEvents([event]).length > 0 && (
+              <DetailEntity className="font-medium" icon={<LiveWebcastIcon />}>
+                Watch live on <a href={`/gameday/${eventKey}`}>TBA GameDay</a>
+              </DetailEntity>
+            )}
+        </div>
+        <Link
+          to="/suggest/event/video"
+          search={{ event_key: eventKey }}
+          className={buttonVariants({ variant: 'secondary' })}
+        >
+          Add Match Videos
+        </Link>
       </div>
 
       <AnimatedTabs
@@ -1463,13 +1472,22 @@ function MediaTab({
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-2xl font-bold">Webcasts</h1>
-          <Link
-            to="/suggest/event/media"
-            search={{ event_key: eventKey }}
-            className={buttonVariants()}
-          >
-            Add Event Media
-          </Link>
+          <div className="flex flex-wrap justify-end gap-2">
+            <Link
+              to="/suggest/event/video"
+              search={{ event_key: eventKey }}
+              className={buttonVariants({ variant: 'secondary' })}
+            >
+              Add Match Videos
+            </Link>
+            <Link
+              to="/suggest/event/media"
+              search={{ event_key: eventKey }}
+              className={buttonVariants()}
+            >
+              Add Event Media
+            </Link>
+          </div>
         </div>
         {webcasts.length > 0 ? (
           <>
