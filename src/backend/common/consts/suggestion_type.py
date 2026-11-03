@@ -29,3 +29,14 @@ TYPE_NAMES = {
     SuggestionType.ROBOT: "CAD Models",
     SuggestionType.EVENT_MEDIA: "Event Media",
 }
+
+TYPE_NAMES_SINGULAR = {
+    SuggestionType.EVENT: "Webcast",
+    SuggestionType.MATCH: "Match Video",
+    SuggestionType.MEDIA: "Team Media",
+    SuggestionType.SOCIAL_MEDIA: "Social Media",
+    SuggestionType.OFFSEASON_EVENT: "Offseason Event",
+    SuggestionType.API_AUTH_ACCESS: "API Write Key Request",
+    SuggestionType.ROBOT: "CAD Model",
+    SuggestionType.EVENT_MEDIA: "Event Media",
+}
