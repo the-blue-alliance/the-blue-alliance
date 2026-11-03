@@ -1,7 +1,11 @@
 from flask import Blueprint
 
 from backend.common.consts.suggestion_state import SuggestionState
-from backend.common.consts.suggestion_type import SuggestionType, TYPE_NAMES
+from backend.common.consts.suggestion_type import (
+    SuggestionType,
+    TYPE_NAMES,
+    TYPE_NAMES_SINGULAR,
+)
 from backend.common.helpers.outgoing_notification_helper import (
     OutgoingNotificationHelper,
     slack_link,
@@ -11,6 +15,11 @@ from backend.common.helpers.suggestion_fetcher import SuggestionFetcher
 from backend.common.sitevars.slack_hook_urls import SlackHookUrls
 
 blueprint = Blueprint("cron_misc", __name__)
+
+
+def _type_name(suggestion_type: SuggestionType, count: int) -> str:
+    names = TYPE_NAMES_SINGULAR if count == 1 else TYPE_NAMES
+    return names[suggestion_type]
 
 
 @blueprint.route("/tasks/do/nag_suggestions")
@@ -43,7 +52,7 @@ def nag_pending_suggestions() -> str:
         else f"{total} suggestions {slack_link(review_home, 'need review')}"
     )
     bullets = [
-        f"• {count} {slack_link(PwaUrlHelper.suggestion_review_url(t), TYPE_NAMES[t])}"
+        f"• {count} {slack_link(PwaUrlHelper.suggestion_review_url(t), _type_name(t, count))}"
         for t, count in pending
     ]
     OutgoingNotificationHelper.send_slack_alert(

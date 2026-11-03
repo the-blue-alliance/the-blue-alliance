@@ -93,7 +93,27 @@ def test_nag_totals_and_sorts_types_by_count(
         f"*:inbox_tray: 6 suggestions <{base}|need review>*",
         f"• 3 <{base}/api_auth_access|API Write Key Requests>",
         f"• 2 <{base}/event|Webcasts>",
-        f"• 1 <{base}/match|Match Videos>",
+        f"• 1 <{base}/match|Match Video>",
     ]
     # The Jinja review page is gone; never send moderators to www
     assert "www.thebluealliance.com" not in nag_text
+
+
+@patch.object(OutgoingNotificationHelper, "send_slack_alert")
+def test_nag_single_suggestion_uses_singular_type_name(
+    notif_mock: Mock,
+    tasks_client: Client,
+    ndb_stub,
+) -> None:
+    SlackHookUrls.put({"suggestion-nag": "http://foo.bar/nag"})
+    _pending("m1", "match")
+
+    resp = tasks_client.get("/tasks/do/nag_suggestions")
+    assert resp.status_code == 200
+
+    _, nag_text = notif_mock.call_args.args
+    base = "https://beta.thebluealliance.com/suggest/review"
+    assert nag_text.split("\n") == [
+        f"*:inbox_tray: 1 suggestion <{base}|needs review>*",
+        f"• 1 <{base}/match|Match Video>",
+    ]
