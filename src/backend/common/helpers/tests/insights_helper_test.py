@@ -656,6 +656,8 @@ def test_do_match_insights_computes_all_match_stats(ndb_stub) -> None:
     qm1_data = next(m for m in highscore["qual"] if m["key_name"] == "2014wk2_qm1")
     assert qm1_data == {
         "key_name": "2014wk2_qm1",
+        "year": 2014,
+        "comp_level": "qm",
         "verbose_name": "Quals 1",
         "event_name": "Week Two Regional",
         "alliances": {
