@@ -315,7 +315,10 @@ export default function MatchDetails({
           </div>
         </div>
       </div>
-      <div className="order-1 flex w-full flex-col gap-2 md:order-2 md:w-xl">
+      <div
+        className="order-1 flex w-full flex-col gap-2 md:order-2 md:w-xl
+          md:grow"
+      >
         {youtubeVideos.map((v) => (
           <YoutubeEmbed
             key={v.key}
