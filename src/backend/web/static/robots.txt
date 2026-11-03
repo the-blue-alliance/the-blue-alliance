@@ -1,13 +1,44 @@
+# A crawler obeys only the most specific User-agent group that matches it, so
+# every group repeats the shared Disallow rules below.
+
+# Search engines and everyone else
 User-agent: *
-Allow: /
 Disallow: /_
-Disallow: /advanced_search?*
-Disallow: /admin/
-Disallow: /account/
+Disallow: /admin
+Disallow: /account
 Disallow: /api/
 Disallow: /backend-tasks/
-Disallow: /request/
 Disallow: /suggest/
 Disallow: /tasks/
-Disallow: /mytba/
-Disallow: /nearby?*
+Disallow: /mytba
+
+# SEO and backlink tools: they send no visitors to TBA
+User-agent: SemrushBot
+User-agent: AhrefsBot
+User-agent: DotBot
+User-agent: MJ12bot
+User-agent: Barkrowler
+User-agent: DataForSeoBot
+User-agent: SERankingBacklinksBot
+Disallow: /
+
+# AI crawlers: team and event pages are fine, but individual match pages are a
+# long tail that misses every cache
+User-agent: ExaSearchBot
+User-agent: ClaudeBot
+User-agent: GPTBot
+User-agent: Amazonbot
+User-agent: PerplexityBot
+User-agent: LinkupBot
+User-agent: Bytespider
+User-agent: CCBot
+User-agent: meta-externalagent
+Disallow: /match/
+Disallow: /_
+Disallow: /admin
+Disallow: /account
+Disallow: /api/
+Disallow: /backend-tasks/
+Disallow: /suggest/
+Disallow: /tasks/
+Disallow: /mytba
