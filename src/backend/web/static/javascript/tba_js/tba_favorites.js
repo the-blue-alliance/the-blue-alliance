@@ -210,10 +210,6 @@ function updateTeamFABFavoriteTeams(favoriteTeams) {
 function setupFavClick(action, hideSelector) {
   $(".tba-fab-team").off("click");  // make sure only one click handler is attached at a time
   $(".tba-fab-team").click(function() {
-    if (!isSignedIn()) {
-      $('#login-modal').modal('show');
-      return;
-    }
     $(".tba-fab-team").off("click");
     $(this).find(hideSelector).hide();
     addSpinner($(this));

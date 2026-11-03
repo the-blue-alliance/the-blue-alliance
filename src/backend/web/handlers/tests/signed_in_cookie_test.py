@@ -37,7 +37,7 @@ def test_login_sets_marker(web_client: FlaskClient) -> None:
 def test_existing_session_gets_marker(web_client: FlaskClient) -> None:
     with web_client.session_transaction() as session:
         session["session"] = "firebase-cookie"
-    resp = web_client.get("/contact")
+    resp = web_client.get("/_/account/info")
     assert _signed_in_set_cookie(resp).startswith(f"{SIGNED_IN_COOKIE}=1;")
 
 
@@ -45,13 +45,13 @@ def test_synced_marker_untouched(web_client: FlaskClient) -> None:
     with web_client.session_transaction() as session:
         session["session"] = "firebase-cookie"
     web_client.set_cookie(SIGNED_IN_COOKIE, "1")
-    resp = web_client.get("/contact")
+    resp = web_client.get("/_/account/info")
     assert _signed_in_set_cookie(resp) == ""
 
 
 def test_marker_without_session_cleared(web_client: FlaskClient) -> None:
     web_client.set_cookie(SIGNED_IN_COOKIE, "1")
-    resp = web_client.get("/contact")
+    resp = web_client.get("/_/account/info")
     cookie = _signed_in_set_cookie(resp)
     assert cookie.startswith(f"{SIGNED_IN_COOKIE}=;")
     assert "Max-Age=0" in cookie
@@ -86,5 +86,28 @@ def test_stale_session_clears_marker_and_session(web_client: FlaskClient) -> Non
         assert "session" not in session
 
     # Not re-set on the next request
+    resp = web_client.get("/_/account/info")
+    assert _signed_in_set_cookie(resp) == ""
+
+
+def test_public_page_never_syncs_marker(web_client: FlaskClient) -> None:
+    # Shared caches could replay the Set-Cookie to every visitor
+    with web_client.session_transaction() as session:
+        session["session"] = "firebase-cookie"
     resp = web_client.get("/contact")
+    assert "public" in resp.headers["Cache-Control"]
+    assert _signed_in_set_cookie(resp) == ""
+
+    with web_client.session_transaction() as session:
+        session.pop("session")
+    web_client.set_cookie(SIGNED_IN_COOKIE, "1")
+    resp = web_client.get("/contact")
+    assert _signed_in_set_cookie(resp) == ""
+
+
+def test_not_modified_never_syncs_marker(web_client: FlaskClient) -> None:
+    etag = web_client.get("/contact").headers["ETag"]
+    web_client.set_cookie(SIGNED_IN_COOKIE, "1")
+    resp = web_client.get("/contact", headers={"If-None-Match": etag})
+    assert resp.status_code == 304
     assert _signed_in_set_cookie(resp) == ""
