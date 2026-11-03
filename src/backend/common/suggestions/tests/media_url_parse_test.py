@@ -236,6 +236,42 @@ class TestMediaUrlParser(unittest.TestCase):
         self.assertEqual(details["author_name"], "1stroboticsrocks")
         self.assertIsNotNone(details.get("thumbnail_url", None))
 
+    def test_instagram_image_share_sheet_url(self) -> None:
+        with patch("google.appengine.ext.ndb.Context.urlfetch") as mock_urlfetch:
+            result = MediaParser.partial_media_dict_from_url(
+                "https://www.instagram.com/p/BwLasWMFIhZ/?utm_source=ig_share_sheet&igshid=1xxn8uyx1by5w"
+            ).get_result()
+        mock_urlfetch.assert_not_called()
+        self.assertIsNotNone(result)
+        self.assertEqual(result["media_type_enum"], MediaType.INSTAGRAM_IMAGE)
+        self.assertEqual(result["is_social"], False)
+        self.assertEqual(result["foreign_key"], "BwLasWMFIhZ")
+        self.assertEqual(result["site_name"], TYPE_NAMES[MediaType.INSTAGRAM_IMAGE])
+
+    def test_instagram_image_url_variants(self) -> None:
+        for url in [
+            "https://www.instagram.com/p/BwLasWMFIhZ",
+            "https://instagram.com/p/BwLasWMFIhZ/",
+            "https://www.instagram.com/p/BwLasWMFIhZ/?igsh=MTV1a2x6",
+            "https://www.instagram.com/p/BwLasWMFIhZ/#comments",
+        ]:
+            with self.subTest(url=url):
+                result = MediaParser.partial_media_dict_from_url(url).get_result()
+                self.assertIsNotNone(result)
+                self.assertEqual(result["media_type_enum"], MediaType.INSTAGRAM_IMAGE)
+                self.assertEqual(result["foreign_key"], "BwLasWMFIhZ")
+
+    def test_instagram_profile_share_sheet_url(self) -> None:
+        result = MediaParser.partial_media_dict_from_url(
+            "https://www.instagram.com/4hteamneutrino/?utm_source=ig_share_sheet&igshid=1xxn8uyx1by5w"
+        ).get_result()
+        self.assertIsNotNone(result)
+        self.assertEqual(result["media_type_enum"], MediaType.INSTAGRAM_PROFILE)
+        self.assertEqual(result["foreign_key"], "4hteamneutrino")
+        self.assertEqual(
+            result["profile_url"], "https://www.instagram.com/4hteamneutrino"
+        )
+
     def test_unsupported_url_parse(self) -> None:
         self.assertEqual(
             MediaParser.partial_media_dict_from_url("http://foo.bar").get_result(), None

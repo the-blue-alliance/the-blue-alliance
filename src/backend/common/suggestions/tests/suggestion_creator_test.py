@@ -136,6 +136,26 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account.key)
         self.assertEqual(suggestion.target_model, "media")
 
+    def test_instagram_share_sheet_url(self) -> None:
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key,
+            "https://www.instagram.com/p/BwLasWMFIhZ/?utm_source=ig_share_sheet&igshid=1xxn8uyx1by5w",
+            "frc1124",
+            "2019",
+        ).get_result()
+        self.assertEqual(status, "success")
+
+        suggestion = Suggestion.get_by_id(
+            Suggestion.render_media_key_name(
+                2019, "team", "frc1124", "instagram-image", "BwLasWMFIhZ"
+            )
+        )
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(
+            suggestion.contents["media_type_enum"], MediaType.INSTAGRAM_IMAGE
+        )
+        self.assertEqual(suggestion.contents["foreign_key"], "BwLasWMFIhZ")
+
     def test_create_social_media_suggestion(self) -> None:
         status, _ = SuggestionCreator.createTeamMediaSuggestion(
             self.account.key,
