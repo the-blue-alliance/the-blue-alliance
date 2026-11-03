@@ -13,6 +13,7 @@ import {
   PlayoffType,
 } from '~/api/tba/read';
 import {
+  adjacentMatches,
   allianceRobots,
   calculateRobotsRecord,
   calculateTeamAvgScore,
@@ -482,6 +483,48 @@ describe('sortMatchComparator', () => {
       '2024test_sf1m2',
       '2024test_sf2m1',
     ]);
+  });
+});
+
+describe('adjacentMatches', () => {
+  const matches = [
+    makeMatch({ key: '2024test_f1m1', comp_level: CompLevel.F }),
+    makeMatch({
+      key: '2024test_sf13m1',
+      comp_level: CompLevel.SF,
+      set_number: 13,
+    }),
+    makeMatch({ key: '2024test_qm2', match_number: 2 }),
+    makeMatch({
+      key: '2024test_sf2m1',
+      comp_level: CompLevel.SF,
+      set_number: 2,
+    }),
+    makeMatch({ key: '2024test_qm10', match_number: 10 }),
+  ];
+
+  test('finds the matches before and after in play order', () => {
+    const { previous, next } = adjacentMatches(matches, '2024test_sf2m1');
+
+    expect([previous?.key, next?.key]).toEqual([
+      '2024test_qm10',
+      '2024test_sf13m1',
+    ]);
+  });
+
+  test('has no previous match for the first match', () => {
+    expect(adjacentMatches(matches, '2024test_qm2').previous).toBeUndefined();
+  });
+
+  test('has no next match for the last match', () => {
+    expect(adjacentMatches(matches, '2024test_f1m1').next).toBeUndefined();
+  });
+
+  test('has no neighbours for a match missing from the list', () => {
+    expect(adjacentMatches(matches, '2024test_qm99')).toEqual({
+      previous: undefined,
+      next: undefined,
+    });
   });
 });
 

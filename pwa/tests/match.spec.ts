@@ -89,3 +89,22 @@ test('renders a practice match page', async ({ page }) => {
     page.getByRole('heading', { name: /Practice 5/ }).first(),
   ).toBeVisible();
 });
+
+test('steps to the next match in play order', async ({ page }) => {
+  await page.goto('/match/2024casj_qm5');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await page.getByRole('link', { name: 'Next match: Quals 6' }).click();
+
+  await expect(page).toHaveURL(/\/match\/2024casj_qm6$/);
+});
+
+test('has no previous match link on the first match', async ({ page }) => {
+  await page.goto('/match/2024casj_qm1');
+  await page.locator('body[data-hydrated]').waitFor();
+  await page.getByRole('link', { name: /^Next match/ }).waitFor();
+
+  await expect(page.getByRole('link', { name: /^Previous match/ })).toHaveCount(
+    0,
+  );
+});

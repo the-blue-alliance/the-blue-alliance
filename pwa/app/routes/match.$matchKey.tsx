@@ -1,14 +1,16 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { Temporal } from 'temporal-polyfill';
 
 import { PlayoffType } from '~/api/tba/read';
 import {
+  getEventMatchesOptions,
   getEventOptions,
   getMatchOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { EventLink } from '~/components/tba/links';
 import MatchDetails from '~/components/tba/match/matchDetails';
+import MatchNavigation from '~/components/tba/match/matchNavigation';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import { doThrowNotFound, publicCacheControlHeaders } from '~/lib/utils';
@@ -154,17 +156,28 @@ function MatchPage() {
     ...getMatchOptions({ path: { match_key: matchKey } }),
     staleTime: eventStaleTime,
   });
+  const matchesQuery = useQuery({
+    ...getEventMatchesOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
+  const playoffType = event.playoff_type ?? PlayoffType.CUSTOM;
 
   return (
     <div>
       <h1 className="mb-4 text-4xl">
-        {matchTitleShort(match, event.playoff_type ?? PlayoffType.CUSTOM)}{' '}
+        {matchTitleShort(match, playoffType)}{' '}
         <small className="text-xl">
           <EventLink eventOrKey={event}>
             {event.name} {event.year}
           </EventLink>
         </small>
       </h1>
+      <MatchNavigation
+        matchKey={matchKey}
+        matches={matchesQuery.data}
+        isPending={matchesQuery.isPending}
+        playoffType={playoffType}
+      />
       <MatchDetails match={match} event={event} />
     </div>
   );

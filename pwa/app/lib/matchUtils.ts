@@ -55,6 +55,18 @@ export function sortMatchComparator(a: Match, b: Match) {
   return a.set_number - b.set_number || a.match_number - b.match_number;
 }
 
+export function adjacentMatches(
+  matches: Match[],
+  matchKey: string,
+): { previous: Match | undefined; next: Match | undefined } {
+  const sorted = [...matches].sort(sortMatchComparator);
+  const index = sorted.findIndex((m) => m.key === matchKey);
+  if (index === -1) {
+    return { previous: undefined, next: undefined };
+  }
+  return { previous: sorted[index - 1], next: sorted[index + 1] };
+}
+
 export function sortMultipleEventsMatches(matches: Match[], events: Event[]) {
   const eventKeys = events.map((e) => e.key);
   return matches.sort(
