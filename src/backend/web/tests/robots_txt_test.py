@@ -81,9 +81,7 @@ def robots() -> Robots:
 
 
 @pytest.mark.parametrize("agent", [GOOGLEBOT, BINGBOT, APPLEBOT, BROWSER])
-def test_search_engines_crawl_everything_public(
-    robots: Robots, agent: str
-) -> None:
+def test_search_engines_crawl_everything_public(robots: Robots, agent: str) -> None:
     for path in PUBLIC_PAGES + ["/match/2026casj_qm1"]:
         assert robots.can_fetch(agent, path), path
     for path in SHARED_DISALLOWED:
@@ -110,9 +108,7 @@ def test_every_group_repeats_shared_disallows() -> None:
     groups = re.split(r"\n\s*\n", ROBOTS_TXT.read_text().strip())
     rule_groups = [g for g in groups if "Disallow:" in g]
     shared = {
-        line
-        for line in rule_groups[0].splitlines()
-        if line.startswith("Disallow:")
+        line for line in rule_groups[0].splitlines() if line.startswith("Disallow:")
     }
     for group in rule_groups[1:]:
         rules = {line for line in group.splitlines() if line.startswith("Disallow:")}
