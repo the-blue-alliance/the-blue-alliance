@@ -156,6 +156,55 @@ class TestTeamMediaSuggestionCreator(SuggestionCreatorTest):
         self.assertEqual(suggestion.author, self.account.key)
         self.assertEqual(suggestion.target_model, "social-media")
 
+    def test_create_instagram_reel_suggestion(self) -> None:
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key,
+            "https://www.instagram.com/reel/C4bhT7FsmAW/?igsh=x",
+            "frc254",
+            "2024",
+        ).get_result()
+        self.assertEqual(status, "success")
+
+        suggestion = Suggestion.get_by_id(
+            Suggestion.render_media_key_name(
+                2024, "team", "frc254", "instagram-image", "C4bhT7FsmAW"
+            )
+        )
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.target_model, "media")
+        self.assertEqual(
+            suggestion.contents["media_type_enum"], MediaType.INSTAGRAM_IMAGE
+        )
+        self.assertEqual(suggestion.contents["foreign_key"], "C4bhT7FsmAW")
+
+    def test_create_instagram_profile_social_media_suggestion(self) -> None:
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key,
+            "https://www.instagram.com/frc254/?igsh=x",
+            "frc254",
+            None,
+            is_social=True,
+        ).get_result()
+        self.assertEqual(status, "success")
+
+        suggestion = Suggestion.get_by_id(
+            Suggestion.render_media_key_name(
+                None, "team", "frc254", "instagram-profile", "frc254"
+            )
+        )
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.target_model, "social-media")
+
+    def test_instagram_reel_rejected_as_social_media(self) -> None:
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key,
+            "https://www.instagram.com/reel/C4bhT7FsmAW/",
+            "frc254",
+            None,
+            is_social=True,
+        ).get_result()
+        self.assertEqual(status, "bad_url")
+
     def test_duplicate_suggestion(self) -> None:
         suggestion_id = Suggestion.render_media_key_name(
             2016, "team", "frc1124", "imgur", "ruRAxDm"
