@@ -13,7 +13,7 @@ A key is only considered orphaned when it parses cleanly AND either:
     it is older than the buffer for every class it matches (CACHE_VERSION or dict
     subversion more than one behind).
 
-Anything unparseable, or not attributable to a known class, is left alone.
+Anything unparseable or not valid UTF-8, or not attributable to a known class, is left alone.
 Cache key prefixes overlap (e.g. "event_{event_key}" vs "event_awards_{event_key}"),
 so classes are matched on the full format, never by prefix.
 """
@@ -198,7 +198,13 @@ def purge_orphaned_cached_query_results(
         )
         for key in keys:
             counts["scanned"] += 1
-            key_string = key.string_id()
+            try:
+                key_string = key.string_id()
+            except UnicodeDecodeError:
+                # Some legacy key names aren't valid UTF-8; ndb can't decode them
+                counts["kept:undecodable"] += 1
+                counts["kept"] += 1
+                continue
             reason = classifier.orphan_reason(key_string) if key_string else None
             if reason is None:
                 counts["kept"] += 1
