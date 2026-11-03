@@ -13,6 +13,10 @@ SIGNED_IN_COOKIE = "tba-signed-in"
 
 
 def sync_signed_in_cookie(response: Response) -> Response:
+    if response.cache_control.public or response.status_code == 304:
+        # A shared cache could store this Set-Cookie and replay it to every visitor
+        return response
+
     has_session_cookie = current_app.config["SESSION_COOKIE_NAME"] in request.cookies
     if has_session_cookie or g.get(SESSION_AUTH_CHANGED, False):
         signed_in = is_signed_in_session()
