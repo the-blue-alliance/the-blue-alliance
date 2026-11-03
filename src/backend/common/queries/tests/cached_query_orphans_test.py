@@ -193,3 +193,29 @@ def test_purge_deletes_only_orphans_across_tasks(ndb_stub, taskqueue_stub) -> No
 
     remaining = {k.string_id() for k in CachedQueryResult.query().fetch(keys_only=True)}
     assert remaining == set(live)
+
+
+def test_purge_skips_undecodable_key_names(
+    ndb_stub, taskqueue_stub, monkeypatch
+) -> None:
+    live, orphaned = _keys()
+    undecodable = f"team_frc254_bad:0:{DB - 3}"
+    _put(live + orphaned + [undecodable])
+
+    real_string_id = ndb.Key.string_id
+
+    def string_id(key: ndb.Key) -> str:
+        key_string = real_string_id(key)
+        if key_string == undecodable:
+            raise UnicodeDecodeError(
+                "utf-8", b"\xc2", 0, 1, "invalid continuation byte"
+            )
+        return key_string
+
+    monkeypatch.setattr(ndb.Key, "string_id", string_id)
+    purge_orphaned_cached_query_results(dry_run=False, pages_per_task=1, page_size=2)
+    _drain(taskqueue_stub)
+    monkeypatch.undo()
+
+    remaining = {k.string_id() for k in CachedQueryResult.query().fetch(keys_only=True)}
+    assert remaining == set(live) | {undecodable}
