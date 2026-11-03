@@ -16,6 +16,9 @@ from backend.common.models.event import Event
 from backend.common.models.event import EventDetails
 from backend.common.models.match import Match
 from backend.common.models.team import Team
+from backend.common.queries.cached_query_orphans import (
+    purge_orphaned_cached_query_results,
+)
 from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.web.profiled_render import render_template
 
@@ -209,6 +212,18 @@ def cached_query_purge_global_version(db_version: int) -> Response:
             _target="py3-tasks-io",
         )
 
+    return redirect(url_for("admin.cached_query_list"))
+
+
+def cached_query_purge_orphans() -> Response:
+    """Enqueue a scan for cache entries no current query will read; dry run unless asked."""
+    dry_run = request.form.get("execute") != "true"
+    defer_safe(
+        purge_orphaned_cached_query_results,
+        dry_run=dry_run,
+        _queue="cache-clearing",
+        _target="py3-tasks-io",
+    )
     return redirect(url_for("admin.cached_query_list"))
 
 

@@ -33,6 +33,7 @@ from backend.web.handlers.admin.cache import (
     cached_query_list,
     cached_query_purge_class_global_version,
     cached_query_purge_global_version,
+    cached_query_purge_orphans,
     cached_query_purge_version,
     clear_model_cache,
 )
@@ -236,6 +237,9 @@ admin_routes.add_url_rule(
     "/award/edit/<award_key>", methods=["POST"], view_func=award_edit_post
 )
 admin_routes.add_url_rule("/cache", view_func=cached_query_list)
+admin_routes.add_url_rule(
+    "/cache/purge_orphans", methods=["POST"], view_func=cached_query_purge_orphans
+)
 admin_routes.add_url_rule(
     "/cache/<query_class_name>", methods=["GET"], view_func=cached_query_detail
 )

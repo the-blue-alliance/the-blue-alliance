@@ -755,3 +755,44 @@ def test_clear_team_cache_redirects_to_team_page(
     assert resp.headers["Location"] == "/admin/team/254"
     mock_clear.assert_called_once()
     assert mock_clear.call_args[0][0].key_name == "frc254"
+
+
+def test_purge_orphans_defaults_to_dry_run(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    orphan_key = _make_cache_key("test_admin_cache_a", 1, current_v - 2)
+    CachedQueryResult(id=orphan_key, result=None).put()
+
+    resp = web_client.post("/admin/cache/purge_orphans")
+    assert resp.status_code == 302
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="cache-clearing")
+    assert len(tasks) == 1
+    run_from_task(tasks[0])
+    assert CachedQueryResult.get_by_id(orphan_key) is not None
+
+
+def test_purge_orphans_execute_deletes_orphans(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    orphan_key = _make_cache_key("test_admin_cache_a", 1, current_v - 2)
+    current_key = _make_cache_key("test_admin_cache_b", 1, current_v)
+    CachedQueryResult(id=orphan_key, result=None).put()
+    CachedQueryResult(id=current_key, result=None).put()
+
+    resp = web_client.post("/admin/cache/purge_orphans", data={"execute": "true"})
+    assert resp.status_code == 302
+
+    for task in taskqueue_stub.get_filtered_tasks(queue_names="cache-clearing"):
+        run_from_task(task)
+    assert CachedQueryResult.get_by_id(orphan_key) is None
+    assert CachedQueryResult.get_by_id(current_key) is not None
+
+
+def test_purge_orphans_not_accessible_without_login(
+    web_client: Client, ndb_stub
+) -> None:
+    resp = web_client.post("/admin/cache/purge_orphans")
+    assert resp.status_code == 401

@@ -36,6 +36,25 @@
 </div>
 
 <div class="row">
+    <h2>Orphaned Entries</h2>
+    <p>Scan every cached query result and find entries no current query will read again: a database query version, query cache version, or dict subversion more than one behind current. Unparseable keys and keys that don't match a known query are kept. Results are written to the task logs.</p>
+    <form method="post" action="/admin/cache/purge_orphans" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn btn-default">
+            <span class="glyphicon glyphicon-search"></span> Dry Run
+        </button>
+    </form>
+    <form method="post" action="/admin/cache/purge_orphans" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="execute" value="true"/>
+        <button type="submit" class="btn btn-danger"
+                onclick="return confirm('Delete all orphaned cached query results?')">
+            <span class="glyphicon glyphicon-trash"></span> Purge Orphans
+        </button>
+    </form>
+</div>
+
+<div class="row">
     <h2>Global Version Management</h2>
     <p>Manage database query cache versions globally across all query classes.</p>
     
