@@ -164,20 +164,25 @@ function MatchPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-4xl">
-        {matchTitleShort(match, playoffType)}{' '}
-        <small className="text-xl">
-          <EventLink eventOrKey={event}>
-            {event.name} {event.year}
-          </EventLink>
-        </small>
-      </h1>
-      <MatchNavigation
-        matchKey={matchKey}
-        matches={matchesQuery.data}
-        isPending={matchesQuery.isPending}
-        playoffType={playoffType}
-      />
+      <div
+        className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4
+          gap-y-2"
+      >
+        <h1 className="text-4xl">
+          {matchTitleShort(match, playoffType)}{' '}
+          <small className="text-xl">
+            <EventLink eventOrKey={event}>
+              {event.name} {event.year}
+            </EventLink>
+          </small>
+        </h1>
+        <MatchNavigation
+          matchKey={matchKey}
+          matches={matchesQuery.data}
+          isPending={matchesQuery.isPending}
+          playoffType={playoffType}
+        />
+      </div>
       <MatchDetails match={match} event={event} />
     </div>
   );

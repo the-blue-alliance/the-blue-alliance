@@ -5,7 +5,6 @@ import ChevronRightIcon from '~icons/lucide/chevron-right';
 
 import { type Match, PlayoffType } from '~/api/tba/read';
 import LoadingSkeleton from '~/components/tba/loadingSkeleton';
-import { buttonVariants } from '~/components/ui/button';
 import { adjacentMatches, matchTitleShort } from '~/lib/matchUtils';
 
 export default function MatchNavigation({
@@ -23,7 +22,7 @@ export default function MatchNavigation({
     return (
       <LoadingSkeleton
         label="Loading adjacent matches"
-        className="mb-4 h-9 rounded-md"
+        className="h-6 w-48 rounded-md"
       />
     );
   }
@@ -34,29 +33,27 @@ export default function MatchNavigation({
   }
 
   return (
-    <nav aria-label="Event matches" className="mb-4 flex justify-between gap-2">
-      {previous ? (
+    <nav aria-label="Event matches" className="flex gap-4">
+      {previous && (
         <Link
           to="/match/$matchKey"
           params={{ matchKey: previous.key }}
           aria-label={`Previous match: ${matchTitleShort(previous, playoffType)}`}
-          className={buttonVariants({ variant: 'outline', size: 'sm' })}
+          className="whitespace-nowrap"
         >
-          <ChevronLeftIcon className="mr-1 size-4" />
+          <ChevronLeftIcon className="inline size-4 align-[-0.2em]" />
           {matchTitleShort(previous, playoffType)}
         </Link>
-      ) : (
-        <span />
       )}
       {next && (
         <Link
           to="/match/$matchKey"
           params={{ matchKey: next.key }}
           aria-label={`Next match: ${matchTitleShort(next, playoffType)}`}
-          className={buttonVariants({ variant: 'outline', size: 'sm' })}
+          className="whitespace-nowrap"
         >
           {matchTitleShort(next, playoffType)}
-          <ChevronRightIcon className="ml-1 size-4" />
+          <ChevronRightIcon className="inline size-4 align-[-0.2em]" />
         </Link>
       )}
     </nav>
