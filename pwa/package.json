@@ -100,7 +100,7 @@
     "pino-pretty": "13.2.0",
     "prettier": "3.9.10",
     "prettier-plugin-classnames": "0.10.5",
-    "prettier-plugin-merge": "0.10.1",
+    "prettier-plugin-merge": "0.10.2",
     "prettier-plugin-tailwindcss": "0.8.1",
     "shadcn": "4.23.0",
     "tailwindcss": "4.3.3",
