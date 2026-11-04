@@ -29,10 +29,19 @@ SHARED_DISALLOWED = [
     "/account",
     "/account/login",
     "/admin",
+    "/api/v3/status",
     "/mytba",
     "/suggest/match/video",
 ]
-PUBLIC_PAGES = ["/", "/team/254", "/team/254/2026", "/event/2026casj", "/events"]
+PUBLIC_PAGES = [
+    "/",
+    "/team/254",
+    "/team/254/2026",
+    "/event/2026casj",
+    "/events",
+    "/apidocs/v3",
+    "/swagger/api_v3.json",
+]
 
 
 class Robots:
