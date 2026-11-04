@@ -59,7 +59,7 @@
         <div class="navbar-collapse collapse tba-navbar-collapse tba-collapse navbar-responsive-collapse">
           <br class="visible-xs">
           <p class="navbar-text pull-right">
-            Logged in as <a href="#" class="navbar-link">{{ user.display_name }}</a> || <a href="{{ url_for('account.logout') }}">log out</a>
+            Logged in as <a href="#" class="navbar-link">{{ admin_email or "unknown" }}</a>{% if user %} (TBA account: {{ user.display_name or user.email }}){% endif %} || <a href="{{ url_for('account.logout') }}">log out</a>
           </p>
           <ul class="nav navbar-nav tba-navbar-nav">
             <!-- Nothing here yet -->

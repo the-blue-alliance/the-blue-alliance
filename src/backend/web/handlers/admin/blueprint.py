@@ -1,3 +1,5 @@
+from typing import Dict, Optional
+
 from flask import abort, Blueprint
 from google.appengine.api import users as gae_login
 
@@ -144,6 +146,16 @@ def require_gae_admin() -> None:
     """
     if not gae_login.is_current_user_admin():
         abort(401)
+
+
+@admin_routes.context_processor
+def admin_identity() -> Dict[str, Optional[str]]:
+    """
+    The Google account App Engine admitted as an admin. It is separate from the
+    TBA account (`user`), which may be signed out or have no display name.
+    """
+    google_user = gae_login.get_current_user()
+    return {"admin_email": google_user.email() if google_user else None}
 
 
 @admin_routes.route("/")
