@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 from flask import abort, redirect, request, url_for
-from google.appengine.ext import ndb
 from werkzeug import Response
 
 from backend.common.helpers.deferred import defer_safe
@@ -23,7 +22,6 @@ from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.web.profiled_render import render_template
 
 DATASTORE_PAGE_SIZE = 1000
-DATASTORE_DELETE_BATCH_SIZE = 500
 
 
 def cached_query_list() -> str:
@@ -36,17 +34,8 @@ def cached_query_list() -> str:
         for c in CachedDatabaseQuery.__subclasses__()
     }
 
-    current_db_version = CachedDatabaseQuery.DATABASE_QUERY_VERSION
-    # Generate list of versions that can be deleted (< current - 1)
-    # and versions that are protected (current and current - 1)
-    protected_versions = [current_db_version, current_db_version - 1]
-    clearable_versions = list(range(1, current_db_version - 1))
-
     template_args = {
         "cached_queries": cached_queries,
-        "current_db_version": current_db_version,
-        "protected_versions": protected_versions,
-        "clearable_versions": clearable_versions,
     }
     return render_template(
         "admin/cached_query_list.html", template_values=template_args
@@ -144,77 +133,6 @@ def cached_query_delete(query_class_name: str, cache_key: str) -> Response:
     )
 
 
-def cached_query_purge_version(
-    query_class_name: str, db_version: str, query_version: int
-) -> Response:
-    query_class = CachedDatabaseQuery.get_query_class_by_name(query_class_name)
-    if query_class is None:
-        abort(404)
-
-    target_db_version: int
-    try:
-        target_db_version = int(db_version)
-    except ValueError:
-        abort(400)
-
-    try:
-        CachedDatabaseQuery.validate_db_version_for_deletion(target_db_version)
-    except ValueError:
-        abort(400)
-
-    cache_key_prefix = CachedQueryResult.cache_key_prefix_from_format(
-        query_class.CACHE_KEY_FORMAT
-    )
-
-    keys_to_delete = set()
-    for key in CachedQueryResult.iter_keys_by_cache_key_prefix(
-        cache_key_prefix, DATASTORE_PAGE_SIZE
-    ):
-        key_string = key.string_id()
-        if key_string is None:
-            continue
-        item_query_version = CachedQueryResult.query_version_from_key_string(key_string)
-        item_db_version = CachedQueryResult.db_version_from_key_string(key_string)
-        if (
-            item_query_version is not None
-            and item_db_version is not None
-            and query_version == item_query_version
-            and item_db_version == target_db_version
-        ):
-            keys_to_delete.add(key)
-
-    ndb.delete_multi(keys_to_delete)
-
-    return redirect(
-        url_for("admin.cached_query_detail", query_class_name=query_class_name)
-    )
-
-
-def cached_query_purge_global_version(db_version: int) -> Response:
-    """Enqueue per-class purge tasks for the given DATABASE_QUERY_VERSION.
-
-    We enqueue one task per query class on the cache-clearing queue so each task
-    only scans/deletes one class slice.
-    """
-    try:
-        CachedDatabaseQuery.validate_db_version_for_deletion(db_version)
-    except ValueError:
-        abort(400)
-
-    for query_class in CachedDatabaseQuery.__subclasses__():
-        defer_safe(
-            CachedQueryResult.purge_query_class_global_version,
-            query_class,
-            db_version,
-            DATASTORE_PAGE_SIZE,
-            DATASTORE_DELETE_BATCH_SIZE,
-            _queue="cache-clearing",
-            _target="py3-tasks-io",
-        )
-
-    return redirect(url_for("admin.cached_query_list"))
-
-
 def cached_query_purge_orphans() -> Response:
     """Enqueue a scan for cache entries no current query will read; dry run unless asked."""
     dry_run = request.form.get("execute") != "true"
@@ -225,33 +143,6 @@ def cached_query_purge_orphans() -> Response:
         _target="py3-tasks-io",
     )
     return redirect(url_for("admin.cached_query_list"))
-
-
-def cached_query_purge_class_global_version(
-    query_class_name: str, db_version: int
-) -> Response:
-    query_class = CachedDatabaseQuery.get_query_class_by_name(query_class_name)
-    if query_class is None:
-        abort(404)
-
-    try:
-        CachedDatabaseQuery.validate_db_version_for_deletion(db_version)
-    except ValueError:
-        abort(400)
-
-    defer_safe(
-        CachedQueryResult.purge_query_class_global_version,
-        query_class,
-        db_version,
-        DATASTORE_PAGE_SIZE,
-        DATASTORE_DELETE_BATCH_SIZE,
-        _queue="cache-clearing",
-        _target="py3-tasks-io",
-    )
-
-    return redirect(
-        url_for("admin.cached_query_detail", query_class_name=query_class_name)
-    )
 
 
 def clear_model_cache(model_type: str, model_key: str) -> Response:
