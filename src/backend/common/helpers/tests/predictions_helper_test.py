@@ -1003,3 +1003,29 @@ def test_compute_rankings_predictions_from_computed_predictions_unplayed(
     assert all(
         1 <= p.min_rank <= p.max_rank <= len(teams) for _, p in ranking_predictions
     )
+
+
+@pytest.mark.parametrize("event_key", ["2023orbb", "2024cc"])
+def test_compute_predictions_partial_score_breakdowns(
+    event_key: EventKey, test_data_importer
+) -> None:
+    # Offseason uploads that carry only some of the FMS breakdown fields
+    test_data_importer.import_event(__file__, f"data/{event_key}.json")
+    test_data_importer.import_match_list(__file__, f"data/{event_key}_matches.json")
+
+    matches = Match.query(Match.event == ndb.Key(Event, event_key)).fetch()
+    sorted_matches = MatchHelper.play_order_sorted_matches(matches)
+    (
+        match_predictions,
+        match_prediction_stats,
+        stat_mean_vars,
+    ) = PredictionHelper.get_match_predictions(sorted_matches)
+    assert match_predictions is not None
+    assert match_prediction_stats is not None
+    assert stat_mean_vars is not None
+
+    ranking_predictions, ranking_prediction_stats = (
+        PredictionHelper.get_ranking_predictions(sorted_matches, match_predictions, n=1)
+    )
+    assert ranking_predictions is not None
+    assert ranking_prediction_stats is not None

@@ -351,30 +351,36 @@ class GameSpecifics2023(
             "Total Cones Scored": lambda match, color: (
                 sum(
                     [
-                        match.score_breakdown[color]["teleopCommunity"]["B"].count(
-                            "Cone"
-                        ),
-                        match.score_breakdown[color]["teleopCommunity"]["M"].count(
-                            "Cone"
-                        ),
-                        match.score_breakdown[color]["teleopCommunity"]["T"].count(
-                            "Cone"
-                        ),
+                        match.score_breakdown[color]
+                        .get("teleopCommunity", {})
+                        .get("B", [])
+                        .count("Cone"),
+                        match.score_breakdown[color]
+                        .get("teleopCommunity", {})
+                        .get("M", [])
+                        .count("Cone"),
+                        match.score_breakdown[color]
+                        .get("teleopCommunity", {})
+                        .get("T", [])
+                        .count("Cone"),
                     ]
                 )
             ),
             "Total Cubes Scored": lambda match, color: (
                 sum(
                     [
-                        match.score_breakdown[color]["teleopCommunity"]["B"].count(
-                            "Cube"
-                        ),
-                        match.score_breakdown[color]["teleopCommunity"]["M"].count(
-                            "Cube"
-                        ),
-                        match.score_breakdown[color]["teleopCommunity"]["T"].count(
-                            "Cube"
-                        ),
+                        match.score_breakdown[color]
+                        .get("teleopCommunity", {})
+                        .get("B", [])
+                        .count("Cube"),
+                        match.score_breakdown[color]
+                        .get("teleopCommunity", {})
+                        .get("M", [])
+                        .count("Cube"),
+                        match.score_breakdown[color]
+                        .get("teleopCommunity", {})
+                        .get("T", [])
+                        .count("Cube"),
                     ]
                 )
             ),

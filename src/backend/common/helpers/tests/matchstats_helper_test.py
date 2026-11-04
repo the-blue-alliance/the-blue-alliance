@@ -357,3 +357,15 @@ def test_get_last_event_stats(memcache_stub) -> None:
     # The second call reuses the cached stats for 254
     stats = MatchstatsHelper.get_last_event_stats(["254"], event_key)
     assert stats == {StatType.OPR: {"254": 20.0}}
+
+
+@pytest.mark.parametrize("event_key", ["2023orbb", "2024cc"])
+def test_compute_coprs_partial_score_breakdowns(
+    event_key: str, test_data_importer
+) -> None:
+    # Offseason uploads that carry only some of the FMS breakdown fields
+    matches = test_data_importer.parse_match_list(
+        __file__, f"data/{event_key}_matches.json"
+    )
+    coprs = MatchstatsHelper.calculate_coprs(matches, int(event_key[:4]))
+    assert coprs
