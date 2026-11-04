@@ -170,6 +170,18 @@ describe('TableOfContents', () => {
     expect(screen.getByText('2026')).toBeTruthy();
   });
 
+  test('renders an empty placeholder when the loader threw', () => {
+    const tocPreview = vi.fn(({ year }: { year: number }) => ({
+      activeLabel: String(year),
+    }));
+    router.match = { staticData: { tocPreview }, loaderData: undefined };
+    const { container } = render(
+      <TOCRendererProvider>{null}</TOCRendererProvider>,
+    );
+    expect(tocPreview).not.toHaveBeenCalled();
+    expect(container.querySelector('[data-toc-placeholder]')).toBeTruthy();
+  });
+
   test('clicking a desktop link without a target does not scroll', () => {
     render(
       <TableOfContents

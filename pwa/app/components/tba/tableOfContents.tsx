@@ -64,7 +64,11 @@ function TOCPlaceholder() {
   const match = useRouterState({ select: (s) => s.matches.at(-1) });
   const tocPreview = match?.staticData.tocPreview as
     ((loaderData: unknown) => TocPreview) | undefined;
-  const preview = tocPreview?.(match?.loaderData);
+  // A loader that threw (notFound, error) leaves no data to preview
+  const preview =
+    match?.loaderData === undefined
+      ? undefined
+      : tocPreview?.(match.loaderData);
 
   return (
     <div
