@@ -7,8 +7,7 @@ ever look up the current generation, and entries are only written on a miss, so
 an entry from an older generation is never read or overwritten again.
 
 A key is only considered orphaned when it parses cleanly AND either:
-  - its DATABASE_QUERY_VERSION is older than the prior-version buffer (the same
-    rule as CachedDatabaseQuery.validate_db_version_for_deletion), or
+  - its DATABASE_QUERY_VERSION is older than current, or
   - its partial key matches at least one known query class's CACHE_KEY_FORMAT and
     it is older than the buffer for every class it matches (CACHE_VERSION or dict
     subversion more than one behind).
@@ -35,6 +34,8 @@ from backend.common.queries.database_query import CachedDatabaseQuery
 
 # How many generations behind current are kept, so a rolled-back deploy still hits cache
 VERSION_BUFFER = 1
+# DATABASE_QUERY_VERSION bumps are rare and not rolled back, so keep only current
+DB_VERSION_BUFFER = 0
 
 PAGE_SIZE = 1000
 PAGES_PER_TASK = 50
@@ -147,7 +148,7 @@ class OrphanClassifier:
         if parsed is None:
             return None
 
-        if parsed.db_version < self.current_db_version - VERSION_BUFFER:
+        if parsed.db_version < self.current_db_version - DB_VERSION_BUFFER:
             return REASON_DB_VERSION
 
         matches = self.matching_classes(parsed.partial)
