@@ -424,6 +424,8 @@ class InsightsHelper(object):
         """
         return {
             "key_name": match.key_name,
+            "year": match.year,
+            "comp_level": match.comp_level,
             "verbose_name": match.verbose_name,
             "event_name": event.name,
             "alliances": match.alliances,
