@@ -59,6 +59,11 @@ class Team(CachedModel):
         "motto",
     }
 
+    # Deprecated and never written, so a Team write without one clears it
+    _allow_none_attrs: Set[str] = {
+        "normalized_location",
+    }
+
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
