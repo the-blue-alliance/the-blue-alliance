@@ -1508,7 +1508,7 @@ def test_compute_event_location_score_premise_partial_match() -> None:
         1.0 / 3,
     )
     assert 0 < score < 1
-    assert score == pytest.approx(expected)  # pyre-ignore[16]
+    assert score == pytest.approx(expected)
 
 
 def test_compute_event_location_score_not_point_of_interest() -> None:
@@ -1741,7 +1741,7 @@ def test_get_team_location_info_textsearch_keeps_best_match(
 
     # Exact match at rank 1 (i=1) is discounted by 0.9 and beats the partial match
     assert info["place_id"] == "exact"
-    assert score == pytest.approx(0.9)  # pyre-ignore[16]
+    assert score == pytest.approx(0.9)
     assert _requests_to(requests_mock, NEARBYSEARCH_URL) == []
     assert [_qs(r, "query") for r in _requests_to(requests_mock, TEXTSEARCH_URL)] == [
         " Leland High School",
@@ -1807,7 +1807,7 @@ def test_compute_team_location_score_non_school_discounted() -> None:
     score = LocationHelper.compute_team_location_score(
         "Leland High School", info, SAN_JOSE
     )
-    assert score == pytest.approx(0.9)  # pyre-ignore[16]
+    assert score == pytest.approx(0.9)
 
 
 def test_compute_team_location_score_partial_match() -> None:
@@ -1815,7 +1815,7 @@ def test_compute_team_location_score_partial_match() -> None:
     score = LocationHelper.compute_team_location_score(
         "Leland High School", info, SAN_JOSE
     )
-    assert score == pytest.approx(  # pyre-ignore[16]
+    assert score == pytest.approx(
         pow(LocationHelper.get_similarity("leland  ", "leland academy"), 0.7)
     )
     assert 0 < score < 1
@@ -2327,4 +2327,4 @@ def test_compute_event_location_score_without_formatted_address() -> None:
     score = LocationHelper.compute_event_location_score(
         "Leland High School", info, SAN_JOSE
     )
-    assert score == pytest.approx(1.0)  # pyre-ignore[16]
+    assert score == pytest.approx(1.0)

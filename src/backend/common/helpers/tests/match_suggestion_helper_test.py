@@ -211,7 +211,7 @@ def test_significance_ramps_across_double_elim_rounds(
     match = make_match(event, comp_level=CompLevel.SF, set_number=set_number)
 
     actual = MatchSuggestionHelper._significance(event, match)
-    assert actual == pytest.approx(expected)  # pyre-ignore[16]
+    assert actual == pytest.approx(expected)
 
 
 def test_significance_double_elim_rounds_are_monotonic() -> None:
@@ -248,7 +248,7 @@ def test_significance_handles_the_four_team_bracket(
     match = make_match(event, comp_level=CompLevel.SF, set_number=set_number)
 
     actual = MatchSuggestionHelper._significance(event, match)
-    assert actual == pytest.approx(expected)  # pyre-ignore[16]
+    assert actual == pytest.approx(expected)
 
 
 def test_significance_ignores_double_elim_before_2023() -> None:
@@ -736,7 +736,7 @@ def test_score_is_the_weighted_sum_of_components(ndb_stub, memcache_stub) -> Non
         + W_HIGH_SCORE * c.high_score
         + W_CLOSE_SCORE * c.close_score
     )
-    assert suggestion.score == pytest.approx(expected, abs=1e-4)  # pyre-ignore[16]
+    assert suggestion.score == pytest.approx(expected, abs=1e-4)
 
 
 def test_populates_render_fields(ndb_stub, memcache_stub) -> None:
@@ -884,7 +884,7 @@ def test_score_all_zeroes_time_decay(ndb_stub, memcache_stub) -> None:
         + W_HIGH_SCORE * suggestion.components.high_score
         + W_CLOSE_SCORE * suggestion.components.close_score
     )
-    assert suggestion.score == pytest.approx(expected, abs=1e-4)  # pyre-ignore[16]
+    assert suggestion.score == pytest.approx(expected, abs=1e-4)
 
 
 def test_score_all_is_not_truncated(ndb_stub, memcache_stub) -> None:
