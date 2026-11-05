@@ -42,3 +42,26 @@ def test_dictToModel_v3_round_trip(ndb_context) -> None:
     assert model.state_prov == "CA"
     assert model.country == "USA"
     assert model.school_name == "Bellarmine College Preparatory"
+
+
+def test_teamConverter_v3_location_from_team_fields(ndb_context) -> None:
+    team = Team(
+        id="frc254",
+        team_number=254,
+        city="San Jose",
+        state_prov="CA",
+        country="USA",
+        postalcode="95126",
+    )
+
+    converted = TeamConverter(team).convert(ApiMajorVersion.API_V3)
+
+    assert converted is not None
+    assert converted["city"] == "San Jose"
+    assert converted["state_prov"] == "CA"
+    assert converted["country"] == "USA"
+    assert converted["postal_code"] == "95126"
+    assert converted["address"] is None
+    assert converted["location_name"] is None
+    assert converted["lat"] is None
+    assert converted["lng"] is None
