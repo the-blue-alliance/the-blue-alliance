@@ -1,0 +1,37 @@
+{
+  "address": "Catlin Gabel School\r\n8825 SW Barnes Road\r\nPortland, OR, USA",
+  "city": "Portland",
+  "country": "USA",
+  "district": null,
+  "division_keys": [],
+  "end_date": "2023-12-16",
+  "event_code": "orbb",
+  "event_type": 99,
+  "event_type_string": "Offseason",
+  "first_event_code": null,
+  "first_event_id": null,
+  "gmaps_place_id": null,
+  "gmaps_url": null,
+  "key": "2023orbb",
+  "lat": null,
+  "lng": null,
+  "location_name": "Catlin Gabel School",
+  "name": "BunnyBots",
+  "parent_event_key": null,
+  "playoff_type": 11,
+  "playoff_type_string": null,
+  "postal_code": null,
+  "short_name": "",
+  "start_date": "2023-12-16",
+  "state_prov": "OR",
+  "timezone": "America/Los_Angeles",
+  "webcasts": [
+    {
+      "channel": "QxP-tWoO42E",
+      "type": "youtube"
+    }
+  ],
+  "website": "https://www.team1540.org/bunnybots",
+  "week": null,
+  "year": 2023
+}

@@ -346,44 +346,46 @@ class GameSpecifics2026(
 
     def get_manual_coprs(self) -> Dict[str, StatAccessor]:
         return {
-            "Hub Auto Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("autoCount", 0),
-            "Hub Teleop Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("teleopCount", 0),
-            "Hub Endgame Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("endgameCount", 0),
-            "Hub Total Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("totalCount", 0),
-            "Hub Transition Fuel Count": lambda match, color: match.score_breakdown[
-                color
-            ]["hubScore"].get("transitionCount", 0),
-            "Hub Shift 1 Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("shift1Count", 0),
-            "Hub Shift 2 Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("shift2Count", 0),
-            "Hub Shift 3 Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("shift3Count", 0),
-            "Hub Shift 4 Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("shift4Count", 0),
+            "Hub Auto Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("autoCount", 0)
+            ),
+            "Hub Teleop Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("teleopCount", 0)
+            ),
+            "Hub Endgame Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("endgameCount", 0)
+            ),
+            "Hub Total Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("totalCount", 0)
+            ),
+            "Hub Transition Fuel Count": lambda match, color: (
+                match.score_breakdown[color]
+                .get("hubScore", {})
+                .get("transitionCount", 0)
+            ),
+            "Hub Shift 1 Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("shift1Count", 0)
+            ),
+            "Hub Shift 2 Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("shift2Count", 0)
+            ),
+            "Hub Shift 3 Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("shift3Count", 0)
+            ),
+            "Hub Shift 4 Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("shift4Count", 0)
+            ),
             "Hub First Active Shift Count": lambda match, color: (
-                match.score_breakdown[color]["hubScore"].get("shift1Count", 0)
-                + match.score_breakdown[color]["hubScore"].get("shift2Count", 0)
+                match.score_breakdown[color].get("hubScore", {}).get("shift1Count", 0)
+                + match.score_breakdown[color].get("hubScore", {}).get("shift2Count", 0)
             ),
             "Hub Second Active Shift Count": lambda match, color: (
-                match.score_breakdown[color]["hubScore"].get("shift3Count", 0)
-                + match.score_breakdown[color]["hubScore"].get("shift4Count", 0)
+                match.score_breakdown[color].get("hubScore", {}).get("shift3Count", 0)
+                + match.score_breakdown[color].get("hubScore", {}).get("shift4Count", 0)
             ),
-            "Hub Uncounted": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("uncounted", 0),
+            "Hub Uncounted": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("uncounted", 0)
+            ),
         }
 
     def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
