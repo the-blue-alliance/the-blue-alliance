@@ -1,0 +1,57 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Purge Team Location Field - TBA Admin{% endblock %}
+
+{% block content %}
+
+<h1>Purge Team.normalized_location</h1>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-info">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="panel panel-default" data-testid="team-normalized-location-status">
+  <div class="panel-heading">
+    <h3 class="panel-title">Status</h3>
+  </div>
+  <div class="panel-body">
+    <dl class="dl-horizontal">
+      <dt>Teams with the field</dt>
+      <dd>{{ remaining }}</dd>
+    </dl>
+    <p class="text-muted">
+      Counted from the index on the stored null <code>normalized_location</code>.
+      It reaches 0 once the purge task has finished.
+    </p>
+  </div>
+</div>
+
+<div class="panel panel-warning">
+  <div class="panel-heading">
+    <h3 class="panel-title">Purge</h3>
+  </div>
+  <div class="panel-body">
+    <p>
+      <code>Team</code> no longer defines <code>normalized_location</code>, and its data
+      was already cleared, but cleared teams still store an empty
+      <code>normalized_location: null</code> that NDB writes back on every save. This task
+      queries those teams in batches of {{ batch_size }}, removes the property, saves them,
+      and clears their cached queries through <code>TeamManipulator.clearCache</code>.
+      Safe to re-run; teams without the property are not written. Watch the task logs
+      for per-batch purged counts.
+    </p>
+    <form action="{{ url_for('admin.team_normalized_location_purge_post') }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <button type="submit" class="btn btn-danger"
+              onclick="return confirm('Remove the normalized_location property from every team?')">
+        Purge Team Location Field
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
