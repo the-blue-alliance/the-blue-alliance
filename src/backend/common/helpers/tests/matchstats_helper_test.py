@@ -57,9 +57,7 @@ def assert_coprs_values_equal(
     for component, oprs in coprs.items():
         assert oprs.keys() == expected_coprs[component].keys()
         for team_key, opr in oprs.items():
-            assert opr == pytest.approx(  # pyre-ignore[16]
-                expected_coprs[component][team_key]
-            )
+            assert opr == pytest.approx(expected_coprs[component][team_key])
 
 
 def test_compute_matchstats_no_matches() -> None:
@@ -212,7 +210,7 @@ def test_compute_coprs_constant_component_splits_evenly() -> None:
     coprs = MatchstatsHelper.calculate_coprs(matches, 2021)
 
     for team in ["1", "2", "3", "4", "5", "6"]:
-        assert coprs["totalPoints"][team] == pytest.approx(10)  # pyre-ignore[16]
+        assert coprs["totalPoints"][team] == pytest.approx(10)
 
 
 def test_compute_coprs_shrinks_low_sample_team_but_opr_does_not() -> None:
@@ -242,7 +240,7 @@ def test_compute_coprs_shrinks_low_sample_team_but_opr_does_not() -> None:
 
     assert team_mean < coprs["totalPoints"]["7"] < least_squares["7"]
     for team in teams:
-        assert oprs[team] == pytest.approx(least_squares[team])  # pyre-ignore[16]
+        assert oprs[team] == pytest.approx(least_squares[team])
 
 
 def test_compute_coprs_components_still_sum_to_total(test_data_importer) -> None:
@@ -255,9 +253,7 @@ def test_compute_coprs_components_still_sum_to_total(test_data_importer) -> None
     for team, total in coprs["totalPoints"].items():
         assert coprs["Total Points Less Fouls"][team] + coprs["foulPoints"][
             team
-        ] == pytest.approx(  # pyre-ignore[16]
-            total
-        )
+        ] == pytest.approx(total)
 
 
 def _tower_breakdown(teams: List[str], climber: str) -> Dict[str, Any]:
