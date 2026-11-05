@@ -317,6 +317,27 @@ def test_make_insight_team_data_for_unknown_district_is_empty(ndb_stub) -> None:
     assert InsightsDistrictsHelper.make_insight_team_data("ne") == {}
 
 
+def test_make_insight_team_data_skips_upcoming_season_without_rankings(
+    ndb_stub,
+) -> None:
+    setup_district_with_team(2026, "fim", "frc27")
+    put_district_event("2026miche", EventType.DISTRICT, "2026fim", ["frc27"])
+    # Shaped like FMSAPIDistrictListParser output: rankings unset until events play
+    District(
+        id="2027fim",
+        year=2027,
+        abbreviation="fim",
+        display_name="FIRST in Michigan",
+    ).put()
+    put_district_event("2027miche", EventType.DISTRICT, "2027fim", ["frc27"])
+
+    result = InsightsDistrictsHelper.make_insight_team_data("fim")
+
+    assert set(result.keys()) == {"frc27"}
+    assert result["frc27"]["district_seasons"] == 1
+    assert result["frc27"]["total_district_points"] == 100
+
+
 def test_make_team_deltas() -> None:
     yearly_teams = {2019: {"frc1", "frc2"}, 2020: {"frc2", "frc3"}}
 
