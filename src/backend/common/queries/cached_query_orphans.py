@@ -8,9 +8,9 @@ an entry from an older generation is never read or overwritten again.
 
 A key is only considered orphaned when it parses cleanly AND either:
   - its DATABASE_QUERY_VERSION is older than current, or
-  - its partial key matches at least one known query class's CACHE_KEY_FORMAT and
-    it is older than the buffer for every class it matches (CACHE_VERSION or dict
-    subversion more than one behind).
+  - its partial key matches at least one known query class's CACHE_KEY_FORMAT and,
+    for every class it matches, its CACHE_VERSION or dict subversion is older than
+    that class's current one.
 
 Anything unparseable or not valid UTF-8, or not attributable to a known class, is left alone.
 Cache key prefixes overlap (e.g. "event_{event_key}" vs "event_awards_{event_key}"),
@@ -32,10 +32,9 @@ from backend.common.helpers.deferred import defer_safe
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.queries.database_query import CachedDatabaseQuery
 
-# How many generations behind current are kept, so a rolled-back deploy still hits cache
-VERSION_BUFFER = 1
-# DATABASE_QUERY_VERSION bumps are rare and not rolled back, so keep only current
-DB_VERSION_BUFFER = 0
+# Generations behind current that are kept. Zero: purges are run by hand after a
+# deploy is known good, and deleting an entry a rollback would want only costs a miss.
+VERSION_BUFFER = 0
 
 PAGE_SIZE = 1000
 PAGES_PER_TASK = 50
@@ -148,7 +147,7 @@ class OrphanClassifier:
         if parsed is None:
             return None
 
-        if parsed.db_version < self.current_db_version - DB_VERSION_BUFFER:
+        if parsed.db_version < self.current_db_version - VERSION_BUFFER:
             return REASON_DB_VERSION
 
         matches = self.matching_classes(parsed.partial)

@@ -37,7 +37,7 @@
 
 <div class="row">
     <h2>Orphaned Entries</h2>
-    <p>Scan every cached query result and find entries no current query will read again: a database query version older than current, or a query cache version or dict subversion more than one behind current. Unparseable keys and keys that don't match a known query are kept. Results are written to the task logs.</p>
+    <p>Scan every cached query result and find entries no current query will read again: a database query version, query cache version, or dict subversion older than current. Unparseable keys and keys that don't match a known query are kept. Results are written to the task logs.</p>
     <form method="post" action="/admin/cache/purge_orphans" style="display:inline">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button type="submit" class="btn btn-default">

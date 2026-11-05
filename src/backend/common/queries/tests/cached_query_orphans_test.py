@@ -78,15 +78,6 @@ def test_real_cache_keys_kept(classifier: OrphanClassifier) -> None:
         assert classifier.orphan_reason(query.dict_cache_key(V3)) is None
 
 
-def test_one_generation_behind_kept(classifier: OrphanClassifier) -> None:
-    v = TeamQuery.CACHE_VERSION
-    assert classifier.orphan_reason(f"team_frc254:{v - 1}:{DB}") is None
-    assert (
-        classifier.orphan_reason(f"team_frc254:{v}:{DB}~dictv3.{_sub(TeamQuery) - 1}")
-        is None
-    )
-
-
 def test_newer_generation_kept(classifier: OrphanClassifier) -> None:
     assert (
         classifier.orphan_reason(f"team_frc254:{TeamQuery.CACHE_VERSION + 1}:{DB + 1}")
@@ -95,7 +86,6 @@ def test_newer_generation_kept(classifier: OrphanClassifier) -> None:
 
 
 def test_old_db_version_orphaned(classifier: OrphanClassifier) -> None:
-    # No buffer for DATABASE_QUERY_VERSION: the prior version is orphaned too
     assert (
         classifier.orphan_reason(f"team_frc254:{TeamQuery.CACHE_VERSION}:{DB - 1}")
         == REASON_DB_VERSION
@@ -108,12 +98,12 @@ def test_old_db_version_orphaned(classifier: OrphanClassifier) -> None:
 
 
 def test_old_cache_version_orphaned(classifier: OrphanClassifier) -> None:
-    key = f"team_frc254:{TeamQuery.CACHE_VERSION - 2}:{DB}"
+    key = f"team_frc254:{TeamQuery.CACHE_VERSION - 1}:{DB}"
     assert classifier.orphan_reason(key) == REASON_CACHE_VERSION
 
 
 def test_old_dict_subversion_orphaned(classifier: OrphanClassifier) -> None:
-    key = f"team_frc254:{TeamQuery.CACHE_VERSION}:{DB}~dictv3.{_sub(TeamQuery) - 2}"
+    key = f"team_frc254:{TeamQuery.CACHE_VERSION}:{DB}~dictv3.{_sub(TeamQuery) - 1}"
     assert classifier.orphan_reason(key) == REASON_DICT_SUBVERSION
 
 
@@ -137,7 +127,7 @@ def test_overlapping_prefix_uses_own_version(classifier: OrphanClassifier) -> No
 def test_ambiguous_key_orphaned_only_when_stale_for_all(
     classifier: OrphanClassifier,
 ) -> None:
-    stale = min(EventQuery.CACHE_VERSION, EventAwardsQuery.CACHE_VERSION) - 2
+    stale = min(EventQuery.CACHE_VERSION, EventAwardsQuery.CACHE_VERSION) - 1
     key = f"event_awards_2024casj:{stale}:{DB}"
     assert classifier.orphan_reason(key) == REASON_CACHE_VERSION
 
@@ -167,8 +157,8 @@ def _keys() -> tuple[List[str], List[str]]:
     orphaned = [
         f"team_frc254:{v}:{DB - 2}",
         f"team_frc604:{v}:{DB - 1}",
-        f"team_frc254:{v - 2}:{DB}",
-        f"team_frc254:{v}:{DB}~dictv3.{_sub(TeamQuery) - 2}",
+        f"team_frc254:{v - 1}:{DB}",
+        f"team_frc254:{v}:{DB}~dictv3.{_sub(TeamQuery) - 1}",
         f"removed_query_x:0:{DB - 3}",
     ]
     return live, orphaned
