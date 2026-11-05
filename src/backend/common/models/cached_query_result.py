@@ -47,6 +47,21 @@ class CachedQueryResult(ndb.Model):
                 span.set_label("uncompressed_bytes", str(len(res_bytes)))
             return res_bytes
 
+    def stored_size_bytes(self) -> int:
+        """
+        Returns the compressed size of result + result_dict as written to Datastore.
+        Reuses the base values NDB cached during a put attempt, so calling this after
+        a failed put does not re-pickle or re-compress.
+        """
+        size = 0
+        for prop in (CachedQueryResult.result, CachedQueryResult.result_dict):
+            for base in prop._get_base_value_unwrapped_as_list(self):
+                if isinstance(base, ndb.model._CompressedValue):
+                    size += len(base.z_val)
+                elif isinstance(base, (bytes, bytearray)):
+                    size += len(base)
+        return size
+
     @staticmethod
     def cache_key_prefix_from_format(cache_key_format: str) -> str:
         cache_key_splits = cache_key_format.split("_")

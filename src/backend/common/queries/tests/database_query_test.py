@@ -1,12 +1,14 @@
 import hashlib
 import json
 import logging
+import os
 import pickle
 from typing import Any, Generator, Iterable, List, Optional, TypedDict
 from unittest.mock import MagicMock, patch
 
 import orjson
 import pytest
+from google.appengine.api import datastore_errors
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -133,6 +135,37 @@ class CachedDummyModelPointQueryNoDictCache(
     def _query_async(self, model_key: str) -> Generator[Any, Any, Optional[DummyModel]]:
         model = yield DummyModel.get_by_id_async(model_key)
         return model
+
+
+class BlobDict(TypedDict):
+    blob: str
+
+
+class BlobConverter(ConverterBase):
+    SUBVERSIONS = {
+        ApiMajorVersion.API_V3: 0,
+    }
+
+    @classmethod
+    def _convert_list(
+        cls, model_list: List[str], version: ApiMajorVersion
+    ) -> List[BlobDict]:
+        return [BlobDict(blob=blob) for blob in model_list]
+
+
+# Random hex compresses ~2x, so this is ~1.5MB stored: over the 1,048,487-byte limit.
+OVERSIZED_BLOB_HEX_BYTES = 1_500_000
+
+
+class CachedOversizedQuery(CachedDatabaseQuery[List[str], List[BlobDict]]):
+    CACHE_KEY_FORMAT = "test_oversized_query_{seed}"
+    DICT_CONVERTER = BlobConverter
+    CACHE_WRITES_ENABLED = True
+
+    @ndb.tasklet
+    def _query_async(self, seed: int) -> Generator[Any, Any, List[str]]:
+        yield ndb.sleep(0)
+        return [os.urandom(OVERSIZED_BLOB_HEX_BYTES).hex()]
 
 
 class CachedDummyModelWithRequiredPropQuery(
@@ -350,6 +383,101 @@ def test_cached_dict_query_put_exception_logs_cache_key(caplog) -> None:
             result = query.fetch_dict(ApiMajorVersion.API_V3)
     assert len(result) == 3
     assert query.dict_cache_key(ApiMajorVersion.API_V3) in caplog.text
+
+
+def _assert_logged_too_large(caplog, cache_key: str) -> None:
+    warnings = [r for r in caplog.records if r.levelno == logging.WARNING]
+    assert any(
+        "too large to cache" in r.getMessage() and cache_key in r.getMessage()
+        for r in warnings
+    )
+    assert not [r for r in caplog.records if r.levelno >= logging.ERROR]
+
+
+def test_cached_query_oversized_result_served_uncached_with_warning(caplog) -> None:
+    query = CachedOversizedQuery(seed=1)
+    with caplog.at_level(logging.WARNING):
+        result = query.fetch()
+    assert len(result[0]) == 2 * OVERSIZED_BLOB_HEX_BYTES
+    assert CachedQueryResult.get_by_id(query.cache_key) is None
+    _assert_logged_too_large(caplog, query.cache_key)
+    message = next(
+        r.getMessage() for r in caplog.records if "too large to cache" in r.getMessage()
+    )
+    assert "query=CachedOversizedQuery" in message
+    size = int(message.split("size_bytes=")[1])
+    assert size > 1_048_487
+
+
+def test_cached_dict_query_oversized_result_served_uncached_with_warning(
+    caplog,
+) -> None:
+    query = CachedOversizedQuery(seed=2)
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    with caplog.at_level(logging.WARNING):
+        result = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(none_throws(result)[0]["blob"]) == 2 * OVERSIZED_BLOB_HEX_BYTES
+    assert CachedQueryResult.get_by_id(cache_key) is None
+    _assert_logged_too_large(caplog, cache_key)
+
+
+def test_cached_json_query_oversized_result_served_uncached_with_warning(
+    caplog,
+) -> None:
+    query = CachedOversizedQuery(seed=3)
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    with caplog.at_level(logging.WARNING):
+        json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+    blob = json.loads(none_throws(json_bytes))[0]["blob"]
+    assert len(blob) == 2 * OVERSIZED_BLOB_HEX_BYTES
+    assert CachedQueryResult.get_by_id(cache_key) is None
+    _assert_logged_too_large(caplog, cache_key)
+
+
+def test_cached_query_prod_length_limit_error_logs_warning(caplog) -> None:
+    ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 3)])
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    prod_error = datastore_errors.BadRequestError(
+        'The value of property "result" is longer than 1048487 bytes.'
+    )
+    with caplog.at_level(logging.WARNING):
+        with patch.object(CachedQueryResult, "put_async", side_effect=prod_error):
+            result = query.fetch()
+    assert len(result) == 3
+    _assert_logged_too_large(caplog, query.cache_key)
+
+
+def test_cached_dict_query_prod_length_limit_error_logs_warning(caplog) -> None:
+    ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 3)])
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    prod_error = datastore_errors.BadRequestError(
+        'The value of property "result_dict" is longer than 1048487 bytes.'
+    )
+    with caplog.at_level(logging.WARNING):
+        with patch.object(CachedQueryResult, "put_async", side_effect=prod_error):
+            result = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(none_throws(result)) == 3
+    _assert_logged_too_large(caplog, query.dict_cache_key(ApiMajorVersion.API_V3))
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        Exception("boom"),
+        datastore_errors.BadRequestError("some other bad request"),
+    ],
+)
+def test_cached_query_other_put_failure_logs_error(caplog, error: Exception) -> None:
+    ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 3)])
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    with caplog.at_level(logging.WARNING):
+        with patch.object(CachedQueryResult, "put_async", side_effect=error):
+            result = query.fetch()
+    assert len(result) == 3
+    assert "CachedQueryResult.put_async() failed" in caplog.text
+    errors = [r for r in caplog.records if r.levelno == logging.ERROR]
+    assert len(errors) == 1 and errors[0].exc_info is not None
+    assert "too large to cache" not in caplog.text
 
 
 def test_cached_query_corrupt_cache_treated_as_miss(caplog, monkeypatch) -> None:
