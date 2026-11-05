@@ -862,3 +862,46 @@ class TestOembedParser(unittest.TestCase):
         self.assertEqual(result["media_type_enum"], MediaType.INSTAGRAM_IMAGE)
         self.assertEqual(result["foreign_key"], "BUnZiriBYre")
         self.assertEqual(json.loads(result["details_json"]), oembed_data)
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://www.instagram.com/reel/C4bhT7FsmAW/?igsh=x",
+        "https://www.instagram.com/reel/C4bhT7FsmAW",
+        "https://www.instagram.com/reels/C4bhT7FsmAW/",
+        "https://www.instagram.com/tv/C4bhT7FsmAW/",
+        "https://www.instagram.com/p/C4bhT7FsmAW/?utm_source=ig_web_copy_link",
+        "https://www.instagram.com/team254/p/C4bhT7FsmAW/",
+        "https://www.instagram.com/team254/reel/C4bhT7FsmAW/?igsh=x",
+        "instagram.com/reel/C4bhT7FsmAW/",
+    ],
+)
+def test_instagram_post_urls_parse_as_image(url: str) -> None:
+    result = MediaParser.partial_media_dict_from_url(url).get_result()
+    assert result is not None
+    assert result["media_type_enum"] == MediaType.INSTAGRAM_IMAGE
+    assert result["is_social"] is False
+    # Shortcodes are case sensitive
+    assert result["foreign_key"] == "C4bhT7FsmAW"
+    assert result["site_name"] == TYPE_NAMES[MediaType.INSTAGRAM_IMAGE]
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://www.instagram.com/frc254",
+        "https://www.instagram.com/frc254/",
+        "https://www.instagram.com/FRC254/?igsh=abc123&utm_source=qr",
+        "https://instagram.com/frc254?hl=en",
+        "https://www.instagram.com/frc254/reels/",
+        "https://www.instagram.com/frc254/tagged/",
+    ],
+)
+def test_instagram_profile_urls_parse_first_segment(url: str) -> None:
+    result = MediaParser.partial_media_dict_from_url(url).get_result()
+    assert result is not None
+    assert result["media_type_enum"] == MediaType.INSTAGRAM_PROFILE
+    assert result["is_social"] is True
+    assert result["foreign_key"] == "frc254"
+    assert result["profile_url"] == "https://www.instagram.com/frc254"
