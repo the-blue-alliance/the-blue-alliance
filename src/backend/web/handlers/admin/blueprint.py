@@ -121,10 +121,6 @@ from backend.web.handlers.admin.team_media_mod import (
     team_media_mod_edit_post,
     team_media_mod_list,
 )
-from backend.web.handlers.admin.team_normalized_location import (
-    team_normalized_location_clear_post,
-    team_normalized_location_dashboard,
-)
 from backend.web.handlers.admin.users import (
     user_detail,
     user_edit,
@@ -501,16 +497,6 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/mobile_clients/dedupe",
     view_func=mobile_clients_dedupe_post,
-    methods=["POST"],
-)
-admin_routes.add_url_rule(
-    "/team_normalized_location",
-    view_func=team_normalized_location_dashboard,
-    methods=["GET"],
-)
-admin_routes.add_url_rule(
-    "/team_normalized_location/clear",
-    view_func=team_normalized_location_clear_post,
     methods=["POST"],
 )
 admin_routes.add_url_rule(

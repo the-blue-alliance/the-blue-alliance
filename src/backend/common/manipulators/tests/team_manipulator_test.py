@@ -1,10 +1,8 @@
 import unittest
 
 import pytest
-from google.appengine.api import datastore
 
 from backend.common.manipulators.team_manipulator import TeamManipulator
-from backend.common.models.location import Location
 from backend.common.models.team import Team
 
 
@@ -87,21 +85,3 @@ class TestTeamManipulator(unittest.TestCase):
         team = Team.get_by_id("frc%s" % (number - 1))
         self.assertEqual(team.key_name, "frc%s" % (number - 1))
         self.assertEqual(team.team_number, number - 1)
-
-    def test_createOrUpdate_clears_normalized_location(self):
-        self.old_team.normalized_location = Location(
-            country="USA", place_details={"name": "Bobcat Robotics"}
-        )
-        self.old_team.put()
-
-        TeamManipulator.createOrUpdate(self.new_team)
-
-        team = Team.get_by_id("frc177", use_cache=False, use_memcache=False)
-        self.assertIsNone(team.normalized_location)
-        self.assertMergedTeam(team)
-        # Only a null placeholder is stored; no subproperties like place_details
-        stored = datastore.Get(team.key.to_old_key())
-        self.assertEqual(
-            {k: v for k, v in stored.items() if k.startswith("normalized_location")},
-            {"normalized_location": None},
-        )

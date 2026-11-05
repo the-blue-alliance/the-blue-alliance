@@ -8,4 +8,8 @@ class Locatable(Protocol):
     state_prov: str | None
     country: str | None
     postalcode: str | None
-    nl: Location | None
+
+    @property
+    def nl(self) -> Location | None:
+        """Geocoded location. Events may have one; teams never do."""
+        ...

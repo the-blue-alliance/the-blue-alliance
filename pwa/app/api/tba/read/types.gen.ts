@@ -3440,7 +3440,7 @@ export type Team = {
    */
   country: string | null;
   /**
-   * Will be NULL, for future development.
+   * Always null. Teams are not geocoded, so there is no address or location name; use city, state_prov, country, and postal_code.
    */
   address: string | null;
   /**
@@ -3464,7 +3464,7 @@ export type Team = {
    */
   lng: number | null;
   /**
-   * Will be NULL, for future development.
+   * Always null. Teams are not geocoded, so there is no address or location name; use city, state_prov, country, and postal_code.
    */
   location_name: string | null;
   /**
