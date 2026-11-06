@@ -91,3 +91,19 @@ test.describe('/events', () => {
     ).toBeVisible();
   });
 });
+
+test('/events/pnw redirects to the current-season district page', async ({
+  page,
+}) => {
+  await page.goto('/events/pnw');
+
+  await expect(page).toHaveURL('/district/pnw');
+});
+
+test('/events/pnw/2024 redirects to that year of the district page', async ({
+  page,
+}) => {
+  await page.goto('/events/pnw/2024');
+
+  await expect(page).toHaveURL('/district/pnw/2024');
+});

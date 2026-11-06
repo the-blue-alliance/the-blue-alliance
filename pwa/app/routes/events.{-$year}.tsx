@@ -51,7 +51,8 @@ export const Route = createFileRoute('/events/{-$year}')({
     if (params.year !== undefined && Number.isNaN(Number(params.year))) {
       throw redirect({
         to: '/district/$districtAbbreviation/{-$year}',
-        params: { districtAbbreviation: params.year },
+        // Omitting year would inherit the current (non-numeric) year param.
+        params: { districtAbbreviation: params.year, year: undefined },
       });
     }
   },
