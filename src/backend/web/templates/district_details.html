@@ -50,7 +50,7 @@
         </div>
 	</div>
 
-        <div class="tba-sidebar">
+        <div class="tba-sidebar" id="district-week-nav">
           <ul class="nav tba-sidenav">
           {% for label, events in week_events.items() %}
             <li><a class="smooth-scroll" href="#{{label|slugify}}">{{label}}</a></li>
@@ -356,4 +356,13 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script>
+  // The week links only scroll the Events tab, so hide them on other tabs.
+  $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+    $('#district-week-nav').toggle($(e.target).attr('href') === '#events');
+  });
+</script>
 {% endblock %}
