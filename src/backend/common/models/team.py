@@ -5,7 +5,6 @@ from google.appengine.ext import ndb
 
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.keys import TeamKey
-from backend.common.models.location import Location
 
 
 class Team(CachedModel):
@@ -27,9 +26,6 @@ class Team(CachedModel):
     postalcode = (
         ndb.StringProperty()
     )  # From ElasticSearch only. String because it can be like "95126-1215"
-    # Normalized address from the Google Maps API, constructed using the above
-    # WARNING: normalized_location is no longer being set. This property is deprecated
-    normalized_location = ndb.StructuredProperty(Location)
 
     website = ndb.TextProperty(indexed=False)
     first_tpid = (
@@ -49,7 +45,6 @@ class Team(CachedModel):
         "state_prov",
         "country",
         "postalcode",
-        "normalized_location",  # Overwrite whole thing as one
         "name",
         "nickname",
         "school_name",
@@ -57,11 +52,6 @@ class Team(CachedModel):
         "website",
         "rookie_year",
         "motto",
-    }
-
-    # Deprecated and never written, so a Team write without one clears it
-    _allow_none_attrs: Set[str] = {
-        "normalized_location",
     }
 
     def __init__(self, *args, **kw):
@@ -119,11 +109,9 @@ class Team(CachedModel):
         return self._city_state_country
 
     @property
-    def nl(self):
-        return None  # 2017-03-25 Normalized location too inconsistent. Completely disable for now. -fangeugene
-        # if self.normalized_location and self.normalized_location.country not in {'United States', 'Canada'}:
-        #     return False
-        # return self.normalized_location
+    def nl(self) -> None:
+        # Teams have no normalized location; location comes from city/state_prov/country
+        return None
 
     @property
     def details_url(self):

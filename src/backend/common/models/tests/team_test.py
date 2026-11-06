@@ -53,3 +53,9 @@ def test_details_url() -> None:
         team_number=254,
     )
     assert team.details_url == "/team/254"
+
+
+def test_no_normalized_location() -> None:
+    team = Team(id="frc254", team_number=254, city="San Jose")
+    assert not hasattr(Team, "normalized_location")
+    assert team.nl is None

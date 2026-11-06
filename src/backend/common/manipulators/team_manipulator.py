@@ -17,33 +17,6 @@ class TeamManipulator(ManipulatorBase[Team]):
     ) -> List[get_affected_queries.TCacheKeyAndQuery]:
         return get_affected_queries.team_updated(affected_refs)
 
-    """
-    @classmethod
-    def postDeleteHook(cls, teams):
-        # To run after the team has been deleted.
-        for team in teams:
-            SearchHelper.remove_team_location_index(team)
-
-    @classmethod
-    def postUpdateHook(cls, teams, updated_attr_list, is_new_list):
-        # To run after models have been updated
-        for (team, updated_attrs) in zip(teams, updated_attr_list):
-            if 'city' in updated_attrs or 'state_prov' in updated_attrs or \
-                    'country' in updated_attrs or 'postalcode' in updated_attrs:
-                try:
-                    LocationHelper.update_team_location(team)
-                except Exception, e:
-                    logging.error("update_team_location for {} errored!".format(team.key.id()))
-                    logging.exception(e)
-
-                try:
-                    SearchHelper.update_team_location_index(team)
-                except Exception, e:
-                    logging.error("update_team_location_index for {} errored!".format(team.key.id()))
-                    logging.exception(e)
-        cls.createOrUpdate(teams, run_post_update_hook=False)
-    """
-
     @classmethod
     def updateMerge(
         cls,
