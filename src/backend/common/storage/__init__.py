@@ -24,7 +24,7 @@ def write(
     client.write(file_name, content, content_type, metadata)
 
 
-def read(file_name: str, bucket: str | None = None) -> Optional[str | bytes]:
+def read(file_name: str, bucket: str | None = None) -> Optional[bytes]:
     client = _client_for_env(bucket)
     return client.read(file_name)
 
