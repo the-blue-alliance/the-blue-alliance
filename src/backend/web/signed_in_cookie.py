@@ -36,5 +36,11 @@ def sync_signed_in_cookie(response: Response) -> Response:
             samesite="Lax",
         )
     elif not signed_in and has_marker:
-        response.delete_cookie(SIGNED_IN_COOKIE, path="/")
+        response.delete_cookie(
+            SIGNED_IN_COOKIE,
+            path="/",
+            secure=current_app.config["SESSION_COOKIE_SECURE"],
+            httponly=False,
+            samesite="Lax",
+        )
     return response
