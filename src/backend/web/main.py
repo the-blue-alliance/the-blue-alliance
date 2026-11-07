@@ -10,6 +10,7 @@ from backend.common.url_converters import install_url_converters
 from backend.web.context_processors import (
     pwa_url_context_processor,
     render_time_context_processor,
+    static_asset_url_context_processor,
 )
 from backend.web.handlers.account import blueprint as account_blueprint
 from backend.web.handlers.admin.blueprint import admin_routes as admin_blueprint
@@ -63,6 +64,7 @@ from backend.web.handlers.static import (
     swag,
     thanks,
 )
+from backend.web.handlers.static_assets import static_asset
 from backend.web.handlers.suggestions.suggestion_review_redirects import (
     blueprint as suggestion_review_redirects_blueprint,
 )
@@ -98,6 +100,10 @@ csrf.init_app(app)
 app.url_map.strict_slashes = False
 
 app.add_url_rule("/", view_func=index)
+app.add_url_rule(
+    "/py3_static/<content_hash>/<any(css, javascript):kind>/<path:filename>",
+    view_func=static_asset,
+)
 app.add_url_rule("/about", view_func=about)
 app.add_url_rule("/donate", view_func=donate)
 
@@ -239,6 +245,7 @@ app.register_error_handler(500, handle_500)
 app.context_processor(_user_context_processor)
 app.context_processor(render_time_context_processor)
 app.context_processor(pwa_url_context_processor)
+app.context_processor(static_asset_url_context_processor)
 
 register_template_filters(app)
 maybe_install_local_routes(app, csrf)
