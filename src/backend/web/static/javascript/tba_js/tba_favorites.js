@@ -73,6 +73,8 @@ function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken, isCsrfRetry)
       });
     }
   } else if (!isSignedIn()) {
+    // Drop the previous session's cache so the next sign-in refetches
+    $.removeCookie(favoriteTeamsCookieName, {path: '/'});
     updatePageFavoriteTeams({}, skipDelay);
   } else {
     if (storedFavoriteTeams == null) {

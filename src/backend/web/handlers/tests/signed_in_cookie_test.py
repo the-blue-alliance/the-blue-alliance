@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+from typing import Iterator
 from unittest.mock import patch
 
 from firebase_admin import auth
@@ -14,6 +16,12 @@ def _signed_in_set_cookie(response) -> str:
     ]
     assert len(cookies) <= 1
     return cookies[0] if cookies else ""
+
+
+@contextmanager
+def _valid_session_cookie() -> Iterator[None]:
+    with patch.object(auth, "verify_session_cookie", return_value={"sub": "uid"}):
+        yield
 
 
 def test_anonymous_request_untouched(web_client: FlaskClient) -> None:
@@ -37,7 +45,9 @@ def test_login_sets_marker(web_client: FlaskClient) -> None:
 def test_existing_session_gets_marker(web_client: FlaskClient) -> None:
     with web_client.session_transaction() as session:
         session["session"] = "firebase-cookie"
-    resp = web_client.get("/_/account/info")
+    with _valid_session_cookie():
+        resp = web_client.get("/_/account/info")
+    assert resp.json["logged_in"] is True
     assert _signed_in_set_cookie(resp).startswith(f"{SIGNED_IN_COOKIE}=1;")
 
 
@@ -45,7 +55,9 @@ def test_synced_marker_untouched(web_client: FlaskClient) -> None:
     with web_client.session_transaction() as session:
         session["session"] = "firebase-cookie"
     web_client.set_cookie(SIGNED_IN_COOKIE, "1")
-    resp = web_client.get("/_/account/info")
+    with _valid_session_cookie():
+        resp = web_client.get("/_/account/info")
+    assert resp.json["logged_in"] is True
     assert _signed_in_set_cookie(resp) == ""
 
 
@@ -55,6 +67,7 @@ def test_marker_without_session_cleared(web_client: FlaskClient) -> None:
     cookie = _signed_in_set_cookie(resp)
     assert cookie.startswith(f"{SIGNED_IN_COOKIE}=;")
     assert "Max-Age=0" in cookie
+    assert "SameSite=Lax" in cookie
 
 
 def test_logout_clears_marker(web_client: FlaskClient) -> None:
@@ -94,7 +107,8 @@ def test_public_page_never_syncs_marker(web_client: FlaskClient) -> None:
     # Shared caches could replay the Set-Cookie to every visitor
     with web_client.session_transaction() as session:
         session["session"] = "firebase-cookie"
-    resp = web_client.get("/contact")
+    with _valid_session_cookie():
+        resp = web_client.get("/contact")
     assert "public" in resp.headers["Cache-Control"]
     assert _signed_in_set_cookie(resp) == ""
 
@@ -111,3 +125,22 @@ def test_not_modified_never_syncs_marker(web_client: FlaskClient) -> None:
     resp = web_client.get("/contact", headers={"If-None-Match": etag})
     assert resp.status_code == 304
     assert _signed_in_set_cookie(resp) == ""
+
+
+def test_stale_session_on_public_page_leaves_marker(web_client: FlaskClient) -> None:
+    # Public pages never sync the hint; the next private 401 clears it
+    with web_client.session_transaction() as session:
+        session["session"] = "firebase-cookie"
+    web_client.set_cookie(SIGNED_IN_COOKIE, "1")
+    with patch.object(
+        auth,
+        "verify_session_cookie",
+        side_effect=auth.ExpiredSessionCookieError("expired", None),
+    ):
+        resp = web_client.get("/contact")
+        assert "public" in resp.headers["Cache-Control"]
+        assert _signed_in_set_cookie(resp) == ""
+
+        resp = web_client.get("/_/account/favorites/1")
+    assert resp.status_code == 401
+    assert _signed_in_set_cookie(resp).startswith(f"{SIGNED_IN_COOKIE}=;")
