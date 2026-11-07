@@ -49,7 +49,8 @@ class InsightsDistrictsHelper:
         total_district_points = defaultdict(int)
         total_pre_dcmp_district_points = defaultdict(int)
         for district in history:
-            if district.year == 2021:
+            # 2021 had no district points; upcoming seasons have no rankings yet
+            if district.year == 2021 or not district.rankings:
                 continue
 
             for ranking in district.rankings:
