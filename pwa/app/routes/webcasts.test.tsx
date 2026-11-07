@@ -5,7 +5,9 @@ import { runHead, runLoader } from '~/routes/-testUtils';
 import { Route } from '~/routes/webcasts';
 
 describe('webcasts route', () => {
-  test('loads the current season', async () => {
+  test('loads the current season and the date to render with', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-07T12:00:00Z'));
     const queryClient = {
       ensureQueryData: vi.fn<() => Promise<unknown>>().mockResolvedValue([]),
     } as unknown as QueryClient;
@@ -14,7 +16,11 @@ describe('webcasts route', () => {
       runLoader(Route, {
         context: { queryClient, currentSeason: 2026 },
       }),
-    ).resolves.toEqual({ year: 2026 });
+    ).resolves.toEqual({
+      year: 2026,
+      today: '2026-11-07',
+    });
+    vi.useRealTimers();
   });
 
   test('titles the page Live Webcasts', () => {
