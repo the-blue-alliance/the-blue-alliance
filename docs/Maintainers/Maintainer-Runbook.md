@@ -30,6 +30,6 @@ Every service deploys in place to version `1` (`ops/deploy/deploy_module.sh`), s
 
 1. **Preferred:** revert the bad commit on `main` and let the push workflow redeploy.
 2. **Urgent, with maintainer credentials:** check out the last good commit and run `./ops/deploy/deploy_module.sh src/<service>.yaml` for each affected backend service.
-   The PWA can't be redeployed from `pwa/pwa.yaml` alone. Its deploy needs the production build and `NEXUS_API_KEY` added to a copy of `pwa/pwa.yaml`, so re-run the **Deploy PWA** job of the last good commit's push workflow instead.
+   The PWA can't be redeployed from `pwa/pwa.yaml` alone. Its deploy needs the production build and `NEXUS_API_KEY` added to a copy of `pwa/pwa.yaml`, so re-run the **Deploy PWA** job of the last good commit's push workflow instead. GitHub only allows re-runs within 30 days, so for an older commit, revert on `main` (option 1).
 
 Python dependencies come from `uv.lock`, so a rebuild of an old commit gets the same packages. The App Engine base runtime image may be newer than it was at the original deploy.
