@@ -9,7 +9,6 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import ListSubheader from "@mui/material/ListSubheader";
 import Switch from "@mui/material/Switch";
 import { red, common } from "@mui/material/colors";
@@ -33,12 +32,11 @@ const LayoutDrawer = (props) => {
       const icon = showCheck ? <CheckIcon /> : null;
 
       layouts.push(
-        <ListItem key={i.toString()} disablePadding>
+        <ListItem key={i.toString()} disablePadding secondaryAction={icon}>
           <ListItemButton onClick={() => props.setLayout(layoutNum)}>
             <ListItemIcon>{getLayoutSvgIcon(layoutNum)}</ListItemIcon>
             <ListItemText primary={NAME_FOR_LAYOUT[layoutNum]} />
           </ListItemButton>
-          <ListItemSecondaryAction>{icon}</ListItemSecondaryAction>
         </ListItem>
       );
     }
@@ -77,8 +75,10 @@ const LayoutDrawer = (props) => {
       open={props.layoutDrawerVisible}
       onClose={() => props.setLayoutDrawerVisibility(false)}
       anchor="right"
-      PaperProps={{
-        style: { width: 300, marginTop: theme.layout.appBarHeight },
+      slotProps={{
+        paper: {
+          style: { width: 300, marginTop: theme.layout.appBarHeight },
+        },
       }}
     >
       <div>
@@ -93,13 +93,11 @@ const LayoutDrawer = (props) => {
           <ListSubheader style={{ color: primaryColor }}>
             Enable/disable sidebars
           </ListSubheader>
-          <ListItem>
+          <ListItem secondaryAction={hashtagToggle}>
             <ListItemText primary="Social Sidebar" />
-            <ListItemSecondaryAction>{hashtagToggle}</ListItemSecondaryAction>
           </ListItem>
-          <ListItem>
+          <ListItem secondaryAction={chatToggle}>
             <ListItemText primary="Chat Sidebar" />
-            <ListItemSecondaryAction>{chatToggle}</ListItemSecondaryAction>
           </ListItem>
         </List>
         <Divider />
