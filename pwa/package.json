@@ -38,7 +38,7 @@
     "@tanstack/react-table": "9.3.1",
     "@tanstack/react-virtual": "3.14.25",
     "cache-control-parser": "2.2.0",
-    "calendar-link": "2.11.6",
+    "calendar-link": "2.11.7",
     "class-variance-authority": "0.7.1",
     "cmdk": "1.1.1",
     "cn": "0.5.1",
