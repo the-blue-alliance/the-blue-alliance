@@ -1,5 +1,6 @@
 import re
 
+from google.appengine.api import datastore
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
@@ -95,6 +96,17 @@ def test_dashboard_renders_messaging_id_type_counts(
         secret="secret",
         display_name="Webhook",
     ).put()
+    # Written before `messaging_id_type` existed, so it has no value for a
+    # `== TOKEN` filter to match and must still be counted as a token
+    legacy = datastore.Entity("MobileClient", name="ios-legacy-token")
+    legacy.update(
+        {
+            "user_id": "user1",
+            "messaging_id": "ios-legacy-token",
+            "client_type": int(ClientType.OS_IOS),
+        }
+    )
+    datastore.Put(legacy)
 
     resp = web_client.get("/admin/mobile_clients")
     assert resp.status_code == 200
@@ -103,7 +115,7 @@ def test_dashboard_renders_messaging_id_type_counts(
     rows = _messaging_id_type_rows(resp.data.decode())
     assert rows == {
         # client type: (token count, fid count)
-        "iOS": ("1", "1"),
+        "iOS": ("2", "1"),
         "Android-FCM": ("0", "1"),
     }
     assert "Webhook" not in rows

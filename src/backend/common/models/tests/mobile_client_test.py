@@ -1,4 +1,6 @@
 import pytest
+from google.appengine.api import datastore
+from google.appengine.ext import ndb
 
 from backend.common.consts import client_type
 from backend.common.consts.client_type import ClientType
@@ -57,15 +59,25 @@ def test_messaging_id_type_persists(ndb_stub) -> None:
 
 
 def test_messaging_id_type_absent_reads_back_as_token(ndb_stub) -> None:
-    """Rows written before `messaging_id_type` existed must read back as TOKEN"""
-    MobileClient(
-        id="legacy_client",
-        user_id="user_id",
-        messaging_id="legacy_messaging_id",
-        client_type=ClientType.OS_ANDROID_FCM,
-    ).put()
+    """Rows written before `messaging_id_type` existed must read back as TOKEN.
 
-    mobile_client = MobileClient.get_by_id("legacy_client")
+    Written through the low-level API: `MobileClient.put()` stores the default,
+    and a second ndb model for the kind would replace ndb's kind-to-class map.
+    """
+    legacy = datastore.Entity("MobileClient", name="legacy_client")
+    legacy.update(
+        {
+            "user_id": "user_id",
+            "messaging_id": "legacy_messaging_id",
+            "client_type": int(ClientType.OS_ANDROID_FCM),
+        }
+    )
+    datastore.Put(legacy)
+    assert "messaging_id_type" not in datastore.Get(legacy.key())
+
+    mobile_client = ndb.Key(MobileClient, "legacy_client").get(
+        use_cache=False, use_memcache=False
+    )
     assert mobile_client is not None
     assert mobile_client.messaging_id_type == MessagingIdType.TOKEN
     assert mobile_client.is_fid is False
