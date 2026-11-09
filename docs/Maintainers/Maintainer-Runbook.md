@@ -7,7 +7,12 @@ Bumping the Python version requires that Google App Engine supports the new Pyth
    - `pyproject.toml` (`requires-python`)
    - GAE service `.yaml` files (`runtime:` directive)
    - GitHub Actions workflow files (`python-version:`)
+   - The dev container base image (`ops/dev/docker/Dockerfile`)
+   - The dev server runtime (`runtime_version` in `ops/dev/scripts/dev_appserver.sh`)
 3. Verify the changes: `./ops/check_python_version.sh`
+4. Re-lock dependencies with `uv lock`, then regenerate `src/requirements.txt` with `make freeze`
+5. Update the Python version in [[Repo Setup|Repo-Setup]] and `copilot-setup-steps.yml`
+6. Run `docker compose up --build` and load a few pages. `dev_appserver.py` and its local datastore stub come from the Google Cloud SDK and run on the new Python too, so a new version can break local dev even when all unit tests pass. The Dockerfile patches the SDK where that has happened before.
 
 ## Running One-Off Data Migrations/Cleanups
 

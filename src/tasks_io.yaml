@@ -1,5 +1,5 @@
 service: py3-tasks-io
-runtime: python313
+runtime: python314
 entrypoint: gunicorn -t 0 -b :$PORT --workers 1 --threads 8 backend.tasks_io.main:app
 app_engine_apis: true
 

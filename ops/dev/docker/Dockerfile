@@ -1,4 +1,4 @@
-FROM python:3.13
+FROM python:3.14
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -22,6 +22,15 @@ ENV HTTPLIB2_CA_CERTS="/usr/lib/google-cloud-sdk/platform/google_appengine/lib/h
 
 # Install legacy-cgi (removed in Python 3.13, but required by dev_appserver.py)
 RUN pip install --no-cache-dir legacy-cgi
+
+# Python 3.14's sqlite3 rejects named placeholders (":1") bound to a list, and
+# dev_appserver's local datastore stub still builds its WHERE clauses that way,
+# so filtered queries fail, including the ancestor query behind every
+# transactional get. Numbered placeholders ("?1") bind to the same list
+# positions. The grep fails the build if an SDK update moves this line.
+RUN stub=/usr/lib/google-cloud-sdk/platform/google_appengine/google/appengine/datastore/datastore_sqlite_stub.py \
+    && sed -i "s/'%s %s :%d' % (prop, sql_op, value_index)/'%s %s ?%d' % (prop, sql_op, value_index)/" "$stub" \
+    && grep -q "'%s %s ?%d' % (prop, sql_op, value_index)" "$stub"
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/

@@ -4,7 +4,7 @@ description: |
   This file configures the environment so that Python, Node.js, and PWA tests can run successfully.
   
   Prerequisites:
-  - Python 3.13 or higher
+  - Python 3.14 or higher
   - Node.js 22 or higher (the PWA's own node/pnpm come from pwa/mise.toml via mise)
   - Git
 
