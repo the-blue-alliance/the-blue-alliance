@@ -251,7 +251,10 @@ export type RegistrationRequest = {
 
 export type RegisteredMobileClient = {
   name: string;
-  operating_system: OperatingSystem;
+  /**
+   * The platform the device registered as. Usually an `OperatingSystem` value, but older registrations can report others.
+   */
+  operating_system: string;
   mobile_id: string;
   device_uuid: string;
   /**

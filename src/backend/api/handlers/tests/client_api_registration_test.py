@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -394,6 +395,37 @@ def test_register_fid_deletes_replaced_token(
     fid_client = MobileClient.query(MobileClient.messaging_id == FID).get()
     assert fid_client is not None
     assert remaining == {unrelated_token, non_fcm, other_account, fid_client.key}
+
+
+def test_register_fid_keeps_token_when_write_fails(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    """The replaced token is only deleted once the FID is stored, so a failed
+    write leaves the device registered."""
+    account_key = none_throws(mock_clientapi_auth.account_key)
+    token = f"{FID}:APA91bOld"
+    MobileClient(
+        parent=account_key,
+        user_id=str(account_key.id()),
+        messaging_id=token,
+        client_type=ClientType.OS_IOS,
+        device_uuid="asdf",
+        display_name="iPhone",
+    ).put()
+
+    req = RegistrationRequest(
+        operating_system="ios",
+        mobile_id=FID,
+        device_uuid="asdf",
+        name="iPhone",
+        mobile_id_type="fid",
+    )
+    with patch.object(MobileClient, "put", side_effect=RuntimeError("write failed")):
+        resp = api_client.post("/clientapi/tbaClient/v9/register", data=json.dumps(req))
+    assert resp.status_code == 500
+
+    clients = MobileClient.query(ancestor=account_key).fetch()
+    assert [client.messaging_id for client in clients] == [token]
 
 
 def test_register_token_keeps_other_tokens(

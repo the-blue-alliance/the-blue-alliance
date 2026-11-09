@@ -549,7 +549,8 @@
             "type": "string"
           },
           "operating_system": {
-            "$ref": "#/components/schemas/OperatingSystem"
+            "type": "string",
+            "description": "The platform the device registered as. Usually an `OperatingSystem` value, but older registrations can report others."
           },
           "mobile_id": {
             "type": "string"

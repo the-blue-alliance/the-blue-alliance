@@ -92,19 +92,6 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
             code=400, message=f"Unknown mobile_id_type: {mobile_id_type}"
         )
 
-    if messaging_id_type == MessagingIdType.FID:
-        # An app that switches to FID registration keeps its old FCM token valid,
-        # so the device would get every notification twice. FCM tokens have the
-        # form `<fid>:<suffix>`, which identifies this install's token rows.
-        legacy_token_keys = [
-            client.key
-            for client in MobileClient.query(ancestor=account_key).fetch()
-            if client.client_type in FCM_CLIENTS
-            and client.messaging_id.startswith(f"{gcm_id}:")
-        ]
-        if legacy_token_keys:
-            ndb.delete_multi(legacy_token_keys)
-
     # Dedup on the FCM token (`messaging_id`): FCM guarantees it is unique per
     # (app install, device), so the same token re-registering is the same client.
     # `device_uuid` is unreliable as a dedup key on iOS (regenerated from
@@ -120,18 +107,35 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
         existing.display_name = name
         existing.messaging_id_type = messaging_id_type
         existing.put()
-        return BaseResponse(code=304, message="Client already exists")
+        response = BaseResponse(code=304, message="Client already exists")
+    else:
+        MobileClient(
+            parent=account_key,
+            user_id=user_id,
+            messaging_id=gcm_id,
+            messaging_id_type=messaging_id_type,
+            client_type=os,
+            device_uuid=uuid,
+            display_name=name,
+        ).put()
+        response = BaseResponse(code=200, message="Registration successful")
 
-    MobileClient(
-        parent=account_key,
-        user_id=user_id,
-        messaging_id=gcm_id,
-        messaging_id_type=messaging_id_type,
-        client_type=os,
-        device_uuid=uuid,
-        display_name=name,
-    ).put()
-    return BaseResponse(code=200, message="Registration successful")
+    if messaging_id_type == MessagingIdType.FID:
+        # An app that switches to FID registration keeps its old FCM token valid,
+        # so the device would get every notification twice. FCM tokens have the
+        # form `<fid>:<suffix>`, which identifies this install's token rows. This
+        # runs after the FID is stored, so a failed write can't leave the device
+        # with neither registration.
+        legacy_token_keys = [
+            client.key
+            for client in MobileClient.query(ancestor=account_key).fetch()
+            if client.client_type in FCM_CLIENTS
+            and client.messaging_id.startswith(f"{gcm_id}:")
+        ]
+        if legacy_token_keys:
+            ndb.delete_multi(legacy_token_keys)
+
+    return response
 
 
 def _registered_mobile_client(client: MobileClient) -> RegisteredMobileClient:
