@@ -39,7 +39,13 @@ from backend.api.handlers.decorators import client_api_method
 from backend.common.consts.auth_type import WRITE_TYPE_NAMES
 from backend.common.consts.client_type import (
     ENUMS as CLIENT_TYPE_MAP,
+    FCM_CLIENTS,
     NAMES as CLIENT_TYPE_NAMES,
+)
+from backend.common.consts.messaging_id_type import (
+    ENUMS as MESSAGING_ID_TYPE_MAP,
+    MessagingIdType,
+    NAMES as MESSAGING_ID_TYPE_NAMES,
 )
 from backend.common.consts.notification_type import (
     TYPE_NAMES as NOTIFICATION_TYPE_NAMES,
@@ -77,6 +83,28 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
     name = req.get("name", "Unnamed Device")
     uuid = req["device_uuid"]
 
+    mobile_id_type = req.get(
+        "mobile_id_type", MESSAGING_ID_TYPE_NAMES[MessagingIdType.TOKEN]
+    )
+    # The request body isn't validated against `RegistrationRequest`, and a list or
+    # object would raise on the lookup instead of being rejected
+    messaging_id_type = (
+        MESSAGING_ID_TYPE_MAP.get(mobile_id_type)
+        if isinstance(mobile_id_type, str)
+        else None
+    )
+    if messaging_id_type is None:
+        return BaseResponse(
+            code=400, message=f"Unknown mobile_id_type: {mobile_id_type}"
+        )
+    # Only FCM clients are sent to, so a FID on any other platform would never be
+    # delivered, while still replacing the install's FCM token below
+    if messaging_id_type == MessagingIdType.FID and os not in FCM_CLIENTS:
+        return BaseResponse(
+            code=400,
+            message=f"mobile_id_type fid isn't supported for {req['operating_system']}",
+        )
+
     # Dedup on the FCM token (`messaging_id`): FCM guarantees it is unique per
     # (app install, device), so the same token re-registering is the same client.
     # `device_uuid` is unreliable as a dedup key on iOS (regenerated from
@@ -90,18 +118,50 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
         existing.client_type = os
         existing.device_uuid = uuid
         existing.display_name = name
+        existing.messaging_id_type = messaging_id_type
         existing.put()
-        return BaseResponse(code=304, message="Client already exists")
+        response = BaseResponse(code=304, message="Client already exists")
+    else:
+        MobileClient(
+            parent=account_key,
+            user_id=user_id,
+            messaging_id=gcm_id,
+            messaging_id_type=messaging_id_type,
+            client_type=os,
+            device_uuid=uuid,
+            display_name=name,
+        ).put()
+        response = BaseResponse(code=200, message="Registration successful")
 
-    MobileClient(
-        parent=account_key,
-        user_id=user_id,
-        messaging_id=gcm_id,
-        client_type=os,
-        device_uuid=uuid,
-        display_name=name,
-    ).put()
-    return BaseResponse(code=200, message="Registration successful")
+    if messaging_id_type == MessagingIdType.FID:
+        # An app that switches to FID registration keeps its old FCM token valid,
+        # so the device would get every notification twice. FCM tokens have the
+        # form `<fid>:<suffix>`, which identifies this install's token rows. This
+        # runs after the FID is stored, so a failed write can't leave the device
+        # with neither registration.
+        legacy_token_keys = [
+            client.key
+            for client in MobileClient.query(ancestor=account_key).fetch()
+            if client.client_type in FCM_CLIENTS
+            and client.messaging_id.startswith(f"{gcm_id}:")
+        ]
+        if legacy_token_keys:
+            ndb.delete_multi(legacy_token_keys)
+
+    return response
+
+
+def _registered_mobile_client(client: MobileClient) -> RegisteredMobileClient:
+    registered = RegisteredMobileClient(
+        name=client.display_name,
+        operating_system=CLIENT_TYPE_NAMES[client.client_type].lower(),
+        mobile_id=client.messaging_id,
+        device_uuid=client.device_uuid,
+    )
+    # A webhook's `mobile_id` is a URL, so there's no messaging ID type to report
+    if not client.is_webhook:
+        registered["mobile_id_type"] = MESSAGING_ID_TYPE_NAMES[client.messaging_id_type]
+    return registered
 
 
 @client_api_method(VoidRequest, ListDevicesResponse)
@@ -119,15 +179,7 @@ def list_mobile_clients(req: VoidRequest) -> ListDevicesResponse:
     return ListDevicesResponse(
         code=200,
         message="",
-        devices=[
-            RegisteredMobileClient(
-                name=d.display_name,
-                operating_system=CLIENT_TYPE_NAMES[d.client_type].lower(),
-                mobile_id=d.messaging_id,
-                device_uuid=d.device_uuid,
-            )
-            for d in mobile_clients
-        ],
+        devices=[_registered_mobile_client(d) for d in mobile_clients],
     )
 
 

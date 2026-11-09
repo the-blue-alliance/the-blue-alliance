@@ -225,6 +225,52 @@ export type AddApiReadKeyResponse = {
   read_key?: ApiReadKeyMessage;
 };
 
+/**
+ * The client platform. With `webhook`, `mobile_id` is the URL to send to.
+ */
+export type OperatingSystem = 'ios' | 'android-fcm' | 'web' | 'webhook';
+
+/**
+ * The kind of ID in `mobile_id` (token=legacy FCM registration token, fid=Firebase Installation ID)
+ */
+export type MobileIdType = 'token' | 'fid';
+
+export type RegistrationRequest = {
+  operating_system: OperatingSystem;
+  /**
+   * The FCM registration token, Firebase Installation ID, or webhook URL to send to
+   */
+  mobile_id: string;
+  mobile_id_type?: MobileIdType;
+  device_uuid: string;
+  /**
+   * Display name for the device. Defaults to "Unnamed Device".
+   */
+  name?: string;
+};
+
+export type RegisteredMobileClient = {
+  name: string;
+  /**
+   * The platform the device registered as. Usually an `OperatingSystem` value, but older registrations can report others.
+   */
+  operating_system: string;
+  mobile_id: string;
+  device_uuid: string;
+  /**
+   * Omitted for webhooks, whose `mobile_id` is a URL
+   */
+  mobile_id_type?: MobileIdType;
+};
+
+export type ListDevicesResponse = BaseResponse & {
+  devices: Array<RegisteredMobileClient>;
+};
+
+export type PingRequest = {
+  mobile_id: string;
+};
+
 export type ListFavoritesData = {
   body?: never;
   path?: never;
@@ -456,3 +502,71 @@ export type DeleteApiReadKeyResponses = {
 
 export type DeleteApiReadKeyResponse =
   DeleteApiReadKeyResponses[keyof DeleteApiReadKeyResponses];
+
+export type RegisterMobileClientData = {
+  body: RegistrationRequest;
+  path?: never;
+  query?: never;
+  url: '/register';
+};
+
+export type RegisterMobileClientResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type RegisterMobileClientResponse =
+  RegisterMobileClientResponses[keyof RegisterMobileClientResponses];
+
+export type UnregisterMobileClientData = {
+  body: RegistrationRequest;
+  path?: never;
+  query?: never;
+  url: '/unregister';
+};
+
+export type UnregisterMobileClientResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type UnregisterMobileClientResponse =
+  UnregisterMobileClientResponses[keyof UnregisterMobileClientResponses];
+
+export type ListMobileClientsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/list_clients';
+};
+
+export type ListMobileClientsResponses = {
+  /**
+   * Successful response
+   */
+  200: ListDevicesResponse;
+};
+
+export type ListMobileClientsResponse =
+  ListMobileClientsResponses[keyof ListMobileClientsResponses];
+
+export type PingMobileClientData = {
+  body: PingRequest;
+  path?: never;
+  query?: never;
+  url: '/ping';
+};
+
+export type PingMobileClientResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type PingMobileClientResponse =
+  PingMobileClientResponses[keyof PingMobileClientResponses];

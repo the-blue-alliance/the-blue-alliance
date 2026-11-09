@@ -489,6 +489,112 @@
             "$ref": "#/components/schemas/ApiReadKeyMessage"
           }
         }
+      },
+      "OperatingSystem": {
+        "type": "string",
+        "enum": [
+          "ios",
+          "android-fcm",
+          "web",
+          "webhook"
+        ],
+        "description": "The client platform. With `webhook`, `mobile_id` is the URL to send to."
+      },
+      "MobileIdType": {
+        "type": "string",
+        "enum": [
+          "token",
+          "fid"
+        ],
+        "default": "token",
+        "description": "The kind of ID in `mobile_id` (token=legacy FCM registration token, fid=Firebase Installation ID)"
+      },
+      "RegistrationRequest": {
+        "type": "object",
+        "required": [
+          "operating_system",
+          "mobile_id",
+          "device_uuid"
+        ],
+        "properties": {
+          "operating_system": {
+            "$ref": "#/components/schemas/OperatingSystem"
+          },
+          "mobile_id": {
+            "type": "string",
+            "description": "The FCM registration token, Firebase Installation ID, or webhook URL to send to"
+          },
+          "mobile_id_type": {
+            "$ref": "#/components/schemas/MobileIdType"
+          },
+          "device_uuid": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the device. Defaults to \"Unnamed Device\"."
+          }
+        }
+      },
+      "RegisteredMobileClient": {
+        "type": "object",
+        "required": [
+          "name",
+          "operating_system",
+          "mobile_id",
+          "device_uuid"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "operating_system": {
+            "type": "string",
+            "description": "The platform the device registered as. Usually an `OperatingSystem` value, but older registrations can report others."
+          },
+          "mobile_id": {
+            "type": "string"
+          },
+          "device_uuid": {
+            "type": "string"
+          },
+          "mobile_id_type": {
+            "$ref": "#/components/schemas/MobileIdType",
+            "description": "Omitted for webhooks, whose `mobile_id` is a URL"
+          }
+        }
+      },
+      "ListDevicesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          },
+          {
+            "type": "object",
+            "required": [
+              "devices"
+            ],
+            "properties": {
+              "devices": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RegisteredMobileClient"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PingRequest": {
+        "type": "object",
+        "required": [
+          "mobile_id"
+        ],
+        "properties": {
+          "mobile_id": {
+            "type": "string"
+          }
+        }
       }
     },
     "securitySchemes": {
@@ -913,6 +1019,131 @@
                     "description": "The id of the read key to delete"
                   }
                 }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "summary": "Register a device for notifications",
+        "description": "Registers the device for the signed-in account, or updates it if this account already has `mobile_id`. `code` is 200 for a new device, 304 for an existing one, 400 for an unknown `mobile_id_type` or a `fid` from a platform other than `ios` or `android-fcm`, and 401 when not signed in. Registering a FID also deletes this account's FCM registration token for the same installation (`<fid>:...`), so the device isn't notified twice.",
+        "operationId": "registerMobileClient",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/unregister": {
+      "post": {
+        "summary": "Unregister a device",
+        "description": "Deletes the signed-in account's device with `mobile_id`. `code` is 200 when deleted, 404 if the account has no such device, and 401 when not signed in.",
+        "operationId": "unregisterMobileClient",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/list_clients": {
+      "post": {
+        "summary": "List registered devices",
+        "operationId": "listMobileClients",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListDevicesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ping": {
+      "post": {
+        "summary": "Send a test notification to a device",
+        "description": "`code` is 200 when sent, 404 if the account has no such device, 500 if the send failed, and 401 when not signed in.",
+        "operationId": "pingMobileClient",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PingRequest"
               }
             }
           }
