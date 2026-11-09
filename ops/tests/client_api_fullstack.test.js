@@ -65,6 +65,8 @@ describe("Mobile device registration", () => {
     mobile_id: "abc123",
     device_uuid: "test",
   };
+  // Registrations without a mobile_id_type are tokens
+  const listedDevice = { ...device, mobile_id_type: "token" };
 
   it("should register successfully", async () => {
     const regRes = await postToClientAPI("register", idToken, device);
@@ -81,7 +83,7 @@ describe("Mobile device registration", () => {
 
     const respBody = await listRes.json();
     expect(respBody.code).toEqual(200);
-    expect(respBody.devices).toContainEqual(device);
+    expect(respBody.devices).toContainEqual(listedDevice);
   });
 
   it("should unregister successfully", async () => {
@@ -99,7 +101,66 @@ describe("Mobile device registration", () => {
 
     const respBody = await listRes.json();
     expect(respBody.code).toEqual(200);
-    expect(respBody.devices).not.toContainEqual(device);
+    expect(respBody.devices).not.toContainEqual(listedDevice);
+  });
+});
+
+describe("FID registration", () => {
+  let idToken = null;
+  it("can fetch an auth token", async () => {
+    idToken = await getIdToken();
+  });
+
+  const fid = "fullstack_test_fid_000";
+  const tokenDevice = {
+    name: "Test iPhone",
+    operating_system: "ios",
+    mobile_id: fid + ":APA91bFullstackTestToken",
+    device_uuid: "test",
+  };
+  const fidDevice = {
+    ...tokenDevice,
+    mobile_id: fid,
+    mobile_id_type: "fid",
+  };
+
+  async function listedMobileIds() {
+    const listRes = await postToClientAPI("list_clients", idToken, {});
+    const respBody = await listRes.json();
+    expect(respBody.code).toEqual(200);
+    return respBody.devices.map((d) => d.mobile_id);
+  }
+
+  it("should register the device's legacy token", async () => {
+    const regRes = await postToClientAPI("register", idToken, tokenDevice);
+    expect([200, 304]).toContainEqual((await regRes.json()).code);
+    expect(await listedMobileIds()).toContain(tokenDevice.mobile_id);
+  });
+
+  it("should replace the token when the device registers its FID", async () => {
+    const regRes = await postToClientAPI("register", idToken, fidDevice);
+    expect([200, 304]).toContainEqual((await regRes.json()).code);
+
+    const listRes = await postToClientAPI("list_clients", idToken, {});
+    const respBody = await listRes.json();
+    expect(respBody.devices).toContainEqual(fidDevice);
+    expect(respBody.devices.map((d) => d.mobile_id)).not.toContain(
+      tokenDevice.mobile_id
+    );
+  });
+
+  it("should reject an unknown mobile_id_type", async () => {
+    const regRes = await postToClientAPI("register", idToken, {
+      ...fidDevice,
+      mobile_id_type: "installation_id",
+    });
+    expect((await regRes.json()).code).toEqual(400);
+  });
+
+  it("should unregister the FID", async () => {
+    const unregRes = await postToClientAPI("unregister", idToken, fidDevice);
+    expect((await unregRes.json()).code).toEqual(200);
+    expect(await listedMobileIds()).not.toContain(fid);
   });
 });
 

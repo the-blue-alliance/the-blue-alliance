@@ -7,7 +7,10 @@ import {
   deleteApiReadKey,
   listApiKeys,
   listFavorites,
+  listMobileClients,
   listSubscriptions,
+  pingMobileClient,
+  registerMobileClient,
   resolveVideoPlaylist,
   setModelPreferences,
   suggestEventMatchVideos,
@@ -15,6 +18,7 @@ import {
   suggestMatchVideo,
   suggestTeamMedia,
   suggestTeamSocialMedia,
+  unregisterMobileClient,
 } from '../sdk.gen';
 import type {
   AddApiReadKeyData,
@@ -25,8 +29,14 @@ import type {
   ListApiKeysResponse,
   ListFavoritesData,
   ListFavoritesResponse,
+  ListMobileClientsData,
+  ListMobileClientsResponse,
   ListSubscriptionsData,
   ListSubscriptionsResponse,
+  PingMobileClientData,
+  PingMobileClientResponse,
+  RegisterMobileClientData,
+  RegisterMobileClientResponse,
   ResolveVideoPlaylistData,
   ResolveVideoPlaylistResponse,
   SetModelPreferencesData,
@@ -41,6 +51,8 @@ import type {
   SuggestTeamMediaResponse,
   SuggestTeamSocialMediaData,
   SuggestTeamSocialMediaResponse,
+  UnregisterMobileClientData,
+  UnregisterMobileClientResponse,
 } from '../types.gen';
 
 /**
@@ -357,6 +369,120 @@ export const deleteApiReadKeyMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await deleteApiReadKey({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Register a device for notifications
+ *
+ * Registers the device for the signed-in account, or updates it if this account already has `mobile_id`. `code` is 200 for a new device, 304 for an existing one, 400 for an unknown `mobile_id_type`, and 401 when not signed in. Registering a FID also deletes this account's FCM registration token for the same installation (`<fid>:...`), so the device isn't notified twice.
+ */
+export const registerMobileClientMutation = (
+  options?: Partial<Options<RegisterMobileClientData>>,
+): UseMutationOptions<
+  RegisterMobileClientResponse,
+  DefaultError,
+  Options<RegisterMobileClientData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RegisterMobileClientResponse,
+    DefaultError,
+    Options<RegisterMobileClientData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await registerMobileClient({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Unregister a device
+ *
+ * Deletes the signed-in account's device with `mobile_id`. `code` is 200 when deleted, 404 if the account has no such device, and 401 when not signed in.
+ */
+export const unregisterMobileClientMutation = (
+  options?: Partial<Options<UnregisterMobileClientData>>,
+): UseMutationOptions<
+  UnregisterMobileClientResponse,
+  DefaultError,
+  Options<UnregisterMobileClientData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UnregisterMobileClientResponse,
+    DefaultError,
+    Options<UnregisterMobileClientData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await unregisterMobileClient({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * List registered devices
+ */
+export const listMobileClientsMutation = (
+  options?: Partial<Options<ListMobileClientsData>>,
+): UseMutationOptions<
+  ListMobileClientsResponse,
+  DefaultError,
+  Options<ListMobileClientsData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ListMobileClientsResponse,
+    DefaultError,
+    Options<ListMobileClientsData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await listMobileClients({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Send a test notification to a device
+ *
+ * `code` is 200 when sent, 404 if the account has no such device, 500 if the send failed, and 401 when not signed in.
+ */
+export const pingMobileClientMutation = (
+  options?: Partial<Options<PingMobileClientData>>,
+): UseMutationOptions<
+  PingMobileClientResponse,
+  DefaultError,
+  Options<PingMobileClientData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PingMobileClientResponse,
+    DefaultError,
+    Options<PingMobileClientData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await pingMobileClient({
         ...options,
         ...fnOptions,
         throwOnError: true,

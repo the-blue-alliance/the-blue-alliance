@@ -16,8 +16,14 @@ import type {
   ListApiKeysResponses,
   ListFavoritesData,
   ListFavoritesResponses,
+  ListMobileClientsData,
+  ListMobileClientsResponses,
   ListSubscriptionsData,
   ListSubscriptionsResponses,
+  PingMobileClientData,
+  PingMobileClientResponses,
+  RegisterMobileClientData,
+  RegisterMobileClientResponses,
   ResolveVideoPlaylistData,
   ResolveVideoPlaylistResponses,
   SetModelPreferencesData,
@@ -32,6 +38,8 @@ import type {
   SuggestTeamMediaResponses,
   SuggestTeamSocialMediaData,
   SuggestTeamSocialMediaResponses,
+  UnregisterMobileClientData,
+  UnregisterMobileClientResponses,
 } from './types.gen';
 
 export type Options<
@@ -271,6 +279,88 @@ export const deleteApiReadKey = <ThrowOnError extends boolean = false>(
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api_keys/read/delete',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Register a device for notifications
+ *
+ * Registers the device for the signed-in account, or updates it if this account already has `mobile_id`. `code` is 200 for a new device, 304 for an existing one, 400 for an unknown `mobile_id_type`, and 401 when not signed in. Registering a FID also deletes this account's FCM registration token for the same installation (`<fid>:...`), so the device isn't notified twice.
+ */
+export const registerMobileClient = <ThrowOnError extends boolean = false>(
+  options: Options<RegisterMobileClientData, ThrowOnError>,
+): RequestResult<RegisterMobileClientResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    RegisterMobileClientResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/register',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Unregister a device
+ *
+ * Deletes the signed-in account's device with `mobile_id`. `code` is 200 when deleted, 404 if the account has no such device, and 401 when not signed in.
+ */
+export const unregisterMobileClient = <ThrowOnError extends boolean = false>(
+  options: Options<UnregisterMobileClientData, ThrowOnError>,
+): RequestResult<UnregisterMobileClientResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    UnregisterMobileClientResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/unregister',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * List registered devices
+ */
+export const listMobileClients = <ThrowOnError extends boolean = false>(
+  options?: Options<ListMobileClientsData, ThrowOnError>,
+): RequestResult<ListMobileClientsResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).post<
+    ListMobileClientsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/list_clients',
+    ...options,
+  });
+
+/**
+ * Send a test notification to a device
+ *
+ * `code` is 200 when sent, 404 if the account has no such device, 500 if the send failed, and 401 when not signed in.
+ */
+export const pingMobileClient = <ThrowOnError extends boolean = false>(
+  options: Options<PingMobileClientData, ThrowOnError>,
+): RequestResult<PingMobileClientResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    PingMobileClientResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/ping',
     ...options,
     headers: {
       'Content-Type': 'application/json',

@@ -15,6 +15,8 @@ class BaseResponse(TypedDict):
 
 class _RegistrationRequestNotRequired(TypedDict, total=False):
     name: str
+    # A `messaging_id_type` name ("token" or "fid"); omitted means "token"
+    mobile_id_type: str
 
 
 class RegistrationRequest(_RegistrationRequestNotRequired):
@@ -23,7 +25,12 @@ class RegistrationRequest(_RegistrationRequestNotRequired):
     device_uuid: str
 
 
-class RegisteredMobileClient(TypedDict):
+class _RegisteredMobileClientNotRequired(TypedDict, total=False):
+    # Omitted for webhooks, whose `mobile_id` is a URL
+    mobile_id_type: str
+
+
+class RegisteredMobileClient(_RegisteredMobileClientNotRequired):
     name: str
     operating_system: str
     mobile_id: str
