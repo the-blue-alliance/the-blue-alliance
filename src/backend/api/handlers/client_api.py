@@ -97,6 +97,13 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
         return BaseResponse(
             code=400, message=f"Unknown mobile_id_type: {mobile_id_type}"
         )
+    # Only FCM clients are sent to, so a FID on any other platform would never be
+    # delivered, while still replacing the install's FCM token below
+    if messaging_id_type == MessagingIdType.FID and os not in FCM_CLIENTS:
+        return BaseResponse(
+            code=400,
+            message=f"mobile_id_type fid isn't supported for {req['operating_system']}",
+        )
 
     # Dedup on the FCM token (`messaging_id`): FCM guarantees it is unique per
     # (app install, device), so the same token re-registering is the same client.

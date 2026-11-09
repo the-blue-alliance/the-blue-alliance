@@ -343,6 +343,37 @@ def test_register_non_string_mobile_id_type(
     assert MobileClient.query().fetch() == []
 
 
+def test_register_fid_for_non_fcm_platform(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    """A FID on a platform that's never sent to must not replace the install's
+    FCM token."""
+    account_key = none_throws(mock_clientapi_auth.account_key)
+    token = f"{FID}:APA91bOld"
+    MobileClient(
+        parent=account_key,
+        user_id=str(account_key.id()),
+        messaging_id=token,
+        client_type=ClientType.OS_IOS,
+        device_uuid="asdf",
+        display_name="iPhone",
+    ).put()
+
+    req = RegistrationRequest(
+        operating_system="web",
+        mobile_id=FID,
+        device_uuid="asdf",
+        name="Browser",
+        mobile_id_type="fid",
+    )
+    resp = make_clientapi_request(api_client, "/register", req)
+    assert resp["code"] == 400
+    assert resp["message"] == "mobile_id_type fid isn't supported for web"
+
+    clients = MobileClient.query(ancestor=account_key).fetch()
+    assert [client.messaging_id for client in clients] == [token]
+
+
 def test_register_existing_fid(api_client: Client, mock_clientapi_auth: User) -> None:
     MobileClient(
         parent=mock_clientapi_auth.account_key,
