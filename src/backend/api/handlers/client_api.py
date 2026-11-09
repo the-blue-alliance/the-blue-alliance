@@ -68,6 +68,18 @@ from backend.common.suggestions.suggestion_creator import (
 )
 
 
+def _parse_messaging_id_type(req: RegistrationRequest) -> MessagingIdType | None:
+    """The request's `mobile_id_type`, defaulting to token, or None if it's invalid."""
+    mobile_id_type = req.get("mobile_id_type")
+    if mobile_id_type is None:
+        return MessagingIdType.TOKEN
+    # The request body isn't validated against `RegistrationRequest`, and a list or
+    # object would raise on the lookup instead of being rejected
+    if not isinstance(mobile_id_type, str):
+        return None
+    return MESSAGING_ID_TYPE_MAP.get(mobile_id_type)
+
+
 @client_api_method(RegistrationRequest, BaseResponse)
 def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
     current_user = ClientApiAuthHelper.get_current_user()
@@ -83,19 +95,10 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
     name = req.get("name", "Unnamed Device")
     uuid = req["device_uuid"]
 
-    mobile_id_type = req.get(
-        "mobile_id_type", MESSAGING_ID_TYPE_NAMES[MessagingIdType.TOKEN]
-    )
-    # The request body isn't validated against `RegistrationRequest`, and a list or
-    # object would raise on the lookup instead of being rejected
-    messaging_id_type = (
-        MESSAGING_ID_TYPE_MAP.get(mobile_id_type)
-        if isinstance(mobile_id_type, str)
-        else None
-    )
+    messaging_id_type = _parse_messaging_id_type(req)
     if messaging_id_type is None:
         return BaseResponse(
-            code=400, message=f"Unknown mobile_id_type: {mobile_id_type}"
+            code=400, message=f"Unknown mobile_id_type: {req.get('mobile_id_type')}"
         )
     # Only FCM clients are sent to, so a FID on any other platform would never be
     # delivered, while still replacing the install's FCM token below
@@ -134,19 +137,16 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
         response = BaseResponse(code=200, message="Registration successful")
 
     if messaging_id_type == MessagingIdType.FID:
-        # An app that switches to FID registration keeps its old FCM token valid,
-        # so the device would get every notification twice. FCM tokens have the
-        # form `<fid>:<suffix>`, which identifies this install's token rows. This
-        # runs after the FID is stored, so a failed write can't leave the device
-        # with neither registration.
-        legacy_token_keys = [
-            client.key
-            for client in MobileClient.query(ancestor=account_key).fetch()
-            if client.client_type in FCM_CLIENTS
-            and client.messaging_id.startswith(f"{gcm_id}:")
-        ]
-        if legacy_token_keys:
-            ndb.delete_multi(legacy_token_keys)
+        # An app that switches to FID registration keeps its old FCM token valid, so
+        # the device would get every notification twice. This runs after the FID is
+        # stored, so a failed write can't leave the device with neither registration.
+        ndb.delete_multi(
+            [
+                client.key
+                for client in MobileClient.query(ancestor=account_key).fetch()
+                if not client.is_fid and client.is_for_installation(gcm_id)
+            ]
+        )
 
     return response
 
@@ -191,17 +191,31 @@ def unregister_mobile_client(req: RegistrationRequest) -> BaseResponse:
 
     account_key = none_throws(current_user.account_key)
 
+    messaging_id_type = _parse_messaging_id_type(req)
+    if messaging_id_type is None:
+        return BaseResponse(
+            code=400, message=f"Unknown mobile_id_type: {req.get('mobile_id_type')}"
+        )
+
     gcm_id = req["mobile_id"]
-    query = MobileClient.query(
-        MobileClient.messaging_id == gcm_id,
-        ancestor=account_key,
-    ).fetch(keys_only=True)
-    if len(query) == 0:
+    if messaging_id_type == MessagingIdType.FID:
+        # Includes the install's old FCM token, which is all TBA has for a device that
+        # signs out before its FID registration reaches it
+        to_delete = [
+            client.key
+            for client in MobileClient.query(ancestor=account_key).fetch()
+            if client.messaging_id == gcm_id or client.is_for_installation(gcm_id)
+        ]
+    else:
+        to_delete = MobileClient.query(
+            MobileClient.messaging_id == gcm_id,
+            ancestor=account_key,
+        ).fetch(keys_only=True)
+    if not to_delete:
         # Record doesn't exist, so we can't remove it
         return BaseResponse(code=404, message="User doesn't exist. Can't remove it")
-    else:
-        ndb.delete_multi(query)
-        return BaseResponse(code=200, message="User deleted")
+    ndb.delete_multi(to_delete)
+    return BaseResponse(code=200, message="User deleted")
 
 
 @client_api_method(PingRequest, BaseResponse)
