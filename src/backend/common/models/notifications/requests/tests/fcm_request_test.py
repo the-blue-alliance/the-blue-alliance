@@ -52,7 +52,7 @@ def test_init_fids(fcm_app):
 def test_init_delivery_too_many_tokens(fcm_app):
     with pytest.raises(
         ValueError,
-        match=f"FCMRequest must contain less than {MAXIMUM_TOKENS} tokens/fids",
+        match=f"FCMRequest must not contain more than {MAXIMUM_TOKENS} tokens/fids",
     ):
         FCMRequest(
             fcm_app,
@@ -64,7 +64,7 @@ def test_init_delivery_too_many_tokens(fcm_app):
 def test_init_delivery_too_many_fids(fcm_app):
     with pytest.raises(
         ValueError,
-        match=f"FCMRequest must contain less than {MAXIMUM_TOKENS} tokens/fids",
+        match=f"FCMRequest must not contain more than {MAXIMUM_TOKENS} tokens/fids",
     ):
         FCMRequest(
             fcm_app,
@@ -77,7 +77,7 @@ def test_init_delivery_too_many_combined(fcm_app):
     """The SDK caps `len(tokens) + len(fids)` at 500, not each individually"""
     with pytest.raises(
         ValueError,
-        match=f"FCMRequest must contain less than {MAXIMUM_TOKENS} tokens/fids",
+        match=f"FCMRequest must not contain more than {MAXIMUM_TOKENS} tokens/fids",
     ):
         FCMRequest(
             fcm_app,
@@ -85,6 +85,13 @@ def test_init_delivery_too_many_combined(fcm_app):
             tokens=["a" for i in range(MAXIMUM_TOKENS)],
             fids=["b"],
         )
+
+
+def test_for_clients_empty(fcm_app):
+    with pytest.raises(
+        ValueError, match="FCMRequest must contain at least one token or fid"
+    ):
+        FCMRequest.for_clients(fcm_app, MockNotification(), [])
 
 
 def test_init_delivery_at_combined_limit(fcm_app):

@@ -2,8 +2,8 @@ import warnings
 
 from backend.common.models.notifications.requests.request import Request
 
+# firebase-admin's MulticastMessage caps tokens and fids at 500 combined
 MAXIMUM_TOKENS = 500
-# https://github.com/firebase/firebase-admin-python/blob/9e5b8e383e066c319a483285df903150d5029a34/firebase_admin/_messaging_encoder.py#L78
 
 
 class FCMRequest(Request):
@@ -35,14 +35,14 @@ class FCMRequest(Request):
 
         if len(self.tokens) + len(self.fids) > MAXIMUM_TOKENS:
             raise ValueError(
-                f"FCMRequest must contain less than {MAXIMUM_TOKENS} tokens/fids"
+                f"FCMRequest must not contain more than {MAXIMUM_TOKENS} tokens/fids"
             )
 
     @classmethod
     def for_clients(cls, app, notification, clients):
         """Build a request targeting clients that all share one messaging id kind."""
         messaging_ids = [client.messaging_id for client in clients]
-        if clients[0].is_fid:
+        if clients and clients[0].is_fid:
             return cls(app, notification, fids=messaging_ids)
         return cls(app, notification, tokens=messaging_ids)
 
