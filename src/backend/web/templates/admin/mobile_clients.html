@@ -48,11 +48,11 @@
       </tr>
     </thead>
     <tbody>
-      {% for type_name, token_count, fid_count in messaging_id_type_counts %}
+      {% for type_name, counts in messaging_id_type_counts.items() %}
       <tr>
         <td>{{ type_name }}</td>
-        <td>{{ token_count }}</td>
-        <td>{{ fid_count }}</td>
+        <td>{{ counts.token }}</td>
+        <td>{{ counts.fid }}</td>
       </tr>
       {% endfor %}
     </tbody>

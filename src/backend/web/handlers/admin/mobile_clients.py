@@ -28,19 +28,16 @@ def mobile_clients_dashboard() -> str:
     # The token count is derived rather than queried because rows written before
     # `messaging_id_type` existed store no value for it, so they never match an
     # equality filter on the TOKEN default even though they read back as TOKEN.
-    messaging_id_type_counts = []
+    messaging_id_type_counts: dict[str, dict[str, int]] = {}
     for client_type in sorted(FCM_CLIENTS):
         fid_count = MobileClient.query(
             MobileClient.client_type == client_type,
             MobileClient.messaging_id_type == MessagingIdType.FID,
         ).count()
-        messaging_id_type_counts.append(
-            (
-                CLIENT_TYPE_NAMES[client_type],
-                counts_by_type[client_type] - fid_count,
-                fid_count,
-            )
-        )
+        messaging_id_type_counts[CLIENT_TYPE_NAMES[client_type]] = {
+            "token": counts_by_type[client_type] - fid_count,
+            "fid": fid_count,
+        }
 
     template_values = {
         "type_counts": [
