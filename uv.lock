@@ -1687,15 +1687,15 @@ wheels = [
 
 [[package]]
 name = "pytest-testmon"
-version = "2.2.0"
+version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "coverage" },
     { name = "pytest" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4d/1d/3e4230cc67cd6205bbe03c3527500c0ccaf7f0c78b436537eac71590ee4a/pytest_testmon-2.2.0.tar.gz", hash = "sha256:01f488e955ed0e0049777bee598bf1f647dd524e06f544c31a24e68f8d775a51", size = 23108, upload-time = "2025-12-01T07:30:24.76Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/10/c5/12ad97c49648f24768449822c5b032f87215060efa8c0cb214a1464d46d0/pytest_testmon-2.3.0.tar.gz", hash = "sha256:7bcd50afce305393edc6b530ee77a61c91949efafe0c54f799f12fe3da999623", size = 24373, upload-time = "2026-11-02T13:07:10.334Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/61/55/ebb3c2f59fb089f08d00f764830d35780fc4e4c41dffcadafa3264682b65/pytest_testmon-2.2.0-py3-none-any.whl", hash = "sha256:2604ca44a54d61a2e830d9ce828b41a837075e4ebc1f81b148add8e90d34815b", size = 25199, upload-time = "2025-12-01T07:30:23.623Z" },
+    { url = "https://files.pythonhosted.org/packages/1b/f1/0312fca79f6695ce17426e8d30df0c4c2f6efa297094ea6fd81fe7a257b4/pytest_testmon-2.3.0-py3-none-any.whl", hash = "sha256:fd541506efa483e5a217e6cc5c07c73b382619c218d1ed4ffa80584c34defd77", size = 26512, upload-time = "2026-11-02T13:07:09.07Z" },
 ]
 
 [[package]]
