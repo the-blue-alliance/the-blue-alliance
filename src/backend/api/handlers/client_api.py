@@ -68,6 +68,18 @@ from backend.common.suggestions.suggestion_creator import (
 )
 
 
+def _parse_messaging_id_type(req: RegistrationRequest) -> MessagingIdType | None:
+    """The request's `mobile_id_type`, defaulting to token, or None if it's invalid."""
+    mobile_id_type = req.get("mobile_id_type")
+    if mobile_id_type is None:
+        return MessagingIdType.TOKEN
+    # The request body isn't validated against `RegistrationRequest`, and a list or
+    # object would raise on the lookup instead of being rejected
+    if not isinstance(mobile_id_type, str):
+        return None
+    return MESSAGING_ID_TYPE_MAP.get(mobile_id_type)
+
+
 @client_api_method(RegistrationRequest, BaseResponse)
 def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
     current_user = ClientApiAuthHelper.get_current_user()
@@ -125,40 +137,18 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
         response = BaseResponse(code=200, message="Registration successful")
 
     if messaging_id_type == MessagingIdType.FID:
-        # After the FID is stored, so a failed write can't leave the device with
-        # neither registration
+        # An app that switches to FID registration keeps its old FCM token valid, so
+        # the device would get every notification twice. This runs after the FID is
+        # stored, so a failed write can't leave the device with neither registration.
         ndb.delete_multi(
             [
                 client.key
                 for client in MobileClient.query(ancestor=account_key).fetch()
-                if _is_token_for_fid(client, gcm_id)
+                if not client.is_fid and client.is_for_installation(gcm_id)
             ]
         )
 
     return response
-
-
-def _parse_messaging_id_type(req: RegistrationRequest) -> MessagingIdType | None:
-    """The request's `mobile_id_type`, defaulting to token, or None if it's invalid."""
-    mobile_id_type = req.get(
-        "mobile_id_type", MESSAGING_ID_TYPE_NAMES[MessagingIdType.TOKEN]
-    )
-    # The request body isn't validated against `RegistrationRequest`, and a list or
-    # object would raise on the lookup instead of being rejected
-    if not isinstance(mobile_id_type, str):
-        return None
-    return MESSAGING_ID_TYPE_MAP.get(mobile_id_type)
-
-
-def _is_token_for_fid(client: MobileClient, fid: str) -> bool:
-    """
-    Whether `client` is the FCM token row for the install `fid` belongs to. An app that
-    switches to FID registration keeps its old token valid, so the device would get
-    every notification twice. FCM tokens have the form `<fid>:<suffix>`.
-    """
-    return client.client_type in FCM_CLIENTS and client.messaging_id.startswith(
-        f"{fid}:"
-    )
 
 
 def _registered_mobile_client(client: MobileClient) -> RegisteredMobileClient:
@@ -208,17 +198,19 @@ def unregister_mobile_client(req: RegistrationRequest) -> BaseResponse:
         )
 
     gcm_id = req["mobile_id"]
-    to_delete = [
-        client.key
-        for client in MobileClient.query(ancestor=account_key).fetch()
-        if client.messaging_id == gcm_id
-        # A device that signs out before its FID registration reaches TBA is still
-        # registered by its old FCM token
-        or (
-            messaging_id_type == MessagingIdType.FID
-            and _is_token_for_fid(client, gcm_id)
-        )
-    ]
+    if messaging_id_type == MessagingIdType.FID:
+        # Includes the install's old FCM token, which is all TBA has for a device that
+        # signs out before its FID registration reaches it
+        to_delete = [
+            client.key
+            for client in MobileClient.query(ancestor=account_key).fetch()
+            if client.messaging_id == gcm_id or client.is_for_installation(gcm_id)
+        ]
+    else:
+        to_delete = MobileClient.query(
+            MobileClient.messaging_id == gcm_id,
+            ancestor=account_key,
+        ).fetch(keys_only=True)
     if not to_delete:
         # Record doesn't exist, so we can't remove it
         return BaseResponse(code=404, message="User doesn't exist. Can't remove it")

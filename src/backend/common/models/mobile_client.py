@@ -49,6 +49,16 @@ class MobileClient(ndb.Model):
     def is_fid(self) -> bool:
         return self.messaging_id_type == MessagingIdType.FID
 
+    def is_for_installation(self, fid: str) -> bool:
+        """
+        Whether this FCM client registers the app install `fid` identifies: it's the FID
+        itself, or an FCM registration token, which is minted for an install and has the
+        form `<fid>:<suffix>`.
+        """
+        if not fid or self.client_type not in client_type.FCM_CLIENTS:
+            return False
+        return self.messaging_id == fid or self.messaging_id.startswith(f"{fid}:")
+
     @property
     def short_id(self):
         return (
