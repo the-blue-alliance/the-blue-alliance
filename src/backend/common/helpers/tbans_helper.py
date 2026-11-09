@@ -912,9 +912,13 @@ class TBANSHelper:
             UnregisteredError,
         )
 
+        def severity(exception: Exception) -> int:
+            if isinstance(exception, (ThirdPartyAuthError, InvalidArgumentError)):
+                return logging.CRITICAL
+            return logging.ERROR
+
         failures: Counter[str] = Counter()
-        level = logging.NOTSET
-        first_error: str | None = None
+        reportable: list[Exception] = []
         for index, response in enumerate(batch_response.responses):
             if response.success:
                 continue
@@ -922,26 +926,21 @@ class TBANSHelper:
             failures[type(exception).__name__] += 1
             if isinstance(exception, (UnregisteredError, SenderIdMismatchError)):
                 MobileClientQuery.delete_for_messaging_id(messaging_ids[index])
-                continue
-            exception_level = (
-                logging.CRITICAL
-                if isinstance(exception, (ThirdPartyAuthError, InvalidArgumentError))
-                else logging.ERROR
-            )
-            # Take the example from the first failure at the logged severity, so a
-            # CRITICAL line never shows an ERROR-level example
-            if exception_level > level:
-                level = exception_level
-                first_error = cls._debug_string(exception)
+            else:
+                reportable.append(exception)
+
+        if not reportable:
+            return
 
         # One line per batch, not per client: a request-wide failure (e.g. bad APNs
-        # credentials) fails every client in the batch the same way.
-        if level > logging.NOTSET:
-            logging.log(
-                level,
-                f"FCM failures in batch of {len(messaging_ids)}: {dict(failures)}. "
-                f"First error: {first_error}",
-            )
+        # credentials) fails every client in the batch the same way. `max` returns
+        # the first of equally severe failures.
+        example = max(reportable, key=severity)
+        logging.log(
+            severity(example),
+            f"FCM failures in batch of {len(messaging_ids)}: {dict(failures)}. "
+            f"First error: {cls._debug_string(example)}",
+        )
 
     @classmethod
     def _send_webhook(cls, client: MobileClient, notification: Notification) -> None:
