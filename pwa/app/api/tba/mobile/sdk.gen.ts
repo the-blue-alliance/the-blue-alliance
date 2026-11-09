@@ -311,7 +311,7 @@ export const registerMobileClient = <ThrowOnError extends boolean = false>(
 /**
  * Unregister a device
  *
- * Deletes the signed-in account's device with `mobile_id`. `code` is 200 when deleted, 404 if the account has no such device, and 401 when not signed in.
+ * Deletes the signed-in account's device with `mobile_id`. With `mobile_id_type: fid`, also deletes this account's FCM registration token for the same installation (`<fid>:...`), which is all TBA has for a device whose FID registration hasn't reached it yet. `code` is 200 when anything was deleted, 404 if nothing matched, 400 for an unknown `mobile_id_type`, and 401 when not signed in.
  */
 export const unregisterMobileClient = <ThrowOnError extends boolean = false>(
   options: Options<UnregisterMobileClientData, ThrowOnError>,
