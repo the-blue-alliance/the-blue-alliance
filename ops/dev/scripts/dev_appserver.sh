@@ -102,7 +102,7 @@ else
     assert_google_application_credentials
 fi
 
-runtime_version="python313"
+runtime_version="python314"
 
 set -x
 dev_appserver.py \

@@ -242,11 +242,11 @@ jobs:
       # Ubuntu 23+ doesn't like running puppeteer without disabling AppArmor.
       - name: Disable AppArmor
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-      - name: Set up Python 3.13
+      - name: Set up Python 3.14
         if: steps.changes.outputs.web == 'true'
         uses: actions/setup-python@v7
         with:
-          python-version: "3.13"
+          python-version: "3.14"
           cache: "pip"
       - name: Install Python Dependencies
         if: steps.changes.outputs.web == 'true'

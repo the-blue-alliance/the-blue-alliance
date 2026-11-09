@@ -113,6 +113,38 @@ for workflow in "$REPO_ROOT"/.github/workflows/*.yml; do
     fi
 done
 
+# Check/update the dev container base image
+DOCKERFILE="$REPO_ROOT/ops/dev/docker/Dockerfile"
+if [[ -f "$DOCKERFILE" ]]; then
+    CURRENT_IMAGE_VERSION=$(grep -m1 -E '^FROM python:' "$DOCKERFILE" | sed -E 's/^FROM python:([0-9.]+).*/\1/' || true)
+    if [[ "$CURRENT_IMAGE_VERSION" != "$PYTHON_VERSION" ]]; then
+        if [[ "$UPDATE_MODE" == true ]]; then
+            update_file "$DOCKERFILE" "s/^FROM python:[0-9.]*/FROM python:$PYTHON_VERSION/"
+        else
+            echo "ERROR: $DOCKERFILE has FROM python:$CURRENT_IMAGE_VERSION (expected python:$PYTHON_VERSION)"
+            ERRORS=$((ERRORS + 1))
+        fi
+    else
+        echo "OK: $DOCKERFILE"
+    fi
+fi
+
+# Check/update the dev_appserver runtime
+DEV_APPSERVER="$REPO_ROOT/ops/dev/scripts/dev_appserver.sh"
+if [[ -f "$DEV_APPSERVER" ]]; then
+    CURRENT_DEV_RUNTIME=$(grep -m1 '^runtime_version=' "$DEV_APPSERVER" | sed -E 's/^runtime_version="?([^"]*)"?.*/\1/' || true)
+    if [[ "$CURRENT_DEV_RUNTIME" != "$GAE_RUNTIME" ]]; then
+        if [[ "$UPDATE_MODE" == true ]]; then
+            update_file "$DEV_APPSERVER" "s/^runtime_version=\"python[0-9]*\"/runtime_version=\"$GAE_RUNTIME\"/"
+        else
+            echo "ERROR: $DEV_APPSERVER has runtime_version=$CURRENT_DEV_RUNTIME (expected $GAE_RUNTIME)"
+            ERRORS=$((ERRORS + 1))
+        fi
+    else
+        echo "OK: $DEV_APPSERVER"
+    fi
+fi
+
 echo ""
 if [[ "$UPDATE_MODE" == true ]]; then
     echo "Updated $UPDATED file(s) to Python $PYTHON_VERSION"
