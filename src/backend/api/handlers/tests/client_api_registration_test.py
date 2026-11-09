@@ -260,6 +260,110 @@ def test_unregister_no_client(api_client: Client, mock_clientapi_auth: User) -> 
     assert len(user_clients) == 0
 
 
+def _put_client(
+    account_key: ndb.Key,
+    messaging_id: str,
+    messaging_id_type: MessagingIdType = MessagingIdType.TOKEN,
+    client_type: ClientType = ClientType.OS_IOS,
+) -> ndb.Key:
+    return MobileClient(
+        parent=account_key,
+        user_id=str(account_key.id()),
+        messaging_id=messaging_id,
+        messaging_id_type=messaging_id_type,
+        client_type=client_type,
+        device_uuid="asdf",
+        display_name="iPhone",
+    ).put()
+
+
+def _unregister_fid_request(
+    mobile_id_type: str | None = "fid",
+) -> RegistrationRequest:
+    req = RegistrationRequest(
+        operating_system="ios",
+        mobile_id=FID,
+        device_uuid="asdf",
+        name="iPhone",
+    )
+    if mobile_id_type is not None:
+        req["mobile_id_type"] = mobile_id_type
+    return req
+
+
+def test_unregister_fid_deletes_its_token(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    """A device that signs out before its FID registration reaches TBA only has its
+    old token row, and unregistering the FID has to remove it."""
+    account_key = none_throws(mock_clientapi_auth.account_key)
+    _put_client(account_key, f"{FID}:APA91bOld")
+    other_device = _put_client(account_key, "otherfid:APA91bOther")
+    other_account = _put_client(ndb.Key(Account, "2"), f"{FID}:APA91bOld")
+
+    resp = make_clientapi_request(api_client, "/unregister", _unregister_fid_request())
+    assert resp["code"] == 200
+
+    remaining = {client.key for client in MobileClient.query().fetch()}
+    assert remaining == {other_device, other_account}
+
+
+def test_unregister_fid_deletes_fid_and_token(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    account_key = none_throws(mock_clientapi_auth.account_key)
+    _put_client(account_key, FID, MessagingIdType.FID)
+    _put_client(account_key, f"{FID}:APA91bOld")
+
+    resp = make_clientapi_request(api_client, "/unregister", _unregister_fid_request())
+    assert resp["code"] == 200
+
+    assert MobileClient.query(ancestor=account_key).fetch() == []
+
+
+def test_unregister_without_fid_type_keeps_tokens(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    """Without `mobile_id_type: fid`, `mobile_id` is matched exactly."""
+    account_key = none_throws(mock_clientapi_auth.account_key)
+    token = _put_client(account_key, f"{FID}:APA91bOld")
+
+    resp = make_clientapi_request(
+        api_client, "/unregister", _unregister_fid_request(mobile_id_type=None)
+    )
+    assert resp["code"] == 404
+
+    assert [client.key for client in MobileClient.query().fetch()] == [token]
+
+
+def test_unregister_fid_keeps_non_fcm_rows(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    """Only FCM token rows belong to the install, and with nothing else to delete the
+    unregister is a 404."""
+    account_key = none_throws(mock_clientapi_auth.account_key)
+    web = _put_client(account_key, f"{FID}:web", client_type=ClientType.WEB)
+
+    resp = make_clientapi_request(api_client, "/unregister", _unregister_fid_request())
+    assert resp["code"] == 404
+
+    assert [client.key for client in MobileClient.query().fetch()] == [web]
+
+
+def test_unregister_unknown_mobile_id_type(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    account_key = none_throws(mock_clientapi_auth.account_key)
+    token = _put_client(account_key, f"{FID}:APA91bOld")
+
+    resp = make_clientapi_request(
+        api_client, "/unregister", _unregister_fid_request(mobile_id_type="FID")
+    )
+    assert resp["code"] == 400
+
+    assert [client.key for client in MobileClient.query().fetch()] == [token]
+
+
 def test_register_collapses_duplicate_token(
     api_client: Client, mock_clientapi_auth: User
 ) -> None:
