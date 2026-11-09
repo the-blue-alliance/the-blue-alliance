@@ -1,6 +1,12 @@
 import warnings
+from typing import TYPE_CHECKING
 
+from backend.common.models.mobile_client import MobileClient
+from backend.common.models.notifications.notification import Notification
 from backend.common.models.notifications.requests.request import Request
+
+if TYPE_CHECKING:
+    import firebase_admin
 
 # firebase-admin's MulticastMessage caps tokens and fids at 500 combined
 MAXIMUM_TOKENS = 500
@@ -15,13 +21,19 @@ class FCMRequest(Request):
         fids (list, string): The Firebase Installation IDs to send a message to.
     """
 
-    def __init__(self, app, notification, tokens=None, fids=None):
+    def __init__(
+        self,
+        app: "firebase_admin.App",
+        notification: Notification,
+        tokens: list[str] | None = None,
+        fids: list[str] | None = None,
+    ) -> None:
         super(FCMRequest, self).__init__(notification=notification)
 
         self._app = app
 
-        self.tokens = tokens or []
-        self.fids = fids or []
+        self.tokens: list[str] = tokens or []
+        self.fids: list[str] = fids or []
 
         if not self.tokens and not self.fids:
             raise ValueError("FCMRequest must contain at least one token or fid")
@@ -32,7 +44,12 @@ class FCMRequest(Request):
             )
 
     @classmethod
-    def for_clients(cls, app, notification, clients):
+    def for_clients(
+        cls,
+        app: "firebase_admin.App",
+        notification: Notification,
+        clients: list[MobileClient],
+    ) -> "FCMRequest":
         return cls(
             app,
             notification,

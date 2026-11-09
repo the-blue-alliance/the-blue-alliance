@@ -2,6 +2,7 @@ import datetime
 import enum
 import logging
 from collections import Counter
+from typing import TYPE_CHECKING
 
 from backend.common.consts.client_type import ClientType, FCM_CLIENTS
 from backend.common.consts.notification_type import (
@@ -42,6 +43,9 @@ from backend.common.models.notifications.verification import VerificationNotific
 from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
 from backend.common.queries.mobile_client_query import MobileClientQuery
+
+if TYPE_CHECKING:
+    from firebase_admin import messaging
 
 MATCH_UPCOMING_MINUTES = datetime.timedelta(minutes=-7)
 
@@ -892,7 +896,7 @@ class TBANSHelper:
 
     @classmethod
     def _handle_fcm_batch_response(
-        cls, messaging_ids: list[str], batch_response
+        cls, messaging_ids: list[str], batch_response: "messaging.BatchResponse"
     ) -> None:
         """
         Handle failed sends - remove clients FCM no longer recognizes, and log a
@@ -919,11 +923,16 @@ class TBANSHelper:
             if isinstance(exception, (UnregisteredError, SenderIdMismatchError)):
                 MobileClientQuery.delete_for_messaging_id(messaging_ids[index])
                 continue
-            if isinstance(exception, (ThirdPartyAuthError, InvalidArgumentError)):
-                level = logging.CRITICAL
-            else:
-                level = max(level, logging.ERROR)
-            first_error = first_error or cls._debug_string(exception)
+            exception_level = (
+                logging.CRITICAL
+                if isinstance(exception, (ThirdPartyAuthError, InvalidArgumentError))
+                else logging.ERROR
+            )
+            # Take the example from the first failure at the logged severity, so a
+            # CRITICAL line never shows an ERROR-level example
+            if exception_level > level:
+                level = exception_level
+                first_error = cls._debug_string(exception)
 
         # One line per batch, not per client: a request-wide failure (e.g. bad APNs
         # credentials) fails every client in the batch the same way.

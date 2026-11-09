@@ -1818,8 +1818,8 @@ class TestTBANSHelper(unittest.TestCase):
         assert len(tasks) == 0
 
     def test_send_fcm_unregister_error_multi_client_fid(self):
-        """The `subclients[index]` <-> `responses[index]` mapping must hold for a
-        FID-only request the same way it does for a token-only request."""
+        """A failed response must map back to the right client in a FID-only
+        request, the same as in a token-only one."""
         client_ok = MobileClient(
             parent=ndb.Key(Account, "user_id"),
             user_id="user_id",
@@ -2163,6 +2163,8 @@ class TestTBANSHelper(unittest.TestCase):
             )
 
     def test_send_fcm_mixed_failures_log_highest_severity(self):
+        """The example error comes from the most severe failure, whatever order the
+        failures arrive in."""
         clients = [
             MobileClient(
                 parent=ndb.Key(Account, "user_id"),
@@ -2170,7 +2172,7 @@ class TestTBANSHelper(unittest.TestCase):
                 messaging_id="messaging_id_{}".format(i),
                 client_type=ClientType.OS_IOS,
             )
-            for i in range(3)
+            for i in range(4)
         ]
 
         batch_response = messaging.BatchResponse(
@@ -2178,6 +2180,7 @@ class TestTBANSHelper(unittest.TestCase):
                 messaging.SendResponse(None, UnregisteredError("code", "message")),
                 messaging.SendResponse(None, QuotaExceededError("code", "message")),
                 messaging.SendResponse(None, InvalidArgumentError("code", "message")),
+                messaging.SendResponse(None, QuotaExceededError("code", "message")),
             ]
         )
         with (
@@ -2189,9 +2192,9 @@ class TestTBANSHelper(unittest.TestCase):
             mock_delete.assert_called_once_with("messaging_id_0")
             mock_log.assert_called_once_with(
                 logging.CRITICAL,
-                "FCM failures in batch of 3: {'UnregisteredError': 1, "
-                "'QuotaExceededError': 1, 'InvalidArgumentError': 1}. "
-                "First error: RESOURCE_EXHAUSTED / code",
+                "FCM failures in batch of 4: {'UnregisteredError': 1, "
+                "'QuotaExceededError': 2, 'InvalidArgumentError': 1}. "
+                "First error: INVALID_ARGUMENT / code",
             )
 
     def test_send_webhook_disabled(self):

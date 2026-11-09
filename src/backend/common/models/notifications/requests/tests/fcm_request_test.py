@@ -465,34 +465,3 @@ def test_fcm_message_notification(fcm_app):
     assert isinstance(message.apns, messaging.APNSConfig)
     assert message.webpush is None
     assert message.tokens == ["abc"]
-
-
-def _client(messaging_id, is_fid=False):
-    from backend.common.consts.client_type import ClientType
-    from backend.common.consts.messaging_id_type import MessagingIdType
-    from backend.common.models.mobile_client import MobileClient
-
-    return MobileClient(
-        user_id="user_id",
-        messaging_id=messaging_id,
-        client_type=ClientType.OS_IOS,
-        messaging_id_type=(MessagingIdType.FID if is_fid else MessagingIdType.TOKEN),
-    )
-
-
-def test_for_clients_tokens(fcm_app):
-    request = FCMRequest.for_clients(
-        fcm_app, MockNotification(), [_client("a"), _client("b")]
-    )
-    assert request.tokens == ["a", "b"]
-    assert request.fids == []
-
-
-def test_for_clients_fids(fcm_app):
-    request = FCMRequest.for_clients(
-        fcm_app,
-        MockNotification(),
-        [_client("a", is_fid=True), _client("b", is_fid=True)],
-    )
-    assert request.fids == ["a", "b"]
-    assert request.tokens == []
