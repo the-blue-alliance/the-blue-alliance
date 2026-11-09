@@ -382,7 +382,7 @@ export const deleteApiReadKeyMutation = (
 /**
  * Register a device for notifications
  *
- * Registers the device for the signed-in account, or updates it if this account already has `mobile_id`. `code` is 200 for a new device, 304 for an existing one, 400 for an unknown `mobile_id_type`, and 401 when not signed in. Registering a FID also deletes this account's FCM registration token for the same installation (`<fid>:...`), so the device isn't notified twice.
+ * Registers the device for the signed-in account, or updates it if this account already has `mobile_id`. `code` is 200 for a new device, 304 for an existing one, 400 for an unknown `mobile_id_type` or a `fid` from a platform other than `ios` or `android-fcm`, and 401 when not signed in. Registering a FID also deletes this account's FCM registration token for the same installation (`<fid>:...`), so the device isn't notified twice.
  */
 export const registerMobileClientMutation = (
   options?: Partial<Options<RegisterMobileClientData>>,
