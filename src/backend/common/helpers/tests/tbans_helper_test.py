@@ -1618,9 +1618,7 @@ class TestTBANSHelper(unittest.TestCase):
             sent = mock_init.for_clients.call_args[0][2]
             assert [c.messaging_id for c in sent] == ["fid_0", "fid_1"]
 
-    def test_send_fcm_partitions_tokens_and_fids(self):
-        """Tokens and FIDs must never share a request - FCM expands tokens first
-        and fids second, which would break the response index mapping."""
+    def test_send_fcm_mixes_tokens_and_fids(self):
         clients = [
             MobileClient(
                 parent=ndb.Key(Account, "user_id"),
@@ -1647,12 +1645,9 @@ class TestTBANSHelper(unittest.TestCase):
             "backend.common.helpers.tbans_helper.FCMRequest",
         ) as mock_init:
             TBANSHelper._send_fcm(clients, MockNotification())
-            assert mock_init.for_clients.call_count == 2
-            batches = [
-                [c.messaging_id for c in call[0][2]]
-                for call in mock_init.for_clients.call_args_list
-            ]
-            assert batches == [["token_0", "token_1"], ["fid_0"]]
+            mock_init.for_clients.assert_called_once()
+            sent = mock_init.for_clients.call_args[0][2]
+            assert [c.messaging_id for c in sent] == ["token_0", "fid_0", "token_1"]
 
     def test_send_fcm_filter_from_notification(self):
         clients = [
@@ -1698,8 +1693,7 @@ class TestTBANSHelper(unittest.TestCase):
             TBANSHelper._send_fcm(clients, MockNotification())
             assert mock_send.call_count == 2
 
-    def test_send_fcm_batch_per_kind(self):
-        """Batching happens per-kind, since a request never mixes tokens and fids"""
+    def test_send_fcm_batch_mixed_kinds(self):
         clients = [
             MobileClient(
                 parent=ndb.Key(Account, "user_id"),
@@ -1732,8 +1726,8 @@ class TestTBANSHelper(unittest.TestCase):
             patch.object(FCMRequest, "send", return_value=batch_response) as mock_send,
         ):
             TBANSHelper._send_fcm(clients, MockNotification())
-            # 3 tokens -> 2 requests, 3 fids -> 2 requests
-            assert mock_send.call_count == 4
+            # 6 clients of either kind -> 3 requests of 2
+            assert mock_send.call_count == 3
 
     def test_send_fcm_unregister_error(self):
         client = MobileClient(
@@ -1871,6 +1865,54 @@ class TestTBANSHelper(unittest.TestCase):
         # Make sure we haven't queued for a retry
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 0
+
+    def test_send_fcm_unregister_error_mixed_order(self):
+        """FCM responds to tokens first and fids second, not in client order, so a
+        failure must map back through `FCMRequest.messaging_ids`."""
+        clients = [
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="token_0",
+                client_type=ClientType.OS_IOS,
+            ),
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="fid_0",
+                client_type=ClientType.OS_IOS,
+                messaging_id_type=MessagingIdType.FID,
+            ),
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="token_1",
+                client_type=ClientType.OS_ANDROID_FCM,
+            ),
+        ]
+        for client in clients:
+            client.put()
+
+        # Response order: token_0, token_1, fid_0
+        batch_response = messaging.BatchResponse(
+            [
+                messaging.SendResponse({"name": "abc"}, None),
+                messaging.SendResponse({"name": "def"}, None),
+                messaging.SendResponse(None, UnregisteredError("code", "message")),
+            ]
+        )
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch.object(
+                MobileClientQuery,
+                "delete_for_messaging_id",
+                wraps=MobileClientQuery.delete_for_messaging_id,
+            ) as mock_delete,
+        ):
+            TBANSHelper._send_fcm(clients, MockNotification())
+            mock_delete.assert_called_once_with("fid_0")
+
+        assert set(fcm_messaging_ids("user_id")) == {"token_0", "token_1"}
 
     def test_send_fcm_sender_id_mismatch_error(self):
         client = MobileClient(

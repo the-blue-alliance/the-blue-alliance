@@ -16,13 +16,6 @@ class FCMRequest(Request):
     """
 
     def __init__(self, app, notification, tokens=None, fids=None):
-        """
-        Note:
-            `tokens` and `fids` may not be mixed in a single request. FCM expands a
-            multicast into per-token messages first and per-fid messages second, so a
-            mixed request would break the caller's ability to map a `BatchResponse`
-            index back to the client it was sent to.
-        """
         super(FCMRequest, self).__init__(notification=notification)
 
         self._app = app
@@ -40,11 +33,21 @@ class FCMRequest(Request):
 
     @classmethod
     def for_clients(cls, app, notification, clients):
-        """Build a request targeting clients that all share one messaging id kind."""
-        messaging_ids = [client.messaging_id for client in clients]
-        if clients and clients[0].is_fid:
-            return cls(app, notification, fids=messaging_ids)
-        return cls(app, notification, tokens=messaging_ids)
+        return cls(
+            app,
+            notification,
+            tokens=[client.messaging_id for client in clients if not client.is_fid],
+            fids=[client.messaging_id for client in clients if client.is_fid],
+        )
+
+    @property
+    def messaging_ids(self) -> list[str]:
+        """
+        The order of `BatchResponse.responses` from `send`: firebase-admin expands a
+        multicast into one message per token, then one per fid. This is not the order
+        of the clients passed to `for_clients`.
+        """
+        return self.tokens + self.fids
 
     def __str__(self):
         return "FCMRequest(tokens={}, fids={}, notification={})".format(
@@ -117,11 +120,14 @@ class FCMRequest(Request):
         ]
 
         with warnings.catch_warnings():
-            if self.tokens:
-                # firebase-admin 7.5.0 deprecated `tokens` in favor of `fids`, and
-                # pytest runs with `filterwarnings = error`. Suppress only on the
-                # legacy path, so a future deprecation on the FID path still surfaces.
-                warnings.simplefilter("ignore", DeprecationWarning)
+            # firebase-admin 7.5.0 deprecated `tokens` in favor of `fids`, and pytest
+            # runs with `filterwarnings = error`. Ignore only that warning, so any other
+            # deprecation still surfaces, including in a request that mixes the two.
+            warnings.filterwarnings(
+                "ignore",
+                message=r"MulticastMessage\.tokens is deprecated",
+                category=DeprecationWarning,
+            )
             return messaging.MulticastMessage(
                 tokens=self.tokens or None,
                 fids=self.fids or None,

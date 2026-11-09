@@ -1,10 +1,13 @@
+import warnings
 from unittest.mock import Mock, patch
 
 import pytest
 from firebase_admin import messaging
 
 from backend.common.consts.fcm.platform_priority import PlatformPriority
+from backend.common.consts.messaging_id_type import MessagingIdType
 from backend.common.models.fcm.platform_config import PlatformConfig
+from backend.common.models.mobile_client import MobileClient
 from backend.common.models.notifications.requests.fcm_request import (
     FCMRequest,
     MAXIMUM_TOKENS,
@@ -92,6 +95,58 @@ def test_for_clients_empty(fcm_app):
         ValueError, match="FCMRequest must contain at least one token or fid"
     ):
         FCMRequest.for_clients(fcm_app, MockNotification(), [])
+
+
+def test_for_clients_mixed(fcm_app):
+    clients = [
+        MobileClient(messaging_id="token_0"),
+        MobileClient(messaging_id="fid_0", messaging_id_type=MessagingIdType.FID),
+        MobileClient(messaging_id="token_1"),
+    ]
+    request = FCMRequest.for_clients(fcm_app, MockNotification(), clients)
+    assert request.tokens == ["token_0", "token_1"]
+    assert request.fids == ["fid_0"]
+    assert request.messaging_ids == ["token_0", "token_1", "fid_0"]
+
+
+def test_messaging_ids_match_sdk_send_order(fcm_app):
+    """`_handle_fcm_batch_response` deletes `messaging_ids[index]` when
+    `responses[index]` fails, so this order must match the order firebase-admin
+    sends in. Fails if a firebase-admin upgrade changes how it expands a multicast."""
+    request = FCMRequest(
+        fcm_app,
+        notification=MockNotification(),
+        tokens=["token_0", "token_1"],
+        fids=["fid_0"],
+    )
+    with patch.object(messaging, "_get_messaging_service") as mock_service:
+        mock_service.return_value.send_each.return_value = messaging.BatchResponse([])
+        request.send()
+
+    sent = mock_service.return_value.send_each.call_args[0][0]
+    assert [m.token or m.fid for m in sent] == request.messaging_ids
+
+
+def test_fcm_message_mixed_only_ignores_tokens_deprecation(fcm_app):
+    """A request with tokens must not hide any other deprecation"""
+    request = FCMRequest(
+        fcm_app, notification=MockNotification(), tokens=["abc"], fids=["def"]
+    )
+    multicast_message = messaging.MulticastMessage
+
+    def warn_then_build(*args, **kwargs):
+        warnings.warn("MulticastMessage.fids is deprecated", DeprecationWarning)
+        return multicast_message(*args, **kwargs)
+
+    with (
+        patch.object(messaging, "MulticastMessage", side_effect=warn_then_build),
+        pytest.warns(DeprecationWarning) as record,
+    ):
+        message = request._fcm_message()
+
+    assert [str(w.message) for w in record] == ["MulticastMessage.fids is deprecated"]
+    assert message.tokens == ["abc"]
+    assert message.fids == ["def"]
 
 
 def test_init_delivery_at_combined_limit(fcm_app):

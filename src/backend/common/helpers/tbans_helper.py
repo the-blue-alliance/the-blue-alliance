@@ -876,39 +876,30 @@ class TBANSHelper:
             and notification.should_send_to_client(client)
         ]
 
-        # FCM expands a multicast into per-token messages first and per-fid messages
-        # second, so a request mixing the two kinds would break the
-        # `subclients[index]` <-> `responses[index]` mapping that
-        # `_handle_fcm_batch_response` relies on to decide which client to delete.
-        # Partition by kind before chunking and never mix kinds in one request.
-        token_clients = [client for client in clients if not client.is_fid]
-        fid_clients = [client for client in clients if client.is_fid]
+        # We can only send to so many FCM clients at a time - send to our clients across several requests
+        for subclients in [
+            clients[i : i + MAXIMUM_TOKENS]
+            for i in range(0, len(clients), MAXIMUM_TOKENS)
+        ]:
+            fcm_request = FCMRequest.for_clients(
+                _firebase_app(), notification, subclients
+            )
 
-        for partition in (token_clients, fid_clients):
-            # We can only send to so many FCM clients at a time - send to our clients across several requests
-            for subclients in [
-                partition[i : i + MAXIMUM_TOKENS]
-                for i in range(0, len(partition), MAXIMUM_TOKENS)
-            ]:
-                fcm_request = FCMRequest.for_clients(
-                    _firebase_app(), notification, subclients
-                )
-
-                batch_response = fcm_request.send()
-                cls._handle_fcm_batch_response(subclients, batch_response)
+            batch_response = fcm_request.send()
+            cls._handle_fcm_batch_response(fcm_request.messaging_ids, batch_response)
 
         return
 
     @classmethod
     def _handle_fcm_batch_response(
-        cls, subclients: list[MobileClient], batch_response
+        cls, messaging_ids: list[str], batch_response
     ) -> None:
         """
         Handle failed sends - remove clients FCM no longer recognizes, and log a
         summary if anything else failed.
 
-        `batch_response.responses[index]` corresponds to `subclients[index]`, which
-        only holds if the request was not built from a mix of tokens and fids.
+        `batch_response.responses[index]` corresponds to `messaging_ids[index]`, so
+        pass `FCMRequest.messaging_ids` rather than the clients in their own order.
         """
         from firebase_admin.exceptions import InvalidArgumentError
         from firebase_admin.messaging import (
@@ -926,9 +917,7 @@ class TBANSHelper:
             exception = response.exception
             failures[type(exception).__name__] += 1
             if isinstance(exception, (UnregisteredError, SenderIdMismatchError)):
-                MobileClientQuery.delete_for_messaging_id(
-                    subclients[index].messaging_id
-                )
+                MobileClientQuery.delete_for_messaging_id(messaging_ids[index])
                 continue
             if isinstance(exception, (ThirdPartyAuthError, InvalidArgumentError)):
                 level = logging.CRITICAL
@@ -941,7 +930,7 @@ class TBANSHelper:
         if level > logging.NOTSET:
             logging.log(
                 level,
-                f"FCM failures in batch of {len(subclients)}: {dict(failures)}. "
+                f"FCM failures in batch of {len(messaging_ids)}: {dict(failures)}. "
                 f"First error: {first_error}",
             )
 
