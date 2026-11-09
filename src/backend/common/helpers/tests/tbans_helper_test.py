@@ -1,4 +1,5 @@
 import json
+import logging
 import unittest
 from datetime import datetime, timedelta, timezone
 from unittest import mock
@@ -1807,10 +1808,13 @@ class TestTBANSHelper(unittest.TestCase):
                 "delete_for_messaging_id",
                 wraps=MobileClientQuery.delete_for_messaging_id,
             ) as mock_delete,
+            patch("logging.log") as mock_log,
         ):
             TBANSHelper._send_fcm([client_ok, client_bad], MockNotification())
             # Only the bad client should be deleted
             mock_delete.assert_called_once_with("messaging_id_bad")
+            # Pruning stale clients is routine and shouldn't log
+            mock_log.assert_not_called()
 
         # The good client should still exist, the bad one should be gone
         assert fcm_messaging_ids("user_id") == ["messaging_id_ok"]
@@ -1918,10 +1922,14 @@ class TestTBANSHelper(unittest.TestCase):
         )
         with (
             patch.object(FCMRequest, "send", return_value=batch_response),
-            patch("logging.error") as mock_error,
+            patch("logging.log") as mock_log,
         ):
             TBANSHelper._send_fcm([client], MockNotification())
-            mock_error.assert_called_once_with("Quota exceeded - retrying client...")
+            mock_log.assert_called_once_with(
+                logging.ERROR,
+                "FCM failures in batch of 1: {'QuotaExceededError': 1}. "
+                "First error: RESOURCE_EXHAUSTED / code",
+            )
 
         # Sanity check
         assert fcm_messaging_ids("user_id") == ["messaging_id"]
@@ -1943,11 +1951,13 @@ class TestTBANSHelper(unittest.TestCase):
         )
         with (
             patch.object(FCMRequest, "send", return_value=batch_response),
-            patch("logging.critical") as mock_critical,
+            patch("logging.log") as mock_log,
         ):
             TBANSHelper._send_fcm([client], MockNotification())
-            mock_critical.assert_called_once_with(
-                "Third party error sending to FCM - code"
+            mock_log.assert_called_once_with(
+                logging.CRITICAL,
+                "FCM failures in batch of 1: {'ThirdPartyAuthError': 1}. "
+                "First error: UNAUTHENTICATED / code",
             )
 
         # Sanity check
@@ -1974,11 +1984,13 @@ class TestTBANSHelper(unittest.TestCase):
         )
         with (
             patch.object(FCMRequest, "send", return_value=batch_response),
-            patch("logging.critical") as mock_critical,
+            patch("logging.log") as mock_log,
         ):
             TBANSHelper._send_fcm([client], MockNotification())
-            mock_critical.assert_called_once_with(
-                "Invalid argument when sending to FCM - code"
+            mock_log.assert_called_once_with(
+                logging.CRITICAL,
+                "FCM failures in batch of 1: {'InvalidArgumentError': 1}. "
+                "First error: INVALID_ARGUMENT / code",
             )
 
         # Sanity check
@@ -2005,11 +2017,13 @@ class TestTBANSHelper(unittest.TestCase):
         )
         with (
             patch.object(FCMRequest, "send", return_value=batch_response),
-            patch("logging.error") as mock_error,
+            patch("logging.log") as mock_log,
         ):
             TBANSHelper._send_fcm([client], MockNotification())
-            mock_error.assert_called_once_with(
-                "Internal FCM error - retrying client..."
+            mock_log.assert_called_once_with(
+                logging.ERROR,
+                "FCM failures in batch of 1: {'InternalError': 1}. "
+                "First error: INTERNAL / code",
             )
 
         # Sanity check
@@ -2032,10 +2046,14 @@ class TestTBANSHelper(unittest.TestCase):
         )
         with (
             patch.object(FCMRequest, "send", return_value=batch_response),
-            patch("logging.error") as mock_error,
+            patch("logging.log") as mock_log,
         ):
             TBANSHelper._send_fcm([client], MockNotification())
-            mock_error.assert_called_once_with("FCM unavailable - retrying client...")
+            mock_log.assert_called_once_with(
+                logging.ERROR,
+                "FCM failures in batch of 1: {'UnavailableError': 1}. "
+                "First error: UNAVAILABLE / code",
+            )
 
         # Sanity check
         assert fcm_messaging_ids("user_id") == ["messaging_id"]
@@ -2057,11 +2075,13 @@ class TestTBANSHelper(unittest.TestCase):
         )
         with (
             patch.object(FCMRequest, "send", return_value=batch_response),
-            patch("logging.error") as mock_error,
+            patch("logging.log") as mock_log,
         ):
             TBANSHelper._send_fcm([client], MockNotification())
-            mock_error.assert_called_once_with(
-                "Unhandled FCM error for messaging_id - code / message"
+            mock_log.assert_called_once_with(
+                logging.ERROR,
+                "FCM failures in batch of 1: {'FirebaseError': 1}. "
+                "First error: code / message",
             )
 
         # Sanity check
@@ -2070,6 +2090,67 @@ class TestTBANSHelper(unittest.TestCase):
         # Check that we didn't queue for a retry
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 0
+
+    def test_send_fcm_uniform_failure_logs_once(self):
+        """A request-wide failure logs one line for the batch, not one per client"""
+        clients = [
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="messaging_id_{}".format(i),
+                client_type=ClientType.OS_IOS,
+            )
+            for i in range(3)
+        ]
+
+        batch_response = messaging.BatchResponse(
+            [
+                messaging.SendResponse(None, ThirdPartyAuthError("code", "message"))
+                for _ in clients
+            ]
+        )
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch("logging.log") as mock_log,
+        ):
+            TBANSHelper._send_fcm(clients, MockNotification())
+            mock_log.assert_called_once_with(
+                logging.CRITICAL,
+                "FCM failures in batch of 3: {'ThirdPartyAuthError': 3}. "
+                "First error: UNAUTHENTICATED / code",
+            )
+
+    def test_send_fcm_mixed_failures_log_highest_severity(self):
+        clients = [
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="messaging_id_{}".format(i),
+                client_type=ClientType.OS_IOS,
+            )
+            for i in range(3)
+        ]
+
+        batch_response = messaging.BatchResponse(
+            [
+                messaging.SendResponse(None, UnregisteredError("code", "message")),
+                messaging.SendResponse(None, QuotaExceededError("code", "message")),
+                messaging.SendResponse(None, InvalidArgumentError("code", "message")),
+            ]
+        )
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch.object(MobileClientQuery, "delete_for_messaging_id") as mock_delete,
+            patch("logging.log") as mock_log,
+        ):
+            TBANSHelper._send_fcm(clients, MockNotification())
+            mock_delete.assert_called_once_with("messaging_id_0")
+            mock_log.assert_called_once_with(
+                logging.CRITICAL,
+                "FCM failures in batch of 3: {'UnregisteredError': 1, "
+                "'QuotaExceededError': 1, 'InvalidArgumentError': 1}. "
+                "First error: RESOURCE_EXHAUSTED / code",
+            )
 
     def test_send_webhook_disabled(self):
         from backend.common.sitevars.notifications_enable import NotificationsEnable

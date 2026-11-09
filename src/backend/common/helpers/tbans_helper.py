@@ -1,7 +1,7 @@
 import datetime
 import enum
 import logging
-import time
+from collections import Counter
 
 from backend.common.consts.client_type import ClientType, FCM_CLIENTS
 from backend.common.consts.notification_type import (
@@ -894,10 +894,7 @@ class TBANSHelper:
                     _firebase_app(), notification, subclients
                 )
 
-                logging.info(f"Sending FCM request: {time.strftime('%X')}")
                 batch_response = fcm_request.send()
-                logging.info(f"Got FCM response: {time.strftime('%X')}")
-
                 cls._handle_fcm_batch_response(subclients, batch_response)
 
         return
@@ -907,57 +904,46 @@ class TBANSHelper:
         cls, subclients: list[MobileClient], batch_response
     ) -> None:
         """
-        Handle failed sends - this might include logging/alerting or removing old
-        clients.
+        Handle failed sends - remove clients FCM no longer recognizes, and log a
+        summary if anything else failed.
 
         `batch_response.responses[index]` corresponds to `subclients[index]`, which
         only holds if the request was not built from a mix of tokens and fids.
         """
-        from firebase_admin.exceptions import (
-            InternalError,
-            InvalidArgumentError,
-            UnavailableError,
-        )
+        from firebase_admin.exceptions import InvalidArgumentError
         from firebase_admin.messaging import (
-            QuotaExceededError,
             SenderIdMismatchError,
             ThirdPartyAuthError,
             UnregisteredError,
         )
 
+        failures: Counter[str] = Counter()
+        level = logging.NOTSET
+        first_error: str | None = None
         for index, response in enumerate(batch_response.responses):
             if response.success:
                 continue
-            client = subclients[index]
-            if isinstance(response.exception, UnregisteredError):
-                logging.info(f"Deleting mobile client with ID: {client.messaging_id}")
-                MobileClientQuery.delete_for_messaging_id(client.messaging_id)
-            elif isinstance(response.exception, SenderIdMismatchError):
-                logging.info(f"Deleting mobile client with ID: {client.messaging_id}")
-                MobileClientQuery.delete_for_messaging_id(client.messaging_id)
-            elif isinstance(response.exception, QuotaExceededError):
-                logging.error("Quota exceeded - retrying client...")
-            elif isinstance(response.exception, ThirdPartyAuthError):
-                logging.critical(
-                    "Third party error sending to FCM - {}".format(response.exception)
+            exception = response.exception
+            failures[type(exception).__name__] += 1
+            if isinstance(exception, (UnregisteredError, SenderIdMismatchError)):
+                MobileClientQuery.delete_for_messaging_id(
+                    subclients[index].messaging_id
                 )
-            elif isinstance(response.exception, InvalidArgumentError):
-                logging.critical(
-                    "Invalid argument when sending to FCM - {}".format(
-                        response.exception
-                    )
-                )
-            elif isinstance(response.exception, InternalError):
-                logging.error("Internal FCM error - retrying client...")
-            elif isinstance(response.exception, UnavailableError):
-                logging.error("FCM unavailable - retrying client...")
+                continue
+            if isinstance(exception, (ThirdPartyAuthError, InvalidArgumentError)):
+                level = logging.CRITICAL
             else:
-                debug_string = cls._debug_string(response.exception)
-                logging.error(
-                    "Unhandled FCM error for {} - {}".format(
-                        client.messaging_id, debug_string
-                    )
-                )
+                level = max(level, logging.ERROR)
+            first_error = first_error or cls._debug_string(exception)
+
+        # One line per batch, not per client: a request-wide failure (e.g. bad APNs
+        # credentials) fails every client in the batch the same way.
+        if level > logging.NOTSET:
+            logging.log(
+                level,
+                f"FCM failures in batch of {len(subclients)}: {dict(failures)}. "
+                f"First error: {first_error}",
+            )
 
     @classmethod
     def _send_webhook(cls, client: MobileClient, notification: Notification) -> None:
