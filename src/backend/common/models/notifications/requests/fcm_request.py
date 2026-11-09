@@ -1,7 +1,15 @@
+import warnings
+from typing import TYPE_CHECKING
+
+from backend.common.models.mobile_client import MobileClient
+from backend.common.models.notifications.notification import Notification
 from backend.common.models.notifications.requests.request import Request
 
+if TYPE_CHECKING:
+    import firebase_admin
+
+# firebase-admin's MulticastMessage caps tokens and fids at 500 combined
 MAXIMUM_TOKENS = 500
-# https://github.com/firebase/firebase-admin-python/blob/9e5b8e383e066c319a483285df903150d5029a34/firebase_admin/_messaging_encoder.py#L78
 
 
 class FCMRequest(Request):
@@ -9,34 +17,58 @@ class FCMRequest(Request):
     https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
     Attributes:
         notification (Notification): The Notification to send.
-        tokens (list, string): The FCM registration tokens (up to 500) to send a message to.
+        tokens (list, string): The legacy FCM registration tokens to send a message to.
+        fids (list, string): The Firebase Installation IDs to send a message to.
     """
 
-    def __init__(self, app, notification, tokens=None):
-        """
-        Note:
-            Should only supply one delivery method - either token, topic, or connection.
-        Args:
-            app (firebase_admin.App): The Firebase app to send to.
-            notification (Notification): The Notification to send.
-            tokens (list, string): The FCM registration tokens (up to 100) to send a message to.
-        """
+    def __init__(
+        self,
+        app: "firebase_admin.App",
+        notification: Notification,
+        tokens: list[str] | None = None,
+        fids: list[str] | None = None,
+    ) -> None:
         super(FCMRequest, self).__init__(notification=notification)
 
         self._app = app
 
-        if len(tokens) > MAXIMUM_TOKENS:
+        self.tokens: list[str] = tokens or []
+        self.fids: list[str] = fids or []
+
+        if not self.tokens and not self.fids:
+            raise ValueError("FCMRequest must contain at least one token or fid")
+
+        if len(self.tokens) + len(self.fids) > MAXIMUM_TOKENS:
             raise ValueError(
-                "FCMRequest tokens must contain less than {} tokens".format(
-                    MAXIMUM_TOKENS
-                )
+                f"FCMRequest must not contain more than {MAXIMUM_TOKENS} tokens/fids"
             )
 
-        self.tokens = tokens
+    @classmethod
+    def for_clients(
+        cls,
+        app: "firebase_admin.App",
+        notification: Notification,
+        clients: list[MobileClient],
+    ) -> "FCMRequest":
+        return cls(
+            app,
+            notification,
+            tokens=[client.messaging_id for client in clients if not client.is_fid],
+            fids=[client.messaging_id for client in clients if client.is_fid],
+        )
+
+    @property
+    def messaging_ids(self) -> list[str]:
+        """
+        The order of `BatchResponse.responses` from `send`: firebase-admin expands a
+        multicast into one message per token, then one per fid. This is not the order
+        of the clients passed to `for_clients`.
+        """
+        return self.tokens + self.fids
 
     def __str__(self):
-        return "FCMRequest(tokens={}, notification={})".format(
-            self.tokens, str(self.notification)
+        return "FCMRequest(tokens={}, fids={}, notification={})".format(
+            self.tokens, self.fids, str(self.notification)
         )
 
     def send(self):
@@ -104,11 +136,21 @@ class FCMRequest(Request):
             self.notification.__class__._type()
         ]
 
-        return messaging.MulticastMessage(
-            tokens=self.tokens,
-            data=data_payload,
-            notification=self.notification.fcm_notification,
-            android=android_config,
-            webpush=webpush_config,
-            apns=apns_config,
-        )
+        with warnings.catch_warnings():
+            # firebase-admin 7.5.0 deprecated `tokens` in favor of `fids`, and pytest
+            # runs with `filterwarnings = error`. Ignore only that warning, so any other
+            # deprecation still surfaces, including in a request that mixes the two.
+            warnings.filterwarnings(
+                "ignore",
+                message=r"MulticastMessage\.tokens is deprecated",
+                category=DeprecationWarning,
+            )
+            return messaging.MulticastMessage(
+                tokens=self.tokens or None,
+                fids=self.fids or None,
+                data=data_payload,
+                notification=self.notification.fcm_notification,
+                android=android_config,
+                webpush=webpush_config,
+                apns=apns_config,
+            )
