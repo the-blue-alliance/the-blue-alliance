@@ -24,6 +24,7 @@ interface EventDocument {
   id: string;
   type: 'event';
   code: string;
+  key: string;
   name: string;
   event: SearchableEvent;
 }
@@ -41,8 +42,9 @@ const FIRST_SEASON = 1992;
 const TEAM_BOOST = 1.5;
 const RECENCY_HALF_LIFE = 7.5;
 const TEAM_PREFIX = /^(?:frc|team)\s*(?=\d)/;
-const TEAM_YEAR_PATTERN = /^(\d+)[\s/]+(\d{4})$/;
+const TEAM_YEAR_PATTERN = /^(\d+)[\s/]+(\d{2}|\d{4})$/;
 const YEAR_PATTERN = /^\d{4}$/;
+const EVENT_KEY_PREFIX = /^\d{4}[a-z]/;
 
 const engines = new WeakMap<SearchIndex, SearchEngine>();
 
@@ -68,6 +70,7 @@ function buildEngine(index: SearchIndex): SearchEngine {
         id: event.key,
         type: 'event',
         code: eventCode(event),
+        key: event.key,
         name: event.name,
         event,
       },
@@ -85,7 +88,7 @@ function buildEngine(index: SearchIndex): SearchEngine {
   }
 
   const miniSearch = new MiniSearch<SearchDocument>({
-    fields: ['code', 'name'],
+    fields: ['code', 'name', 'key'],
   });
   miniSearch.addAll([...documents.values()]);
 
@@ -159,6 +162,14 @@ function documentBoost(
   return age < 0 ? 1 : 1 + 1 / (1 + age / RECENCY_HALF_LIFE);
 }
 
+function fullYear(year: string, currentSeason: number): number {
+  if (year.length === 4) {
+    return Number(year);
+  }
+  const century = 2000 + Number(year);
+  return century > currentSeason + 1 ? century - 100 : century;
+}
+
 function splitYear(
   query: string,
   currentSeason: number,
@@ -193,7 +204,7 @@ export function siteSearch(
   const teamYear = TEAM_YEAR_PATTERN.exec(query);
   const teamYearDoc = teamYear && engine.documents.get(teamKey(teamYear[1]));
   if (teamYear && teamYearDoc?.type === 'team') {
-    return [teamResult(teamYearDoc.team, Number(teamYear[2]))];
+    return [teamResult(teamYearDoc.team, fullYear(teamYear[2], currentSeason))];
   }
 
   const { terms, year } = splitYear(query, currentSeason);
@@ -208,6 +219,7 @@ export function siteSearch(
   );
 
   const hits = engine.miniSearch.search(terms, {
+    fields: EVENT_KEY_PREFIX.test(terms) ? ['key'] : ['code', 'name'],
     prefix: true,
     fuzzy: (term) => (term.length >= 5 && !/\d/.test(term) ? 0.2 : false),
     combineWith: 'AND',

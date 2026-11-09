@@ -194,6 +194,45 @@ describe('siteSearch', () => {
     expect(siteSearch(index, '2025new', SEASON)[0].key).toBe('2025new');
   });
 
+  test('lists events whose key starts with the query, exact key first', () => {
+    const index: SearchIndex = {
+      teams: [{ key: 'frc1234', nickname: 'BC Robotics' }],
+      events: [
+        { key: '2026bc2', name: 'British Columbia Regional 2' },
+        { key: '2026bc', name: 'British Columbia Regional' },
+        { key: '2025bc', name: 'British Columbia Regional' },
+      ],
+    };
+
+    expect(siteSearch(index, '2026bc', SEASON).map((r) => r.key)).toEqual([
+      '2026bc',
+      '2026bc2',
+    ]);
+  });
+
+  test('lists teams rather than event keys for a team number prefix', () => {
+    const index: SearchIndex = {
+      teams: [{ key: 'frc2056', nickname: 'OP Robotics' }],
+      events: [{ key: '2026casj', name: 'Silicon Valley Regional' }],
+    };
+
+    expect(siteSearch(index, '20', SEASON).map((r) => r.key)).toEqual([
+      'frc2056',
+    ]);
+  });
+
+  test('returns at most 10 results for an event key prefix', () => {
+    const index: SearchIndex = {
+      teams: [],
+      events: Array.from({ length: 12 }, (_, i) => ({
+        key: `2026ev${i + 1}`,
+        name: `Robot Event ${i + 1}`,
+      })),
+    };
+
+    expect(siteSearch(index, '2026ev', SEASON)).toHaveLength(10);
+  });
+
   test('labels an event result with its year, trimmed name, and event code', () => {
     const index: SearchIndex = {
       teams: [],
@@ -223,27 +262,40 @@ describe('siteSearch', () => {
     expect(siteSearch(index, 'Robot', SEASON)).toHaveLength(10);
   });
 
-  test.each(['6324 2025', '6324/2025', 'frc6324 2025', ' 6324  /  2025 '])(
-    'returns only the team year page for %s',
-    (query) => {
-      const index: SearchIndex = {
-        teams: [
-          { key: 'frc6324', nickname: 'The Blue Devils' },
-          { key: 'frc2025', nickname: 'Silicon Valley Robotics' },
-        ],
-        events: [{ key: '2025cmptx', name: 'Einstein Field' }],
-      };
+  test.each([
+    '6324 2025',
+    '6324/2025',
+    'frc6324 2025',
+    ' 6324  /  2025 ',
+    '6324 25',
+    '6324/25',
+  ])('returns only the team year page for %s', (query) => {
+    const index: SearchIndex = {
+      teams: [
+        { key: 'frc6324', nickname: 'The Blue Devils' },
+        { key: 'frc2025', nickname: 'Silicon Valley Robotics' },
+      ],
+      events: [{ key: '2025cmptx', name: 'Einstein Field' }],
+    };
 
-      expect(siteSearch(index, query, SEASON)).toEqual([
-        {
-          type: 'team',
-          key: 'frc6324',
-          label: '6324 - The Blue Devils (2025)',
-          path: '/team/6324/2025',
-        },
-      ]);
-    },
-  );
+    expect(siteSearch(index, query, SEASON)).toEqual([
+      {
+        type: 'team',
+        key: 'frc6324',
+        label: '6324 - The Blue Devils (2025)',
+        path: '/team/6324/2025',
+      },
+    ]);
+  });
+
+  test('links a two-digit 1990s year to the 1900s team year page', () => {
+    const index: SearchIndex = {
+      teams: [{ key: 'frc254', nickname: 'The Cheesy Poofs' }],
+      events: [],
+    };
+
+    expect(siteSearch(index, '254 99', SEASON)[0].path).toBe('/team/254/1999');
+  });
 
   test('falls back to a year-filtered search when the team in a team year query does not exist', () => {
     const index: SearchIndex = {
