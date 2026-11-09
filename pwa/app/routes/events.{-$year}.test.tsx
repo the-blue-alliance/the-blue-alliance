@@ -24,7 +24,7 @@ describe('events route beforeLoad', () => {
       expect.objectContaining({
         options: expect.objectContaining({
           to: '/district/$districtAbbreviation/{-$year}',
-          params: { districtAbbreviation: 'ne' },
+          params: { districtAbbreviation: 'ne', year: undefined },
         }),
       }),
     );
