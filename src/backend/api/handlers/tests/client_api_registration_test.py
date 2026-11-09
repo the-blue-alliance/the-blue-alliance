@@ -327,6 +327,22 @@ def test_register_unknown_mobile_id_type(
     assert MobileClient.query().fetch() == []
 
 
+def test_register_non_string_mobile_id_type(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    req = {
+        "operating_system": "ios",
+        "mobile_id": FID,
+        "device_uuid": "asdf",
+        "name": "iPhone",
+        "mobile_id_type": ["fid"],
+    }
+    resp = make_clientapi_request(api_client, "/register", req)
+    assert resp["code"] == 400
+
+    assert MobileClient.query().fetch() == []
+
+
 def test_register_existing_fid(api_client: Client, mock_clientapi_auth: User) -> None:
     MobileClient(
         parent=mock_clientapi_auth.account_key,

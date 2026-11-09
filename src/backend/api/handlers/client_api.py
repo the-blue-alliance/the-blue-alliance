@@ -86,7 +86,13 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
     mobile_id_type = req.get(
         "mobile_id_type", MESSAGING_ID_TYPE_NAMES[MessagingIdType.TOKEN]
     )
-    messaging_id_type = MESSAGING_ID_TYPE_MAP.get(mobile_id_type)
+    # The request body isn't validated against `RegistrationRequest`, and a list or
+    # object would raise on the lookup instead of being rejected
+    messaging_id_type = (
+        MESSAGING_ID_TYPE_MAP.get(mobile_id_type)
+        if isinstance(mobile_id_type, str)
+        else None
+    )
     if messaging_id_type is None:
         return BaseResponse(
             code=400, message=f"Unknown mobile_id_type: {mobile_id_type}"
