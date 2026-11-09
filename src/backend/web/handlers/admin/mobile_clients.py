@@ -10,7 +10,10 @@ from backend.common.consts.client_type import (
     FCM_CLIENTS,
     NAMES as CLIENT_TYPE_NAMES,
 )
-from backend.common.consts.messaging_id_type import MessagingIdType
+from backend.common.consts.messaging_id_type import (
+    MessagingIdType,
+    NAMES as MESSAGING_ID_TYPE_NAMES,
+)
 from backend.common.helpers.deferred import defer_safe
 from backend.common.models.mobile_client import MobileClient
 from backend.web.profiled_render import render_template
@@ -35,8 +38,10 @@ def mobile_clients_dashboard() -> str:
             MobileClient.messaging_id_type == MessagingIdType.FID,
         ).count()
         messaging_id_type_counts[CLIENT_TYPE_NAMES[client_type]] = {
-            "token": counts_by_type[client_type] - fid_count,
-            "fid": fid_count,
+            MESSAGING_ID_TYPE_NAMES[MessagingIdType.TOKEN]: (
+                counts_by_type[client_type] - fid_count
+            ),
+            MESSAGING_ID_TYPE_NAMES[MessagingIdType.FID]: fid_count,
         }
 
     template_values = {
