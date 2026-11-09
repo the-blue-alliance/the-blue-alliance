@@ -43,7 +43,6 @@ from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
 from backend.common.queries.mobile_client_query import MobileClientQuery
 
-MAXIMUM_BACKOFF = 32
 MATCH_UPCOMING_MINUTES = datetime.timedelta(minutes=-7)
 
 
@@ -864,15 +863,9 @@ class TBANSHelper:
         cls,
         clients: list[MobileClient],
         notification: Notification,
-        backoff_iteration: int = 0,
     ) -> None:
         # Only send to FCM clients if notifications are enabled
         if not cls._notifications_enabled():
-            return
-
-        # Only allow so many retries
-        backoff_time = 2**backoff_iteration
-        if backoff_time > MAXIMUM_BACKOFF:
             return
 
         # Make sure we're only sending to FCM clients
@@ -891,7 +884,6 @@ class TBANSHelper:
         token_clients = [client for client in clients if not client.is_fid]
         fid_clients = [client for client in clients if client.is_fid]
 
-        retry_clients: list[MobileClient] = []
         for partition in (token_clients, fid_clients):
             # We can only send to so many FCM clients at a time - send to our clients across several requests
             for subclients in [
@@ -906,37 +898,20 @@ class TBANSHelper:
                 batch_response = fcm_request.send()
                 logging.info(f"Got FCM response: {time.strftime('%X')}")
 
-                retry_clients.extend(
-                    cls._handle_fcm_batch_response(subclients, batch_response)
-                )
-
-        # if retry_clients:
-        #     # Try again, with exponential backoff
-        #     defer_safe(
-        #         cls._send_fcm,
-        #         retry_clients,
-        #         notification,
-        #         backoff_iteration + 1,
-        #         _countdown=backoff_time,
-        #         _target="py3-tasks-io",
-        #         _queue="push-notifications",
-        #         _url="/_ah/queue/deferred_notification_send",
-        #     )
+                cls._handle_fcm_batch_response(subclients, batch_response)
 
         return
 
     @classmethod
     def _handle_fcm_batch_response(
         cls, subclients: list[MobileClient], batch_response
-    ) -> list[MobileClient]:
+    ) -> None:
         """
-        Handle failed sends - this might include logging/alerting, removing old
-        clients, or marking a client to be retried.
+        Handle failed sends - this might include logging/alerting or removing old
+        clients.
 
         `batch_response.responses[index]` corresponds to `subclients[index]`, which
         only holds if the request was not built from a mix of tokens and fids.
-
-        Returns the clients whose sends should be retried.
         """
         from firebase_admin.exceptions import (
             InternalError,
@@ -950,7 +925,6 @@ class TBANSHelper:
             UnregisteredError,
         )
 
-        retry_clients: list[MobileClient] = []
         for index, response in enumerate(batch_response.responses):
             if response.success:
                 continue
@@ -963,7 +937,6 @@ class TBANSHelper:
                 MobileClientQuery.delete_for_messaging_id(client.messaging_id)
             elif isinstance(response.exception, QuotaExceededError):
                 logging.error("Quota exceeded - retrying client...")
-                retry_clients.append(client)
             elif isinstance(response.exception, ThirdPartyAuthError):
                 logging.critical(
                     "Third party error sending to FCM - {}".format(response.exception)
@@ -976,10 +949,8 @@ class TBANSHelper:
                 )
             elif isinstance(response.exception, InternalError):
                 logging.error("Internal FCM error - retrying client...")
-                retry_clients.append(client)
             elif isinstance(response.exception, UnavailableError):
                 logging.error("FCM unavailable - retrying client...")
-                retry_clients.append(client)
             else:
                 debug_string = cls._debug_string(response.exception)
                 logging.error(
@@ -987,8 +958,6 @@ class TBANSHelper:
                         client.messaging_id, debug_string
                     )
                 )
-
-        return retry_clients
 
     @classmethod
     def _send_webhook(cls, client: MobileClient, notification: Notification) -> None:

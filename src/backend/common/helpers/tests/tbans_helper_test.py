@@ -1577,14 +1577,6 @@ class TestTBANSHelper(unittest.TestCase):
             TBANSHelper._send_fcm([], MockNotification())
             mock_check_enabled.assert_called_once()
 
-    # def test_send_fcm_maximum_backoff(self):
-    #     for i in range(0, 6):
-    #         TBANSHelper._send_fcm([], MockNotification(), backoff_iteration=i)
-    #
-    #     # Backoff should start failing at 6
-    #     # TODO: Exit codes were removed - should check we don't call send
-    #     TBANSHelper._send_fcm([], MockNotification(), backoff_iteration=6)
-
     def test_send_fcm_filter_fcm_clients(self):
         expected = ["client_type_{}".format(client_type) for client_type in FCM_CLIENTS]
         clients = [
@@ -1934,16 +1926,6 @@ class TestTBANSHelper(unittest.TestCase):
         # Sanity check
         assert fcm_messaging_ids("user_id") == ["messaging_id"]
 
-        # Check that we queue'd for a retry
-        # NOTE: Removed in https://github.com/the-blue-alliance/the-blue-alliance/pull/4620
-        # tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
-        # assert len(tasks) == 1
-
-        # Make sure our taskqueue tasks execute what we expect
-        # with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
-        #     run_from_task(tasks[0])
-        #     mock_send_fcm.assert_called_once_with([client], ANY, False, 1)
-
     def test_send_fcm_third_party_auth_error(self):
         client = MobileClient(
             parent=ndb.Key(Account, "user_id"),
@@ -2033,16 +2015,6 @@ class TestTBANSHelper(unittest.TestCase):
         # Sanity check
         assert fcm_messaging_ids("user_id") == ["messaging_id"]
 
-        # Check that we queue'd for a retry
-        # NOTE: Removed in https://github.com/the-blue-alliance/the-blue-alliance/pull/4620
-        # tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
-        # assert len(tasks) == 1
-
-        # Make sure our taskqueue tasks execute what we expect
-        # with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
-        #     run_from_task(tasks[0])
-        #     mock_send_fcm.assert_called_once_with([client], ANY, False, 1)
-
     def test_send_fcm_unavailable_error(self):
         client = MobileClient(
             parent=ndb.Key(Account, "user_id"),
@@ -2067,16 +2039,6 @@ class TestTBANSHelper(unittest.TestCase):
 
         # Sanity check
         assert fcm_messaging_ids("user_id") == ["messaging_id"]
-
-        # Check that we queue'd for a retry
-        # NOTE: Removed in https://github.com/the-blue-alliance/the-blue-alliance/pull/4620
-        # tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
-        # assert len(tasks) == 1
-
-        # Make sure our taskqueue tasks execute what we expect
-        # with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
-        #     run_from_task(tasks[0])
-        #     mock_send_fcm.assert_called_once_with([client], ANY, False, 1)
 
     def test_send_fcm_unhandled_error(self):
         client = MobileClient(
@@ -2108,43 +2070,6 @@ class TestTBANSHelper(unittest.TestCase):
         # Check that we didn't queue for a retry
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 0
-
-    def test_send_fcm_retry_backoff_time(self):
-        client = MobileClient(
-            parent=ndb.Key(Account, "user_id"),
-            user_id="user_id",
-            messaging_id="messaging_id",
-            client_type=ClientType.OS_IOS,
-        )
-        client.put()
-
-        # import time
-
-        batch_response = messaging.BatchResponse(
-            [messaging.SendResponse(None, QuotaExceededError("code", "message"))]
-        )
-        for i in range(0, 6):
-            with (
-                patch.object(FCMRequest, "send", return_value=batch_response),
-                patch("logging.error"),
-            ):
-                # call_time = time.time()
-                TBANSHelper._send_fcm([client], MockNotification(), i)
-
-                # NOTE: Removed in https://github.com/the-blue-alliance/the-blue-alliance/pull/4620
-                # Check that we queue'd for a retry with the proper countdown time
-                # tasks = self.taskqueue_stub.get_filtered_tasks(
-                #     queue_names="push-notifications"
-                # )
-                # if i > 0:
-                #     assert tasks[0].eta_posix - call_time > 0
-                #
-                # Make sure our taskqueue tasks execute what we expect
-                # with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
-                #     run_from_task(tasks[0])
-                #     mock_send_fcm.assert_called_once_with([client], ANY, False, i + 1)
-
-                self.taskqueue_stub.FlushQueue("push-notifications")
 
     def test_send_webhook_disabled(self):
         from backend.common.sitevars.notifications_enable import NotificationsEnable
@@ -2451,20 +2376,6 @@ class TestTBANSHelper(unittest.TestCase):
                 )
                 is None
             )
-
-    def test_send_fcm_backoff_exhausted(self):
-        client = MobileClient(
-            parent=ndb.Key(Account, "user_id"),
-            user_id="user_id",
-            messaging_id="token",
-            client_type=ClientType.OS_IOS,
-        )
-        with (
-            patch.object(TBANSHelper, "_notifications_enabled", return_value=True),
-            patch.object(FCMRequest, "send") as mock_send,
-        ):
-            TBANSHelper._send_fcm([client], MockNotification(), backoff_iteration=6)
-        mock_send.assert_not_called()
 
     def test_debug_string_generic_exception(self):
         assert TBANSHelper._debug_string(ValueError("oops")) == "oops"
