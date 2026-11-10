@@ -81,4 +81,5 @@ class AllianceSelectionNotification(Notification):
         payload = cast(Dict[str, Any], none_throws(self.data_payload))
         payload["event_name"] = self.event.name
         payload["event"] = EventConverter.eventConverter_v3(self.event)
+        payload["event_alliances"] = self.event.alliance_selections
         return payload
