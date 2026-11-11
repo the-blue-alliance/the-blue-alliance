@@ -1174,12 +1174,60 @@ export const zNexusNowQueueing = z.object({
 });
 
 /**
- * Live match-queuing info for an event, sourced from Nexus (https://frc.nexus/) and cached by TBA.
+ * A pair of x and y values on a Nexus pit map, used for positions and sizes.
+ */
+export const zNexusMapVector = z.object({
+  x: z.number().optional(),
+  y: z.number().optional(),
+});
+
+/**
+ * A rectangle on a Nexus pit map.
+ */
+export const zNexusMapElement = z.object({
+  position: zNexusMapVector.optional(),
+  size: zNexusMapVector.optional(),
+  angle: z.number().nullish(),
+});
+
+export const zNexusMapPit = zNexusMapElement.and(
+  z.object({
+    team_key: z.string().nullable(),
+  }),
+);
+
+export const zNexusMapLabel = zNexusMapElement.and(
+  z.object({
+    label: z.string().optional(),
+  }),
+);
+
+export const zNexusMapArrow = zNexusMapElement.and(
+  z.object({
+    type: z.enum(['single', 'double']).optional(),
+  }),
+);
+
+/**
+ * The pit map for an event, as reported by Nexus. Each collection maps a Nexus element ID to that element.
+ */
+export const zNexusPitMap = z.object({
+  size: zNexusMapVector,
+  pits: z.record(z.string(), zNexusMapPit),
+  areas: z.record(z.string(), zNexusMapLabel),
+  labels: z.record(z.string(), zNexusMapLabel),
+  arrows: z.record(z.string(), zNexusMapArrow),
+  walls: z.record(z.string(), zNexusMapElement),
+});
+
+/**
+ * Live match-queuing info and the pit map for an event, sourced from Nexus (https://frc.nexus/) and cached by TBA.
  */
 export const zNexusEventInfo = z.object({
-  data_as_of_ms: z.int(),
+  data_as_of_ms: z.int().nullable(),
   now_queueing: zNexusNowQueueing.nullable(),
   matches: z.record(z.string(), zNexusMatchInfo),
+  pit_map: zNexusPitMap.nullable(),
 });
 
 export const zNotablesInsight = z.object({

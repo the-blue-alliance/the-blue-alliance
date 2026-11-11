@@ -41,6 +41,7 @@ from backend.common.models.event_queue_status import (
 from backend.common.models.event_team import EventTeam
 from backend.common.models.match import Match
 from backend.common.models.media import Media
+from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.models.team import Team
 
 
@@ -701,6 +702,114 @@ def test_event_nexus_info(
         "match_name": "Qualification 5",
     }
     assert resp.json["matches"]["2019casj_qm5"]["status"] == "Now queuing"
+
+
+def test_event_nexus_info_without_pit_map_has_null_pit_map(
+    ndb_stub, api_client: Client, memcache_stub, taskqueue_stub
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    EventNexusQueueStatusMemcache("2019casj").put(
+        EventQueueStatus(data_as_of_ms=1721000000000, now_queueing=None, matches={})
+    )
+
+    resp = api_client.get(
+        "/api/v3/event/2019casj/nexus_info",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.json["pit_map"] is None
+
+
+def test_event_nexus_info_pit_map_only(
+    ndb_stub, api_client: Client, memcache_stub, taskqueue_stub
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    NexusEventDetails(
+        id="2019casj",
+        pitmap_json={
+            "size": {"x": 100, "y": 100},
+            "pits": {
+                "A1": {
+                    "position": {"x": 50, "y": 50},
+                    "size": {"x": 40, "y": 40},
+                    "team": "1678",
+                }
+            },
+        },
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/event/2019casj/nexus_info",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == {
+        "data_as_of_ms": None,
+        "now_queueing": None,
+        "matches": {},
+        "pit_map": {
+            "size": {"x": 100, "y": 100},
+            "pits": {
+                "A1": {
+                    "position": {"x": 50, "y": 50},
+                    "size": {"x": 40, "y": 40},
+                    "team_key": "frc1678",
+                }
+            },
+            "areas": {},
+            "labels": {},
+            "arrows": {},
+            "walls": {},
+        },
+    }
+
+
+def test_event_nexus_info_with_queue_status_and_pit_map(
+    ndb_stub, api_client: Client, memcache_stub, taskqueue_stub
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    EventNexusQueueStatusMemcache("2019casj").put(
+        EventQueueStatus(data_as_of_ms=1721000000000, now_queueing=None, matches={})
+    )
+    NexusEventDetails(
+        id="2019casj",
+        pitmap_json={"size": {"x": 100, "y": 100}, "pits": {}},
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/event/2019casj/nexus_info",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert (resp.json["data_as_of_ms"], resp.json["pit_map"]["size"]) == (
+        1721000000000,
+        {"x": 100, "y": 100},
+    )
 
 
 def test_event_nexus_info_no_cached_data(

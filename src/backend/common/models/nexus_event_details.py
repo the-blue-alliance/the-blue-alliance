@@ -8,8 +8,8 @@ from backend.common.nexus_api.types import PitMap
 
 
 class NexusEventDetails(CachedModel):
-    pitmap_json: dict[str, PitMap] = cast(
-        dict[str, PitMap],
+    pitmap_json: PitMap = cast(
+        PitMap,
         ndb.JsonProperty(required=True, indexed=False, compressed=True),
     )
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
