@@ -24,6 +24,8 @@ import type {
   PingMobileClientResponses,
   RegisterMobileClientData,
   RegisterMobileClientResponses,
+  RequestApiWriteKeyData,
+  RequestApiWriteKeyResponses,
   ResolveVideoPlaylistData,
   ResolveVideoPlaylistResponses,
   SetModelPreferencesData,
@@ -279,6 +281,26 @@ export const deleteApiReadKey = <ThrowOnError extends boolean = false>(
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api_keys/read/delete',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Request write API keys for an event
+ */
+export const requestApiWriteKey = <ThrowOnError extends boolean = false>(
+  options: Options<RequestApiWriteKeyData, ThrowOnError>,
+): RequestResult<RequestApiWriteKeyResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    RequestApiWriteKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api_keys/write/request',
     ...options,
     headers: {
       'Content-Type': 'application/json',

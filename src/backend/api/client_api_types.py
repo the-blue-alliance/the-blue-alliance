@@ -174,3 +174,13 @@ class AddApiReadKeyResponse(BaseResponse, _AddApiReadKeyResponseOptional):
 
 class DeleteApiReadKeyMessage(TypedDict):
     key_id: str
+
+
+class ApiWriteKeyRequestMessage(TypedDict):
+    event_key: str
+    affiliation: str
+    auth_types: List[int]
+
+
+class ApiWriteKeyRequestResponse(BaseResponse):
+    status: str

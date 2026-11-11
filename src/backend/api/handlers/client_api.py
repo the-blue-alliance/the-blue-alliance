@@ -10,6 +10,8 @@ from backend.api.client_api_types import (
     ApiKeysResponse,
     ApiReadKeyMessage,
     ApiWriteKeyMessage,
+    ApiWriteKeyRequestMessage,
+    ApiWriteKeyRequestResponse,
     BaseResponse,
     DeleteApiReadKeyMessage,
     EventMatchVideosSuggestionMessage,
@@ -66,6 +68,7 @@ from backend.common.suggestions.suggestion_creator import (
     SuggestionCreationStatus,
     SuggestionCreator,
 )
+from backend.common.suggestions.suggestion_notifier import SuggestionNotifier
 
 
 def _parse_messaging_id_type(req: RegistrationRequest) -> MessagingIdType | None:
@@ -720,3 +723,54 @@ def delete_api_read_key(req: DeleteApiReadKeyMessage) -> BaseResponse:
 
     current_user.delete_api_key(api_key)
     return BaseResponse(code=200, message="Read API key deleted")
+
+
+@client_api_method(ApiWriteKeyRequestMessage, ApiWriteKeyRequestResponse)
+def request_api_write_key(
+    req: ApiWriteKeyRequestMessage,
+) -> ApiWriteKeyRequestResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return ApiWriteKeyRequestResponse(
+            code=401,
+            message="Unauthorized to request write keys",
+            status="unauthorized",
+        )
+
+    event_key = req["event_key"].strip()
+    if not Event.validate_key_name(event_key):
+        return ApiWriteKeyRequestResponse(
+            code=404,
+            message="Event not found",
+            status=SuggestionCreationStatus.BAD_EVENT.value,
+        )
+
+    affiliation = req["affiliation"].strip()
+    auth_types = req["auth_types"]
+    account_key = none_throws(current_user.account_key)
+    status = SuggestionCreator.createApiWriteSuggestion(
+        author_account_key=account_key,
+        event_key=event_key,
+        affiliation=affiliation,
+        auth_types=auth_types,
+    )
+
+    if status == SuggestionCreationStatus.SUCCESS:
+        SuggestionNotifier.apiwrite_requested(
+            account_key,
+            event_key,
+            role=affiliation,
+            auth_types=SuggestionCreator.requestable_auth_types(
+                none_throws(Event.get_by_id(event_key)), auth_types
+            ),
+        )
+        return ApiWriteKeyRequestResponse(
+            code=200, message="Write key request added", status=status.value
+        )
+    if status == SuggestionCreationStatus.NO_AFFILIATION:
+        return ApiWriteKeyRequestResponse(
+            code=400, message="An affiliation is required", status=status.value
+        )
+    return ApiWriteKeyRequestResponse(
+        code=404, message="Event not found", status=status.value
+    )

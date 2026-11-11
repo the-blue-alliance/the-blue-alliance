@@ -253,7 +253,7 @@ function ApiDocs(): React.JSX.Element {
               archival. For example, many offseason events use the Trusted API
               to provide real-time match results to their audience. To get
               started, you need to{' '}
-              <a href="/request/apiwrite">request access tokens</a> for your
+              <Link to="/request/apiwrite">request access tokens</Link> for your
               desired event. These need to be used when constructing each
               request.
             </p>

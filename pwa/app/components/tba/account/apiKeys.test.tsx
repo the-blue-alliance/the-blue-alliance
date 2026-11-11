@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type {
@@ -24,6 +25,21 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('~/lib/hooks/useApiKeys', () => ({ useApiKeys: mocks.useApiKeys }));
+
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({
+    children,
+    to,
+    ...props
+  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
+    children?: ReactNode;
+    to: string;
+  }) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
+}));
 
 const READ_KEY: ApiReadKeyMessage = {
   key: 'read-key-1',
@@ -97,7 +113,7 @@ describe('ApiKeysSection', () => {
       screen
         .getByRole('link', { name: 'Request Write Key' })
         .getAttribute('href'),
-    ).toBe('https://www.thebluealliance.com/request/apiwrite');
+    ).toBe('/request/apiwrite');
   });
 
   test('shows placeholders for missing dates and events, and raw unparseable dates', () => {

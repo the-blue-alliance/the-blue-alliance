@@ -28,7 +28,7 @@ function AddData(): React.JSX.Element {
           &quot;Event&quot; page and input the playlist link. If you&apos;re
           webcasting and archiving an event and want to directly add videos as
           they get uploaded, you can{' '}
-          <a href="/request/apiwrite">request write keys.</a>
+          <Link to="/request/apiwrite">request write keys.</Link>
         </p>
 
         <h2>Event Webcasts</h2>
@@ -72,8 +72,8 @@ function AddData(): React.JSX.Element {
         <p>
           If your offseason event does <em>not</em> have FMS Sync back to
           Headquarters, that&apos;s not an issue either. You can{' '}
-          <a href="/request/apiwrite">request write keys</a> and post individual
-          data points during an event using the{' '}
+          <Link to="/request/apiwrite">request write keys</Link> and post
+          individual data points during an event using the{' '}
           <a href="/eventwizard2">Event Wizard</a> to get results in a timely
           manner.
         </p>
@@ -86,9 +86,9 @@ function AddData(): React.JSX.Element {
         <h2>FMS Reports</h2>
         <p>
           We can also import FMS Report exports into The Blue Alliance. You can
-          either <a href="/request/apiwrite">obtain write keys</a> and use the{' '}
-          <a href="/eventwizard2">Event Wizard</a> to input the reports, or post
-          them in our{' '}
+          either <Link to="/request/apiwrite">obtain write keys</Link> and use
+          the <a href="/eventwizard2">Event Wizard</a> to input the reports, or
+          post them in our{' '}
           <a href="https://www.facebook.com/groups/moardata/">
             Facebook Group.
           </a>

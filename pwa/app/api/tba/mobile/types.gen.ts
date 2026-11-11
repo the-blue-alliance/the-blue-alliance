@@ -271,6 +271,27 @@ export type PingRequest = {
   mobile_id: string;
 };
 
+export type ApiWriteKeyRequestMessage = {
+  /**
+   * The event the write keys are for
+   */
+  event_key: string;
+  /**
+   * The requester's role at the event
+   */
+  affiliation: string;
+  /**
+   * Requested write types (1=match video, 2=event teams, 3=event matches, 4=event rankings, 5=event alliances, 6=event awards, 7=event info, 8=zebra motionworks). Official events only receive match video.
+   */
+  auth_types: Array<number>;
+};
+
+export type ApiWriteKeyRequestResponse = {
+  code: number;
+  message: string;
+  status: 'success' | 'no_affiliation' | 'bad_event' | 'unauthorized';
+};
+
 export type ListFavoritesData = {
   body?: never;
   path?: never;
@@ -502,6 +523,23 @@ export type DeleteApiReadKeyResponses = {
 
 export type DeleteApiReadKeyResponse =
   DeleteApiReadKeyResponses[keyof DeleteApiReadKeyResponses];
+
+export type RequestApiWriteKeyData = {
+  body: ApiWriteKeyRequestMessage;
+  path?: never;
+  query?: never;
+  url: '/api_keys/write/request';
+};
+
+export type RequestApiWriteKeyResponses = {
+  /**
+   * Successful response
+   */
+  200: ApiWriteKeyRequestResponse;
+};
+
+export type RequestApiWriteKeyResponse =
+  RequestApiWriteKeyResponses[keyof RequestApiWriteKeyResponses];
 
 export type RegisterMobileClientData = {
   body: RegistrationRequest;

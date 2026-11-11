@@ -32,6 +32,7 @@ import { Route as GamedayEventCodeRouteImport } from './routes/gameday.$eventCod
 import { Route as InsightsChar123YearChar125RouteImport } from './routes/insights.{-$year}'
 import { Route as LocalDebugRouteImport } from './routes/local.debug'
 import { Route as MatchMatchKeyRouteImport } from './routes/match.$matchKey'
+import { Route as RequestApiwriteRouteImport } from './routes/request.apiwrite'
 import { Route as TeamsChar123PgNumChar125RouteImport } from './routes/teams.{-$pgNum}'
 import { Route as DistrictDistrictAbbreviationInsightsRouteImport } from './routes/district.$districtAbbreviation.insights'
 import { Route as DistrictDistrictAbbreviationChar123YearChar125RouteImport } from './routes/district.$districtAbbreviation.{-$year}'
@@ -166,6 +167,11 @@ const MatchMatchKeyRoute = MatchMatchKeyRouteImport.update({
   path: '/match/$matchKey',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RequestApiwriteRoute = RequestApiwriteRouteImport.update({
+  id: '/request/apiwrite',
+  path: '/request/apiwrite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TeamsChar123PgNumChar125Route =
   TeamsChar123PgNumChar125RouteImport.update({
     id: '/teams/{-$pgNum}',
@@ -272,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
+  '/request/apiwrite': typeof RequestApiwriteRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
   '/account/': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
@@ -312,6 +319,7 @@ export interface FileRoutesByTo {
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
+  '/request/apiwrite': typeof RequestApiwriteRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
   '/account': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
@@ -353,6 +361,7 @@ export interface FileRoutesById {
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
+  '/request/apiwrite': typeof RequestApiwriteRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
   '/account/': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
@@ -395,6 +404,7 @@ export interface FileRouteTypes {
     | '/insights/{-$year}'
     | '/local/debug'
     | '/match/$matchKey'
+    | '/request/apiwrite'
     | '/teams/{-$pgNum}'
     | '/account/'
     | '/district/$districtAbbreviation/insights'
@@ -435,6 +445,7 @@ export interface FileRouteTypes {
     | '/insights/{-$year}'
     | '/local/debug'
     | '/match/$matchKey'
+    | '/request/apiwrite'
     | '/teams/{-$pgNum}'
     | '/account'
     | '/district/$districtAbbreviation/insights'
@@ -475,6 +486,7 @@ export interface FileRouteTypes {
     | '/insights/{-$year}'
     | '/local/debug'
     | '/match/$matchKey'
+    | '/request/apiwrite'
     | '/teams/{-$pgNum}'
     | '/account/'
     | '/district/$districtAbbreviation/insights'
@@ -515,6 +527,7 @@ export interface RootRouteChildren {
   InsightsChar123YearChar125Route: typeof InsightsChar123YearChar125Route
   LocalDebugRoute: typeof LocalDebugRoute
   MatchMatchKeyRoute: typeof MatchMatchKeyRoute
+  RequestApiwriteRoute: typeof RequestApiwriteRoute
   TeamsChar123PgNumChar125Route: typeof TeamsChar123PgNumChar125Route
   AccountIndexRoute: typeof AccountIndexRoute
   DistrictDistrictAbbreviationInsightsRoute: typeof DistrictDistrictAbbreviationInsightsRoute
@@ -696,6 +709,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MatchMatchKeyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/request/apiwrite': {
+      id: '/request/apiwrite'
+      path: '/request/apiwrite'
+      fullPath: '/request/apiwrite'
+      preLoaderRoute: typeof RequestApiwriteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/teams/{-$pgNum}': {
       id: '/teams/{-$pgNum}'
       path: '/teams/{-$pgNum}'
@@ -837,6 +857,7 @@ const rootRouteChildren: RootRouteChildren = {
   InsightsChar123YearChar125Route: InsightsChar123YearChar125Route,
   LocalDebugRoute: LocalDebugRoute,
   MatchMatchKeyRoute: MatchMatchKeyRoute,
+  RequestApiwriteRoute: RequestApiwriteRoute,
   TeamsChar123PgNumChar125Route: TeamsChar123PgNumChar125Route,
   AccountIndexRoute: AccountIndexRoute,
   DistrictDistrictAbbreviationInsightsRoute:
