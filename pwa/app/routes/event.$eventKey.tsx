@@ -880,6 +880,11 @@ function EventPage() {
               matches={sortedMatches}
               media={teamMediaQuery.data}
               statuses={teamStatusesQuery.data}
+              pitMap={nexusInfo?.pit_map}
+              relatedEventKeys={[
+                ...siblingDivisionKeys,
+                ...event.division_keys,
+              ]}
             />
           )}
         </TabsContent>

@@ -1,20 +1,30 @@
-import { useMemo, useState } from 'react';
+import { useQueries, useQueryClient } from '@tanstack/react-query';
+import { Suspense, lazy, useMemo, useState } from 'react';
 
+import MapIcon from '~icons/lucide/map';
 import SearchIcon from '~icons/lucide/search';
 import XIcon from '~icons/lucide/x';
 
+import type { EventColors } from '~/api/colors';
+import { getEventColorsOptions } from '~/api/colors/@tanstack/react-query.gen';
 import type {
   Event,
   Match,
   Media,
+  NexusPitMap as NexusPitMapData,
   Team,
   TeamEventStatus,
 } from '~/api/tba/read';
+import {
+  getEventNexusInfoOptions,
+  getEventTeamsStatusesOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import {
   PitLocationLink,
   TeamLink,
   TeamLocationLink,
 } from '~/components/tba/links';
+import LoadingSkeleton from '~/components/tba/loadingSkeleton';
 import {
   CHANGE_IN_COMP_LEVEL_BREAKER,
   END_OF_DAY_BREAKER,
@@ -37,6 +47,7 @@ import {
 import { Input } from '~/components/ui/input';
 import { getRemappedRobots } from '~/lib/eventUtils';
 import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
+import { staleTimeForYear } from '~/lib/queryClient';
 import { sortTeamsComparator } from '~/lib/teamUtils';
 import { STATE_TO_ABBREVIATION, splitIntoNChunks } from '~/lib/utils';
 
@@ -46,6 +57,115 @@ interface EventTeamsTabProps {
   matches: Match[];
   media: Media[];
   statuses?: { [key: string]: TeamEventStatus | null };
+  pitMap?: NexusPitMapData | null;
+  relatedEventKeys?: string[];
+}
+
+type PitTeam = readonly [pit: string, robotNumber: string];
+
+const NexusPitMap = lazy(() => import('~/components/tba/nexusPitMap'));
+
+function statusesQuery(eventKey: string, year: number) {
+  return {
+    ...getEventTeamsStatusesOptions({ path: { event_key: eventKey } }),
+    staleTime: staleTimeForYear(year),
+  };
+}
+
+function nexusInfoQuery(eventKey: string) {
+  return {
+    ...getEventNexusInfoOptions({ path: { event_key: eventKey } }),
+    staleTime: 30_000,
+  };
+}
+
+function colorsQuery(eventKey: string, year: number) {
+  return {
+    ...getEventColorsOptions({ path: { eventKey } }),
+    staleTime: staleTimeForYear(year),
+  };
+}
+
+// Championship divisions publish a playoff alliance map whose pit IDs collide
+// with the teams' regular pits, so only trust an event whose pits all fit.
+function pitsOnMap(pits: PitTeam[], pitMap: NexusPitMapData): PitTeam[] {
+  return pits.every(([pit]) => pit in pitMap.pits) ? pits : [];
+}
+
+// Nexus gives each event its own copy of a shared venue map, and copies taken
+// at different times can renumber pits, so only borrow teams from an event
+// whose copy puts every pit in the same place.
+function samePits(a: NexusPitMapData, b: NexusPitMapData): boolean {
+  const ids = Object.keys(a.pits);
+  return (
+    ids.length === Object.keys(b.pits).length &&
+    ids.every(
+      (id) =>
+        a.pits[id].position?.x === b.pits[id]?.position?.x &&
+        a.pits[id].position?.y === b.pits[id]?.position?.y,
+    )
+  );
+}
+
+function PitMap({
+  event,
+  pitMap,
+  ownPits,
+  relatedEventKeys,
+}: {
+  event: Event;
+  pitMap: NexusPitMapData;
+  ownPits: PitTeam[];
+  relatedEventKeys: string[];
+}) {
+  const relatedInfo = useQueries({
+    queries: relatedEventKeys.map(nexusInfoQuery),
+  });
+  const relatedStatuses = useQueries({
+    queries: relatedEventKeys.map((key) => statusesQuery(key, event.year)),
+  });
+  const eventColors = useQueries({
+    queries: [event.key, ...relatedEventKeys].map((key) =>
+      colorsQuery(key, event.year),
+    ),
+  });
+  const teamsByPit = new Map([
+    ...relatedInfo.flatMap(({ data }, index): PitTeam[] => {
+      const relatedMap = data?.pit_map;
+      if (!relatedMap || !samePits(pitMap, relatedMap)) {
+        return [];
+      }
+      return [
+        ...Object.entries(relatedMap.pits).flatMap(([pit, { team_key }]) =>
+          team_key ? [[pit, team_key.slice(3).toUpperCase()] as const] : [],
+        ),
+        ...pitsOnMap(
+          Object.entries(relatedStatuses[index].data ?? {}).flatMap(
+            ([teamKey, status]) =>
+              status?.pit_location
+                ? [[status.pit_location, teamKey.slice(3)] as const]
+                : [],
+          ),
+          pitMap,
+        ),
+      ];
+    }),
+    ...pitsOnMap(ownPits, pitMap),
+  ]);
+  const colors: EventColors = {
+    teams: eventColors.reduce<EventColors['teams']>(
+      (all, { data }) => ({ ...all, ...data?.teams }),
+      {},
+    ),
+  };
+  return (
+    <NexusPitMap
+      pitMap={pitMap}
+      year={event.year}
+      teamsByPit={teamsByPit}
+      colors={colors}
+    />
+  );
 }
 
 const ROW_TARGET_CLASS = `block text-sm wrap-break-word after:absolute
@@ -72,6 +192,8 @@ export default function EventTeamsTab({
   matches,
   media,
   statuses,
+  pitMap,
+  relatedEventKeys = [],
 }: EventTeamsTabProps) {
   const { year, first_event_code: firstEventCode } = event;
   const [search, setSearch] = useState('');
@@ -133,6 +255,23 @@ export default function EventTeamsTab({
   }, [event, teams, matches, media, statuses]);
   const hasAvatars = entries.some((entry) => entry.avatar);
   const hasPits = entries.some((entry) => entry.pit);
+  const ownPits = useMemo(
+    () =>
+      entries.flatMap(({ pit, robotKey, team, robotNumber }): PitTeam[] =>
+        pit && robotKey === team.key ? [[pit, robotNumber]] : [],
+      ),
+    [entries],
+  );
+  const queryClient = useQueryClient();
+  const prefetchPitMap = () => {
+    relatedEventKeys.forEach((key) => {
+      void queryClient.prefetchQuery(nexusInfoQuery(key));
+      void queryClient.prefetchQuery(statusesQuery(key, year));
+    });
+    [event.key, ...relatedEventKeys].forEach(
+      (key) => void queryClient.prefetchQuery(colorsQuery(key, year)),
+    );
+  };
   const query = search.trim().toLowerCase();
   const filtered = entries.filter((entry) => entry.searchable.includes(query));
 
@@ -165,11 +304,62 @@ export default function EventTeamsTab({
             </Button>
           )}
         </div>
-        <output className="text-xs text-muted-foreground tabular-nums">
-          {query
-            ? `${filtered.length} of ${entries.length} teams`
-            : `${entries.length} teams`}
-        </output>
+        <div className="flex items-center gap-3">
+          <output className="text-xs text-muted-foreground tabular-nums">
+            {query
+              ? `${filtered.length} of ${entries.length} teams`
+              : `${entries.length} teams`}
+          </output>
+          {pitMap && (
+            <Dialog>
+              <DialogTrigger
+                render={<Button size="sm" variant="outline" />}
+                onPointerEnter={prefetchPitMap}
+                onFocus={prefetchPitMap}
+              >
+                <MapIcon />
+                Pit map
+              </DialogTrigger>
+              <DialogContent
+                aria-describedby={undefined}
+                focusContentOnOpen
+                className="max-h-[90vh] grid-rows-[auto_minmax(0,1fr)_auto]
+                  sm:max-w-5xl"
+              >
+                <DialogHeader>
+                  <DialogTitle>Pit map</DialogTitle>
+                </DialogHeader>
+                <div className="min-h-0 overflow-auto rounded-md border">
+                  <Suspense
+                    fallback={
+                      <LoadingSkeleton
+                        label="Loading pit map"
+                        className="aspect-square w-full"
+                      />
+                    }
+                  >
+                    <PitMap
+                      event={event}
+                      pitMap={pitMap}
+                      ownPits={ownPits}
+                      relatedEventKeys={relatedEventKeys}
+                    />
+                  </Suspense>
+                </div>
+                {firstEventCode && (
+                  <a
+                    href={`https://frc.nexus/en/event/${year}${firstEventCode}/map`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-muted-foreground hover:underline"
+                  >
+                    Pit map data from frc.nexus
+                  </a>
+                )}
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
       </div>
       {filtered.length === 0 ? (
         <p className="border-y py-8 text-center text-sm text-muted-foreground">
