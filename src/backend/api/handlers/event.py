@@ -20,7 +20,7 @@ from backend.api.handlers.helpers.model_query_response import (
     multi_models_query_response,
 )
 from backend.api.handlers.helpers.nexus_info_converter import (
-    event_queue_status_to_api,
+    nexus_info_to_api,
     NexusInfoDict,
 )
 from backend.api.handlers.helpers.profiled_jsonify import (
@@ -37,6 +37,7 @@ from backend.common.memcache_models.event_nexus_queue_status_memcache import (
     EventNexusQueueStatusMemcache,
 )
 from backend.common.models.keys import EventKey
+from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.queries.award_query import EventAwardsQuery
 from backend.common.queries.dict_converters.award_converter import AwardDict
 from backend.common.queries.dict_converters.event_converter import EventDict
@@ -284,15 +285,15 @@ def event_nexus_info(
     event_key: EventKey,
 ) -> TypedFlaskResponse[Optional[NexusInfoDict]]:
     """
-    Returns live match queuing info from Nexus for a given event, or null if
-    no data is currently available.
+    Returns live match queuing info and the pit map from Nexus for a given
+    event, or null if neither is currently available.
     """
     track_call_after_response("event/nexus_info", event_key)
 
     queue_status = EventNexusQueueStatusMemcache(event_key).get()
-    nexus_info: Optional[NexusInfoDict] = (
-        event_queue_status_to_api(queue_status) if queue_status is not None else None
-    )
+    nexus_event_details = NexusEventDetails.get_by_id(event_key)
+    pit_map = nexus_event_details.pitmap_json if nexus_event_details else None
+    nexus_info: Optional[NexusInfoDict] = nexus_info_to_api(queue_status, pit_map)
     return profiled_jsonify(nexus_info)
 
 
