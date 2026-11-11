@@ -41,6 +41,7 @@ const RESULT_LIMIT = 10;
 const FIRST_SEASON = 1992;
 const TEAM_BOOST = 1.5;
 const RECENCY_HALF_LIFE = 7.5;
+const FUTURE_SEASON_PENALTY = 0.01;
 const TEAM_PREFIX = /^(?:frc|team)\s*(?=\d)/;
 const TEAM_YEAR_PATTERN = /^(\d+)[\s/]+(\d{2}|\d{4})$/;
 const YEAR_PATTERN = /^\d{4}$/;
@@ -159,7 +160,8 @@ function documentBoost(
     return TEAM_BOOST;
   }
   const age = currentSeason - eventYear(doc.event);
-  return age < 0 ? 1 : 1 + 1 / (1 + age / RECENCY_HALF_LIFE);
+  const boost = 1 + 1 / (1 + Math.max(age, 0) / RECENCY_HALF_LIFE);
+  return age < 0 ? boost - FUTURE_SEASON_PENALTY : boost;
 }
 
 function fullYear(year: string, currentSeason: number): number {
