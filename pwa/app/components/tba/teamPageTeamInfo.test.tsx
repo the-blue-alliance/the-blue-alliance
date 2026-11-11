@@ -1,41 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import type { District, Media, MediaAvatar, Team } from '~/api/tba/read';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    search,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    to: string;
-    search: Record<string, string>;
-  }) => (
-    <a href={`${to}?${new URLSearchParams(search).toString()}`} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
-vi.mock('~/components/tba/links', () => ({
-  TeamLocationLink: ({ team }: { team: Team }) => (
-    <a href="#map">{team.city}</a>
-  ),
-  DistrictLink: ({
-    children,
-    districtAbbreviation,
-    year,
-  }: {
-    children: ReactNode;
-    districtAbbreviation: string;
-    year: number;
-  }) => <a href={`/district/${districtAbbreviation}/${year}`}>{children}</a>,
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
 const team = {
   key: 'frc254',

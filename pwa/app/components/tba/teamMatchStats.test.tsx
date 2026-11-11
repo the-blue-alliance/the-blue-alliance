@@ -11,19 +11,7 @@ import {
 } from '~/api/tba/read';
 import TeamMatchStats from '~/components/tba/teamMatchStats';
 
-vi.mock('~/components/tba/links', () => ({
-  TeamLink: ({
-    children,
-    teamOrKey,
-    year,
-  }: {
-    children: ReactNode;
-    teamOrKey: string;
-    year?: number;
-  }) => (
-    <a href={`/team/${teamOrKey.substring(3)}/${year ?? ''}`}>{children}</a>
-  ),
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
 vi.mock('recharts', async (importOriginal) => ({
   ...(await importOriginal<typeof import('recharts')>()),

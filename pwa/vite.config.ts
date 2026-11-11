@@ -42,6 +42,7 @@ export default defineConfig({
       exclude: [
         'app/**/*.test.{ts,tsx}',
         'app/**/*.d.ts',
+        'app/testing/**',
         // Generated: the OpenAPI client and the TanStack route tree.
         'app/**/*.gen.ts',
         'app/api/**',

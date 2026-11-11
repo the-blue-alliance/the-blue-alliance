@@ -45,15 +45,7 @@ vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
   }),
 }));
 
-vi.mock('~/components/tba/links', () => ({
-  MatchLink: ({
-    children,
-    matchOrKey,
-  }: {
-    children: ReactNode;
-    matchOrKey: Match;
-  }) => <a href={`/match/${matchOrKey.key}`}>{children}</a>,
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
 vi.mock('~/components/tba/match/matchDetails', () => ({
   default: ({ match, event }: { match: Match; event: Event }) => (

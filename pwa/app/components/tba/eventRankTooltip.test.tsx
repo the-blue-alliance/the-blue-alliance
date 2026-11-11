@@ -6,7 +6,7 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { type EventRanking } from '~/api/tba/read';
@@ -23,22 +23,7 @@ vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
   }),
 }));
 
-vi.mock('~/components/tba/links', () => ({
-  TeamLink: ({
-    children,
-    teamOrKey,
-    year,
-    ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
-    children: ReactNode;
-    teamOrKey: string;
-    year: number;
-  }) => (
-    <a href={`/team/${teamOrKey.substring(3)}/${year}`} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
 vi.mock('~/components/ui/tooltip', () => ({
   Tooltip: ({

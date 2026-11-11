@@ -1,13 +1,10 @@
 import { act, render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { KickoffCountdown } from '~/components/tba/kickoffCountdown';
 
-vi.mock('@tanstack/react-router', () => ({
-  ClientOnly: ({ children }: { children: ReactNode }) => <>{children}</>,
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
 const now = Temporal.Instant.from('2026-09-30T12:00:00Z');
 

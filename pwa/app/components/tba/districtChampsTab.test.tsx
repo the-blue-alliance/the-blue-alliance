@@ -7,7 +7,6 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
-import { type ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { type EventColors } from '~/api/colors';
@@ -60,35 +59,7 @@ vi.mock('~/api/colors/@tanstack/react-query.gen', () => ({
   }),
 }));
 
-vi.mock('~/components/tba/links', () => ({
-  EventLink: ({
-    children,
-    eventOrKey,
-  }: {
-    children: ReactNode;
-    eventOrKey: string;
-  }) => <a href={`/event/${eventOrKey}`}>{children}</a>,
-  MatchLink: ({
-    children,
-    matchOrKey,
-  }: {
-    children: ReactNode;
-    matchOrKey: Match;
-  }) => <a href={`/match/${matchOrKey.key}`}>{children}</a>,
-  TeamLink: ({
-    children,
-    teamOrKey,
-    style,
-  }: {
-    children: ReactNode;
-    teamOrKey: string;
-    style?: React.CSSProperties;
-  }) => (
-    <a href={`/team/${teamOrKey.substring(3)}`} style={style}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
 function makeEvent(
   key: string,

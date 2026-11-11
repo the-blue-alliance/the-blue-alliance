@@ -10,11 +10,10 @@ const { useMediaQueryMock } = vi.hoisted(() => ({
 
 vi.mock('~/lib/hooks', () => ({ useMediaQuery: useMediaQueryMock }));
 
-vi.mock('~/components/tba/teamTooltip', () => ({
-  TeamLinkWithTooltip: ({ teamKey }: { teamKey: string }) => (
-    <a href={`/team/${teamKey}`}>{teamKey}</a>
-  ),
-}));
+vi.mock(
+  '~/components/tba/teamTooltip',
+  () => import('~/testing/mocks/teamTooltip'),
+);
 
 const coprs: EventCoprs = {
   totalPoints: { frc254: 50.123, frc604: 70 },
@@ -49,12 +48,12 @@ describe('ComponentOprsTable', () => {
       within(rows[0])
         .getAllByRole('cell')
         .map((c) => c.textContent),
-    ).toEqual(['1', 'frc604', '70.00', '12.00', '—']);
+    ).toEqual(['1', '604', '70.00', '12.00', '—']);
     expect(
       within(rows[1])
         .getAllByRole('cell')
         .map((c) => c.textContent),
-    ).toEqual(['2', 'frc254', '50.12', '10.00', '40.00']);
+    ).toEqual(['2', '254', '50.12', '10.00', '40.00']);
   });
 
   test('ranks teams by the selected component', () => {
@@ -69,7 +68,7 @@ describe('ComponentOprsTable', () => {
     ).toBe('1');
     expect(
       within(screen.getAllByRole('row')[1]).getByRole('link').textContent,
-    ).toBe('frc254');
+    ).toBe('254');
   });
 
   test('inverts ranks when the component is sorted ascending', () => {
@@ -98,7 +97,7 @@ describe('ComponentOprsTable', () => {
     expect(screen.getByRole('button', { name: 'Total Points ↓' })).toBeTruthy();
     expect(
       within(screen.getAllByRole('row')[1]).getByRole('link').textContent,
-    ).toBe('frc604');
+    ).toBe('604');
   });
 
   test('shows only the sort component on mobile and lets the user pick', async () => {

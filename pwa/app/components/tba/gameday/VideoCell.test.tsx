@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { VideoCell } from '~/components/tba/gameday/VideoCell';
@@ -24,28 +23,7 @@ vi.mock('~/lib/gameday/context', () => ({
   }),
 }));
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    params,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children: ReactNode;
-    params?: Record<string, string>;
-    to: string;
-  }) => (
-    <a
-      href={Object.entries(params ?? {}).reduce(
-        (href, [key, value]) => href.replace(`$${key}`, value),
-        to,
-      )}
-      {...props}
-    >
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
 const dataPanel: GamedayContent = {
   type: 'data-panel',

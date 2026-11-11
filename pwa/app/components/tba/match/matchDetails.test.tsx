@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
@@ -11,39 +10,14 @@ import {
   PlayoffType,
 } from '~/api/tba/read';
 import MatchDetails from '~/components/tba/match/matchDetails';
-import type { TeamTooltipProps } from '~/components/tba/teamTooltip';
 import { formatMatchTime } from '~/lib/matchUtils';
 
-vi.mock('~/components/tba/teamTooltip', () => ({
-  TeamLinkWithTooltip: ({
-    teamKey,
-    year,
-    disqualified: _disqualified,
-    surrogate: _surrogate,
-    ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & TeamTooltipProps) => (
-    <a href={`/team/${teamKey.substring(3)}/${year}`} {...props}>
-      {teamKey.substring(3)}
-    </a>
-  ),
-}));
+vi.mock(
+  '~/components/tba/teamTooltip',
+  () => import('~/testing/mocks/teamTooltip'),
+);
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    search,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    to: string;
-    search: Record<string, string>;
-  }) => (
-    <a href={`${to}?${new URLSearchParams(search).toString()}`} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
 vi.mock('~/lib/hooks/useFavoriteTeams', () => ({
   useFavoriteTeamKeys: () => ({ teamKeys: [], isLoading: false }),

@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import {
   afterEach,
@@ -25,48 +24,17 @@ import SimpleMatchRowsWithBreaks, {
   MatchRow,
   SimpleMatchRow,
 } from '~/components/tba/match/matchRows';
-import type { TeamTooltipProps } from '~/components/tba/teamTooltip';
 import { TooltipProvider } from '~/components/ui/tooltip';
 import { formatMatchTime } from '~/lib/matchUtils';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    to: string;
-  }) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
-vi.mock('~/components/tba/links', () => ({
-  MatchLink: ({
-    children,
-    matchOrKey,
-  }: {
-    children: ReactNode;
-    matchOrKey: Match;
-  }) => <a href={`/match/${matchOrKey.key}`}>{children}</a>,
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
-vi.mock('~/components/tba/teamTooltip', () => ({
-  TeamLinkWithTooltip: ({
-    teamKey,
-    year,
-    disqualified: _disqualified,
-    surrogate: _surrogate,
-    ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & TeamTooltipProps) => (
-    <a href={`/team/${teamKey.substring(3)}/${year}`} {...props}>
-      {teamKey.substring(3)}
-    </a>
-  ),
-}));
+vi.mock(
+  '~/components/tba/teamTooltip',
+  () => import('~/testing/mocks/teamTooltip'),
+);
 
 const mocks = vi.hoisted(() => ({
   useFavoriteTeamKeys:

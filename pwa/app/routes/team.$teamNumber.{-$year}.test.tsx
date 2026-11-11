@@ -1,6 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
@@ -13,31 +12,12 @@ import {
 import { runHead, runLoader } from '~/routes/-testUtils';
 import { Route, StatsSection } from '~/routes/team.$teamNumber.{-$year}';
 
-vi.mock('@tanstack/react-router', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@tanstack/react-router')>();
-  return {
-    ...actual,
-    Link: ({
-      children,
-      to,
-      ...props
-    }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-      children?: ReactNode;
-      to: string;
-    }) => (
-      <a href={to} {...props}>
-        {children}
-      </a>
-    ),
-  };
-});
-
-vi.mock('~/components/tba/links', () => ({
-  DistrictLink: ({ children }: { children: ReactNode }) => (
-    <a href="#district">{children}</a>
-  ),
+vi.mock('@tanstack/react-router', async (importOriginal) => ({
+  ...(await importOriginal()),
+  Link: (await import('~/testing/mocks/router')).Link,
 }));
+
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
 const team = {
   key: 'frc254',

@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import type {
@@ -11,22 +10,7 @@ import type {
 } from '~/api/tba/read';
 import EventTeamsTab from '~/components/tba/eventTeamsTab';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    params,
-    to: _to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children: ReactNode;
-    params: { teamNumber: string; year?: string };
-    to: string;
-  }) => (
-    <a href={`/team/${params.teamNumber}/${params.year}`} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
 vi.mock('~/components/tba/eventRankTooltip', () => ({
   default: ({ rank }: { rank: number }) => <div>Rank {rank}</div>,

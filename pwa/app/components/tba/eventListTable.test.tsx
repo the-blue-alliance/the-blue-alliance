@@ -1,5 +1,4 @@
 import { render, screen, within } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { Event, EventType } from '~/api/tba/read';
@@ -10,22 +9,7 @@ const { isEventActiveMock, isEventOnlineMock } = vi.hoisted(() => ({
   isEventOnlineMock: vi.fn<(event: Event) => boolean>(),
 }));
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    params,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children: ReactNode;
-    params: { eventKey: string };
-    to: string;
-  }) => (
-    <a href={to.replace('$eventKey', params.eventKey)} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
 vi.mock('~/lib/eventUtils', async (importOriginal) => {
   const actual = await importOriginal<typeof import('~/lib/eventUtils')>();

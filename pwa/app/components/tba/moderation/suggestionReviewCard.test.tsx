@@ -5,7 +5,6 @@ import {
   screen,
   within,
 } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test, vi } from 'vitest';
 
@@ -22,28 +21,7 @@ import {
 } from '~/components/tba/moderation/suggestionReviewCard';
 import { formatEventDateRange } from '~/lib/moderationUtils';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    params,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children: ReactNode;
-    params?: Record<string, string>;
-    to: string;
-  }) => (
-    <a
-      href={Object.entries(params ?? {}).reduce(
-        (href, [key, value]) => href.replace(`$${key}`, value),
-        to,
-      )}
-      {...props}
-    >
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
 vi.mock('~/components/tba/videoEmbeds', () => ({
   YoutubeEmbed: ({ videoId, title }: { videoId: string; title: string }) => (
@@ -362,7 +340,7 @@ describe('SuggestionReviewCard reference header', () => {
     const link = screen.getByRole('link', {
       name: 'Team 254 - The Cheesy Poofs (2026)',
     });
-    expect(link.getAttribute('href')).toBe('/team/254/{-2026}');
+    expect(link.getAttribute('href')).toBe('/team/254/2026');
   });
 
   test('links a team without a year', () => {

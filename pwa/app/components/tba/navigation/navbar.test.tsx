@@ -5,7 +5,6 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { Navbar } from '~/components/tba/navigation/navbar';
@@ -21,23 +20,8 @@ const mocks = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    params: _params,
-    activeProps: _activeProps,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    to: string;
-    params?: unknown;
-    activeProps?: unknown;
-  }) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
+vi.mock('@tanstack/react-router', async () => ({
+  ...(await import('~/testing/mocks/router')),
   useLocation: () => ({ pathname: mocks.pathname }),
   useRouter: () => mocks.router,
 }));

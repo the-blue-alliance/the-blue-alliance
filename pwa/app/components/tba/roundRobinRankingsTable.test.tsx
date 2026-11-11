@@ -4,11 +4,10 @@ import { describe, expect, test, vi } from 'vitest';
 import type { PlayoffAdvancement } from '~/api/tba/read';
 import RoundRobinRankingsTable from '~/components/tba/roundRobinRankingsTable';
 
-vi.mock('~/components/tba/teamTooltip', () => ({
-  TeamLinkWithTooltip: ({ teamKey }: { teamKey: string }) => (
-    <a href={`/team/${teamKey}`}>{teamKey.substring(3)}</a>
-  ),
-}));
+vi.mock(
+  '~/components/tba/teamTooltip',
+  () => import('~/testing/mocks/teamTooltip'),
+);
 
 function cells(row: HTMLElement) {
   return within(row)

@@ -1,24 +1,13 @@
 import { render, screen, within } from '@testing-library/react';
-import { type AnchorHTMLAttributes } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import { type PlayoffAdvancement } from '~/api/tba/read';
 import PlayoffAdvancement2015Table from '~/components/tba/playoffAdvancement2015Table';
 
-vi.mock('~/components/tba/teamTooltip', () => ({
-  TeamLinkWithTooltip: ({
-    teamKey,
-    year,
-    ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
-    teamKey: string;
-    year: number;
-  }) => (
-    <a href={`/team/${teamKey.substring(3)}/${year}`} {...props}>
-      {teamKey.substring(3)}
-    </a>
-  ),
-}));
+vi.mock(
+  '~/components/tba/teamTooltip',
+  () => import('~/testing/mocks/teamTooltip'),
+);
 
 const quarterfinals: PlayoffAdvancement = {
   level: 'qf',

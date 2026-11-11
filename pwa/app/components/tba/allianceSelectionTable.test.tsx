@@ -10,11 +10,10 @@ import {
 } from '~/api/tba/read';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 
-vi.mock('~/components/tba/teamTooltip', () => ({
-  TeamLinkWithTooltip: ({ teamKey }: { teamKey: string }) => (
-    <a href={`/team/${teamKey}`}>{teamKey.substring(3)}</a>
-  ),
-}));
+vi.mock(
+  '~/components/tba/teamTooltip',
+  () => import('~/testing/mocks/teamTooltip'),
+);
 
 function alliance(
   overrides: Partial<EliminationAlliance>,

@@ -1,5 +1,4 @@
 import { act, render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, PropsWithChildren } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
@@ -9,7 +8,6 @@ import {
   formatMatchTime,
   sortMatchSuggestions,
 } from '~/components/tba/gameday/MatchRecommendationsPanel';
-import type { TeamTooltipProps } from '~/components/tba/teamTooltip';
 import type { UseFirebaseMatchSuggestionsResult } from '~/lib/gameday/useFirebaseMatchSuggestions';
 
 const { useMatchSuggestionsMock } = vi.hoisted(() => ({
@@ -20,47 +18,12 @@ vi.mock('~/lib/gameday/useFirebaseMatchSuggestions', () => ({
   useFirebaseMatchSuggestions: useMatchSuggestionsMock,
 }));
 
-vi.mock('~/components/tba/links', () => ({
-  EventLink: ({
-    eventOrKey,
-    children,
-    ...props
-  }: PropsWithChildren<
-    { eventOrKey: string } & AnchorHTMLAttributes<HTMLAnchorElement>
-  >) => (
-    <a href={`/event/${eventOrKey}`} {...props}>
-      {children}
-    </a>
-  ),
-  MatchLink: ({
-    matchOrKey,
-    children,
-    noModal: _noModal,
-    ...props
-  }: PropsWithChildren<
-    {
-      matchOrKey: string;
-      noModal?: boolean;
-    } & AnchorHTMLAttributes<HTMLAnchorElement>
-  >) => (
-    <a href={`/match/${matchOrKey}`} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
-vi.mock('~/components/tba/teamTooltip', () => ({
-  TeamLinkWithTooltip: ({
-    teamKey,
-    disqualified: _disqualified,
-    surrogate: _surrogate,
-    ...props
-  }: TeamTooltipProps & AnchorHTMLAttributes<HTMLAnchorElement>) => (
-    <a href={`/team/${teamKey.slice(3)}`} {...props}>
-      {teamKey.slice(3)}
-    </a>
-  ),
-}));
+vi.mock(
+  '~/components/tba/teamTooltip',
+  () => import('~/testing/mocks/teamTooltip'),
+);
 
 function makeSuggestion(
   matchKey: string,
@@ -168,12 +131,12 @@ describe('MatchRecommendationsPanel', () => {
     ).toEqual([
       '/event/2026miket',
       '/match/2026miket_qm12',
-      '/team/1',
-      '/team/2',
-      '/team/3',
-      '/team/4',
-      '/team/5',
-      '/team/6',
+      '/team/1/2026',
+      '/team/2/2026',
+      '/team/3/2026',
+      '/team/4/2026',
+      '/team/5/2026',
+      '/team/6/2026',
     ]);
   });
 

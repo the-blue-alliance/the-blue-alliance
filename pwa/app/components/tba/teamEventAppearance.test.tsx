@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { type ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
@@ -19,33 +18,7 @@ import TeamEventAppearance, {
   getTotalRankingPoints,
 } from '~/components/tba/teamEventAppearance';
 
-vi.mock('~/components/tba/links', () => ({
-  EventLink: ({
-    children,
-    eventOrKey,
-  }: {
-    children: ReactNode;
-    eventOrKey: string;
-  }) => <a href={`/event/${eventOrKey}`}>{children}</a>,
-  EventLocationLink: ({ event }: { event: Event }) => (
-    <a href="https://maps.example">{event.city}</a>
-  ),
-  TeamLink: ({
-    children,
-    teamOrKey,
-    year,
-    ...props
-  }: {
-    children: ReactNode;
-    teamOrKey: string;
-    year?: number;
-    'aria-current'?: 'page';
-  }) => (
-    <a href={`/team/${teamOrKey.substring(3)}/${year ?? ''}`} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
 vi.mock('~/components/tba/eventRankTooltip', () => ({
   default: ({ rank, numTeams }: { rank: number; numTeams: number }) => (

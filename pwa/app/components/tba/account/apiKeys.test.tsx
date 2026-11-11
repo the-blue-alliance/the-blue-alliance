@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type {
@@ -26,20 +25,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('~/lib/hooks/useApiKeys', () => ({ useApiKeys: mocks.useApiKeys }));
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    to: string;
-  }) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
 const READ_KEY: ApiReadKeyMessage = {
   key: 'read-key-1',

@@ -1,5 +1,4 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import { type Event, EventType } from '~/api/tba/read';
@@ -9,48 +8,9 @@ import {
   type LeaderboardShape,
 } from '~/components/tba/leaderboard';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    params,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    params: { eventKey: string };
-    to: string;
-  }) => (
-    <a href={to.replace('$eventKey', params.eventKey)} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
-vi.mock('~/components/tba/links', () => ({
-  TeamLink: ({
-    children,
-    teamOrKey,
-    year,
-  }: {
-    children?: ReactNode;
-    teamOrKey: string;
-    year: number;
-  }) => <a href={`/team/${teamOrKey}/${year}`}>{children}</a>,
-  MatchLink: ({
-    children,
-    matchOrKey,
-    event,
-    ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
-    children?: ReactNode;
-    matchOrKey: string;
-    event?: Event;
-  }) => (
-    <a href={`/match/${matchOrKey}`} data-event={event?.key} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
 const casj = {
   key: '2024casj',
@@ -114,7 +74,7 @@ describe('Leaderboard', () => {
     expect(rowCells(row)).toEqual(['12', '254, 604']);
     expect(
       within(row).getByRole('link', { name: '254' }).getAttribute('href'),
-    ).toBe('/team/frc254/2024');
+    ).toBe('/team/254/2024');
   });
 
   test('falls back to the leaderboard name and expands', () => {

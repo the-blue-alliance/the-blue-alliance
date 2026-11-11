@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { createRef } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
@@ -10,20 +9,7 @@ import {
   TableOfContentsTitle,
 } from '~/components/ui/toc';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children: ReactNode;
-    to: string;
-  }) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
 describe('TableOfContentsList', () => {
   test('has no padding without an indent', () => {

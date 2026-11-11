@@ -6,7 +6,6 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import {
   afterEach,
   beforeAll,
@@ -43,10 +42,10 @@ const SEARCH_INDEX: SearchIndex = {
   ],
 };
 
-vi.mock('@tanstack/react-router', () => ({
+vi.mock('@tanstack/react-router', async () => ({
+  ...(await import('~/testing/mocks/router')),
   useNavigate: () => useNavigateMock,
   useRouteContext: () => ({ currentSeason: 2026 }),
-  ClientOnly: ({ children }: { children: ReactNode }) => children,
 }));
 
 class ResizeObserverMock {

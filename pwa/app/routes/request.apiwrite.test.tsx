@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { ApiWriteKeyRequestResponse } from '~/api/tba/mobile/types.gen';
@@ -11,25 +11,10 @@ const mocks = vi.hoisted(() => ({
   requestApiWriteKey: vi.fn<(options: unknown) => Promise<unknown>>(),
 }));
 
-vi.mock('@tanstack/react-router', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@tanstack/react-router')>();
-  return {
-    ...actual,
-    Link: ({
-      children,
-      to,
-      ...props
-    }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-      children?: ReactNode;
-      to: string;
-    }) => (
-      <a href={to} {...props}>
-        {children}
-      </a>
-    ),
-  };
-});
+vi.mock('@tanstack/react-router', async (importOriginal) => ({
+  ...(await importOriginal()),
+  Link: (await import('~/testing/mocks/router')).Link,
+}));
 
 vi.mock('~/components/tba/auth/auth', () => ({ useAuth: mocks.useAuth }));
 

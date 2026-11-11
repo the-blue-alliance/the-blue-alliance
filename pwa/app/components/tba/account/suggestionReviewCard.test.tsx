@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import type { QueueResponse } from '~/api/tba/moderation/types.gen';
@@ -8,20 +7,7 @@ import {
   pendingSuggestionTotal,
 } from '~/components/tba/account/suggestionReviewCard';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    to: string;
-  }) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
 const QUEUE: QueueResponse = {
   counts: { media: 3, 'social-media': 0, 'offseason-event': 2 },

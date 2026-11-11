@@ -1,33 +1,10 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import type { InsightV2Streak, InsightV2StreakData } from '~/api/tba/read';
 import { StreakInsight } from '~/components/tba/streakInsight';
 
-vi.mock('~/components/tba/links', () => ({
-  TeamLink: ({
-    children,
-    teamOrKey,
-    year,
-    ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
-    children?: ReactNode;
-    teamOrKey: string;
-    year: number;
-  }) => (
-    <a href={`/team/${teamOrKey}/${year}`} {...props}>
-      {children}
-    </a>
-  ),
-  EventLink: ({
-    children,
-    eventOrKey,
-  }: {
-    children?: ReactNode;
-    eventOrKey: string;
-  }) => <a href={`/event/${eventOrKey}`}>{children}</a>,
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
 type Entry = InsightV2StreakData['entries'][number];
 
@@ -81,7 +58,7 @@ describe('StreakInsight', () => {
     expect(rows[0].textContent).toBe('5254' + '2020 – 2024Active');
     expect(
       within(rows[0]).getByRole('link', { name: '254' }).getAttribute('href'),
-    ).toBe('/team/frc254/0');
+    ).toBe('/team/254/history');
 
     expect(rows[1].textContent).toBe('52024casj2024casj – (same)');
     expect(within(rows[1]).getAllByRole('link')).toHaveLength(2);

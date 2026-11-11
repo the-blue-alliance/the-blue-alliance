@@ -5,15 +5,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { type Award, AwardType, type Event } from '~/api/tba/read';
 import TeamAwardsSummary from '~/components/tba/teamAwardsSummary';
 
-vi.mock('~/components/tba/links', () => ({
-  EventLink: ({
-    children,
-    eventOrKey,
-  }: {
-    children: ReactNode;
-    eventOrKey: string;
-  }) => <a href={`/event/${eventOrKey}`}>{children}</a>,
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
 // Base UI tooltips only open on pointer hover; render the trigger element
 // and the content inline so the event list is inspectable.

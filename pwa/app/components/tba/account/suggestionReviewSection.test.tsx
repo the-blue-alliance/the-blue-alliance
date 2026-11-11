@@ -4,11 +4,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { SuggestionReviewSection } from '~/components/tba/account/suggestionReviewSection';
 import { useModerationQueue } from '~/lib/hooks/useModeration';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to }: { children?: React.ReactNode; to: string }) => (
-    <a href={to}>{children}</a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/testing/mocks/router'));
 
 vi.mock('~/lib/hooks/useModeration', () => ({
   useModerationQueue: vi.fn<() => unknown>(),

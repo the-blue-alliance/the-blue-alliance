@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { type AnchorHTMLAttributes, type ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
@@ -13,26 +12,12 @@ import {
 } from '~/api/tba/read';
 import EliminationBracket from '~/components/tba/eliminationBracket';
 
-vi.mock('~/components/tba/teamTooltip', () => ({
-  TeamLinkWithTooltip: ({
-    teamKey,
-    year,
-    ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
-    teamKey: string;
-    year: number;
-  }) => (
-    <a href={`/team/${teamKey.substring(3)}/${year}`} {...props}>
-      {teamKey.substring(3)}
-    </a>
-  ),
-}));
+vi.mock(
+  '~/components/tba/teamTooltip',
+  () => import('~/testing/mocks/teamTooltip'),
+);
 
-vi.mock('~/components/tba/links', () => ({
-  MatchLink: ({ children }: { children: ReactNode }) => (
-    <a href="/match">{children}</a>
-  ),
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
 const alliances: EliminationAlliance[] = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({
   declines: [],

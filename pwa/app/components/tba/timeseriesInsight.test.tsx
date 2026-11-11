@@ -101,14 +101,7 @@ vi.mock('~/components/ui/chart', () => ({
   ),
 }));
 
-vi.mock('~/components/tba/links', () => ({
-  TeamLink: ({ children }: { children: ReactNode }) => (
-    <a href="#t">{children}</a>
-  ),
-  MatchLink: ({ children }: { children: ReactNode }) => (
-    <a href="#m">{children}</a>
-  ),
-}));
+vi.mock('~/components/tba/links', () => import('~/testing/mocks/links'));
 
 type Data = InsightV2Timeseries['data'];
 type Series = Data['series'][number];
