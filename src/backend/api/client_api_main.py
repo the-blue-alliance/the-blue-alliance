@@ -10,6 +10,7 @@ from backend.api.handlers.client_api import (
     list_subscriptions,
     ping_mobile_client,
     register_mobile_client,
+    request_api_write_key,
     resolve_video_playlist,
     suggest_event_match_videos,
     suggest_event_media,
@@ -107,4 +108,9 @@ client_api.add_url_rule(
     "/api_keys/read/delete",
     methods=["POST"],
     view_func=delete_api_read_key,
+)
+client_api.add_url_rule(
+    "/api_keys/write/request",
+    methods=["POST"],
+    view_func=request_api_write_key,
 )

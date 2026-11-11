@@ -11,6 +11,7 @@ import {
   listSubscriptions,
   pingMobileClient,
   registerMobileClient,
+  requestApiWriteKey,
   resolveVideoPlaylist,
   setModelPreferences,
   suggestEventMatchVideos,
@@ -37,6 +38,8 @@ import type {
   PingMobileClientResponse,
   RegisterMobileClientData,
   RegisterMobileClientResponse,
+  RequestApiWriteKeyData,
+  RequestApiWriteKeyResponse,
   ResolveVideoPlaylistData,
   ResolveVideoPlaylistResponse,
   SetModelPreferencesData,
@@ -369,6 +372,33 @@ export const deleteApiReadKeyMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await deleteApiReadKey({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Request write API keys for an event
+ */
+export const requestApiWriteKeyMutation = (
+  options?: Partial<Options<RequestApiWriteKeyData>>,
+): UseMutationOptions<
+  RequestApiWriteKeyResponse,
+  DefaultError,
+  Options<RequestApiWriteKeyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RequestApiWriteKeyResponse,
+    DefaultError,
+    Options<RequestApiWriteKeyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await requestApiWriteKey({
         ...options,
         ...fnOptions,
         throwOnError: true,

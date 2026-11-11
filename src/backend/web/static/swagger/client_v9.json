@@ -595,6 +595,57 @@
             "type": "string"
           }
         }
+      },
+      "ApiWriteKeyRequestMessage": {
+        "type": "object",
+        "required": [
+          "event_key",
+          "affiliation",
+          "auth_types"
+        ],
+        "properties": {
+          "event_key": {
+            "type": "string",
+            "description": "The event the write keys are for"
+          },
+          "affiliation": {
+            "type": "string",
+            "description": "The requester's role at the event"
+          },
+          "auth_types": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Requested write types (1=match video, 2=event teams, 3=event matches, 4=event rankings, 5=event alliances, 6=event awards, 7=event info, 8=zebra motionworks). Official events only receive match video."
+          }
+        }
+      },
+      "ApiWriteKeyRequestResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "status"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "no_affiliation",
+              "bad_event",
+              "unauthorized"
+            ]
+          }
+        }
       }
     },
     "securitySchemes": {
@@ -1030,6 +1081,39 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api_keys/write/request": {
+      "post": {
+        "summary": "Request write API keys for an event",
+        "operationId": "requestApiWriteKey",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiWriteKeyRequestMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiWriteKeyRequestResponse"
                 }
               }
             }

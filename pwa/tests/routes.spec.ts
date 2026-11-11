@@ -40,6 +40,7 @@ const allRoutes = defineAllRoutes([
   '/match_suggestion',
   '/match/$matchKey',
   '/privacy',
+  '/request/apiwrite',
   '/search',
   '/suggest/event/media',
   '/suggest/event/video',

@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
@@ -35,8 +36,6 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { useApiKeys } from '~/lib/hooks/useApiKeys';
-
-const REQUEST_APIWRITE_URL = 'https://www.thebluealliance.com/request/apiwrite';
 
 function formatIsoDate(iso: string | null | undefined): string {
   if (!iso) return '—';
@@ -116,12 +115,12 @@ export default function ApiKeysSection() {
               Keys for writing event data. Granted on request.
             </CardDescription>
           </div>
-          <a
-            href={REQUEST_APIWRITE_URL}
+          <Link
+            to="/request/apiwrite"
             className={buttonVariants({ size: 'sm' })}
           >
             Request Write Key
-          </a>
+          </Link>
         </CardHeader>
         <CardContent>
           {isLoading ? (
