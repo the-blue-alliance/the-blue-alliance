@@ -1,20 +1,11 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { InsightV2, InsightV2GameStatsScope } from '~/api/tba/read';
+import { getInsightsV2YearCategory } from '~/api/tba/read/sdk.gen';
 import { EventSuccessRateTable } from '~/components/tba/eventSuccessRateTable';
-
-const { queryFnMock } = vi.hoisted(() => ({
-  queryFnMock: vi.fn<() => Promise<InsightV2[]>>(),
-}));
-
-vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
-  getInsightsV2YearCategoryOptions: () => ({
-    queryKey: ['insights-v2'],
-    queryFn: queryFnMock,
-  }),
-}));
+import { mockTbaApi } from '~/test/msw';
+import { renderWithClient } from '~/test/render';
 
 function scope(
   overrides: Partial<InsightV2GameStatsScope>,
@@ -40,8 +31,8 @@ function insights(scopes: InsightV2GameStatsScope[]): InsightV2[] {
       year: 2026,
       category: 'leaderboard',
       district_abbreviation: null,
-      data: { rankings: [], key_type: 'team' },
-    } as unknown as InsightV2,
+      data: { rankings: [], key_type: 'team', context_type: 'none' },
+    },
     {
       name: 'game_stats',
       display_name: 'Game Stats',
@@ -53,26 +44,27 @@ function insights(scopes: InsightV2GameStatsScope[]): InsightV2[] {
   ];
 }
 
+function mockInsights(scopes: InsightV2GameStatsScope[]) {
+  return mockTbaApi(
+    getInsightsV2YearCategory,
+    { path: { year: 2026, category: 'game_stats' } },
+    insights(scopes),
+  );
+}
+
 function renderTable() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <EventSuccessRateTable eventKey="2026miket" year={2026} />
-    </QueryClientProvider>,
+  return renderWithClient(
+    <EventSuccessRateTable eventKey="2026miket" year={2026} />,
   );
 }
 
 describe('EventSuccessRateTable', () => {
   beforeEach(() => {
-    queryFnMock.mockResolvedValue(
-      insights([
-        scope({ scope_type: 'overall', key: null, label: 'Season' }),
-        scope({ key: '2026other' }),
-        scope({}),
-      ]),
-    );
+    mockInsights([
+      scope({ scope_type: 'overall', key: null, label: 'Season' }),
+      scope({ key: '2026other' }),
+      scope({}),
+    ]);
   });
 
   test("renders this event's scope and switches to playoffs", async () => {
@@ -85,9 +77,9 @@ describe('EventSuccessRateTable', () => {
   });
 
   test('renders nothing without a matching scope', async () => {
-    queryFnMock.mockResolvedValue(insights([scope({ key: '2026other' })]));
+    const requests = mockInsights([scope({ key: '2026other' })]);
     const { container } = renderTable();
-    await vi.waitFor(() => expect(queryFnMock).toHaveBeenCalled());
+    await vi.waitFor(() => expect(requests).toHaveLength(1));
     await new Promise((r) => setTimeout(r, 0));
     expect(container.innerHTML).toBe('');
   });
