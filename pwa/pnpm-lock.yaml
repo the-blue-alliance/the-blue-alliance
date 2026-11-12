@@ -21,8 +21,8 @@ importers:
         specifier: 0.4.5
         version: 0.4.5(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vue@3.5.45(typescript@6.0.3))
       '@sentry/tanstackstart-react':
-        specifier: 11.10.0
-        version: 11.10.0(react@19.3.1)(rollup@4.62.3)
+        specifier: 11.11.0
+        version: 11.11.0(react@19.3.1)(rollup@4.62.3)
       '@tanstack/react-query':
         specifier: 5.106.1
         version: 5.106.1(@types/react@19.3.0)(react@19.3.1)
@@ -145,8 +145,8 @@ importers:
         specifier: 1.65.0
         version: 1.65.0
       '@sentry/vite-plugin':
-        specifier: 11.10.0
-        version: 11.10.0(rollup@4.62.3)
+        specifier: 11.11.0
+        version: 11.11.0(rollup@4.62.3)
       '@svgr/core':
         specifier: 8.1.0
         version: 8.1.0(supports-color@10.2.2)(typescript@6.0.3)
@@ -1576,6 +1576,9 @@ packages:
     resolution: {integrity: sha512-AokJm4tuBHillT+FpMtxQ60n8ObyXBatq7jD2/JA9dxbDDokKQm8KMht5ibGzLVU9IJDIKK4TPKgMHEYMn3lMg==}
     engines: {node: '>=18'}
 
+  '@isaacs/nonrecursive-glob-match@1.0.3':
+    resolution: {integrity: sha512-SI7kyKHq4XXDRozw+r9GlRZkia1ZkFrpLW98r2IC2Bpr8YkFGE3fvjzmxCG0x78A++69HmDNrDvSMYBZmHGpKA==}
+
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
 
@@ -2901,12 +2904,12 @@ packages:
   '@sec-ant/readable-stream@0.4.1':
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
 
-  '@sentry/browser-utils@11.10.0':
-    resolution: {integrity: sha512-P/bYHTgj76sYBYCZa524YoZ/hZac2XCW3i3qShrMXnh7s63x1cweUjD7BDVDb0L/lGMwtuObuZeRnCif4hWLNg==}
+  '@sentry/browser-utils@11.11.0':
+    resolution: {integrity: sha512-sL1BK7Z7ubIBp+cnz5VIQcVPn+t4PgWTWYaK/AWklPzeA75CJ5xeeCrx0RUvg65k0BbUcc/XvWVxg5v73RQqiQ==}
     engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
 
-  '@sentry/browser@11.10.0':
-    resolution: {integrity: sha512-kU8Inx3K/PaaDGqTu4lBW8XCYNsYNTwwPIZNIRDas/mTXtepXpM7M0KxxrTSZXBTWX0RfDU4t7vsL9ay0o4+NQ==}
+  '@sentry/browser@11.11.0':
+    resolution: {integrity: sha512-UEq04DIcfCVUMF+T0rH9nLTEjVlymmZC8D/7JELJyZkpxMCtnf8iq3aPJ3DXICDCjSo7CuuOI9OIZ32KmmsyPA==}
     engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
 
   '@sentry/bundler-plugins@11.10.0':
@@ -2921,20 +2924,44 @@ packages:
       webpack:
         optional: true
 
+  '@sentry/bundler-plugins@11.11.0':
+    resolution: {integrity: sha512-et1v8V74ARNOSQ+k4VG7PRiNJl2APGAzlRCiUt42izw8yD+X+E4oCe7wwHjohmv3zufvD1VntHDptSC0/9ChQw==}
+    engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
+    peerDependencies:
+      rollup: '>=3.2.0'
+      webpack: '>=5.1.0'
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+      webpack:
+        optional: true
+
   '@sentry/conventions@0.29.0':
     resolution: {integrity: sha512-kYq9/HJ/l6MYP/srIc20dy1W4mWyJfCF0OWFF+RhBGZwyr/wCmtabRFKyw7kqM+DTwZXQOjSTSZUcJhDowcInQ==}
+    engines: {node: '>=14'}
+
+  '@sentry/conventions@0.30.0':
+    resolution: {integrity: sha512-WTumd5A2iFmHTRubi6mc6gLHU8LswPQqoNaZu6T1cxiTUmy3WdEw0i8FAnVbcgxTlsumX5oh63/b4B9lY5wAPQ==}
     engines: {node: '>=14'}
 
   '@sentry/core@11.10.0':
     resolution: {integrity: sha512-l/OtTo1v+TQgZtHG2Q5N4IX+gFdAE1tZ27K/P21UCzJglWk54TPEm+d9T2lulPqMK06kZcLwDgRAhE2GO4YS5w==}
     engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
 
-  '@sentry/feedback@11.10.0':
-    resolution: {integrity: sha512-jZqxVHPoUeZ6W7xSlhJdTMuM/GUJLA/K4U9OFmkP+g+TvtXhdwWxeiT23m2Wm5NmTHjaB07jSc05ayuflD8ETw==}
+  '@sentry/core@11.11.0':
+    resolution: {integrity: sha512-PRrcEdPrTYuHcbDa6DhJZR9Qg2d+2gjKVXiv2QeiTgxvhvXDxYiaVSXH0lldKTR099Er5TAEChiX7aEu4yNlUw==}
+    engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
+
+  '@sentry/feedback@11.11.0':
+    resolution: {integrity: sha512-KP1AYilzLYLIDcDiUD8eaEV955x5rKnwdxpXE70sJpuHUWuEB28MyyDe+tPWU8/MZtdmFGrqCxRqGQN9dNuvtw==}
     engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
 
   '@sentry/node@11.10.0':
     resolution: {integrity: sha512-ZsndrSn1NjL9AslpUdxz/kYPcv/i+plVZoyPe1ivlr5XPUpocB8pUL5noYbIUl96Wd/yGvPBw6zqO8d69rRKQQ==}
+    engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
+
+  '@sentry/node@11.11.0':
+    resolution: {integrity: sha512-6hbFui4AwP/1KGQD7wgvG0rjve4vgb9x+cBAaHV2N7YwZDZUoKdVaJr/S4PYByuI6UPR8xtwGluFlMFXOScz+Q==}
     engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
 
   '@sentry/opentelemetry@11.10.0':
@@ -2943,8 +2970,14 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
 
-  '@sentry/react@11.10.0':
-    resolution: {integrity: sha512-xRa0LTxAu/wW6Q/prOncsfLV4ovmFfwcoLR1xmReWFCTVSYdh9+qbS6fnR3yHGmZUQgGPY9veBsaYGveYoqqQw==}
+  '@sentry/opentelemetry@11.11.0':
+    resolution: {integrity: sha512-L1lXAF1hNUSOTLG8NLkBaopvWWpXqlYgQ++cfWr8Gw4wdmReNp9ec533bEj4r6ZJ6PvIYNdIVNI22GdvmbP6xg==}
+    engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
+    peerDependencies:
+      '@opentelemetry/api': ^1.9.0
+
+  '@sentry/react@11.11.0':
+    resolution: {integrity: sha512-c0Z+MPFIahsFximTIq4kmxldKY9XG1FWmIgblosRxqd5xEj27/TbfZsv2/yYg6jMNVvSkYwbZ3nm7xoBryGZWw==}
     engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
     peerDependencies:
       react: 17.x || 18.x || 19.x
@@ -2953,28 +2986,36 @@ packages:
       react-router:
         optional: true
 
-  '@sentry/replay-canvas@11.10.0':
-    resolution: {integrity: sha512-i0Fsjbl8ChzTMntLVhZvn72+p395tGNtL4iflsprnzPhTVSOGW9IYgUYfO87UcujUf5CmYn7ELBKUc5V0Ipfdg==}
+  '@sentry/replay-canvas@11.11.0':
+    resolution: {integrity: sha512-iVI8+Y+iC6/B6oEjDv63HzxzCsOIEiyb0MzyJiU45/IgQnriP1FUehqO6GitFtjEasl9//lWQL0RwPy97Eb7NQ==}
     engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
 
-  '@sentry/replay@11.10.0':
-    resolution: {integrity: sha512-0rcg+43tkO278VyrKcbmg0JQm2yxuguXKLbr9ieiNsynaxj22JC8baie4Uxizf2jM2ukfqA3O+o0Pbqaed8P2Q==}
+  '@sentry/replay@11.11.0':
+    resolution: {integrity: sha512-di2nOSxPOu9kgNb4G3Y0uAOCX4mKmTCfzyJxTQBKaj0F9ymugUO9Epu4n5Vez7x96KpfIZPA1AzbNVArYmVX2g==}
     engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
 
   '@sentry/server-runtime-injection@11.10.0':
     resolution: {integrity: sha512-1nc+HNPldrPEov16sL5m2cOLVgNJ+FsR7QtaWGOOv8qYFJkSp95lyc2qzLnaG2L72UzSMOv10peGRioAKrrZQQ==}
     engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
 
+  '@sentry/server-runtime-injection@11.11.0':
+    resolution: {integrity: sha512-nHHWfOYi2sB7db9Hjr3i/H66e1/YK9WMlBx3MSI6p/Ha66BGHF3vea/+gILjPz21viQclg1xq37mj8k9KLkGJw==}
+    engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
+
   '@sentry/server-utils@11.10.0':
     resolution: {integrity: sha512-m/MVCvPzQJJZZCTFlVPCrTuoncT7SR80+QKg1K7ul25AsL0byABr5KsHCbXVpOYXLVz04Omk+pOOR5Cv2IAlrA==}
     engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
 
-  '@sentry/tanstackstart-react@11.10.0':
-    resolution: {integrity: sha512-mxpdB/3mqJgPyWSh5gYHO4ZF3Tr+mgncuiC6mMeaN8zYmYedrA+corAeODj4ADjfggq1vWTkW3BEPUZlYqK3uQ==}
+  '@sentry/server-utils@11.11.0':
+    resolution: {integrity: sha512-t1lx9Zw+zhRre0ko+F3CsucG2BqB/7KOZmG1W+Wv/fSvYSnT06vg7WhIvmvH+df7BSFO+cFGBpkxwQWGq3zj+w==}
     engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
 
-  '@sentry/vite-plugin@11.10.0':
-    resolution: {integrity: sha512-1eUQmGMk7nPwGS6PN3nuzM8+U0mzP0zaPjmO3ua4IX6gd7HFpefkxriFgO9yGOhCBMSWkIkVzxl7hUrRTCIIfw==}
+  '@sentry/tanstackstart-react@11.11.0':
+    resolution: {integrity: sha512-KbNFFjBUFbkyolBkMFXtcrXO1HZ1tXWGViSSTdx2WL+XSKBq/+xGxBZ7Xq8G7Cb6/YoPuw2S2Z8hYOPCunxQOw==}
+    engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
+
+  '@sentry/vite-plugin@11.11.0':
+    resolution: {integrity: sha512-2mTYahcev74yoQJ8qENMdBS6aQ3QzFn3vWL0d7SxdQP9nDko9qwK65GjFMtmgF6+spMW5JdjJOt/dvgh3CSJIw==}
     engines: {node: '>=20.19.0 <22.0.0 || >=22.12.0 <23.0.0 || >=23.2.0'}
 
   '@shadcn/registry@0.2.1':
@@ -4120,8 +4161,8 @@ packages:
   brace-expansion@2.1.3:
     resolution: {integrity: sha512-DRdx5neNsG/QXbniLFWi2YmC/68oeOOmKz6zOjVk6ZS1ZLXgLIKqVEc6hWsmkjBbgii0SwaBTcJ5XKj5gzY/4A==}
 
-  brace-expansion@5.0.8:
-    resolution: {integrity: sha512-JZyDyq3D4AUifKTPOB7DELf6XsB3WdPuNxCtob1vFXPsSXhdAiHBWJ/tJ8HAc9aH84BK+5JFZLNkJKx3G9kzQg==}
+  brace-expansion@5.0.12:
+    resolution: {integrity: sha512-YovQ3rzhaLMIrDjNDMkNS01tea93qhEhG5xy8f6+R0l+dw3Ki+5sCoIoI942iuLZTHWogWktgwVDhU09iNEimQ==}
     engines: {node: 20 || >=22}
 
   braces@3.0.3:
@@ -5067,6 +5108,10 @@ packages:
 
   glob@13.0.6:
     resolution: {integrity: sha512-Wjlyrolmm8uDpm/ogGyXZXb1Z+Ca2B8NbJwqBVg0axK9GbBeoS7yGV6vjXnYdGm6X53iehEuxxbyiKp8QmN4Vw==}
+    engines: {node: 18 || 20 || >=22}
+
+  glob@14.0.3:
+    resolution: {integrity: sha512-A1vjIwC3qpdCso45Iw127gnp7sPhqgY8lUQhDrArIs+GbmfaaVPFuoyy7WyLT9EPZCRZ7j7aLdwUhQmHWesEow==}
     engines: {node: 18 || 20 || >=22}
 
   globalthis@1.0.4:
@@ -6017,6 +6062,10 @@ packages:
     resolution: {integrity: sha512-vpLQEs+VLCr1nU0BXS07maYoFwlDAH0gngQuuttxIwutDFEMHq2blX+8vpgxDdK3J1PwjCJiep77OitTZ4Ll1A==}
     engines: {node: 18 || 20 || >=22}
 
+  minimatch@11.0.4:
+    resolution: {integrity: sha512-/UJ1dEoVQTjPNDh6SGlUo+ueLMmoHTas4q+8yaAR/5t6nLAIiBDJtoYUh20IYleix7ehiQkgczb84PE3uzHkxg==}
+    engines: {node: 20 || >=22}
+
   minimatch@5.1.9:
     resolution: {integrity: sha512-7o1wEA2RyMP7Iu7GNba9vc0RWWGACJOCZBJX2GJWip0ikV+wcOsgVuY9uE8CPiyQhkGFSlhuSkZPavN7u1c2Fw==}
     engines: {node: '>=10'}
@@ -6320,6 +6369,10 @@ packages:
 
   path-scurry@2.0.2:
     resolution: {integrity: sha512-3O/iVVsJAPsOnpwWIeD+d6z/7PmqApyQePUtCndjatj/9I5LylHvt5qluFaBT3I5h3r1ejfR056c+FCv+NnNXg==}
+    engines: {node: 18 || 20 || >=22}
+
+  path-scurry@3.0.0:
+    resolution: {integrity: sha512-1pTbQqH1wIwMi/eleQ5leFTTCkzFsPcgXNjwOA8YGGW/W4/kHT3dssE7Z6NH+zuqNLOzOB0uaD61yl7cAcVhgg==}
     engines: {node: 18 || 20 || >=22}
 
   path-to-regexp@8.4.2:
@@ -9653,6 +9706,8 @@ snapshots:
 
   '@isaacs/cliui@9.0.0': {}
 
+  '@isaacs/nonrecursive-glob-match@1.0.3': {}
+
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
       '@jridgewell/sourcemap-codec': 1.6.0
@@ -9799,7 +9854,7 @@ snapshots:
 
   '@opentelemetry/api-logs@0.220.0':
     dependencies:
-      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/api': 1.10.0
 
   '@opentelemetry/api@1.10.0': {}
 
@@ -11018,20 +11073,20 @@ snapshots:
 
   '@sec-ant/readable-stream@0.4.1': {}
 
-  '@sentry/browser-utils@11.10.0':
+  '@sentry/browser-utils@11.11.0':
     dependencies:
-      '@sentry/conventions': 0.29.0
-      '@sentry/core': 11.10.0
+      '@sentry/conventions': 0.30.0
+      '@sentry/core': 11.11.0
       web-vitals: 6.2.3
 
-  '@sentry/browser@11.10.0':
+  '@sentry/browser@11.11.0':
     dependencies:
-      '@sentry/browser-utils': 11.10.0
-      '@sentry/conventions': 0.29.0
-      '@sentry/core': 11.10.0
-      '@sentry/feedback': 11.10.0
-      '@sentry/replay': 11.10.0
-      '@sentry/replay-canvas': 11.10.0
+      '@sentry/browser-utils': 11.11.0
+      '@sentry/conventions': 0.30.0
+      '@sentry/core': 11.11.0
+      '@sentry/feedback': 11.11.0
+      '@sentry/replay': 11.11.0
+      '@sentry/replay-canvas': 11.11.0
 
   '@sentry/bundler-plugins@11.10.0(rollup@4.62.3)':
     dependencies:
@@ -11045,15 +11100,33 @@ snapshots:
     optionalDependencies:
       rollup: 4.62.3
 
+  '@sentry/bundler-plugins@11.11.0(rollup@4.62.3)':
+    dependencies:
+      '@sentry/core': 11.11.0
+      dotenv: 17.4.2
+      glob: 14.0.3
+      magic-string: 1.4.5
+      oxc-parser: 0.152.0
+      sentry: 0.45.0
+      supports-color: 8.1.1
+    optionalDependencies:
+      rollup: 4.62.3
+
   '@sentry/conventions@0.29.0': {}
+
+  '@sentry/conventions@0.30.0': {}
 
   '@sentry/core@11.10.0':
     dependencies:
       '@sentry/conventions': 0.29.0
 
-  '@sentry/feedback@11.10.0':
+  '@sentry/core@11.11.0':
     dependencies:
-      '@sentry/core': 11.10.0
+      '@sentry/conventions': 0.30.0
+
+  '@sentry/feedback@11.11.0':
+    dependencies:
+      '@sentry/core': 11.11.0
 
   '@sentry/node@11.10.0(rollup@4.62.3)':
     dependencies:
@@ -11068,33 +11141,57 @@ snapshots:
       - rollup
       - webpack
 
+  '@sentry/node@11.11.0(rollup@4.62.3)':
+    dependencies:
+      '@opentelemetry/api': 1.10.0
+      '@sentry/bundler-plugins': 11.11.0(rollup@4.62.3)
+      '@sentry/conventions': 0.30.0
+      '@sentry/core': 11.11.0
+      '@sentry/opentelemetry': 11.11.0(@opentelemetry/api@1.10.0)
+      '@sentry/server-runtime-injection': 11.11.0
+      '@sentry/server-utils': 11.11.0
+    transitivePeerDependencies:
+      - rollup
+      - webpack
+
   '@sentry/opentelemetry@11.10.0(@opentelemetry/api@1.10.0)':
     dependencies:
       '@opentelemetry/api': 1.10.0
       '@sentry/conventions': 0.29.0
       '@sentry/core': 11.10.0
 
-  '@sentry/react@11.10.0(react@19.3.1)':
+  '@sentry/opentelemetry@11.11.0(@opentelemetry/api@1.10.0)':
     dependencies:
-      '@sentry/browser': 11.10.0
-      '@sentry/conventions': 0.29.0
-      '@sentry/core': 11.10.0
+      '@opentelemetry/api': 1.10.0
+      '@sentry/conventions': 0.30.0
+      '@sentry/core': 11.11.0
+
+  '@sentry/react@11.11.0(react@19.3.1)':
+    dependencies:
+      '@sentry/browser': 11.11.0
+      '@sentry/conventions': 0.30.0
+      '@sentry/core': 11.11.0
       react: 19.3.1
 
-  '@sentry/replay-canvas@11.10.0':
+  '@sentry/replay-canvas@11.11.0':
     dependencies:
-      '@sentry/core': 11.10.0
-      '@sentry/replay': 11.10.0
+      '@sentry/core': 11.11.0
+      '@sentry/replay': 11.11.0
 
-  '@sentry/replay@11.10.0':
+  '@sentry/replay@11.11.0':
     dependencies:
-      '@sentry/browser-utils': 11.10.0
-      '@sentry/core': 11.10.0
+      '@sentry/browser-utils': 11.11.0
+      '@sentry/core': 11.11.0
 
   '@sentry/server-runtime-injection@11.10.0':
     dependencies:
       '@sentry/core': 11.10.0
       '@sentry/server-utils': 11.10.0
+
+  '@sentry/server-runtime-injection@11.11.0':
+    dependencies:
+      '@sentry/core': 11.11.0
+      '@sentry/server-utils': 11.11.0
 
   '@sentry/server-utils@11.10.0':
     dependencies:
@@ -11102,26 +11199,32 @@ snapshots:
       '@sentry/conventions': 0.29.0
       '@sentry/core': 11.10.0
 
-  '@sentry/tanstackstart-react@11.10.0(react@19.3.1)(rollup@4.62.3)':
+  '@sentry/server-utils@11.11.0':
     dependencies:
       '@opentelemetry/api': 1.10.0
-      '@sentry/browser-utils': 11.10.0
-      '@sentry/bundler-plugins': 11.10.0(rollup@4.62.3)
-      '@sentry/conventions': 0.29.0
-      '@sentry/core': 11.10.0
-      '@sentry/node': 11.10.0(rollup@4.62.3)
-      '@sentry/react': 11.10.0(react@19.3.1)
-      '@sentry/server-runtime-injection': 11.10.0
-      '@sentry/server-utils': 11.10.0
+      '@sentry/conventions': 0.30.0
+      '@sentry/core': 11.11.0
+
+  '@sentry/tanstackstart-react@11.11.0(react@19.3.1)(rollup@4.62.3)':
+    dependencies:
+      '@opentelemetry/api': 1.10.0
+      '@sentry/browser-utils': 11.11.0
+      '@sentry/bundler-plugins': 11.11.0(rollup@4.62.3)
+      '@sentry/conventions': 0.30.0
+      '@sentry/core': 11.11.0
+      '@sentry/node': 11.11.0(rollup@4.62.3)
+      '@sentry/react': 11.11.0(react@19.3.1)
+      '@sentry/server-runtime-injection': 11.11.0
+      '@sentry/server-utils': 11.11.0
     transitivePeerDependencies:
       - react
       - react-router
       - rollup
       - webpack
 
-  '@sentry/vite-plugin@11.10.0(rollup@4.62.3)':
+  '@sentry/vite-plugin@11.11.0(rollup@4.62.3)':
     dependencies:
-      '@sentry/bundler-plugins': 11.10.0(rollup@4.62.3)
+      '@sentry/bundler-plugins': 11.11.0(rollup@4.62.3)
     transitivePeerDependencies:
       - rollup
       - webpack
@@ -12401,7 +12504,7 @@ snapshots:
     dependencies:
       balanced-match: 1.0.2
 
-  brace-expansion@5.0.8:
+  brace-expansion@5.0.12:
     dependencies:
       balanced-match: 4.0.4
 
@@ -13460,6 +13563,12 @@ snapshots:
       minimatch: 10.2.6
       minipass: 7.1.3
       path-scurry: 2.0.2
+
+  glob@14.0.3:
+    dependencies:
+      minimatch: 11.0.4
+      minipass: 7.1.3
+      path-scurry: 3.0.0
 
   globalthis@1.0.4:
     dependencies:
@@ -14586,7 +14695,12 @@ snapshots:
 
   minimatch@10.2.6:
     dependencies:
-      brace-expansion: 5.0.8
+      brace-expansion: 5.0.12
+
+  minimatch@11.0.4:
+    dependencies:
+      '@isaacs/nonrecursive-glob-match': 1.0.3
+      brace-expansion: 5.0.12
 
   minimatch@5.1.9:
     dependencies:
@@ -14923,6 +15037,11 @@ snapshots:
   path-parse@1.0.7: {}
 
   path-scurry@2.0.2:
+    dependencies:
+      lru-cache: 11.5.3
+      minipass: 7.1.3
+
+  path-scurry@3.0.0:
     dependencies:
       lru-cache: 11.5.3
       minipass: 7.1.3
