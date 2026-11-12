@@ -3,15 +3,20 @@ from flask_cors import CORS
 
 from backend.api.handlers.client_api import (
     add_api_read_key,
+    add_webhook,
     delete_api_read_key,
+    delete_webhook,
     list_api_keys,
     list_favorites,
     list_mobile_clients,
     list_subscriptions,
+    list_webhooks,
     ping_mobile_client,
     register_mobile_client,
     request_api_write_key,
     resolve_video_playlist,
+    send_webhook_test,
+    send_webhook_verification,
     suggest_event_match_videos,
     suggest_event_media,
     suggest_match_video,
@@ -19,6 +24,7 @@ from backend.api.handlers.client_api import (
     suggest_team_social_media,
     unregister_mobile_client,
     update_model_preferences,
+    verify_webhook,
 )
 
 # This is a port of the cloud endpoints API service, used by mobile apps
@@ -113,4 +119,34 @@ client_api.add_url_rule(
     "/api_keys/write/request",
     methods=["POST"],
     view_func=request_api_write_key,
+)
+client_api.add_url_rule(
+    "/webhooks/list",
+    methods=["POST"],
+    view_func=list_webhooks,
+)
+client_api.add_url_rule(
+    "/webhooks/add",
+    methods=["POST"],
+    view_func=add_webhook,
+)
+client_api.add_url_rule(
+    "/webhooks/verify",
+    methods=["POST"],
+    view_func=verify_webhook,
+)
+client_api.add_url_rule(
+    "/webhooks/send_verification",
+    methods=["POST"],
+    view_func=send_webhook_verification,
+)
+client_api.add_url_rule(
+    "/webhooks/delete",
+    methods=["POST"],
+    view_func=delete_webhook,
+)
+client_api.add_url_rule(
+    "/webhooks/test",
+    methods=["POST"],
+    view_func=send_webhook_test,
 )

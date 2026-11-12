@@ -224,7 +224,7 @@ function ApiDocs(): React.JSX.Element {
             className="py-4"
           >
             <h2 className="mb-2 text-2xl font-medium">
-              <a href="/apidocs/webhooks">Webhooks</a>
+              <Link to="/apidocs/webhooks">Webhooks</Link>
             </h2>
             <p>
               The TBA API also includes support for{' '}
@@ -234,8 +234,8 @@ function ApiDocs(): React.JSX.Element {
               instantly to the change. This can save both your client and our
               server time and processing power, as it can reduce the need to
               poll the API. See{' '}
-              <a href="/apidocs/webhooks">our webhook documentation page</a> for
-              more information.
+              <Link to="/apidocs/webhooks">our webhook documentation page</Link>{' '}
+              for more information.
             </p>
           </TableOfContentsSection>
 

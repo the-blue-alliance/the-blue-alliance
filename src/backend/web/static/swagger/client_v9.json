@@ -646,6 +646,72 @@
             ]
           }
         }
+      },
+      "Webhook": {
+        "type": "object",
+        "required": [
+          "webhook_id",
+          "name",
+          "url",
+          "secret",
+          "verified"
+        ],
+        "properties": {
+          "webhook_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL notifications are sent to"
+          },
+          "secret": {
+            "type": "string",
+            "description": "The key used to sign each request in the `X-TBA-HMAC` header"
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "Only verified webhooks receive notifications other than pings"
+          }
+        }
+      },
+      "ListWebhooksResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          },
+          {
+            "type": "object",
+            "required": [
+              "webhooks"
+            ],
+            "properties": {
+              "webhooks": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Webhook"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "AddWebhookResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "webhook": {
+                "$ref": "#/components/schemas/Webhook"
+              }
+            }
+          }
+        ]
       }
     },
     "securitySchemes": {
@@ -1239,6 +1305,267 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/list": {
+      "post": {
+        "summary": "List the signed-in account's webhooks",
+        "description": "`code` is 401 when not signed in.",
+        "operationId": "listWebhooks",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListWebhooksResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/add": {
+      "post": {
+        "summary": "Add a webhook",
+        "description": "Creates a webhook with a new secret and sends a verification code to its URL. If the account already has a webhook with this URL, gives it a new secret and code and marks it unverified. `code` is 400 when the name or URL is blank and 401 when not signed in.",
+        "operationId": "addWebhook",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddWebhookResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "url"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/verify": {
+      "post": {
+        "summary": "Verify a webhook",
+        "description": "Marks the webhook verified when `code` matches the most recently sent verification code. `code` in the response is 400 for a wrong code, 404 for an unknown webhook and 401 when not signed in.",
+        "operationId": "verifyWebhook",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "webhook_id",
+                  "code"
+                ],
+                "properties": {
+                  "webhook_id": {
+                    "type": "string",
+                    "description": "The webhook's ID, from `/webhooks/list`"
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "The `verification_key` the webhook received"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/send_verification": {
+      "post": {
+        "summary": "Send a new verification code to a webhook",
+        "description": "Replaces the verification code and marks the webhook unverified. `code` is 404 for an unknown webhook and 401 when not signed in.",
+        "operationId": "sendWebhookVerification",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "webhook_id"
+                ],
+                "properties": {
+                  "webhook_id": {
+                    "type": "string",
+                    "description": "The webhook's ID, from `/webhooks/list`"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/delete": {
+      "post": {
+        "summary": "Delete a webhook",
+        "description": "`code` is 404 for an unknown webhook and 401 when not signed in.",
+        "operationId": "deleteWebhook",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "webhook_id"
+                ],
+                "properties": {
+                  "webhook_id": {
+                    "type": "string",
+                    "description": "The webhook's ID, from `/webhooks/list`"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/test": {
+      "post": {
+        "summary": "Send a test notification to a webhook",
+        "description": "Sends one sample notification of the given type to a verified webhook. `code` is 400 for an unknown type, an unverified webhook or keys the type can't use, 404 for an unknown webhook and 401 when not signed in.",
+        "operationId": "sendWebhookTest",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "webhook_id",
+                  "notification_type"
+                ],
+                "properties": {
+                  "webhook_id": {
+                    "type": "string",
+                    "description": "The webhook's ID, from `/webhooks/list`"
+                  },
+                  "notification_type": {
+                    "type": "string",
+                    "description": "A notification type name, such as `upcoming_match`"
+                  },
+                  "event_key": {
+                    "type": "string"
+                  },
+                  "match_key": {
+                    "type": "string"
+                  },
+                  "district_key": {
+                    "type": "string"
+                  }
                 }
               }
             }

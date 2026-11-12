@@ -24,6 +24,7 @@ const allRoutes = defineAllRoutes([
   '/add-data',
   '/apidocs',
   '/apidocs/v3',
+  '/apidocs/webhooks',
   '/bigquery',
   '/brand',
   '/contact',
