@@ -70,9 +70,7 @@ class TrustedApiLogger:
             # Use URL path as directory
             # For example: /api/trusted/v1/event/2024casj/matches/update/{timestamp}.json
             url_path = request.path.strip("/")
-            timestamp = datetime.datetime.now(
-                datetime.timezone.utc  # pyre-ignore[16]
-            ).isoformat()
+            timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
             storage_path = f"{url_path}/{timestamp}.json"
 
             # Prepare metadata

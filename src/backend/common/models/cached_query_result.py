@@ -81,8 +81,8 @@ class CachedQueryResult(ndb.Model):
         lower_bound, upper_bound = cls.cache_key_bounds_from_prefix(cache_key_prefix)
         return (
             cls.query()
-            .filter(cls.key > ndb.Key(cls, lower_bound))  # pyre-ignore[58]
-            .filter(cls.key < ndb.Key(cls, upper_bound))  # pyre-ignore[58]
+            .filter(cls.key > ndb.Key(cls, lower_bound))
+            .filter(cls.key < ndb.Key(cls, upper_bound))
         )
 
     @classmethod

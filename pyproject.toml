@@ -54,7 +54,7 @@ lint = [
 ]
 typecheck = [
     { include-group = "webpack" },
-    "pyre-check==0.10.0",
+    "pyrefly==1.4.1",
 ]
 webpack = [
     "watchdog==7.1.0",
@@ -70,3 +70,9 @@ dev = [
 # Targeting 3.14 makes black rewrite `except (A, B):` as PEP 758's
 # `except A, B:`, which pyre-check 0.10.0 can't parse. Raise this once it can.
 target-version = ["py313"]
+
+[tool.pyrefly]
+project-includes = ["src", "ops"]
+search-path = ["src", "ops", "ops/pr_screenshots", "stubs"]
+check-unannotated-defs = false
+baseline = "pyrefly_baseline.json"

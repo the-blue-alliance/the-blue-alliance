@@ -32,9 +32,9 @@ $ docker compose up --build
 
 ## Generating Type Checker Stubs
 
-The `stubs/` folder contains [type hint stubs](https://www.python.org/dev/peps/pep-0484/#stub-files) for third-party dependencies that do not natively contain type hints. These type hints are necessary for [pyre](https://pyre-check.org/) (our type checker) to run successfully.
+The `stubs/` folder contains [type hint stubs](https://www.python.org/dev/peps/pep-0484/#stub-files) for third-party dependencies that do not natively contain type hints. These type hints are necessary for [pyrefly](https://pyrefly.org/) (our type checker) to run successfully.
 
-Before generating stubs, check to see if type hints are exposed for a library via it's `site-packages` directory by adding the library in question to the [pyre search paths in our .pyre_configuration](https://github.com/the-blue-alliance/the-blue-alliance/blob/main/.pyre_configuration). This is a preferred solution to generating stubs. If the typecheck run still fails, generating stubs is an appropriate solution.
+Before generating stubs, check to see if the library ships its own type hints in its `site-packages` directory. Pyrefly reads installed packages from the project virtualenv automatically, so this is a preferred solution to generating stubs. If the typecheck run still fails, generating stubs is an appropriate solution.
 
 In order to generate stubs for a third-party library, run [`stubgen`](https://mypy.readthedocs.io/en/stable/stubgen.html) for the third-party package. For For example, to generate stubs for the `google.cloud.ndb` library -
 

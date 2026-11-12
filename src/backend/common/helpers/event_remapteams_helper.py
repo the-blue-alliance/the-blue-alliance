@@ -130,9 +130,7 @@ class EventRemapTeamsHelper:
                         for i, key in enumerate(team_keys):
                             if key == old_team:
                                 match._dirty = True
-                                match.alliances[color][attr][  # pyre-ignore[26]
-                                    i
-                                ] = new_team
+                                match.alliances[color][attr][i] = new_team
                                 match.alliances_json = json.dumps(match.alliances)
 
                 # Update team key names
@@ -156,7 +154,7 @@ class EventRemapTeamsHelper:
                     team_keys = cast(List[TeamKey], row.get(choice, []))
                     for i, key in enumerate(team_keys):
                         if key == old_team:
-                            row[choice][i] = new_team  # pyre-ignore[26,6]
+                            row[choice][i] = new_team
 
     @classmethod
     def remapteams_rankings2(

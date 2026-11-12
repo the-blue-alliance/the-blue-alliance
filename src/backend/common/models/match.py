@@ -93,7 +93,7 @@ class Match(CachedModel):
     )  # Set to True after manual update
     set_number: int = ndb.IntegerProperty(required=True, indexed=False)
     # list of teams in Match, for indexing.
-    team_key_names: List[TeamKey] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
+    team_key_names: List[TeamKey] = ndb.StringProperty(repeated=True)
     time = ndb.DateTimeProperty()  # UTC time of scheduled start
     time_string = ndb.TextProperty(
         indexed=False
@@ -106,9 +106,9 @@ class Match(CachedModel):
         ndb.DateTimeProperty()
     )  # UTC time scores were shown to the audience
     # list of Youtube IDs
-    youtube_videos: List[str] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
+    youtube_videos: List[str] = ndb.StringProperty(repeated=True)
     # list of filetypes a TBA video exists for
-    tba_videos: List[str] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
+    tba_videos: List[str] = ndb.StringProperty(repeated=True)
     push_sent = (
         ndb.BooleanProperty()
     )  # has an upcoming match notification been sent for this match? None/False = not yet

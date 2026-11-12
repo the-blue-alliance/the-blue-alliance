@@ -195,7 +195,7 @@ def event_teams_statuses(event_key: EventKey) -> TypedFlaskResponse[dict]:
             status_strings = event_team.status_strings
             status_dict = status.copy()
             status_dict.update(
-                {  # pyre-ignore[55]
+                {
                     "alliance_status_str": status_strings["alliance"],
                     "playoff_status_str": status_strings["playoff"],
                     "overall_status_str": status_strings["overall"],

@@ -210,7 +210,7 @@ def team_events_statuses_year(team_key: TeamKey, year: int) -> TypedFlaskRespons
             status_strings = event_team.status_strings
             status_dict = status.copy()
             status_dict.update(
-                {  # pyre-ignore[55]
+                {
                     "alliance_status_str": status_strings["alliance"],
                     "playoff_status_str": status_strings["playoff"],
                     "overall_status_str": status_strings["overall"],
@@ -283,7 +283,7 @@ def team_event_status(
         if status is not None:
             status_strings = event_team.status_strings
             status.update(
-                {  # pyre-ignore[55]
+                {
                     "alliance_status_str": status_strings["alliance"],
                     "playoff_status_str": status_strings["playoff"],
                     "overall_status_str": status_strings["overall"],
@@ -293,7 +293,7 @@ def team_event_status(
         if pit_location:
             if status is None:
                 status = {}
-            status["pit_location"] = pit_location["location"]  # pyre-ignore[27]
+            status["pit_location"] = pit_location["location"]
     return profiled_jsonify(status)
 
 

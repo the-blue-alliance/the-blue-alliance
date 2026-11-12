@@ -443,7 +443,7 @@ def _add_reference_metadata(
     if stype == SuggestionType.MEDIA:
         existing_preferred_futures = [
             Media.query(
-                Media.media_type_enum.IN(IMAGE_TYPES),  # pyre-ignore[16]
+                Media.media_type_enum.IN(IMAGE_TYPES),
                 Media.references == reference,
                 Media.preferred_references == reference,
                 Media.year == suggestion.contents["year"],
