@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 import pytest
 from flask import g
+from flask.testing import FlaskClient
 from google.appengine.ext import ndb
-from werkzeug.test import Client
 
 from backend.common import auth
 from backend.common.consts.auth_type import AuthType
@@ -17,7 +17,7 @@ from backend.common.models.match import Match
 from backend.common.models.team import Team
 
 
-def test_not_authenticated(ndb_stub, api_client: Client) -> None:
+def test_not_authenticated(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -35,7 +35,7 @@ def test_not_authenticated(ndb_stub, api_client: Client) -> None:
     assert "required" in resp.json["Error"]
 
 
-def test_bad_auth(ndb_stub, api_client: Client) -> None:
+def test_bad_auth(ndb_stub, api_client: FlaskClient) -> None:
     account = Account()
     ApiAuthAccess(
         id="test_auth_key", auth_types_enum=[AuthType.READ_API], owner=account.key
@@ -56,7 +56,9 @@ def test_bad_auth(ndb_stub, api_client: Client) -> None:
 
 
 @pytest.mark.parametrize("account", [None, Account()])
-def test_authenticated_header(ndb_stub, api_client: Client, account: Account) -> None:
+def test_authenticated_header(
+    ndb_stub, api_client: FlaskClient, account: Account
+) -> None:
     if account:
         account.put()
     ApiAuthAccess(
@@ -80,7 +82,9 @@ def test_authenticated_header(ndb_stub, api_client: Client, account: Account) ->
 
 
 @pytest.mark.parametrize("account", [None, Account()])
-def test_authenticated_urlparam(ndb_stub, api_client: Client, account: Account) -> None:
+def test_authenticated_urlparam(
+    ndb_stub, api_client: FlaskClient, account: Account
+) -> None:
     if account:
         account.put()
     ApiAuthAccess(
@@ -101,7 +105,7 @@ def test_authenticated_urlparam(ndb_stub, api_client: Client, account: Account) 
     assert resp.status_code == 200
 
 
-def test_authenticated_user(ndb_stub, api_client: Client) -> None:
+def test_authenticated_user(ndb_stub, api_client: FlaskClient) -> None:
     email = "zach@thebluealliance.com"
     account = Account(email=email)
 
@@ -119,7 +123,7 @@ def test_authenticated_user(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
 
 
-def test_team_key_valid(ndb_stub, api_client: Client) -> None:
+def test_team_key_valid(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -139,7 +143,7 @@ def test_team_key_valid(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
 
 
-def test_team_key_invalid(ndb_stub, api_client: Client) -> None:
+def test_team_key_invalid(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -161,7 +165,7 @@ def test_team_key_invalid(ndb_stub, api_client: Client) -> None:
     assert resp.json["Error"] == "254 is not a valid team key"
 
 
-def test_team_key_does_not_exist(ndb_stub, api_client: Client) -> None:
+def test_team_key_does_not_exist(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -183,7 +187,7 @@ def test_team_key_does_not_exist(ndb_stub, api_client: Client) -> None:
     assert resp.json["Error"] == "team key: frc604 does not exist"
 
 
-def test_event_key_valid(ndb_stub, api_client: Client) -> None:
+def test_event_key_valid(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -208,7 +212,7 @@ def test_event_key_valid(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
 
 
-def test_event_key_invalid(ndb_stub, api_client: Client) -> None:
+def test_event_key_invalid(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -235,7 +239,7 @@ def test_event_key_invalid(ndb_stub, api_client: Client) -> None:
     assert resp.json["Error"] == "casj is not a valid event key"
 
 
-def test_event_key_does_not_exist(ndb_stub, api_client: Client) -> None:
+def test_event_key_does_not_exist(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -262,7 +266,7 @@ def test_event_key_does_not_exist(ndb_stub, api_client: Client) -> None:
     assert resp.json["Error"] == "event key: 2019casf does not exist"
 
 
-def test_match_key_valid(ndb_stub, api_client: Client) -> None:
+def test_match_key_valid(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -287,7 +291,7 @@ def test_match_key_valid(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
 
 
-def test_match_key_invalid(ndb_stub, api_client: Client) -> None:
+def test_match_key_invalid(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -313,7 +317,7 @@ def test_match_key_invalid(ndb_stub, api_client: Client) -> None:
     assert resp.json["Error"] == "2020casj_qm is not a valid match key"
 
 
-def test_match_key_does_not_exist(ndb_stub, api_client: Client) -> None:
+def test_match_key_does_not_exist(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -339,7 +343,7 @@ def test_match_key_does_not_exist(ndb_stub, api_client: Client) -> None:
     assert resp.json["Error"] == "match key: 2020casj_qm2 does not exist"
 
 
-def test_district_key_valid(ndb_stub, api_client: Client) -> None:
+def test_district_key_valid(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -373,7 +377,7 @@ def test_district_key_valid(ndb_stub, api_client: Client) -> None:
     assert resp.status_code == 200
 
 
-def test_district_key_invalid(ndb_stub, api_client: Client) -> None:
+def test_district_key_invalid(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -399,7 +403,7 @@ def test_district_key_invalid(ndb_stub, api_client: Client) -> None:
     assert resp.json["Error"] == "mar is not a valid district key"
 
 
-def test_district_key_does_not_exist(ndb_stub, api_client: Client) -> None:
+def test_district_key_does_not_exist(ndb_stub, api_client: FlaskClient) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -425,7 +429,9 @@ def test_district_key_does_not_exist(ndb_stub, api_client: Client) -> None:
     assert resp.json["Error"] == "district key: 2020tx does not exist"
 
 
-def test_auth_key_cache_hit_on_subsequent_read(ndb_stub, api_client: Client) -> None:
+def test_auth_key_cache_hit_on_subsequent_read(
+    ndb_stub, api_client: FlaskClient
+) -> None:
     from backend.api.handlers.decorators import auth_key_cache
 
     account = Account()
@@ -465,7 +471,9 @@ def test_auth_key_cache_hit_on_subsequent_read(ndb_stub, api_client: Client) -> 
             assert g.auth_description == "Test Key Description"
 
 
-def test_auth_key_cache_does_not_cache_bad_keys(ndb_stub, api_client: Client) -> None:
+def test_auth_key_cache_does_not_cache_bad_keys(
+    ndb_stub, api_client: FlaskClient
+) -> None:
     from backend.api.handlers.decorators import auth_key_cache
 
     Team(id="frc254", team_number=254).put()

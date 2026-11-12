@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
-from werkzeug.test import Client
+from flask.testing import FlaskClient
 
 from backend.api.client_api_auth_helper import ClientApiAuthHelper
 from backend.common.models.account import Account
@@ -9,7 +9,7 @@ from backend.common.models.user import User
 
 
 @pytest.fixture
-def api_client(gae_testbed, ndb_stub, memcache_stub, taskqueue_stub) -> Client:
+def api_client(gae_testbed, ndb_stub, memcache_stub, taskqueue_stub) -> FlaskClient:
     from backend.api.main import app
 
     return app.test_client()
