@@ -141,6 +141,9 @@ importers:
       '@julr/vite-plugin-validate-env':
         specifier: 2.2.2
         version: 2.2.2(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.15)(yaml@2.9.1))
+      '@msw/playwright':
+        specifier: 0.7.0
+        version: 0.7.0(msw@3.0.3(@types/node@24.19.2)(graphql@16.15.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.15)(yaml@2.9.1)))(supports-color@10.2.2)
       '@playwright/test':
         specifier: 1.64.1
         version: 1.64.1
@@ -1688,6 +1691,12 @@ packages:
   '@modelcontextprotocol/server@2.4.0':
     resolution: {integrity: sha512-rgR9yxSaAJ+bcsi/XroT/S2AfPiIWloXAnrdfYSCms9ivVju0ishu/wW0J21Ho6+ZOR1r7RyeRbjiRuF87ix5Q==}
     engines: {node: '>=20'}
+
+  '@msw/playwright@0.7.0':
+    resolution: {integrity: sha512-HovTLoUTrs3oaMBmztaCtYv3roaWXCkoE89Gzwri2Qc0kFPTZ2hYvEU4fUzXuAR3S7t+TnY1QVLIVKY/p+lJzw==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      msw: '>=3'
 
   '@msw/url@0.1.2':
     resolution: {integrity: sha512-DdeBLQxQ+ZrtmwEmaj7GQ7lbzPCgbbbyAqOz/I4ulo68hwBpfdNvQJ5bmihJUkAAKOeCmqCIG3OFZGosqFN4mA==}
@@ -9897,6 +9906,14 @@ snapshots:
     dependencies:
       '@modelcontextprotocol/core': 2.4.0
       zod: 4.6.7
+
+  '@msw/playwright@0.7.0(msw@3.0.3(@types/node@24.19.2)(graphql@16.15.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.15)(yaml@2.9.1)))(supports-color@10.2.2)':
+    dependencies:
+      '@mswjs/interceptors': 0.45.12(supports-color@10.2.2)
+      msw: 3.0.3(@types/node@24.19.2)(graphql@16.15.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.15)(yaml@2.9.1))
+      outvariant: 1.4.3
+    transitivePeerDependencies:
+      - supports-color
 
   '@msw/url@0.1.2': {}
 
