@@ -37,8 +37,14 @@ describe('Footer', () => {
     expect(
       screen.getByRole('link', { name: 'Blog' }).getAttribute('href'),
     ).toBe('https://blog.thebluealliance.com');
-    // A separator between each of the nine links.
-    expect(screen.getAllByText('/')).toHaveLength(8);
+    expect(screen.getByRole('link', { name: 'FAQ' }).getAttribute('href')).toBe(
+      '/faq',
+    );
+    expect(
+      screen.getByRole('link', { name: 'Brand' }).getAttribute('href'),
+    ).toBe('/brand');
+    // A separator between each of the eleven links.
+    expect(screen.getAllByText('/')).toHaveLength(10);
     expect(screen.getByAltText('AndyMark')).toBeTruthy();
   });
 

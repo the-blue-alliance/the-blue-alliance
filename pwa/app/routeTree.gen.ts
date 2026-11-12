@@ -15,8 +15,10 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AddDataRouteImport } from './routes/add-data'
 import { Route as ApidocsRouteImport } from './routes/apidocs'
 import { Route as BigqueryRouteImport } from './routes/bigquery'
+import { Route as BrandRouteImport } from './routes/brand'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DonateRouteImport } from './routes/donate'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as GamedayRouteImport } from './routes/gameday'
 import { Route as HallOfFameRouteImport } from './routes/hall-of-fame'
 import { Route as Match_suggestionRouteImport } from './routes/match_suggestion'
@@ -83,6 +85,11 @@ const BigqueryRoute = BigqueryRouteImport.update({
   path: '/bigquery',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BrandRoute = BrandRouteImport.update({
+  id: '/brand',
+  path: '/brand',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -91,6 +98,11 @@ const ContactRoute = ContactRouteImport.update({
 const DonateRoute = DonateRouteImport.update({
   id: '/donate',
   path: '/donate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamedayRoute = GamedayRouteImport.update({
@@ -286,8 +298,10 @@ export interface FileRoutesByFullPath {
   '/add-data': typeof AddDataRoute
   '/apidocs': typeof ApidocsRoute
   '/bigquery': typeof BigqueryRoute
+  '/brand': typeof BrandRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
+  '/faq': typeof FaqRoute
   '/gameday': typeof GamedayRouteWithChildren
   '/hall-of-fame': typeof HallOfFameRoute
   '/match_suggestion': typeof Match_suggestionRoute
@@ -331,8 +345,10 @@ export interface FileRoutesByTo {
   '/add-data': typeof AddDataRoute
   '/apidocs': typeof ApidocsRoute
   '/bigquery': typeof BigqueryRoute
+  '/brand': typeof BrandRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
+  '/faq': typeof FaqRoute
   '/gameday': typeof GamedayRouteWithChildren
   '/hall-of-fame': typeof HallOfFameRoute
   '/match_suggestion': typeof Match_suggestionRoute
@@ -377,8 +393,10 @@ export interface FileRoutesById {
   '/add-data': typeof AddDataRoute
   '/apidocs': typeof ApidocsRoute
   '/bigquery': typeof BigqueryRoute
+  '/brand': typeof BrandRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
+  '/faq': typeof FaqRoute
   '/gameday': typeof GamedayRouteWithChildren
   '/hall-of-fame': typeof HallOfFameRoute
   '/match_suggestion': typeof Match_suggestionRoute
@@ -424,8 +442,10 @@ export interface FileRouteTypes {
     | '/add-data'
     | '/apidocs'
     | '/bigquery'
+    | '/brand'
     | '/contact'
     | '/donate'
+    | '/faq'
     | '/gameday'
     | '/hall-of-fame'
     | '/match_suggestion'
@@ -469,8 +489,10 @@ export interface FileRouteTypes {
     | '/add-data'
     | '/apidocs'
     | '/bigquery'
+    | '/brand'
     | '/contact'
     | '/donate'
+    | '/faq'
     | '/gameday'
     | '/hall-of-fame'
     | '/match_suggestion'
@@ -514,8 +536,10 @@ export interface FileRouteTypes {
     | '/add-data'
     | '/apidocs'
     | '/bigquery'
+    | '/brand'
     | '/contact'
     | '/donate'
+    | '/faq'
     | '/gameday'
     | '/hall-of-fame'
     | '/match_suggestion'
@@ -560,8 +584,10 @@ export interface RootRouteChildren {
   AddDataRoute: typeof AddDataRoute
   ApidocsRoute: typeof ApidocsRoute
   BigqueryRoute: typeof BigqueryRoute
+  BrandRoute: typeof BrandRoute
   ContactRoute: typeof ContactRoute
   DonateRoute: typeof DonateRoute
+  FaqRoute: typeof FaqRoute
   GamedayRoute: typeof GamedayRouteWithChildren
   HallOfFameRoute: typeof HallOfFameRoute
   Match_suggestionRoute: typeof Match_suggestionRoute
@@ -642,6 +668,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BigqueryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/brand': {
+      id: '/brand'
+      path: '/brand'
+      fullPath: '/brand'
+      preLoaderRoute: typeof BrandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -654,6 +687,13 @@ declare module '@tanstack/react-router' {
       path: '/donate'
       fullPath: '/donate'
       preLoaderRoute: typeof DonateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gameday': {
@@ -922,8 +962,10 @@ const rootRouteChildren: RootRouteChildren = {
   AddDataRoute: AddDataRoute,
   ApidocsRoute: ApidocsRoute,
   BigqueryRoute: BigqueryRoute,
+  BrandRoute: BrandRoute,
   ContactRoute: ContactRoute,
   DonateRoute: DonateRoute,
+  FaqRoute: FaqRoute,
   GamedayRoute: GamedayRouteWithChildren,
   HallOfFameRoute: HallOfFameRoute,
   Match_suggestionRoute: Match_suggestionRoute,
