@@ -2,6 +2,7 @@
 # lockfile verification pass rejects (ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION) and breaks GAE deploys.
 # Resolution-time minimumReleaseAge (pnpm 11 default, 1440) still applies when resolving new versions.
 trustLockfile: true
+minimumReleaseAge: 0
 
 allowBuilds:
   '@firebase/util': true
