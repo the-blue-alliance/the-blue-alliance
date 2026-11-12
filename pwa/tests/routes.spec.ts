@@ -31,6 +31,7 @@ const allRoutes = defineAllRoutes([
   '/districts/{-$year}',
   '/donate',
   '/event/$eventKey',
+  '/event/$eventKey/feed',
   '/events/$districtAbbreviation/$year',
   '/events/regional/{-$year}',
   '/events/{-$year}',
@@ -88,6 +89,7 @@ const parameterValues = {
 } satisfies Record<RouteParameter, readonly string[]>;
 
 const externalRedirectRoutes: readonly RoutePath[] = ['/bigquery', '/swag'];
+const nonPageRoutes: readonly RoutePath[] = ['/event/$eventKey/feed'];
 
 interface RouteTestCase {
   path: string;
@@ -107,7 +109,11 @@ function getRouteParameters(route: RoutePath): RouteParameter[] {
 
 function generateRouteTestCases(): RouteTestCase[] {
   return allRoutes
-    .filter((route) => !externalRedirectRoutes.includes(route))
+    .filter(
+      (route) =>
+        !externalRedirectRoutes.includes(route) &&
+        !nonPageRoutes.includes(route),
+    )
     .flatMap((route) => {
       const parameters = getRouteParameters(route);
       const combinations = cartesianProduct(
