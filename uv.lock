@@ -498,7 +498,7 @@ wheels = [
 
 [[package]]
 name = "google-api-core"
-version = "2.43.2"
+version = "2.44.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "google-auth" },
@@ -508,9 +508,9 @@ dependencies = [
     { name = "protobuf" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a4/74/307919972c4dc84598f4128a8d6ae05ac3d9e6ca73fe60a7bb93c670931c/google_api_core-2.43.2.tar.gz", hash = "sha256:5dfc5e9d52982bcc03bd6af380a893365b5fdf907dc527f63d3a372833c33329", size = 286250, upload-time = "2026-10-29T17:20:40.193Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/72/ef/63d89cb580f3a42c51db53b3d151352aa61b9c87ea8cfdd8d24ee6caa09d/google_api_core-2.44.0.tar.gz", hash = "sha256:5ab9a396965c1227d7dea4581e562b7018aa2bca96d2de0be5eb70dc9c8ab3a1", size = 288859, upload-time = "2026-11-05T18:39:43.265Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b0/1d/a0120c7d937597293fce74510c80fe0cec8e45b1d702a816b567b6754c25/google_api_core-2.43.2-py3-none-any.whl", hash = "sha256:5a9d21baab97fd3c0547ccfc186a9e64f4227d8d7026f393835316400b29a6d4", size = 224304, upload-time = "2026-10-29T17:20:17.733Z" },
+    { url = "https://files.pythonhosted.org/packages/c9/73/4068d4b123d206f42e44d476b6ed4de773d81efc4e88101ff82e318b9a7a/google_api_core-2.44.0-py3-none-any.whl", hash = "sha256:8cb9ad8af28de9bc75121686d69b697ce0937e21fad2ad80c9a7e89f22b26e1f", size = 225627, upload-time = "2026-11-05T18:39:01.342Z" },
 ]
 
 [package.optional-dependencies]
@@ -1977,7 +1977,7 @@ requires-dist = [
     { name = "flask-caching", specifier = "==2.3.1" },
     { name = "flask-cors", specifier = "==6.0.2" },
     { name = "flask-wtf", specifier = "==1.2.2" },
-    { name = "google-api-core", specifier = "==2.43.2" },
+    { name = "google-api-core", specifier = "==2.44.0" },
     { name = "google-api-python-client", specifier = "==2.201.0" },
     { name = "google-cloud-logging", specifier = "==3.17.0" },
     { name = "google-cloud-run", specifier = "==0.16.2" },
