@@ -5,6 +5,7 @@ from io import StringIO
 from typing import List, Optional
 
 from flask import abort, redirect, request, url_for
+from pyre_extensions import none_throws
 
 from backend.common.helpers.deferred import defer_safe
 from backend.common.models.account import Account
@@ -133,7 +134,7 @@ def team_media_mod_edit_post(year: Year, team_number: TeamNumber):
             account = accounts[0]
 
     access.access_code = access_code
-    access.expiration = datetime.strptime(expiration, "%Y-%m-%d")
+    access.expiration = datetime.strptime(none_throws(expiration), "%Y-%m-%d")
     access.account = account.key if account else None
     access.put()
 
