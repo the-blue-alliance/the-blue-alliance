@@ -93,19 +93,19 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
         "/api/v3/district/2019fim/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    for event in resp.json:
+    assert len(resp.get_json()) == 1
+    for event in resp.get_json():
         validate_nominal_event_keys(event)
-    assert resp.json[0]["key"] == "2019casj"
+    assert resp.get_json()[0]["key"] == "2019casj"
 
     resp = api_client.get(
         "/api/v3/district/2020fim/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    for event in resp.json:
+    assert len(resp.get_json()) == 2
+    for event in resp.get_json():
         validate_nominal_event_keys(event)
-    keys = set([event["key"] for event in resp.json])
+    keys = set([event["key"] for event in resp.get_json()])
     assert "2020casf" in keys
     assert "2020casj" in keys
 
@@ -115,20 +115,20 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    for event in resp.json:
+    assert len(resp.get_json()) == 1
+    for event in resp.get_json():
         validate_simple_event_keys(event)
-    assert resp.json[0]["key"] == "2019casj"
+    assert resp.get_json()[0]["key"] == "2019casj"
 
     resp = api_client.get(
         "/api/v3/district/2020fim/events/simple",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    for event in resp.json:
+    assert len(resp.get_json()) == 2
+    for event in resp.get_json():
         validate_simple_event_keys(event)
-    keys = set([event["key"] for event in resp.json])
+    keys = set([event["key"] for event in resp.get_json()])
     assert "2020casf" in keys
     assert "2020casj" in keys
 
@@ -138,24 +138,24 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    assert "2019casj" in resp.json
+    assert len(resp.get_json()) == 1
+    assert "2019casj" in resp.get_json()
 
     resp = api_client.get(
         "/api/v3/district/2020fim/events/keys",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    assert "2020casf" in resp.json
-    assert "2020casj" in resp.json
+    assert len(resp.get_json()) == 2
+    assert "2020casf" in resp.get_json()
+    assert "2020casj" in resp.get_json()
 
     resp = api_client.get(
         "/api/v3/district/fim/history",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
+    assert len(resp.get_json()) == 2
     assert resp.json == [
         {
             "abbreviation": "fim",
@@ -185,7 +185,7 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
+    assert len(resp.get_json()) == 2
     assert resp.json == [
         {
             "abbreviation": "mar",
@@ -208,7 +208,7 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
+    assert len(resp.get_json()) == 2
     assert resp.json == [
         {
             "abbreviation": "mar",
@@ -257,10 +257,10 @@ def test_district_teams(ndb_stub, api_client: Client) -> None:
         "/api/v3/district/2019fim/teams", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    for team in resp.json:
+    assert len(resp.get_json()) == 2
+    for team in resp.get_json():
         validate_nominal_team_keys(team)
-    keys = set([team["key"] for team in resp.json])
+    keys = set([team["key"] for team in resp.get_json()])
     assert "frc254" in keys
     assert "frc604" in keys
 
@@ -270,10 +270,10 @@ def test_district_teams(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    for team in resp.json:
+    assert len(resp.get_json()) == 2
+    for team in resp.get_json():
         validate_simple_team_keys(team)
-    keys = set([team["key"] for team in resp.json])
+    keys = set([team["key"] for team in resp.get_json()])
     assert "frc254" in keys
     assert "frc604" in keys
 
@@ -282,7 +282,7 @@ def test_district_teams(ndb_stub, api_client: Client) -> None:
         "/api/v3/district/2019fim/teams/keys",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
-    assert len(resp.json) == 2
+    assert len(resp.get_json()) == 2
     assert "frc254" in keys
     assert "frc604" in keys
 
@@ -356,11 +356,11 @@ def test_district_list_year(ndb_stub, api_client: Client) -> None:
         "/api/v3/districts/2020", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    district_keys = set([d["key"] for d in resp.json])
+    assert len(resp.get_json()) == 2
+    district_keys = set([d["key"] for d in resp.get_json()])
     assert "2020ne" in district_keys
     assert "2020fim" in district_keys
-    for d in resp.json:
+    for d in resp.get_json():
         assert "official_advancement_counts" in d
 
 
@@ -405,7 +405,7 @@ def test_district_awards(ndb_stub, api_client: Client) -> None:
     )
 
     assert resp.status_code == 200
-    assert len(resp.json) == 1
+    assert len(resp.get_json()) == 1
     assert resp.json == [
         {
             "award_type": AwardType.WINNER,
@@ -575,7 +575,7 @@ def test_district_advancement_cutoffs_key_set(ndb_stub, api_client: Client) -> N
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert set(resp.json["cutoffs"].keys()) == {
+    assert set(resp.get_json()["cutoffs"].keys()) == {
         "dcmp_original",
         "dcmp_effective",
         "dcmp_declines",
@@ -663,8 +663,8 @@ def test_district_advancement_qualification_survives_empty_advancement(
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert resp.json["teams"] == {}
-    assert resp.json["cutoffs"]["cmp_qualification"] == {
+    assert resp.get_json()["teams"] == {}
+    assert resp.get_json()["cutoffs"]["cmp_qualification"] == {
         "frc95": "district_points",
         "frc133": "dcmp_winner",
     }
@@ -953,7 +953,7 @@ def test_dcmp_history(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    by_key = {entry["event"]["key"]: entry for entry in resp.json}
+    by_key = {entry["event"]["key"]: entry for entry in resp.get_json()}
     assert set(by_key.keys()) == {"2023necmp", "2024necmp", "2024necmp1"}
     assert by_key["2024necmp"]["event"]["event_type"] == EventType.DISTRICT_CMP
     assert by_key["2024necmp1"]["event"]["event_type"] == (

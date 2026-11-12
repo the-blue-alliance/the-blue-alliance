@@ -233,7 +233,7 @@ def test_queue_counts_filtered_by_permission(
 
     resp = api_client.get(f"{BASE_URL}/queue")
     assert resp.status_code == 200
-    counts = resp.json["counts"]
+    counts = resp.get_json()["counts"]
     assert counts["match"] == 1
     assert counts["media"] == 0
     # REVIEW_MEDIA covers match/media/social-media/event; not these:
@@ -247,7 +247,7 @@ def test_queue_counts_admin_sees_all(api_client: Client, moderator) -> None:
     moderator([], is_admin=True)
     resp = api_client.get(f"{BASE_URL}/queue")
     assert resp.status_code == 200
-    assert set(resp.json["counts"].keys()) == {
+    assert set(resp.get_json()["counts"].keys()) == {
         "event",
         "match",
         "media",
@@ -272,7 +272,7 @@ def test_list_suggestions_includes_author_account_created(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/match")
     assert (
-        resp.json["suggestions"][0]["author"]["created"]
+        resp.get_json()["suggestions"][0]["author"]["created"]
         == none_throws(author.created).isoformat()
     )
 
@@ -285,7 +285,7 @@ def test_list_match_suggestions(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/match")
     assert resp.status_code == 200
-    suggestions = resp.json["suggestions"]
+    suggestions = resp.get_json()["suggestions"]
     assert len(suggestions) == 1
     suggestion = suggestions[0]
     assert suggestion["key"] == suggestion_id
@@ -296,7 +296,7 @@ def test_list_match_suggestions(
     assert suggestion["event"]["key"] == "2016necmp"
     assert suggestion["uses_official_webcast_unit"] is False
     assert suggestion["has_first_official_webcast"] is False
-    assert resp.json["total"] == 1
+    assert resp.get_json()["total"] == 1
     # No YouTube API key configured, so no video metadata
     assert "video_title" not in suggestion
 
@@ -316,8 +316,8 @@ def test_list_total_exceeds_page(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/event?limit=2")
     assert resp.status_code == 200
-    assert len(resp.json["suggestions"]) == 2
-    assert resp.json["total"] == 3
+    assert len(resp.get_json()["suggestions"]) == 2
+    assert resp.get_json()["total"] == 3
 
 
 def test_list_author_reputation_counts(
@@ -350,7 +350,7 @@ def test_list_author_reputation_counts(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/match")
     assert resp.status_code == 200
-    suggestion_author = resp.json["suggestions"][0]["author"]
+    suggestion_author = resp.get_json()["suggestions"][0]["author"]
     assert suggestion_author["accepted_count"] == 1
     assert suggestion_author["rejected_count"] == 1
 
@@ -362,7 +362,7 @@ def test_list_author_reputation_counts_cached(
     create_match_video_suggestion(author)
 
     resp = api_client.get(f"{BASE_URL}/suggestions/match")
-    assert resp.json["suggestions"][0]["author"]["accepted_count"] == 0
+    assert resp.get_json()["suggestions"][0]["author"]["accepted_count"] == 0
 
     # A newly accepted suggestion doesn't appear until the hour-long
     # reputation cache expires
@@ -379,13 +379,13 @@ def test_list_author_reputation_counts_cached(
     accepted.put()
 
     resp = api_client.get(f"{BASE_URL}/suggestions/match")
-    assert resp.json["suggestions"][0]["author"]["accepted_count"] == 0
+    assert resp.get_json()["suggestions"][0]["author"]["accepted_count"] == 0
 
     MemcacheClient.get().delete_multi(
         [f"moderation_author_review_counts:{author.key.id()}".encode()]
     )
     resp = api_client.get(f"{BASE_URL}/suggestions/match")
-    assert resp.json["suggestions"][0]["author"]["accepted_count"] == 1
+    assert resp.get_json()["suggestions"][0]["author"]["accepted_count"] == 1
 
 
 def test_list_match_video_metadata(
@@ -425,7 +425,7 @@ def test_list_match_video_metadata(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/match")
     assert resp.status_code == 200
-    suggestion = resp.json["suggestions"][0]
+    suggestion = resp.get_json()["suggestions"][0]
     assert suggestion["video_title"] == "Full Event Stream Day 2"
     assert suggestion["video_duration_seconds"] == 29700
 
@@ -441,7 +441,7 @@ def test_list_match_suggestions_first_webcast_flag(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/match")
     assert resp.status_code == 200
-    assert resp.json["suggestions"][0]["has_first_official_webcast"] is True
+    assert resp.get_json()["suggestions"][0]["has_first_official_webcast"] is True
 
 
 def test_list_webcast_suggestions_existing_webcasts(
@@ -459,7 +459,7 @@ def test_list_webcast_suggestions_existing_webcasts(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/event")
     assert resp.status_code == 200
-    suggestion = resp.json["suggestions"][0]
+    suggestion = resp.get_json()["suggestions"][0]
     assert suggestion["existing_webcasts"] == [
         {"type": "twitch", "channel": "tbagameday"}
     ]
@@ -509,7 +509,7 @@ def test_list_event_media_suggestions_includes_smugmug_album_preview(
     # One batched call for the whole page, not one per suggestion
     mock_previews.assert_called_once()
     assert list(mock_previews.call_args[0][0]) == ["2HCx3m"]
-    media = resp.json["suggestions"][0]["candidate_media"]
+    media = resp.get_json()["suggestions"][0]["candidate_media"]
     assert media["preview_images"] == previews
     assert media["slug_name"] == "smugmug-album"
     assert media["is_image"] is False
@@ -542,7 +542,7 @@ def test_list_team_media_suggestions_includes_reference_and_preferred(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/media")
     assert resp.status_code == 200
-    suggestion = resp.json["suggestions"][0]
+    suggestion = resp.get_json()["suggestions"][0]
     assert suggestion["candidate_media"]["is_image"] is True
     assert suggestion["candidate_media"]["slug_name"] == "imgur"
     assert suggestion["details"]["thumbnail"] == "abc123_m.jpg"
@@ -578,7 +578,7 @@ def test_list_match_video_metadata_survives_youtube_failure(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/match")
     assert resp.status_code == 200
-    suggestion = resp.json["suggestions"][0]
+    suggestion = resp.get_json()["suggestions"][0]
     assert suggestion["event"]["key"] == "2016necmp"
     assert "video_title" not in suggestion
     assert "video_duration_seconds" not in suggestion
@@ -607,7 +607,7 @@ def test_list_webcast_suggestions_official_webcast_unit(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/event")
     assert resp.status_code == 200
-    suggestion = resp.json["suggestions"][0]
+    suggestion = resp.get_json()["suggestions"][0]
     assert suggestion["uses_official_webcast_unit"] is True
     assert suggestion["existing_webcasts"] == []
 
@@ -628,7 +628,7 @@ def test_list_webcast_suggestions_district_without_webcast_unit(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/event")
     assert resp.status_code == 200
-    assert resp.json["suggestions"][0]["uses_official_webcast_unit"] is False
+    assert resp.get_json()["suggestions"][0]["uses_official_webcast_unit"] is False
 
 
 def test_list_webcast_suggestions_missing_district(
@@ -646,7 +646,7 @@ def test_list_webcast_suggestions_missing_district(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/event")
     assert resp.status_code == 200
-    assert resp.json["suggestions"][0]["uses_official_webcast_unit"] is False
+    assert resp.get_json()["suggestions"][0]["uses_official_webcast_unit"] is False
 
 
 def test_list_team_media_suggestions_serializes_team_reference(
@@ -669,7 +669,7 @@ def test_list_team_media_suggestions_serializes_team_reference(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/media")
     assert resp.status_code == 200
-    assert resp.json["suggestions"][0]["reference"] == {
+    assert resp.get_json()["suggestions"][0]["reference"] == {
         "type": "team",
         "key": "frc1124",
         "team_number": 1124,
@@ -697,7 +697,7 @@ def test_list_media_suggestions_ignores_malformed_details_json(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/media")
     assert resp.status_code == 200
-    suggestion = resp.json["suggestions"][0]
+    suggestion = resp.get_json()["suggestions"][0]
     assert "details" not in suggestion
     assert suggestion["candidate_media"]["slug_name"] == "imgur"
 
@@ -721,7 +721,7 @@ def test_list_social_media_suggestions_includes_profile_url(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/social-media")
     assert resp.status_code == 200
-    suggestion = resp.json["suggestions"][0]
+    suggestion = resp.get_json()["suggestions"][0]
     assert suggestion["reference"] is None
     assert "existing_preferred" not in suggestion
     media = suggestion["candidate_media"]
@@ -767,7 +767,7 @@ def test_list_offseason_event_suggestions_includes_similar_events(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/offseason-event")
     assert resp.status_code == 200
-    by_name = {s["contents"]["name"]: s for s in resp.json["suggestions"]}
+    by_name = {s["contents"]["name"]: s for s in resp.get_json()["suggestions"]}
     assert by_name["Chezy Champs 2016"]["similar_events"] == [
         {"key": "2016cc", "name": "Chezy Champs"}
     ]
@@ -828,7 +828,7 @@ def test_list_apiwrite_suggestions_includes_event_and_existing_keys(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/api_auth_access")
     assert resp.status_code == 200
-    suggestion = resp.json["suggestions"][0]
+    suggestion = resp.get_json()["suggestions"][0]
     assert suggestion["event"]["key"] == "2016necmp"
     assert suggestion["event"]["type"] == "event"
     assert suggestion["requested_auth_types"] == [
@@ -882,7 +882,7 @@ def test_list_apiwrite_suggestions_includes_author_past_write_keys(
     create_apiwrite_suggestion(author)
 
     resp = api_client.get(f"{BASE_URL}/suggestions/api_auth_access")
-    assert resp.json["suggestions"][0]["author_write_keys"] == [
+    assert resp.get_json()["suggestions"][0]["author_write_keys"] == [
         {
             "event_keys": ["2015necmp"],
             "auth_types": [
@@ -909,7 +909,7 @@ def test_list_apiwrite_suggestions_lists_newest_author_write_key_first(
     create_apiwrite_suggestion(author)
 
     resp = api_client.get(f"{BASE_URL}/suggestions/api_auth_access")
-    keys = resp.json["suggestions"][0]["author_write_keys"]
+    keys = resp.get_json()["suggestions"][0]["author_write_keys"]
     assert [k["event_keys"] for k in keys] == [["2015necmp"], ["2014necmp"]]
 
 
@@ -925,7 +925,7 @@ def test_list_apiwrite_suggestions_omits_author_read_keys(
     create_apiwrite_suggestion(author)
 
     resp = api_client.get(f"{BASE_URL}/suggestions/api_auth_access")
-    assert resp.json["suggestions"][0]["author_write_keys"] == []
+    assert resp.get_json()["suggestions"][0]["author_write_keys"] == []
 
 
 def test_list_apiwrite_suggestions_omits_other_accounts_write_keys(
@@ -941,7 +941,7 @@ def test_list_apiwrite_suggestions_omits_other_accounts_write_keys(
     create_apiwrite_suggestion(author)
 
     resp = api_client.get(f"{BASE_URL}/suggestions/api_auth_access")
-    assert resp.json["suggestions"][0]["author_write_keys"] == []
+    assert resp.get_json()["suggestions"][0]["author_write_keys"] == []
 
 
 def test_list_apiwrite_suggestions_missing_event(
@@ -961,7 +961,7 @@ def test_list_apiwrite_suggestions_missing_event(
 
     resp = api_client.get(f"{BASE_URL}/suggestions/api_auth_access")
     assert resp.status_code == 200
-    suggestion = resp.json["suggestions"][0]
+    suggestion = resp.get_json()["suggestions"][0]
     assert suggestion["event"] is None
     assert suggestion["existing_auth"] == []
 
@@ -984,8 +984,8 @@ def test_accept_match_video(
 
     resp = api_client.post(f"{BASE_URL}/suggestions/{suggestion_id}/accept")
     assert resp.status_code == 200
-    assert resp.json["result"] == "accepted"
-    assert resp.json["created_target_key"] == "2016necmp_f1m1"
+    assert resp.get_json()["result"] == "accepted"
+    assert resp.get_json()["created_target_key"] == "2016necmp_f1m1"
 
     suggestion = Suggestion.get_by_id(suggestion_id)
     assert suggestion is not None
@@ -1053,7 +1053,7 @@ def test_accept_match_video_bad_target(
         json={"target_match_key": "2016necmp_f1m3"},
     )
     assert resp.status_code == 400
-    assert resp.json["result"] == "invalid"
+    assert resp.get_json()["result"] == "invalid"
 
     suggestion = Suggestion.get_by_id(suggestion_id)
     assert suggestion is not None
@@ -1075,7 +1075,7 @@ def test_accept_twice_conflicts(
     assert resp.status_code == 200
     resp = api_client.post(f"{BASE_URL}/suggestions/{suggestion_id}/accept")
     assert resp.status_code == 409
-    assert resp.json["result"] == "already_reviewed"
+    assert resp.get_json()["result"] == "already_reviewed"
 
 
 def test_accept_rejects_non_object_body(
@@ -1110,7 +1110,7 @@ def test_accept_requires_type_permission(
 
     resp = api_client.post(f"{BASE_URL}/suggestions/{suggestion_id}/accept")
     assert resp.status_code == 403
-    assert resp.json["result"] == "forbidden"
+    assert resp.get_json()["result"] == "forbidden"
 
 
 # ---------------------------------------------------------------------------
@@ -1447,7 +1447,7 @@ def test_accept_event_webcast_requires_fields(
 
     resp = api_client.post(f"{BASE_URL}/suggestions/{suggestion_id}/accept")
     assert resp.status_code == 400
-    assert resp.json["result"] == "invalid"
+    assert resp.get_json()["result"] == "invalid"
 
 
 def test_accept_offseason_event_requires_dates(
@@ -1468,8 +1468,8 @@ def test_accept_offseason_event_requires_dates(
         json={"event_short": "dateless"},
     )
     assert resp.status_code == 400
-    assert resp.json["result"] == "invalid"
-    assert "start_date and end_date are required" in resp.json["message"]
+    assert resp.get_json()["result"] == "invalid"
+    assert "start_date and end_date are required" in resp.get_json()["message"]
 
     suggestion = Suggestion.get_by_id("dateless_offseason")
     assert suggestion is not None
@@ -1486,7 +1486,7 @@ def test_accept_offseason_event_requires_dates(
         },
     )
     assert resp.status_code == 200
-    assert resp.json["result"] == "accepted"
+    assert resp.get_json()["result"] == "accepted"
     event = Event.get_by_id("2016dateless")
     assert event is not None
     assert event.start_date is not None
@@ -1518,7 +1518,7 @@ def test_accept_offseason_event(
         json={"event_short": "bestoff"},
     )
     assert resp.status_code == 200
-    assert resp.json["created_target_key"] == "2016bestoff"
+    assert resp.get_json()["created_target_key"] == "2016bestoff"
 
     created = Event.get_by_id("2016bestoff")
     assert created is not None
@@ -1579,7 +1579,7 @@ def test_accept_apiwrite(
         json={"auth_types": [int(AuthType.MATCH_VIDEO)], "expiration_days": 30},
     )
     assert resp.status_code == 200
-    auth_id = resp.json["created_target_key"]
+    auth_id = resp.get_json()["created_target_key"]
 
     auth = ApiAuthAccess.get_by_id(auth_id)
     assert auth is not None
@@ -1612,7 +1612,7 @@ def test_accept_apiwrite_default_expiration_past_event(
     after = datetime.now()
     assert resp.status_code == 200
 
-    auth = ApiAuthAccess.get_by_id(resp.json["created_target_key"])
+    auth = ApiAuthAccess.get_by_id(resp.get_json()["created_target_key"])
     assert auth is not None
     expiration = none_throws(auth.expiration)
     assert before + timedelta(days=7) <= expiration <= after + timedelta(days=7)
@@ -1649,7 +1649,7 @@ def test_accept_apiwrite_default_expiration_future_event(
     resp = api_client.post(f"{BASE_URL}/suggestions/{suggestion_id}/accept")
     assert resp.status_code == 200
 
-    auth = ApiAuthAccess.get_by_id(resp.json["created_target_key"])
+    auth = ApiAuthAccess.get_by_id(resp.get_json()["created_target_key"])
     assert auth is not None
     assert auth.expiration is not None
     assert auth.expiration == end_date + timedelta(days=8)
@@ -1691,7 +1691,7 @@ def test_accept_apiwrite_sends_admin_alert(
     assert body.startswith(":white_check_mark: *Approved: API write keys for <")
     assert "|2016necmp>" in body
     assert "\n> Enjoy the keys!" in body
-    assert resp.json["created_target_key"] in body
+    assert resp.get_json()["created_target_key"] in body
 
 
 def test_reject_apiwrite_sends_admin_alert(
@@ -1768,7 +1768,7 @@ def test_api_does_not_honor_team_admin_delegation(
         f"{BASE_URL}/suggestions/reject", json={"suggestion_keys": [suggestion_id]}
     )
     assert resp.status_code == 200
-    assert resp.json["results"][0]["result"] == "forbidden"
+    assert resp.get_json()["results"][0]["result"] == "forbidden"
 
 
 def test_accept_apiwrite_emails_requester(
@@ -1863,14 +1863,14 @@ def test_user_message_must_be_a_string(
         json={"user_message": bad_message},
     )
     assert resp.status_code == 400
-    assert "user_message" in resp.json["Error"]
+    assert "user_message" in resp.get_json()["Error"]
 
     resp = api_client.post(
         f"{BASE_URL}/suggestions/reject",
         json={"suggestion_keys": [suggestion_id], "user_message": bad_message},
     )
     assert resp.status_code == 400
-    assert "user_message" in resp.json["Error"]
+    assert "user_message" in resp.get_json()["Error"]
 
     suggestion = Suggestion.get_by_id(int(suggestion_id))
     assert suggestion is not None
@@ -2007,7 +2007,7 @@ def test_reject_batch(
         json={"suggestion_keys": [suggestion_id, "nonexistent"]},
     )
     assert resp.status_code == 200
-    results = {r["suggestion_key"]: r["result"] for r in resp.json["results"]}
+    results = {r["suggestion_key"]: r["result"] for r in resp.get_json()["results"]}
     assert results[suggestion_id] == "rejected"
     assert results["nonexistent"] == "not_found"
 
@@ -2039,7 +2039,7 @@ def test_reject_requires_type_permission(
         f"{BASE_URL}/suggestions/reject", json={"suggestion_keys": [suggestion_id]}
     )
     assert resp.status_code == 200
-    results = {r["suggestion_key"]: r["result"] for r in resp.json["results"]}
+    results = {r["suggestion_key"]: r["result"] for r in resp.get_json()["results"]}
     assert results[suggestion_id] == "forbidden"
 
     suggestion = Suggestion.get_by_id(suggestion_id)
@@ -2060,4 +2060,4 @@ def test_list_clamps_negative_limit(api_client: Client, moderator) -> None:
     moderator([AccountPermission.REVIEW_MEDIA])
     resp = api_client.get(f"{BASE_URL}/suggestions/match?limit=-5")
     assert resp.status_code == 200
-    assert resp.json["suggestions"] == []
+    assert resp.get_json()["suggestions"] == []

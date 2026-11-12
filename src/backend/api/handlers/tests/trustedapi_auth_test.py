@@ -123,7 +123,7 @@ def test_no_event(ndb_stub, api_client: FlaskClient) -> None:
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 404
-    assert resp.json["Error"] == "Event 2019nyny not found"
+    assert resp.get_json()["Error"] == "Event 2019nyny not found"
 
 
 def test_not_authenticated(ndb_stub, api_client: FlaskClient) -> None:
@@ -134,7 +134,8 @@ def test_not_authenticated(ndb_stub, api_client: FlaskClient) -> None:
 
     assert resp.status_code == 401
     assert (
-        resp.json["Error"] == "Must provide a request header parameter 'X-TBA-Auth-Id'"
+        resp.get_json()["Error"]
+        == "Must provide a request header parameter 'X-TBA-Auth-Id'"
     )
 
 
@@ -149,7 +150,8 @@ def test_has_auth_id_but_no_sig(ndb_stub, api_client: FlaskClient) -> None:
 
     assert resp.status_code == 401
     assert (
-        resp.json["Error"] == "Must provide a request header parameter 'X-TBA-Auth-Sig'"
+        resp.get_json()["Error"]
+        == "Must provide a request header parameter 'X-TBA-Auth-Sig'"
     )
 
 
@@ -170,7 +172,7 @@ def test_admin_superpower(
         )
 
     assert resp.status_code == 200
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -188,7 +190,7 @@ def test_eventwizard_permission_not_offseason(
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2020-06-01")
@@ -206,7 +208,7 @@ def test_eventwizard_permission_not_this_year(
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -226,7 +228,7 @@ def test_eventwizard_permission_passes(
         )
 
     assert resp.status_code == 200
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -345,7 +347,7 @@ def test_webcast_permission_passes(ndb_stub, api_client: FlaskClient) -> None:
         )
 
     assert resp.status_code == 200
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -364,7 +366,7 @@ def test_account_permission_logged_in_wrong_events(
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -383,7 +385,7 @@ def test_account_permission_logged_in_wrong_permissions(
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -407,7 +409,7 @@ def test_account_permission_logged_in_auth_expired(
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -433,7 +435,7 @@ def test_account_permission_logged_in_good_forever(
         )
 
     assert resp.status_code == 200
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -459,7 +461,7 @@ def test_account_permission_logged_in_not_expired_yet(
         )
 
     assert resp.status_code == 200
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -489,7 +491,7 @@ def test_explicit_auth_bad_id(
         )
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -520,7 +522,7 @@ def test_explicit_auth_bad_secret(
         )
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -552,7 +554,7 @@ def test_explicit_auth_wrong_event(
         )
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -584,7 +586,7 @@ def test_explicit_auth_wrong_permission(
         )
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -618,7 +620,7 @@ def test_explicit_auth_expired(
         )
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -652,7 +654,7 @@ def test_explicit_auth_good_forever(
         )
 
     assert resp.status_code == 200, resp.data
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -686,7 +688,7 @@ def test_explicit_auth_not_expired(
         )
 
     assert resp.status_code == 200, resp.data
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -721,7 +723,7 @@ def test_explicit_auth_all_official_events(
         )
 
     assert resp.status_code == 200, resp.data
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -756,7 +758,7 @@ def test_explicit_auth_with_event_code_override(
         )
 
     assert resp.status_code == 200, resp.data
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
 
 
 @freeze_time("2020-06-01")
@@ -791,7 +793,7 @@ def test_explicit_auth_all_official_events_not_current_year_fails(
         )
 
     assert resp.status_code == 401, resp.data
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 # File upload tests
@@ -827,7 +829,7 @@ def test_file_upload_no_file_param(
         )
 
     assert resp.status_code == 401
-    assert "Expected file upload not found" in resp.json["Error"]
+    assert "Expected file upload not found" in resp.get_json()["Error"]
 
 
 @freeze_time("2019-06-01")
@@ -874,7 +876,7 @@ def test_file_upload_mismatched_digest(
         )
 
     assert resp.status_code == 401
-    assert "File digest does not match" in resp.json["Error"]
+    assert "File digest does not match" in resp.get_json()["Error"]
 
 
 @freeze_time("2019-06-01")
@@ -920,7 +922,7 @@ def test_file_upload_correct_digest(
         )
 
     assert resp.status_code == 200
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
 
 
 @pytest.mark.parametrize(
@@ -977,7 +979,7 @@ def test_file_upload_succeeds_with_correct_permission(
         )
 
     assert resp.status_code == 200
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -1011,9 +1013,9 @@ def test_error_message_with_all_official_events_and_event_keys(
         )
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
     assert (
-        resp.json["Error"]
+        resp.get_json()["Error"]
         == "Only allowed to edit events: all current-season official events, 2019other"
     )
 
@@ -1049,9 +1051,9 @@ def test_error_message_with_all_official_events_only(
         )
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
     assert (
-        resp.json["Error"]
+        resp.get_json()["Error"]
         == "Only allowed to edit events: all current-season official events"
     )
 
@@ -1087,8 +1089,8 @@ def test_error_message_without_all_official_events(
         )
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
-    assert resp.json["Error"] == "Only allowed to edit events: 2019other"
+    assert "Error" in resp.get_json()
+    assert resp.get_json()["Error"] == "Only allowed to edit events: 2019other"
 
 
 @freeze_time("2019-06-01")
@@ -1328,7 +1330,7 @@ def test_file_upload_unknown_report_type_is_client_error_not_auth_error(
         )
 
     assert resp.status_code in (400, 404), resp.json
-    assert "no required auth types" not in resp.json["Error"]
+    assert "no required auth types" not in resp.get_json()["Error"]
 
 
 def test_explicit_auth_trusted_api_disabled(
@@ -1362,4 +1364,4 @@ def test_explicit_auth_trusted_api_disabled(
         )
 
     assert resp.status_code == 401
-    assert "temporarily disabled" in resp.json["Error"]
+    assert "temporarily disabled" in resp.get_json()["Error"]

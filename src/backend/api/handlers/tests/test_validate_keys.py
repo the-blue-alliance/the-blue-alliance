@@ -65,7 +65,7 @@ def test_validate_keys_negative_cache_hit_skips_datastore_query(
         "/api/v3/team/frc9999999", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp1.status_code == 404
-    assert resp1.json["Error"] == "team key: frc9999999 does not exist"
+    assert resp1.get_json()["Error"] == "team key: frc9999999 does not exist"
     assert key_does_not_exist_cache.get(("Team", "frc9999999")) is True
 
     # 2. Subsequent request should short-circuit via negative cache without calling Team.get_by_id_async
@@ -78,7 +78,7 @@ def test_validate_keys_negative_cache_hit_skips_datastore_query(
             "/api/v3/team/frc9999999", headers={"X-TBA-Auth-Key": "test_auth_key"}
         )
         assert resp2.status_code == 404
-        assert resp2.json["Error"] == "team key: frc9999999 does not exist"
+        assert resp2.get_json()["Error"] == "team key: frc9999999 does not exist"
 
 
 def test_validate_keys_negative_cache_for_all_entity_types(
@@ -94,7 +94,7 @@ def test_validate_keys_negative_cache_for_all_entity_types(
         "/api/v3/event/2020nonexistent", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp_event.status_code == 404
-    assert resp_event.json["Error"] == "event key: 2020nonexistent does not exist"
+    assert resp_event.get_json()["Error"] == "event key: 2020nonexistent does not exist"
     assert key_does_not_exist_cache.get(("Event", "2020nonexistent")) is True
 
     # Match
@@ -102,7 +102,7 @@ def test_validate_keys_negative_cache_for_all_entity_types(
         "/api/v3/match/2020casj_qm99", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp_match.status_code == 404
-    assert resp_match.json["Error"] == "match key: 2020casj_qm99 does not exist"
+    assert resp_match.get_json()["Error"] == "match key: 2020casj_qm99 does not exist"
     assert key_does_not_exist_cache.get(("Match", "2020casj_qm99")) is True
 
     # District
@@ -111,7 +111,10 @@ def test_validate_keys_negative_cache_for_all_entity_types(
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp_district.status_code == 404
-    assert resp_district.json["Error"] == "district key: 2020nonexistent does not exist"
+    assert (
+        resp_district.get_json()["Error"]
+        == "district key: 2020nonexistent does not exist"
+    )
     assert key_does_not_exist_cache.get(("District", "2020nonexistent")) is True
 
 
