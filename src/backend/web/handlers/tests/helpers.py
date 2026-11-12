@@ -213,7 +213,7 @@ def preseed_event_for_team(team_number: TeamNumber, event_key: EventKey) -> Gene
     ).put_async()
 
 
-def get_team_info(resp_data: str) -> TeamInfo:
+def get_team_info(resp_data: bytes) -> TeamInfo:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     header = soup.find(id="team-title")
     location = soup.find(id="team-location")
@@ -288,7 +288,7 @@ def get_team_info(resp_data: str) -> TeamInfo:
     )
 
 
-def get_team_history(resp_data: str) -> Optional[List[TeamEventHistory]]:
+def get_team_history(resp_data: bytes) -> Optional[List[TeamEventHistory]]:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     history_table = soup.find(id="competition-list-table")
     if not history_table:
@@ -305,20 +305,20 @@ def get_team_history(resp_data: str) -> Optional[List[TeamEventHistory]]:
     ]
 
 
-def get_page_title(resp_data: str) -> str:
+def get_page_title(resp_data: bytes) -> str:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     title = soup.find("title")
     return title.string.strip()
 
 
-def get_years_participated_dropdown(resp_data: str) -> List[str]:
+def get_years_participated_dropdown(resp_data: bytes) -> List[str]:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     dropdown = soup.find("ul", id="team-year-dropdown")
     return [li.string.strip() for li in dropdown.contents if li.name == "li"]
 
 
 def get_team_event_participation(
-    resp_data: str, event_key: EventKey
+    resp_data: bytes, event_key: EventKey
 ) -> TeamEventParticipation:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     event = soup.find(id=event_key)
@@ -343,7 +343,7 @@ def assert_alert(div: bs4.element.Tag, title: str, message: str, success: bool) 
     assert alert_message.text == message
 
 
-def find_teams_tables(resp_data: str) -> List[bs4.element.Tag]:
+def find_teams_tables(resp_data: bytes) -> List[bs4.element.Tag]:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     return soup.find_all(id=re.compile(r"^teams_[ab]$"))
 
@@ -367,7 +367,7 @@ def get_teams_from_table(table: bs4.element.Tag) -> List[ParsedTeam]:
     return parsed_teams
 
 
-def get_all_teams(resp_data: str) -> List[ParsedTeam]:
+def get_all_teams(resp_data: bytes) -> List[ParsedTeam]:
     tables = find_teams_tables(resp_data)
     if len(tables) == 0:
         return []
@@ -375,7 +375,7 @@ def get_all_teams(resp_data: str) -> List[ParsedTeam]:
     return get_teams_from_table(tables[0]) + get_teams_from_table(tables[1])
 
 
-def get_HOF_awards(resp_data: str) -> Optional[List[TeamHOFInfo]]:
+def get_HOF_awards(resp_data: bytes) -> Optional[List[TeamHOFInfo]]:
     soup = bs4.BeautifulSoup(resp_data, "html.parser")
     banners = soup.find_all("div", class_="panel-default")
 

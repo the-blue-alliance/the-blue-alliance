@@ -1723,45 +1723,10 @@
       "severity": "error"
     },
     {
-      "column": 27,
-      "path": "src/backend/web/handlers/tests/account_overview_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_page_title`",
-      "severity": "error"
-    },
-    {
       "column": 18,
       "path": "src/backend/web/handlers/tests/account_overview_test.py",
       "name": "bad-argument-type",
       "concise_description": "Argument `str` is not assignable to parameter `div` with type `Tag` in function `backend.web.handlers.tests.helpers.assert_alert`",
-      "severity": "error"
-    },
-    {
-      "column": 27,
-      "path": "src/backend/web/handlers/tests/account_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_page_title`",
-      "severity": "error"
-    },
-    {
-      "column": 27,
-      "path": "src/backend/web/handlers/tests/account_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_page_title`",
-      "severity": "error"
-    },
-    {
-      "column": 27,
-      "path": "src/backend/web/handlers/tests/account_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_page_title`",
-      "severity": "error"
-    },
-    {
-      "column": 27,
-      "path": "src/backend/web/handlers/tests/account_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_page_title`",
       "severity": "error"
     },
     {
@@ -1779,59 +1744,10 @@
       "severity": "error"
     },
     {
-      "column": 39,
-      "path": "src/backend/web/handlers/tests/district_detail_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_all_teams`",
-      "severity": "error"
-    },
-    {
-      "column": 39,
-      "path": "src/backend/web/handlers/tests/district_detail_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_all_teams`",
-      "severity": "error"
-    },
-    {
-      "column": 40,
-      "path": "src/backend/web/handlers/tests/district_detail_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.find_teams_tables`",
-      "severity": "error"
-    },
-    {
-      "column": 48,
-      "path": "src/backend/web/handlers/tests/error_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `get_error_title`",
-      "severity": "error"
-    },
-    {
-      "column": 48,
-      "path": "src/backend/web/handlers/tests/error_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `get_error_title`",
-      "severity": "error"
-    },
-    {
       "column": 12,
       "path": "src/backend/web/handlers/tests/event_detail_test.py",
       "name": "not-iterable",
       "concise_description": "`in` is not supported between `Literal['tooltip']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 35,
-      "path": "src/backend/web/handlers/tests/hall_of_fame_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_page_title`",
-      "severity": "error"
-    },
-    {
-      "column": 41,
-      "path": "src/backend/web/handlers/tests/hall_of_fame_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_HOF_awards`",
       "severity": "error"
     },
     {
@@ -1846,167 +1762,6 @@
       "path": "src/backend/web/handlers/tests/suggest_team_admin_review_test.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `FunctionType` has no attribute `return_value`",
-      "severity": "error"
-    },
-    {
-      "column": 32,
-      "path": "src/backend/web/handlers/tests/team_canonical_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_page_title`",
-      "severity": "error"
-    },
-    {
-      "column": 32,
-      "path": "src/backend/web/handlers/tests/team_canonical_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_page_title`",
-      "severity": "error"
-    },
-    {
-      "column": 39,
-      "path": "src/backend/web/handlers/tests/team_canonical_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_team_info`",
-      "severity": "error"
-    },
-    {
-      "column": 32,
-      "path": "src/backend/web/handlers/tests/team_canonical_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_page_title`",
-      "severity": "error"
-    },
-    {
-      "column": 32,
-      "path": "src/backend/web/handlers/tests/team_detail_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_page_title`",
-      "severity": "error"
-    },
-    {
-      "column": 39,
-      "path": "src/backend/web/handlers/tests/team_detail_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_team_info`",
-      "severity": "error"
-    },
-    {
-      "column": 39,
-      "path": "src/backend/web/handlers/tests/team_detail_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_team_info`",
-      "severity": "error"
-    },
-    {
-      "column": 62,
-      "path": "src/backend/web/handlers/tests/team_detail_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_years_participated_dropdown`",
-      "severity": "error"
-    },
-    {
-      "column": 55,
-      "path": "src/backend/web/handlers/tests/team_detail_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_team_event_participation`",
-      "severity": "error"
-    },
-    {
-      "column": 34,
-      "path": "src/backend/web/handlers/tests/team_detail_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_team_info`",
-      "severity": "error"
-    },
-    {
-      "column": 55,
-      "path": "src/backend/web/handlers/tests/team_detail_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_team_event_participation`",
-      "severity": "error"
-    },
-    {
-      "column": 34,
-      "path": "src/backend/web/handlers/tests/team_detail_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_team_info`",
-      "severity": "error"
-    },
-    {
-      "column": 32,
-      "path": "src/backend/web/handlers/tests/team_history_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_page_title`",
-      "severity": "error"
-    },
-    {
-      "column": 39,
-      "path": "src/backend/web/handlers/tests/team_history_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_team_info`",
-      "severity": "error"
-    },
-    {
-      "column": 45,
-      "path": "src/backend/web/handlers/tests/team_history_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_team_history`",
-      "severity": "error"
-    },
-    {
-      "column": 30,
-      "path": "src/backend/web/handlers/tests/team_list_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_all_teams`",
-      "severity": "error"
-    },
-    {
-      "column": 30,
-      "path": "src/backend/web/handlers/tests/team_list_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_all_teams`",
-      "severity": "error"
-    },
-    {
-      "column": 31,
-      "path": "src/backend/web/handlers/tests/team_list_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_all_teams`",
-      "severity": "error"
-    },
-    {
-      "column": 31,
-      "path": "src/backend/web/handlers/tests/team_list_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_all_teams`",
-      "severity": "error"
-    },
-    {
-      "column": 31,
-      "path": "src/backend/web/handlers/tests/team_list_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_all_teams`",
-      "severity": "error"
-    },
-    {
-      "column": 32,
-      "path": "src/backend/web/handlers/tests/team_list_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.find_teams_tables`",
-      "severity": "error"
-    },
-    {
-      "column": 31,
-      "path": "src/backend/web/handlers/tests/team_list_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_all_teams`",
-      "severity": "error"
-    },
-    {
-      "column": 31,
-      "path": "src/backend/web/handlers/tests/team_list_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `bytes` is not assignable to parameter `resp_data` with type `str` in function `backend.web.handlers.tests.helpers.get_all_teams`",
       "severity": "error"
     },
     {
