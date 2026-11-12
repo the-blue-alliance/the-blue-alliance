@@ -1,14 +1,16 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { HttpResponse } from 'msw';
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { requestApiWriteKey } from '~/api/tba/mobile/sdk.gen';
 import type { ApiWriteKeyRequestResponse } from '~/api/tba/mobile/types.gen';
 import { Route } from '~/routes/request.apiwrite';
+import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
+import { renderWithClient } from '~/test/render';
 
 const mocks = vi.hoisted(() => ({
   useAuth: vi.fn<() => unknown>(),
-  requestApiWriteKey: vi.fn<(options: unknown) => Promise<unknown>>(),
 }));
 
 vi.mock('@tanstack/react-router', async (importOriginal) => {
@@ -37,10 +39,6 @@ vi.mock('~/components/tba/auth/loginPage', () => ({
   default: () => <h1>Please log in to your TBA Account</h1>,
 }));
 
-vi.mock('~/api/tba/mobile/sdk.gen', () => ({
-  requestApiWriteKey: mocks.requestApiWriteKey,
-}));
-
 const USER = {
   email: 'volunteer@example.com',
   getIdToken: () => Promise.resolve('token-1'),
@@ -48,18 +46,12 @@ const USER = {
 
 async function renderPage() {
   const Component = Route.options.component as () => ReactNode;
-  render(
-    <QueryClientProvider client={new QueryClient()}>
-      <Component />
-    </QueryClientProvider>,
-  );
+  renderWithClient(<Component />);
   await screen.findByRole('heading', { level: 1 });
 }
 
 function respondWith(status: ApiWriteKeyRequestResponse['status']) {
-  mocks.requestApiWriteKey.mockResolvedValue({
-    data: { code: 200, message: '', status },
-  });
+  return mockTbaApi(requestApiWriteKey, {}, { code: 200, message: '', status });
 }
 
 function fillAndSubmit() {
@@ -105,19 +97,16 @@ describe('request api write route', () => {
   });
 
   test('sends the trimmed event key, role and checked permissions', async () => {
-    respondWith('success');
+    const requests = respondWith('success');
     await renderPage();
 
     fillAndSubmit();
 
     await screen.findByText('Thanks!');
-    expect(mocks.requestApiWriteKey).toHaveBeenCalledWith({
-      auth: 'token-1',
-      body: {
-        event_key: '2026cthar',
-        affiliation: 'Scorekeeper',
-        auth_types: [1, 3],
-      },
+    expect(await requests[0].json()).toEqual({
+      event_key: '2026cthar',
+      affiliation: 'Scorekeeper',
+      auth_types: [1, 3],
     });
   });
 
@@ -158,7 +147,11 @@ describe('request api write route', () => {
   });
 
   test('shows a generic error when the request fails', async () => {
-    mocks.requestApiWriteKey.mockRejectedValue(new Error('network'));
+    mockTbaApiWith(
+      requestApiWriteKey,
+      {},
+      () => new HttpResponse(null, { status: 500 }),
+    );
     await renderPage();
 
     fillAndSubmit();
