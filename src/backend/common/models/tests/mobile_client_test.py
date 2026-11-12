@@ -46,7 +46,7 @@ def test_is_fid(messaging_id_type: MessagingIdType) -> None:
 @pytest.mark.parametrize(
     "client_type, messaging_id, fid, expected",
     [
-        (ClientType.OS_IOS, "fid", "fid", True),
+        (ClientType.OS_IOS, "fid", "fid", False),
         (ClientType.OS_IOS, "fid:APA91b", "fid", True),
         (ClientType.OS_ANDROID_FCM, "fid:APA91b", "fid", True),
         (ClientType.OS_IOS, "otherfid:APA91b", "fid", False),
@@ -56,13 +56,13 @@ def test_is_fid(messaging_id_type: MessagingIdType) -> None:
         (ClientType.WEB, "fid:APA91b", "fid", False),
     ],
 )
-def test_is_for_installation(
+def test_is_token_for_installation(
     client_type: ClientType, messaging_id: str, fid: str, expected: bool
 ) -> None:
     mobile_client = MobileClient(
         user_id="user_id", messaging_id=messaging_id, client_type=client_type
     )
-    assert mobile_client.is_for_installation(fid) == expected
+    assert mobile_client.is_token_for_installation(fid) == expected
 
 
 def test_messaging_id_type_persists(ndb_stub) -> None:

@@ -83,6 +83,15 @@ def _parse_messaging_id_type(req: RegistrationRequest) -> MessagingIdType | None
     return MESSAGING_ID_TYPE_MAP.get(mobile_id_type)
 
 
+def _installation_token_keys(account_key: ndb.Key, fid: str) -> list[ndb.Key]:
+    """The account's FCM registration tokens for the app install `fid` identifies."""
+    return [
+        client.key
+        for client in MobileClient.query(ancestor=account_key).fetch()
+        if client.is_token_for_installation(fid)
+    ]
+
+
 @client_api_method(RegistrationRequest, BaseResponse)
 def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
     current_user = ClientApiAuthHelper.get_current_user()
@@ -111,8 +120,8 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
             message=f"mobile_id_type fid isn't supported for {req['operating_system']}",
         )
 
-    # Dedup on the FCM token (`messaging_id`): FCM guarantees it is unique per
-    # (app install, device), so the same token re-registering is the same client.
+    # Dedup on `messaging_id`: an FCM token or FID is unique per (app install,
+    # device), so the same one re-registering is the same client.
     # `device_uuid` is unreliable as a dedup key on iOS (regenerated from
     # UIDevice.identifierForVendor on each launch / reinstall).
     existing = MobileClient.query(
@@ -143,13 +152,7 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
         # An app that switches to FID registration keeps its old FCM token valid, so
         # the device would get every notification twice. This runs after the FID is
         # stored, so a failed write can't leave the device with neither registration.
-        ndb.delete_multi(
-            [
-                client.key
-                for client in MobileClient.query(ancestor=account_key).fetch()
-                if not client.is_fid and client.is_for_installation(gcm_id)
-            ]
-        )
+        ndb.delete_multi(_installation_token_keys(account_key, gcm_id))
 
     return response
 
@@ -201,19 +204,14 @@ def unregister_mobile_client(req: RegistrationRequest) -> BaseResponse:
         )
 
     gcm_id = req["mobile_id"]
+    to_delete = MobileClient.query(
+        MobileClient.messaging_id == gcm_id,
+        ancestor=account_key,
+    ).fetch(keys_only=True)
     if messaging_id_type == MessagingIdType.FID:
-        # Includes the install's old FCM token, which is all TBA has for a device that
-        # signs out before its FID registration reaches it
-        to_delete = [
-            client.key
-            for client in MobileClient.query(ancestor=account_key).fetch()
-            if client.messaging_id == gcm_id or client.is_for_installation(gcm_id)
-        ]
-    else:
-        to_delete = MobileClient.query(
-            MobileClient.messaging_id == gcm_id,
-            ancestor=account_key,
-        ).fetch(keys_only=True)
+        # The install's old FCM token is all TBA has for a device that signs out
+        # before its FID registration reaches it
+        to_delete += _installation_token_keys(account_key, gcm_id)
     if not to_delete:
         # Record doesn't exist, so we can't remove it
         return BaseResponse(code=404, message="User doesn't exist. Can't remove it")
