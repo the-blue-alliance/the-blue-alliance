@@ -1,27 +1,13 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { delay } from 'msw';
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import { type EventRanking } from '~/api/tba/read';
+import { getEventRankings } from '~/api/tba/read/sdk.gen';
 import EventRankTooltip from '~/components/tba/eventRankTooltip';
-
-const { queryFnMock } = vi.hoisted(() => ({
-  queryFnMock: vi.fn<() => Promise<EventRanking | null>>(),
-}));
-
-vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
-  getEventRankingsOptions: () => ({
-    queryKey: ['event-rankings'],
-    queryFn: queryFnMock,
-  }),
-}));
+import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
+import { renderWithClient } from '~/test/render';
 
 vi.mock('~/components/tba/links', () => ({
   TeamLink: ({
@@ -80,45 +66,52 @@ function makeRankings(): EventRanking {
   };
 }
 
-function renderTooltip() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
+const RANKINGS_PATH = { path: { event_key: '2026miket' } };
 
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <EventRankTooltip
-        eventKey="2026miket"
-        teamKey="frc103"
-        rank={3}
-        numTeams={40}
-      />
-    </QueryClientProvider>,
+function mockRankings(rankings: EventRanking) {
+  mockTbaApi(getEventRankings, RANKINGS_PATH, rankings);
+}
+
+function holdRankings() {
+  const requests: Request[] = [];
+  mockTbaApiWith(getEventRankings, RANKINGS_PATH, async ({ request }) => {
+    requests.push(request);
+    await delay('infinite');
+  });
+  return requests;
+}
+
+function renderTooltip() {
+  return renderWithClient(
+    <EventRankTooltip
+      eventKey="2026miket"
+      teamKey="frc103"
+      rank={3}
+      numTeams={40}
+    />,
   );
 }
 
 describe('EventRankTooltip', () => {
-  beforeEach(() => {
-    queryFnMock.mockReset();
-    queryFnMock.mockImplementation(() => new Promise(() => undefined));
-  });
-
   test('does not fetch rankings before the tooltip opens', () => {
+    const requests = holdRankings();
     renderTooltip();
 
-    expect(queryFnMock).not.toHaveBeenCalled();
+    expect(requests).toEqual([]);
   });
 
   test('shows a loading indicator while rankings are pending', async () => {
+    const requests = holdRankings();
     renderTooltip();
 
     fireEvent.mouseEnter(screen.getByTestId('tooltip'));
 
-    await waitFor(() => expect(queryFnMock).toHaveBeenCalledOnce());
+    await waitFor(() => expect(requests).toHaveLength(1));
     expect(screen.getByRole('status', { name: 'Loading' })).toBeTruthy();
   });
 
   test('fetches rankings when the rank is tapped', async () => {
+    const requests = holdRankings();
     renderTooltip();
 
     fireEvent.click(
@@ -127,11 +120,11 @@ describe('EventRankTooltip', () => {
       }),
     );
 
-    await waitFor(() => expect(queryFnMock).toHaveBeenCalledOnce());
+    await waitFor(() => expect(requests).toHaveLength(1));
   });
 
   test('shows all rankings in rank order', async () => {
-    queryFnMock.mockResolvedValue(makeRankings());
+    mockRankings(makeRankings());
     renderTooltip();
 
     fireEvent.mouseEnter(screen.getByTestId('tooltip'));
@@ -156,7 +149,7 @@ describe('EventRankTooltip', () => {
   });
 
   test('shows total ranking points', async () => {
-    queryFnMock.mockResolvedValue(makeRankings());
+    mockRankings(makeRankings());
     renderTooltip();
 
     fireEvent.mouseEnter(screen.getByTestId('tooltip'));
@@ -167,7 +160,7 @@ describe('EventRankTooltip', () => {
   });
 
   test('marks the current team ranking', async () => {
-    queryFnMock.mockResolvedValue(makeRankings());
+    mockRankings(makeRankings());
     renderTooltip();
 
     fireEvent.mouseEnter(screen.getByTestId('tooltip'));
@@ -180,7 +173,7 @@ describe('EventRankTooltip', () => {
   });
 
   test('links ranking entries to team season pages', async () => {
-    queryFnMock.mockResolvedValue(makeRankings());
+    mockRankings(makeRankings());
     renderTooltip();
 
     fireEvent.mouseEnter(screen.getByTestId('tooltip'));
@@ -197,7 +190,7 @@ describe('EventRankTooltip', () => {
       ...r,
       sort_orders: [r.rank * 2.4],
     }));
-    queryFnMock.mockResolvedValue(rankings);
+    mockRankings(rankings);
     renderTooltip();
 
     fireEvent.mouseEnter(screen.getByTestId('tooltip'));
@@ -212,7 +205,7 @@ describe('EventRankTooltip', () => {
     rankings.rankings = rankings.rankings.map((r) =>
       r.rank === 3 ? { ...r, sort_orders: [] } : r,
     );
-    queryFnMock.mockResolvedValue(rankings);
+    mockRankings(rankings);
     renderTooltip();
 
     fireEvent.mouseEnter(screen.getByTestId('tooltip'));

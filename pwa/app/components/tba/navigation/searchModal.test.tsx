@@ -1,11 +1,5 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
+import { HttpResponse, delay } from 'msw';
 import type { ReactNode } from 'react';
 import {
   afterEach,
@@ -18,18 +12,13 @@ import {
 } from 'vitest';
 
 import type { SearchIndex } from '~/api/tba/read';
+import { getSearchIndex } from '~/api/tba/read/sdk.gen';
 import { SearchModal } from '~/components/tba/navigation/searchModal';
+import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
+import { renderWithClient } from '~/test/render';
 
-const { useNavigateMock, searchIndexMock } = vi.hoisted(() => ({
+const { useNavigateMock } = vi.hoisted(() => ({
   useNavigateMock: vi.fn<(options: { to: string }) => void>(),
-  searchIndexMock: vi.fn<() => Promise<SearchIndex>>(),
-}));
-
-vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
-  getSearchIndexOptions: () => ({
-    queryKey: ['searchIndex'],
-    queryFn: searchIndexMock,
-  }),
 }));
 
 const SEARCH_INDEX: SearchIndex = {
@@ -62,25 +51,13 @@ beforeAll(() => {
 });
 
 function renderSearchModal() {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
-
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <SearchModal />
-    </QueryClientProvider>,
-  );
+  return renderWithClient(<SearchModal />);
 }
 
 describe('SearchModal', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    searchIndexMock.mockResolvedValue(SEARCH_INDEX);
+    mockTbaApi(getSearchIndex, {}, SEARCH_INDEX);
   });
 
   afterEach(() => {
@@ -189,7 +166,7 @@ describe('SearchModal', () => {
   });
 
   test('shows a loading state until the index arrives', async () => {
-    searchIndexMock.mockReturnValue(new Promise(() => undefined));
+    mockTbaApiWith(getSearchIndex, {}, () => delay('infinite'));
     renderSearchModal();
 
     fireEvent.click(screen.getByRole('button', { name: 'Search' }));
@@ -198,7 +175,7 @@ describe('SearchModal', () => {
   });
 
   test('shows an error when the index fails to load', async () => {
-    searchIndexMock.mockRejectedValue(new Error('offline'));
+    mockTbaApiWith(getSearchIndex, {}, () => HttpResponse.error());
     renderSearchModal();
 
     fireEvent.click(screen.getByRole('button', { name: 'Search' }));

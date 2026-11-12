@@ -1,16 +1,16 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
   fireEvent,
-  render,
   screen,
   waitFor,
   within,
 } from '@testing-library/react';
+import { delay } from 'msw';
 import { type ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { type EventColors } from '~/api/colors';
+import { getEventColors } from '~/api/colors/sdk.gen';
 import {
   AllianceColor,
   CompLevel,
@@ -19,46 +19,15 @@ import {
   EventType,
   type Match,
 } from '~/api/tba/read';
+import {
+  getDistrictTeamsKeys,
+  getEventMatches,
+  getEventRankings,
+  getEventsByYear,
+} from '~/api/tba/read/sdk.gen';
 import { DistrictChampsTab } from '~/components/tba/districtChampsTab';
-
-const { districtTeamsFn, eventsFn, matchesFn, rankingsFn, colorsFn } =
-  vi.hoisted(() => ({
-    districtTeamsFn: vi.fn<(districtKey: string) => Promise<string[]>>(),
-    eventsFn: vi.fn<(year: number) => Promise<Event[]>>(),
-    matchesFn: vi.fn<(eventKey: string) => Promise<Match[]>>(),
-    rankingsFn: vi.fn<(eventKey: string) => Promise<EventRanking | null>>(),
-    colorsFn: vi.fn<(eventKey: string) => Promise<EventColors>>(),
-  }));
-
-vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
-  getDistrictTeamsKeysOptions: ({
-    path,
-  }: {
-    path: { district_key: string };
-  }) => ({
-    queryKey: ['district-teams', path.district_key],
-    queryFn: () => districtTeamsFn(path.district_key),
-  }),
-  getEventsByYearOptions: ({ path }: { path: { year: number } }) => ({
-    queryKey: ['events', path.year],
-    queryFn: () => eventsFn(path.year),
-  }),
-  getEventMatchesOptions: ({ path }: { path: { event_key: string } }) => ({
-    queryKey: ['matches', path.event_key],
-    queryFn: () => matchesFn(path.event_key),
-  }),
-  getEventRankingsOptions: ({ path }: { path: { event_key: string } }) => ({
-    queryKey: ['rankings', path.event_key],
-    queryFn: () => rankingsFn(path.event_key),
-  }),
-}));
-
-vi.mock('~/api/colors/@tanstack/react-query.gen', () => ({
-  getEventColorsOptions: ({ path }: { path: { eventKey: string } }) => ({
-    queryKey: ['colors', path.eventKey],
-    queryFn: () => colorsFn(path.eventKey),
-  }),
-}));
+import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
+import { renderWithClient } from '~/test/render';
 
 vi.mock('~/components/tba/links', () => ({
   EventLink: ({
@@ -310,6 +279,7 @@ const archimedesColors: EventColors = {
 };
 
 function setupQueries({
+  year = 2025,
   events = [archimedes, newton, regional],
   teams = DISTRICT_TEAMS,
   rankings = {
@@ -321,40 +291,49 @@ function setupQueries({
     '2026new': newtonMatches,
   } as Record<string, Match[]>,
 }: {
+  year?: number;
   events?: Event[];
   teams?: string[];
   rankings?: Record<string, EventRanking | null>;
   matches?: Record<string, Match[]>;
 } = {}) {
-  districtTeamsFn.mockResolvedValue(teams);
-  eventsFn.mockResolvedValue(events);
-  matchesFn.mockImplementation((key) => Promise.resolve(matches[key] ?? []));
-  rankingsFn.mockImplementation((key) =>
-    Promise.resolve(rankings[key] ?? null),
+  mockTbaApi(
+    getDistrictTeamsKeys,
+    { path: { district_key: `${year}fim` } },
+    teams,
   );
-  colorsFn.mockImplementation((key) =>
-    key === '2026arc'
-      ? Promise.resolve(archimedesColors)
-      : // Never resolves: exercises the "no colours yet" path.
-        new Promise(() => {}),
+  const eventsRequests = mockTbaApi(
+    getEventsByYear,
+    { path: { year } },
+    events,
   );
+  for (const key of ['2026arc', '2026new']) {
+    const path = { path: { event_key: key } };
+    mockTbaApi(getEventMatches, path, matches[key] ?? []);
+    mockTbaApi(getEventRankings, path, rankings[key] ?? null);
+  }
+  mockTbaApi(
+    getEventColors,
+    { path: { eventKey: '2026arc' } },
+    archimedesColors,
+  );
+  // Never resolves: exercises the "no colours yet" path.
+  mockTbaApiWith(getEventColors, { path: { eventKey: '2026new' } }, () =>
+    delay('infinite'),
+  );
+  return { eventsRequests };
 }
 
 function renderTab(
   props: Partial<Parameters<typeof DistrictChampsTab>[0]> = {},
 ) {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <DistrictChampsTab
-        abbreviation="fim"
-        currentSeason={2026}
-        year={2025}
-        {...props}
-      />
-    </QueryClientProvider>,
+  return renderWithClient(
+    <DistrictChampsTab
+      abbreviation="fim"
+      currentSeason={2026}
+      year={2025}
+      {...props}
+    />,
   );
 }
 
@@ -380,8 +359,6 @@ describe('DistrictChampsTab', () => {
     renderTab();
 
     expect(screen.getByText('Loading divisions…')).toBeTruthy();
-    expect(districtTeamsFn).toHaveBeenCalledWith('2025fim');
-    expect(eventsFn).toHaveBeenCalledWith(2025);
 
     await waitForDivisions();
     const tabs = screen.getAllByRole('tab').map((t) => t.textContent);
@@ -626,9 +603,9 @@ describe('DistrictChampsTab', () => {
     });
 
     test('counts down to the next refresh and resets once a fetch completes', async () => {
+      const { eventsRequests } = setupQueries({ year: 2026 });
       const { unmount } = renderTab({ year: 2026 });
 
-      expect(districtTeamsFn).toHaveBeenCalledWith('2026fim');
       expect(screen.getByText('Refreshing…')).toBeTruthy();
 
       await waitForDivisions();
@@ -649,7 +626,7 @@ describe('DistrictChampsTab', () => {
       // The final tick wraps the countdown and React Query's own 60s
       // refetch interval fires, so the badge reports the refresh in
       // progress and then resets once it settles.
-      expect(eventsFn).toHaveBeenCalledTimes(1);
+      expect(eventsRequests).toHaveLength(1);
       act(() => {
         vi.advanceTimersByTime(1000);
       });
@@ -657,7 +634,7 @@ describe('DistrictChampsTab', () => {
       await waitFor(() =>
         expect(screen.getByText('Auto-refresh in 60s')).toBeTruthy(),
       );
-      expect(eventsFn).toHaveBeenCalledTimes(2);
+      expect(eventsRequests).toHaveLength(2);
 
       unmount();
       expect(vi.getTimerCount()).toBe(0);

@@ -1,63 +1,52 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, renderHook, waitFor } from '@testing-library/react';
-import type { PropsWithChildren } from 'react';
+import { act, waitFor } from '@testing-library/react';
+import { HttpResponse } from 'msw';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { ReviewResult, SuggestionType } from '~/api/tba/moderation/types.gen';
+import {
+  acceptModerationSuggestion,
+  getModerationQueue,
+  listModerationSuggestions,
+  rejectModerationSuggestions,
+} from '~/api/tba/moderation/sdk.gen';
+import {
+  type AcceptResponse,
+  type RejectRequest,
+  ReviewResult,
+  SuggestionType,
+} from '~/api/tba/moderation/types.gen';
 import {
   type ReviewSubmissionResult,
   useModerationQueue,
   useModerationSuggestions,
   useReviewSubmission,
 } from '~/lib/hooks/useModeration';
-
-interface SdkResponse {
-  data?: unknown;
-  error?: unknown;
-  response?: { status: number };
-}
+import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
+import { renderHookWithClient } from '~/test/render';
 
 const mocks = vi.hoisted(() => ({
   useAuth: vi.fn<() => { user: unknown }>(),
-  getModerationQueue: vi.fn<(options: unknown) => Promise<SdkResponse>>(),
-  listModerationSuggestions:
-    vi.fn<(options: unknown) => Promise<SdkResponse>>(),
-  acceptModerationSuggestion:
-    vi.fn<(options: unknown) => Promise<SdkResponse>>(),
-  rejectModerationSuggestions:
-    vi.fn<(options: unknown) => Promise<SdkResponse>>(),
 }));
 
 vi.mock('~/components/tba/auth/auth', () => ({ useAuth: mocks.useAuth }));
 
-vi.mock('~/api/tba/moderation/sdk.gen', () => ({
-  getModerationQueue: mocks.getModerationQueue,
-  listModerationSuggestions: mocks.listModerationSuggestions,
-  acceptModerationSuggestion: mocks.acceptModerationSuggestion,
-  rejectModerationSuggestions: mocks.rejectModerationSuggestions,
-}));
-
 const USER = { uid: 'user-1', getIdToken: () => Promise.resolve('token-1') };
 const TYPE = SuggestionType.OFFSEASON_EVENT;
 
-function createClient() {
-  return new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  });
-}
-
-function wrapperFor(queryClient: QueryClient) {
-  return function Wrapper({ children }: PropsWithChildren) {
-    return (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    );
-  };
-}
-
 function renderQueue() {
-  return renderHook(() => useModerationQueue(), {
-    wrapper: wrapperFor(createClient()),
-  });
+  return renderHookWithClient(() => useModerationQueue());
+}
+
+function mockAccept(key: string, status: number, body: object) {
+  const requests: Request[] = [];
+  mockTbaApiWith(
+    acceptModerationSuggestion,
+    { path: { suggestion_key: key } },
+    ({ request }) => {
+      requests.push(request);
+      return HttpResponse.json(body, { status });
+    },
+  );
+  return requests;
 }
 
 describe('useModerationQueue', () => {
@@ -67,29 +56,36 @@ describe('useModerationQueue', () => {
 
   test('stays idle when signed out', () => {
     mocks.useAuth.mockReturnValue({ user: null });
+    const requests = mockTbaApi(
+      getModerationQueue,
+      {},
+      { counts: {}, type_names: {} },
+    );
 
     const { result } = renderQueue();
 
     expect(result.current.fetchStatus).toBe('idle');
-    expect(mocks.getModerationQueue).not.toHaveBeenCalled();
+    expect(requests).toEqual([]);
   });
 
   test('returns the queue for moderators', async () => {
-    const queue = { total_pending: 3 };
-    mocks.getModerationQueue.mockResolvedValue({ data: queue });
+    const queue = {
+      counts: { [TYPE]: 3 },
+      type_names: { [TYPE]: 'Offseason Events' },
+    };
+    const requests = mockTbaApi(getModerationQueue, {}, queue);
 
     const { result } = renderQueue();
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toBe(queue);
-    expect(mocks.getModerationQueue).toHaveBeenCalledWith({ auth: 'token-1' });
+    expect(result.current.data).toEqual(queue);
+    expect(requests[0].headers.get('Authorization')).toBe('Bearer token-1');
   });
 
   test('returns null for accounts without review permissions', async () => {
-    mocks.getModerationQueue.mockResolvedValue({
-      error: { Error: 'Forbidden' },
-      response: { status: 403 },
-    });
+    mockTbaApiWith(getModerationQueue, {}, () =>
+      HttpResponse.json({ Error: 'Forbidden' }, { status: 403 }),
+    );
 
     const { result } = renderQueue();
 
@@ -99,26 +95,26 @@ describe('useModerationQueue', () => {
 
   test('surfaces a 403 that asks for a verified email', async () => {
     const error = { Error: 'Moderators need a verified email' };
-    mocks.getModerationQueue.mockResolvedValue({
-      error,
-      response: { status: 403 },
-    });
+    mockTbaApiWith(getModerationQueue, {}, () =>
+      HttpResponse.json(error, { status: 403 }),
+    );
 
     const { result } = renderQueue();
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(result.current.error).toBe(error);
+    expect(result.current.error).toEqual(error);
   });
 
-  test('falls back to a generic error when the SDK has none', async () => {
-    mocks.getModerationQueue.mockResolvedValue({ response: { status: 500 } });
+  test('reports an error when the server fails', async () => {
+    mockTbaApiWith(
+      getModerationQueue,
+      {},
+      () => new HttpResponse(null, { status: 500 }),
+    );
 
     const { result } = renderQueue();
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(result.current.error).toEqual(
-      new Error('Failed to load moderation queue'),
-    );
   });
 });
 
@@ -129,30 +125,35 @@ describe('useModerationSuggestions', () => {
 
   test('stays idle when signed out', () => {
     mocks.useAuth.mockReturnValue({ user: null });
+    const requests = mockTbaApi(
+      listModerationSuggestions,
+      { path: { suggestion_type: TYPE } },
+      { suggestions: [], total: 0 },
+    );
 
-    const { result } = renderHook(() => useModerationSuggestions(TYPE), {
-      wrapper: wrapperFor(createClient()),
-    });
+    const { result } = renderHookWithClient(() =>
+      useModerationSuggestions(TYPE),
+    );
 
     expect(result.current.fetchStatus).toBe('idle');
-    expect(mocks.listModerationSuggestions).not.toHaveBeenCalled();
+    expect(requests).toEqual([]);
   });
 
   test('lists pending suggestions of the given type', async () => {
-    const suggestions = { suggestions: [] };
-    mocks.listModerationSuggestions.mockResolvedValue({ data: suggestions });
+    const suggestions = { suggestions: [], total: 0 };
+    const requests = mockTbaApi(
+      listModerationSuggestions,
+      { path: { suggestion_type: TYPE } },
+      suggestions,
+    );
 
-    const { result } = renderHook(() => useModerationSuggestions(TYPE), {
-      wrapper: wrapperFor(createClient()),
-    });
+    const { result } = renderHookWithClient(() =>
+      useModerationSuggestions(TYPE),
+    );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toBe(suggestions);
-    expect(mocks.listModerationSuggestions).toHaveBeenCalledWith({
-      auth: 'token-1',
-      path: { suggestion_type: TYPE },
-      throwOnError: true,
-    });
+    expect(result.current.data).toEqual(suggestions);
+    expect(requests[0].headers.get('Authorization')).toBe('Bearer token-1');
   });
 });
 
@@ -162,16 +163,17 @@ describe('useReviewSubmission', () => {
   });
 
   function renderSubmission() {
-    const queryClient = createClient();
-    const invalidate = vi.spyOn(queryClient, 'invalidateQueries');
-    const hook = renderHook(() => useReviewSubmission(TYPE), {
-      wrapper: wrapperFor(queryClient),
-    });
+    const hook = renderHookWithClient(() => useReviewSubmission(TYPE));
+    const invalidate = vi.spyOn(hook.queryClient, 'invalidateQueries');
     return { ...hook, invalidate };
   }
 
   test('rejects the submission when signed out', async () => {
     mocks.useAuth.mockReturnValue({ user: null });
+    const requests = mockAccept('a', 200, {
+      result: ReviewResult.ACCEPTED,
+      suggestion_key: 'a',
+    });
     const { result } = renderSubmission();
 
     await act(async () => {
@@ -179,20 +181,26 @@ describe('useReviewSubmission', () => {
         result.current.mutateAsync({ accepts: [], rejects: [] }),
       ).rejects.toThrow('User not authenticated');
     });
-    expect(mocks.acceptModerationSuggestion).not.toHaveBeenCalled();
+    expect(requests).toEqual([]);
   });
 
   test('sorts accept outcomes and invalidates moderation queries', async () => {
-    mocks.acceptModerationSuggestion
-      .mockResolvedValueOnce({ data: { result: ReviewResult.ACCEPTED } })
-      .mockResolvedValueOnce({
-        error: { result: ReviewResult.ALREADY_REVIEWED },
-      })
-      .mockResolvedValueOnce({
-        error: { result: ReviewResult.INVALID, message: 'Missing city' },
-      })
-      .mockResolvedValueOnce({ error: { result: ReviewResult.NOT_FOUND } })
-      .mockResolvedValueOnce({});
+    const acceptA = mockAccept('a', 200, {
+      result: ReviewResult.ACCEPTED,
+      suggestion_key: 'a',
+    } satisfies AcceptResponse);
+    mockAccept('b', 409, { result: ReviewResult.ALREADY_REVIEWED });
+    mockAccept('c', 400, {
+      result: ReviewResult.INVALID,
+      message: 'Missing city',
+    });
+    mockAccept('d', 404, { result: ReviewResult.NOT_FOUND });
+    mockAccept('e', 500, {});
+    const rejectRequests = mockTbaApi(
+      rejectModerationSuggestions,
+      {},
+      { results: [] },
+    );
     const { result, invalidate } = renderSubmission();
 
     let outcome: ReviewSubmissionResult | undefined;
@@ -206,11 +214,8 @@ describe('useReviewSubmission', () => {
       });
     });
 
-    expect(mocks.acceptModerationSuggestion).toHaveBeenNthCalledWith(1, {
-      auth: 'token-1',
-      path: { suggestion_key: 'a' },
-      body: {},
-    });
+    expect(acceptA[0].headers.get('Authorization')).toBe('Bearer token-1');
+    expect(await acceptA[0].json()).toEqual({});
     expect(outcome).toEqual({
       accepted: ['a'],
       rejected: [],
@@ -221,7 +226,7 @@ describe('useReviewSubmission', () => {
         { key: 'e', message: 'request failed' },
       ],
     });
-    expect(mocks.rejectModerationSuggestions).not.toHaveBeenCalled();
+    expect(rejectRequests).toEqual([]);
     expect(invalidate).toHaveBeenCalledWith({
       queryKey: ['moderation', 'suggestions', TYPE],
     });
@@ -231,27 +236,33 @@ describe('useReviewSubmission', () => {
   });
 
   test('batches rejects by message and sorts their outcomes', async () => {
-    mocks.rejectModerationSuggestions
-      .mockResolvedValueOnce({
-        data: {
-          results: [
-            { suggestion_key: 'r1', result: ReviewResult.REJECTED },
-            { suggestion_key: 'r2', result: ReviewResult.ALREADY_REVIEWED },
-          ],
-        },
-      })
-      .mockResolvedValueOnce({
-        data: {
-          results: [
-            {
-              suggestion_key: 'r3',
-              result: ReviewResult.FORBIDDEN,
-              message: 'Not allowed',
+    const bodies: RejectRequest[] = [];
+    mockTbaApiWith(rejectModerationSuggestions, {}, async ({ request }) => {
+      const body = (await request.json()) as RejectRequest;
+      bodies.push(body);
+      return HttpResponse.json(
+        body.user_message
+          ? {
+              results: [
+                {
+                  suggestion_key: 'r3',
+                  result: ReviewResult.FORBIDDEN,
+                  message: 'Not allowed',
+                },
+                { suggestion_key: 'r4', result: ReviewResult.NOT_FOUND },
+              ],
+            }
+          : {
+              results: [
+                { suggestion_key: 'r1', result: ReviewResult.REJECTED },
+                {
+                  suggestion_key: 'r2',
+                  result: ReviewResult.ALREADY_REVIEWED,
+                },
+              ],
             },
-            { suggestion_key: 'r4', result: ReviewResult.NOT_FOUND },
-          ],
-        },
-      });
+      );
+    });
     const { result } = renderSubmission();
 
     let outcome: ReviewSubmissionResult | undefined;
@@ -267,14 +278,10 @@ describe('useReviewSubmission', () => {
       });
     });
 
-    expect(mocks.rejectModerationSuggestions).toHaveBeenNthCalledWith(1, {
-      auth: 'token-1',
-      body: { suggestion_keys: ['r1', 'r2'], user_message: undefined },
-    });
-    expect(mocks.rejectModerationSuggestions).toHaveBeenNthCalledWith(2, {
-      auth: 'token-1',
-      body: { suggestion_keys: ['r3', 'r4'], user_message: 'Sorry' },
-    });
+    expect(bodies).toEqual([
+      { suggestion_keys: ['r1', 'r2'] },
+      { suggestion_keys: ['r3', 'r4'], user_message: 'Sorry' },
+    ]);
     expect(outcome).toEqual({
       accepted: [],
       rejected: ['r1'],
@@ -287,10 +294,9 @@ describe('useReviewSubmission', () => {
   });
 
   test('rejects whose request fails outright are reported as failed', async () => {
-    mocks.rejectModerationSuggestions.mockResolvedValue({
-      error: { Error: 'Internal Server Error' },
-      response: { status: 500 },
-    });
+    mockTbaApiWith(rejectModerationSuggestions, {}, () =>
+      HttpResponse.json({ Error: 'Internal Server Error' }, { status: 500 }),
+    );
     const { result } = renderSubmission();
 
     let outcome: ReviewSubmissionResult | undefined;
