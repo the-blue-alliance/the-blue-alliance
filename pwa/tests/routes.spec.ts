@@ -44,6 +44,7 @@ const allRoutes = defineAllRoutes([
   '/local/debug',
   '/match_suggestion',
   '/match/$matchKey',
+  '/mytba',
   '/privacy',
   '/request/apiwrite',
   '/search',
