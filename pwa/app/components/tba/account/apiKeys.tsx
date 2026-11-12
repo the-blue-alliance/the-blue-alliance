@@ -9,6 +9,7 @@ import type {
   ApiReadKeyMessage,
   ApiWriteKeyMessage,
 } from '~/api/tba/mobile/types.gen';
+import { Badge, badgeVariants } from '~/components/ui/badge';
 import { Button, buttonVariants } from '~/components/ui/button';
 import {
   Card,
@@ -130,22 +131,11 @@ export default function ApiKeysSection() {
               You have no write API keys.
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Event(s)</TableHead>
-                  <TableHead>Permissions</TableHead>
-                  <TableHead>Expires</TableHead>
-                  <TableHead>Auth ID</TableHead>
-                  <TableHead>Auth Secret</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {writeKeys.map((key) => (
-                  <WriteKeyRow key={key.auth_id} writeKey={key} />
-                ))}
-              </TableBody>
-            </Table>
+            <ul className="max-h-96 divide-y overflow-y-auto pr-2">
+              {writeKeys.map((key) => (
+                <WriteKeyItem key={key.auth_id} writeKey={key} />
+              ))}
+            </ul>
           )}
         </CardContent>
       </Card>
@@ -182,23 +172,44 @@ function ReadKeyRow({
   );
 }
 
-function WriteKeyRow({ writeKey }: { writeKey: ApiWriteKeyMessage }) {
+function WriteKeyItem({ writeKey }: { writeKey: ApiWriteKeyMessage }) {
   return (
-    <TableRow>
-      <TableCell className="whitespace-nowrap">
-        {writeKey.event_keys.join(', ') || '—'}
-      </TableCell>
-      <TableCell>{writeKey.auth_types.join(', ')}</TableCell>
-      <TableCell className="whitespace-nowrap">
-        {formatIsoDate(writeKey.expiration)}
-      </TableCell>
-      <TableCell className="font-mono text-xs break-all">
-        {writeKey.auth_id}
-      </TableCell>
-      <TableCell className="max-w-[16rem] font-mono text-xs break-all">
-        {writeKey.secret}
-      </TableCell>
-    </TableRow>
+    <li className="py-3 first:pt-0 last:pb-0">
+      <dl
+        className="grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-1
+          text-sm"
+      >
+        <dt className="text-muted-foreground">Events</dt>
+        <dd className="flex flex-wrap gap-1">
+          {writeKey.event_keys.length === 0
+            ? '—'
+            : writeKey.event_keys.map((eventKey) => (
+                <Link
+                  key={eventKey}
+                  to="/event/$eventKey"
+                  params={{ eventKey }}
+                  className={badgeVariants({ variant: 'outline' })}
+                >
+                  {eventKey}
+                </Link>
+              ))}
+        </dd>
+        <dt className="text-muted-foreground">Permissions</dt>
+        <dd className="flex flex-wrap gap-1">
+          {writeKey.auth_types.map((authType) => (
+            <Badge key={authType} variant="secondary">
+              {authType}
+            </Badge>
+          ))}
+        </dd>
+        <dt className="text-muted-foreground">Expires</dt>
+        <dd>{formatIsoDate(writeKey.expiration)}</dd>
+        <dt className="text-muted-foreground">Auth ID</dt>
+        <dd className="font-mono text-xs break-all">{writeKey.auth_id}</dd>
+        <dt className="text-muted-foreground">Auth Secret</dt>
+        <dd className="font-mono text-xs break-all">{writeKey.secret}</dd>
+      </dl>
+    </li>
   );
 }
 
