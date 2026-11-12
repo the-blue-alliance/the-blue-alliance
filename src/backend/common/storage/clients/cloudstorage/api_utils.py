@@ -31,6 +31,8 @@ import math
 import os
 import threading
 import time
+import urllib.parse
+from http import client as http_client
 
 import six
 from google.appengine import runtime
@@ -43,7 +45,6 @@ from google.appengine.ext.ndb import eventloop
 from google.appengine.ext.ndb import tasklets
 from google.appengine.ext.ndb import utils
 from google.appengine.runtime import apiproxy_errors
-from six.moves import http_client
 
 _RETRIABLE_EXCEPTIONS = (
     urlfetch.DownloadError,
@@ -92,9 +93,9 @@ def _quote_filename(filename, encoding=None):
     # method claims to only encode the filename. This is OK because bucket name
     # only has unreserved chars so escaping will have no effect on it.
     if six.PY2:
-        return six.moves.urllib.parse.quote(filename)
+        return urllib.parse.quote(filename)
     else:
-        return six.moves.urllib.parse.quote(filename, encoding=encoding)
+        return urllib.parse.quote(filename, encoding=encoding)
 
 
 def _unquote_filename(filename, encoding="utf-8"):
@@ -112,9 +113,9 @@ def _unquote_filename(filename, encoding="utf-8"):
       The filename unquoted.
     """
     if six.PY2:
-        return six.moves.urllib.parse.unquote(filename)
+        return urllib.parse.unquote(filename)
     else:
-        return six.moves.urllib.parse.unquote(filename, encoding=encoding)
+        return urllib.parse.unquote(filename, encoding=encoding)
 
 
 def _should_retry(resp):
