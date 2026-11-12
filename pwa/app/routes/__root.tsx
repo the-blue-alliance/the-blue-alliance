@@ -107,7 +107,7 @@ moderationClient.interceptors.error.use((error, response) => {
 
 // SSR-only network LRU under the API client. Client freshness is owned by
 // React Query staleTime — do not install a second TTL in the browser.
-if (import.meta.env.SSR) {
+if (import.meta.env.SSR && !globalThis.__TBA_E2E_MOCKS__) {
   const { createCachedFetch } = await import('~/lib/middleware/network-cache');
   client.setConfig({
     fetch: createCachedFetch({

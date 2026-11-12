@@ -16,3 +16,5 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+declare var __TBA_E2E_MOCKS__: boolean | undefined;
