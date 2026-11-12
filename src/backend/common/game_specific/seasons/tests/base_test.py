@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 
+from backend.common.consts.alliance_color import AllianceColor
 from backend.common.game_specific.base import (
+    alliance_breakdown,
     DefaultSeasonGameConfig,
     NoBonusRankingPointsMixin,
     NoQualAverageInRankingsMixin,
@@ -13,6 +17,23 @@ from backend.common.game_specific.seasons.default import DefaultGame
 from backend.common.game_specific.seasons.game_specifics_2010 import GameSpecifics2010
 from backend.common.game_specific.seasons.game_specifics_2021 import GameSpecifics2021
 from backend.common.game_specific.seasons.game_specifics_2026 import GameSpecifics2026
+from backend.common.models.match import Match
+
+
+def test_alliance_breakdown_returns_the_alliance_half() -> None:
+    match = Match(
+        id="2023test_qm1",
+        alliances_json=json.dumps({"red": {"score": -1}, "blue": {"score": -1}}),
+        score_breakdown_json=json.dumps(
+            {"red": {"totalPoints": 10}, "blue": {"totalPoints": 5}}
+        ),
+    )
+    assert alliance_breakdown(match, AllianceColor.BLUE) == {"totalPoints": 5}
+
+
+def test_alliance_breakdown_requires_a_breakdown() -> None:
+    with pytest.raises(AssertionError):
+        alliance_breakdown(Match(id="2023test_qm1"), AllianceColor.RED)
 
 
 def test_cannot_instantiate_abstract_root() -> None:
