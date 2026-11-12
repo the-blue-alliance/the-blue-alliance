@@ -10,9 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShortKeyRouteImport } from './routes/$shortKey'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AddDataRouteImport } from './routes/add-data'
 import { Route as ApidocsRouteImport } from './routes/apidocs'
+import { Route as BigqueryRouteImport } from './routes/bigquery'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DonateRouteImport } from './routes/donate'
 import { Route as GamedayRouteImport } from './routes/gameday'
@@ -20,6 +22,7 @@ import { Route as HallOfFameRouteImport } from './routes/hall-of-fame'
 import { Route as Match_suggestionRouteImport } from './routes/match_suggestion'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as SwagRouteImport } from './routes/swag'
 import { Route as ThanksRouteImport } from './routes/thanks'
 import { Route as WebcastsRouteImport } from './routes/webcasts'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
@@ -54,6 +57,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShortKeyRoute = ShortKeyRouteImport.update({
+  id: '/$shortKey',
+  path: '/$shortKey',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -67,6 +75,11 @@ const AddDataRoute = AddDataRouteImport.update({
 const ApidocsRoute = ApidocsRouteImport.update({
   id: '/apidocs',
   path: '/apidocs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BigqueryRoute = BigqueryRouteImport.update({
+  id: '/bigquery',
+  path: '/bigquery',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -102,6 +115,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SwagRoute = SwagRouteImport.update({
+  id: '/swag',
+  path: '/swag',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ThanksRoute = ThanksRouteImport.update({
@@ -257,9 +275,11 @@ const TeamTeamNumberChar123YearChar125Route =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$shortKey': typeof ShortKeyRoute
   '/about': typeof AboutRoute
   '/add-data': typeof AddDataRoute
   '/apidocs': typeof ApidocsRoute
+  '/bigquery': typeof BigqueryRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
   '/gameday': typeof GamedayRouteWithChildren
@@ -267,6 +287,7 @@ export interface FileRoutesByFullPath {
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/swag': typeof SwagRoute
   '/thanks': typeof ThanksRoute
   '/webcasts': typeof WebcastsRoute
   '/account/mytba': typeof AccountMytbaRoute
@@ -298,9 +319,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$shortKey': typeof ShortKeyRoute
   '/about': typeof AboutRoute
   '/add-data': typeof AddDataRoute
   '/apidocs': typeof ApidocsRoute
+  '/bigquery': typeof BigqueryRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
   '/gameday': typeof GamedayRouteWithChildren
@@ -308,6 +331,7 @@ export interface FileRoutesByTo {
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/swag': typeof SwagRoute
   '/thanks': typeof ThanksRoute
   '/webcasts': typeof WebcastsRoute
   '/account/mytba': typeof AccountMytbaRoute
@@ -340,9 +364,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$shortKey': typeof ShortKeyRoute
   '/about': typeof AboutRoute
   '/add-data': typeof AddDataRoute
   '/apidocs': typeof ApidocsRoute
+  '/bigquery': typeof BigqueryRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
   '/gameday': typeof GamedayRouteWithChildren
@@ -350,6 +376,7 @@ export interface FileRoutesById {
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
+  '/swag': typeof SwagRoute
   '/thanks': typeof ThanksRoute
   '/webcasts': typeof WebcastsRoute
   '/account/mytba': typeof AccountMytbaRoute
@@ -383,9 +410,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$shortKey'
     | '/about'
     | '/add-data'
     | '/apidocs'
+    | '/bigquery'
     | '/contact'
     | '/donate'
     | '/gameday'
@@ -393,6 +422,7 @@ export interface FileRouteTypes {
     | '/match_suggestion'
     | '/privacy'
     | '/search'
+    | '/swag'
     | '/thanks'
     | '/webcasts'
     | '/account/mytba'
@@ -424,9 +454,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/$shortKey'
     | '/about'
     | '/add-data'
     | '/apidocs'
+    | '/bigquery'
     | '/contact'
     | '/donate'
     | '/gameday'
@@ -434,6 +466,7 @@ export interface FileRouteTypes {
     | '/match_suggestion'
     | '/privacy'
     | '/search'
+    | '/swag'
     | '/thanks'
     | '/webcasts'
     | '/account/mytba'
@@ -465,9 +498,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/$shortKey'
     | '/about'
     | '/add-data'
     | '/apidocs'
+    | '/bigquery'
     | '/contact'
     | '/donate'
     | '/gameday'
@@ -475,6 +510,7 @@ export interface FileRouteTypes {
     | '/match_suggestion'
     | '/privacy'
     | '/search'
+    | '/swag'
     | '/thanks'
     | '/webcasts'
     | '/account/mytba'
@@ -507,9 +543,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ShortKeyRoute: typeof ShortKeyRoute
   AboutRoute: typeof AboutRoute
   AddDataRoute: typeof AddDataRoute
   ApidocsRoute: typeof ApidocsRoute
+  BigqueryRoute: typeof BigqueryRoute
   ContactRoute: typeof ContactRoute
   DonateRoute: typeof DonateRoute
   GamedayRoute: typeof GamedayRouteWithChildren
@@ -517,6 +555,7 @@ export interface RootRouteChildren {
   Match_suggestionRoute: typeof Match_suggestionRoute
   PrivacyRoute: typeof PrivacyRoute
   SearchRoute: typeof SearchRoute
+  SwagRoute: typeof SwagRoute
   ThanksRoute: typeof ThanksRoute
   WebcastsRoute: typeof WebcastsRoute
   AccountMytbaRoute: typeof AccountMytbaRoute
@@ -555,6 +594,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$shortKey': {
+      id: '/$shortKey'
+      path: '/$shortKey'
+      fullPath: '/$shortKey'
+      preLoaderRoute: typeof ShortKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -574,6 +620,13 @@ declare module '@tanstack/react-router' {
       path: '/apidocs'
       fullPath: '/apidocs'
       preLoaderRoute: typeof ApidocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bigquery': {
+      id: '/bigquery'
+      path: '/bigquery'
+      fullPath: '/bigquery'
+      preLoaderRoute: typeof BigqueryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -623,6 +676,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/swag': {
+      id: '/swag'
+      path: '/swag'
+      fullPath: '/swag'
+      preLoaderRoute: typeof SwagRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/thanks': {
@@ -837,9 +897,11 @@ const GamedayRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ShortKeyRoute: ShortKeyRoute,
   AboutRoute: AboutRoute,
   AddDataRoute: AddDataRoute,
   ApidocsRoute: ApidocsRoute,
+  BigqueryRoute: BigqueryRoute,
   ContactRoute: ContactRoute,
   DonateRoute: DonateRoute,
   GamedayRoute: GamedayRouteWithChildren,
@@ -847,6 +909,7 @@ const rootRouteChildren: RootRouteChildren = {
   Match_suggestionRoute: Match_suggestionRoute,
   PrivacyRoute: PrivacyRoute,
   SearchRoute: SearchRoute,
+  SwagRoute: SwagRoute,
   ThanksRoute: ThanksRoute,
   WebcastsRoute: WebcastsRoute,
   AccountMytbaRoute: AccountMytbaRoute,

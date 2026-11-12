@@ -17,12 +17,14 @@ function defineAllRoutes<T extends readonly RoutePath[]>(
 
 const allRoutes = defineAllRoutes([
   '/',
+  '/$shortKey',
   '/about',
   '/account/',
   '/account/mytba',
   '/add-data',
   '/apidocs',
   '/apidocs/v3',
+  '/bigquery',
   '/contact',
   '/district/$districtAbbreviation/{-$year}',
   '/district/$districtAbbreviation/insights',
@@ -49,6 +51,7 @@ const allRoutes = defineAllRoutes([
   '/suggest/review/$suggestionType',
   '/suggest/team/media',
   '/suggest/team/social_media',
+  '/swag',
   '/team/$teamNumber/{-$year}',
   '/team/$teamNumber/history',
   '/team/$teamNumber/stats',
@@ -81,7 +84,10 @@ const parameterValues = {
   $districtAbbreviation: ['fim'],
   $teamNumber: ['604'],
   $suggestionType: ['match'],
+  $shortKey: ['254'],
 } satisfies Record<RouteParameter, readonly string[]>;
+
+const externalRedirectRoutes: readonly RoutePath[] = ['/bigquery', '/swag'];
 
 interface RouteTestCase {
   path: string;
@@ -100,20 +106,22 @@ function getRouteParameters(route: RoutePath): RouteParameter[] {
 }
 
 function generateRouteTestCases(): RouteTestCase[] {
-  return allRoutes.flatMap((route) => {
-    const parameters = getRouteParameters(route);
-    const combinations = cartesianProduct(
-      parameters.map((parameter) => parameterValues[parameter]),
-    );
+  return allRoutes
+    .filter((route) => !externalRedirectRoutes.includes(route))
+    .flatMap((route) => {
+      const parameters = getRouteParameters(route);
+      const combinations = cartesianProduct(
+        parameters.map((parameter) => parameterValues[parameter]),
+      );
 
-    return combinations.map((combination) => ({
-      path: parameters.reduce<string>(
-        (path, parameter, index) =>
-          path.replace(parameter, combination[index] ?? ''),
-        route,
-      ),
-    }));
-  });
+      return combinations.map((combination) => ({
+        path: parameters.reduce<string>(
+          (path, parameter, index) =>
+            path.replace(parameter, combination[index] ?? ''),
+          route,
+        ),
+      }));
+    });
 }
 
 const routeTestCases = generateRouteTestCases();
