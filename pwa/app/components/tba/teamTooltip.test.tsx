@@ -1,34 +1,17 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
-import { type AnchorHTMLAttributes, type ReactNode, Suspense } from 'react';
+import { screen } from '@testing-library/react';
+import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import type { Media, SearchIndex } from '~/api/tba/read';
+import type { SearchIndex } from '~/api/tba/read';
+import { getSearchIndexOptions } from '~/api/tba/read/@tanstack/react-query.gen';
+import { getSearchIndex, getTeamMediaByYear } from '~/api/tba/read/sdk.gen';
 import {
   TeamLinkWithAvatarTooltip,
   TeamLinkWithTooltip,
   TeamTooltip,
 } from '~/components/tba/teamTooltip';
-
-const { searchIndexMock, mediaMock } = vi.hoisted(() => ({
-  searchIndexMock: vi.fn<() => Promise<SearchIndex>>(),
-  mediaMock: vi.fn<() => Promise<Media[]>>(),
-}));
-
-vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
-  getSearchIndexOptions: () => ({
-    queryKey: ['search-index'],
-    queryFn: searchIndexMock,
-  }),
-  getTeamMediaByYearOptions: ({
-    path,
-  }: {
-    path: { team_key: string; year: number };
-  }) => ({
-    queryKey: ['team-media', path.team_key, path.year],
-    queryFn: mediaMock,
-  }),
-}));
+import { mockTbaApi } from '~/test/msw';
+import { renderWithClient } from '~/test/render';
 
 vi.mock('~/components/tba/links', () => ({
   TeamLink: ({
@@ -52,21 +35,13 @@ const searchIndex: SearchIndex = {
   events: [],
 };
 
-function renderWithClient(ui: ReactNode) {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  const result = render(
-    <QueryClientProvider client={queryClient}>
-      <Suspense fallback="loading">{ui}</Suspense>
-    </QueryClientProvider>,
-  );
-  return { ...result, queryClient };
-}
-
 beforeEach(() => {
-  searchIndexMock.mockResolvedValue(searchIndex);
-  mediaMock.mockResolvedValue([]);
+  mockTbaApi(getSearchIndex, {}, searchIndex);
+  mockTbaApi(
+    getTeamMediaByYear,
+    { path: { team_key: 'frc254', year: 2026 } },
+    [],
+  );
 });
 
 function stubHoverCapability(canHover: boolean) {
@@ -113,7 +88,9 @@ describe('TeamLinkWithTooltip', () => {
       <TeamLinkWithTooltip teamKey="frc254" year={2026} {...props} />,
     );
     await vi.waitFor(() =>
-      expect(queryClient.getQueryData(['search-index'])).toBe(searchIndex),
+      expect(
+        queryClient.getQueryData(getSearchIndexOptions({}).queryKey),
+      ).toEqual(searchIndex),
     );
     const link = await screen.findByRole('link', { name: /^254/ });
     expect(link.getAttribute('href')).toBe('/team/254/2026');
@@ -122,14 +99,18 @@ describe('TeamLinkWithTooltip', () => {
 
 describe('TeamTooltip', () => {
   test('renders the nickname, avatar, and status flags', async () => {
-    mediaMock.mockResolvedValue([
-      {
-        type: 'avatar',
-        foreign_key: 'avatar_2026_frc254',
-        team_keys: ['frc254'],
-        details: { base64Image: 'AAAA' },
-      } as Media,
-    ]);
+    mockTbaApi(
+      getTeamMediaByYear,
+      { path: { team_key: 'frc254', year: 2026 } },
+      [
+        {
+          type: 'avatar',
+          foreign_key: 'avatar_2026_frc254',
+          team_keys: ['frc254'],
+          details: { base64Image: 'AAAA' },
+        },
+      ],
+    );
     renderWithClient(
       <TeamTooltip teamKey="frc254" year={2026} disqualified surrogate />,
     );
@@ -153,6 +134,11 @@ describe('TeamTooltip', () => {
   });
 
   test('renders nothing for an unknown team', async () => {
+    mockTbaApi(
+      getTeamMediaByYear,
+      { path: { team_key: 'frc9999', year: 2026 } },
+      [],
+    );
     const { container } = renderWithClient(
       <TeamTooltip teamKey="frc9999" year={2026} />,
     );

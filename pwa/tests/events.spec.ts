@@ -1,4 +1,24 @@
-import { expect, test } from '@playwright/test';
+import { type Event, getEventsByYear } from '~/api/tba/read';
+
+import { expect, test } from './fixtures';
+import events2025 from './mocks/data/events/2025.json' with { type: 'json' };
+
+test('/events/2025 drops the parent event name from division rows', async ({
+  page,
+  mockTba,
+}) => {
+  await mockTba(
+    getEventsByYear,
+    { path: { year: 2025 } },
+    events2025 as Event[],
+  );
+
+  await page.goto('/events/2025');
+
+  await expect(
+    page.getByRole('link', { name: 'Mercury Division', exact: true }),
+  ).toBeVisible();
+});
 
 test.describe('/events/2025', () => {
   test.beforeEach(async ({ page }) => {
@@ -21,12 +41,6 @@ test.describe('/events/2025', () => {
     await expect(
       einsteinRow.locator('xpath=following-sibling::tr[1]'),
     ).toContainText('Archimedes Division');
-  });
-
-  test('drops the parent event name from division rows', async ({ page }) => {
-    await expect(
-      page.getByRole('link', { name: 'Mercury Division', exact: true }),
-    ).toBeVisible();
   });
 
   test('hides the webcast column (mobile)', async ({ page }) => {

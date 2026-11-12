@@ -1,30 +1,14 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { HttpResponse } from 'msw';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { type Event, type InsightV2 } from '~/api/tba/read';
+import {
+  getEventsByYear,
+  getInsightsV2YearDistrict,
+} from '~/api/tba/read/sdk.gen';
 import { DistrictInsightsTab } from '~/components/tba/districtInsightsTab';
-
-const { insightsFn, eventsFn } = vi.hoisted(() => ({
-  insightsFn:
-    vi.fn<(year: number, abbreviation: string) => Promise<InsightV2[]>>(),
-  eventsFn: vi.fn<(year: number) => Promise<Event[]>>(),
-}));
-
-vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
-  getInsightsV2YearDistrictOptions: ({
-    path,
-  }: {
-    path: { year: number; district_abbreviation: string };
-  }) => ({
-    queryKey: ['district-insights', path.year, path.district_abbreviation],
-    queryFn: () => insightsFn(path.year, path.district_abbreviation),
-  }),
-  getEventsByYearOptions: ({ path }: { path: { year: number } }) => ({
-    queryKey: ['events', path.year],
-    queryFn: () => eventsFn(path.year),
-  }),
-}));
+import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
+import { renderWithClient } from '~/test/render';
 
 vi.mock('~/components/tba/leaderboard', () => ({
   Leaderboard: ({ displayName }: { displayName: string }) => (
@@ -32,26 +16,19 @@ vi.mock('~/components/tba/leaderboard', () => ({
   ),
 }));
 
+const INSIGHTS_PATH = { path: { year: 2024, district_abbreviation: 'fim' } };
+
 function renderTab() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  render(
-    <QueryClientProvider client={queryClient}>
-      <DistrictInsightsTab abbreviation="fim" year={2024} />
-    </QueryClientProvider>,
-  );
+  renderWithClient(<DistrictInsightsTab abbreviation="fim" year={2024} />);
 }
 
 describe('DistrictInsightsTab', () => {
   beforeEach(() => {
-    insightsFn.mockReset();
-    eventsFn.mockReset();
-    eventsFn.mockResolvedValue([]);
+    mockTbaApi(getEventsByYear, { path: { year: 2024 } }, []);
   });
 
   test('shows an empty message when the district has no insights', async () => {
-    insightsFn.mockResolvedValue([]);
+    mockTbaApi(getInsightsV2YearDistrict, INSIGHTS_PATH, []);
     renderTab();
     expect(
       await screen.findByText('No insights for this district in 2024.'),
@@ -59,7 +36,11 @@ describe('DistrictInsightsTab', () => {
   });
 
   test('shows an empty message when the insights request fails', async () => {
-    insightsFn.mockRejectedValue(new Error('404'));
+    mockTbaApiWith(
+      getInsightsV2YearDistrict,
+      INSIGHTS_PATH,
+      () => new HttpResponse(null, { status: 404 }),
+    );
     renderTab();
     expect(
       await screen.findByText('No insights for this district in 2024.'),
@@ -67,23 +48,17 @@ describe('DistrictInsightsTab', () => {
   });
 
   test('shows a leaderboard returned for the district', async () => {
-    insightsFn.mockResolvedValue([
+    mockTbaApi(getInsightsV2YearDistrict, INSIGHTS_PATH, [
       {
         name: 'blue_banners',
         display_name: 'Total Blue Banners',
         year: 2024,
         category: 'leaderboard',
-        data: { rankings: [], key_type: 'team' },
-      } as unknown as InsightV2,
+        district_abbreviation: 'fim',
+        data: { rankings: [], key_type: 'team', context_type: 'none' },
+      },
     ]);
     renderTab();
     expect(await screen.findByText('Total Blue Banners')).toBeTruthy();
-  });
-
-  test('requests insights for the given year and district', async () => {
-    insightsFn.mockResolvedValue([]);
-    renderTab();
-    await screen.findByText('No insights for this district in 2024.');
-    expect(insightsFn).toHaveBeenCalledWith(2024, 'fim');
   });
 });
