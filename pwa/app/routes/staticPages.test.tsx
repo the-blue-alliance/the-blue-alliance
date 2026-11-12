@@ -4,8 +4,10 @@ import { Route as AboutRoute } from '~/routes/about';
 import { Route as AccountRoute } from '~/routes/account.index';
 import { Route as MyTbaRoute } from '~/routes/account.mytba';
 import { Route as AddDataRoute } from '~/routes/add-data';
+import { Route as BrandRoute } from '~/routes/brand';
 import { Route as ContactRoute } from '~/routes/contact';
 import { Route as DonateRoute } from '~/routes/donate';
+import { Route as FaqRoute } from '~/routes/faq';
 import { Route as PrivacyRoute } from '~/routes/privacy';
 import { Route as ThanksRoute } from '~/routes/thanks';
 
@@ -21,12 +23,20 @@ describe('component-only routes', () => {
     expect(AddDataRoute.options.component).toBeTypeOf('function');
   });
 
+  test('brand route declares its page component', () => {
+    expect(BrandRoute.options.component).toBeTypeOf('function');
+  });
+
   test('contact route declares its page component', () => {
     expect(ContactRoute.options.component).toBeTypeOf('function');
   });
 
   test('donate route declares its page component', () => {
     expect(DonateRoute.options.component).toBeTypeOf('function');
+  });
+
+  test('faq route declares its page component', () => {
+    expect(FaqRoute.options.component).toBeTypeOf('function');
   });
 
   test('privacy route declares its page component', () => {
