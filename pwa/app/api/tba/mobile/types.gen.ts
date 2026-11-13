@@ -292,6 +292,31 @@ export type ApiWriteKeyRequestResponse = {
   status: 'success' | 'no_affiliation' | 'bad_event' | 'unauthorized';
 };
 
+export type Webhook = {
+  webhook_id: string;
+  name: string;
+  /**
+   * The URL notifications are sent to
+   */
+  url: string;
+  /**
+   * The key used to sign each request in the `X-TBA-HMAC` header
+   */
+  secret: string;
+  /**
+   * Only verified webhooks receive notifications other than pings
+   */
+  verified: boolean;
+};
+
+export type ListWebhooksResponse = BaseResponse & {
+  webhooks: Array<Webhook>;
+};
+
+export type AddWebhookResponse = BaseResponse & {
+  webhook?: Webhook;
+};
+
 export type ListFavoritesData = {
   body?: never;
   path?: never;
@@ -608,3 +633,139 @@ export type PingMobileClientResponses = {
 
 export type PingMobileClientResponse =
   PingMobileClientResponses[keyof PingMobileClientResponses];
+
+export type ListWebhooksData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/webhooks/list';
+};
+
+export type ListWebhooksResponses = {
+  /**
+   * Successful response
+   */
+  200: ListWebhooksResponse;
+};
+
+export type ListWebhooksResponse2 =
+  ListWebhooksResponses[keyof ListWebhooksResponses];
+
+export type AddWebhookData = {
+  body: {
+    name: string;
+    url: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/webhooks/add';
+};
+
+export type AddWebhookResponses = {
+  /**
+   * Successful response
+   */
+  200: AddWebhookResponse;
+};
+
+export type AddWebhookResponse2 =
+  AddWebhookResponses[keyof AddWebhookResponses];
+
+export type VerifyWebhookData = {
+  body: {
+    /**
+     * The webhook's ID, from `/webhooks/list`
+     */
+    webhook_id: string;
+    /**
+     * The `verification_key` the webhook received
+     */
+    code: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/webhooks/verify';
+};
+
+export type VerifyWebhookResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type VerifyWebhookResponse =
+  VerifyWebhookResponses[keyof VerifyWebhookResponses];
+
+export type SendWebhookVerificationData = {
+  body: {
+    /**
+     * The webhook's ID, from `/webhooks/list`
+     */
+    webhook_id: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/webhooks/send_verification';
+};
+
+export type SendWebhookVerificationResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type SendWebhookVerificationResponse =
+  SendWebhookVerificationResponses[keyof SendWebhookVerificationResponses];
+
+export type DeleteWebhookData = {
+  body: {
+    /**
+     * The webhook's ID, from `/webhooks/list`
+     */
+    webhook_id: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/webhooks/delete';
+};
+
+export type DeleteWebhookResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type DeleteWebhookResponse =
+  DeleteWebhookResponses[keyof DeleteWebhookResponses];
+
+export type SendWebhookTestData = {
+  body: {
+    /**
+     * The webhook's ID, from `/webhooks/list`
+     */
+    webhook_id: string;
+    /**
+     * A notification type name, such as `upcoming_match`
+     */
+    notification_type: string;
+    event_key?: string;
+    match_key?: string;
+    district_key?: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/webhooks/test';
+};
+
+export type SendWebhookTestResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type SendWebhookTestResponse =
+  SendWebhookTestResponses[keyof SendWebhookTestResponses];

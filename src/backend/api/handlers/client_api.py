@@ -1,4 +1,5 @@
 import json
+import uuid
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -7,6 +8,8 @@ from backend.api.client_api_auth_helper import ClientApiAuthHelper
 from backend.api.client_api_types import (
     AddApiReadKeyMessage,
     AddApiReadKeyResponse,
+    AddWebhookMessage,
+    AddWebhookResponse,
     ApiKeysResponse,
     ApiReadKeyMessage,
     ApiWriteKeyMessage,
@@ -21,6 +24,7 @@ from backend.api.client_api_types import (
     FavoriteCollection,
     FavoriteMessage,
     ListDevicesResponse,
+    ListWebhooksResponse,
     MatchVideoSuggestionMessage,
     MatchVideoSuggestionResponse,
     MediaSuggestionMessage,
@@ -33,13 +37,18 @@ from backend.api.client_api_types import (
     TeamSocialMediaSuggestionMessage,
     TeamSocialMediaSuggestionResponse,
     UpdatePreferencesInternalResponse,
+    VerifyWebhookMessage,
     VideoPlaylistMessage,
     VideoPlaylistResponse,
     VoidRequest,
+    WebhookIdMessage,
+    WebhookMessage,
+    WebhookTestMessage,
 )
 from backend.api.handlers.decorators import client_api_method
 from backend.common.consts.auth_type import WRITE_TYPE_NAMES
 from backend.common.consts.client_type import (
+    ClientType,
     ENUMS as CLIENT_TYPE_MAP,
     FCM_CLIENTS,
     NAMES as CLIENT_TYPE_NAMES,
@@ -772,3 +781,154 @@ def request_api_write_key(
     return ApiWriteKeyRequestResponse(
         code=404, message="Event not found", status=status.value
     )
+
+
+def _webhook_message(webhook: MobileClient) -> WebhookMessage:
+    return WebhookMessage(
+        webhook_id=str(webhook.key.id()),
+        name=webhook.display_name,
+        url=webhook.messaging_id,
+        secret=webhook.secret or "",
+        verified=webhook.verified,
+    )
+
+
+def _get_webhook(account_key: ndb.Key, webhook_id: str) -> MobileClient | None:
+    if not webhook_id.isdigit():
+        return None
+    webhook = MobileClient.get_by_id(int(webhook_id), parent=account_key)
+    if webhook is None or webhook.client_type != ClientType.WEBHOOK:
+        return None
+    return webhook
+
+
+@client_api_method(VoidRequest, ListWebhooksResponse)
+def list_webhooks(req: VoidRequest) -> ListWebhooksResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return ListWebhooksResponse(
+            code=401, message="Unauthorized to list webhooks", webhooks=[]
+        )
+
+    webhooks = MobileClient.query(
+        MobileClient.client_type == ClientType.WEBHOOK,
+        ancestor=none_throws(current_user.account_key),
+    ).fetch()
+    return ListWebhooksResponse(
+        code=200, message="", webhooks=[_webhook_message(w) for w in webhooks]
+    )
+
+
+@client_api_method(AddWebhookMessage, AddWebhookResponse)
+def add_webhook(req: AddWebhookMessage) -> AddWebhookResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return AddWebhookResponse(code=401, message="Unauthorized to add a webhook")
+
+    name = req.get("name", "").strip()
+    url = req.get("url", "").strip()
+    if not name or not url:
+        return AddWebhookResponse(code=400, message="A name and URL are required")
+
+    account_key = none_throws(current_user.account_key)
+    secret = uuid.uuid4().hex
+    verification_code = TBANSHelper.verify_webhook(url, secret)
+    webhook = MobileClient.query(
+        MobileClient.messaging_id == url, ancestor=account_key
+    ).get()
+    if webhook is None:
+        webhook = MobileClient(
+            parent=account_key,
+            user_id=str(account_key.id()),
+            messaging_id=url,
+            display_name=name,
+            client_type=ClientType.WEBHOOK,
+        )
+    webhook.secret = secret
+    webhook.verification_code = verification_code
+    webhook.verified = False
+    webhook.put()
+    return AddWebhookResponse(
+        code=200, message="Webhook added", webhook=_webhook_message(webhook)
+    )
+
+
+@client_api_method(VerifyWebhookMessage, BaseResponse)
+def verify_webhook(req: VerifyWebhookMessage) -> BaseResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return BaseResponse(code=401, message="Unauthorized to verify a webhook")
+
+    webhook = _get_webhook(none_throws(current_user.account_key), req["webhook_id"])
+    if webhook is None:
+        return BaseResponse(code=404, message="Webhook not found")
+
+    if req.get("code", "").strip() != webhook.verification_code:
+        return BaseResponse(code=400, message="Incorrect verification code")
+
+    webhook.verified = True
+    webhook.put()
+    return BaseResponse(code=200, message="Webhook verified")
+
+
+@client_api_method(WebhookIdMessage, BaseResponse)
+def send_webhook_verification(req: WebhookIdMessage) -> BaseResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return BaseResponse(code=401, message="Unauthorized to verify a webhook")
+
+    webhook = _get_webhook(none_throws(current_user.account_key), req["webhook_id"])
+    if webhook is None:
+        return BaseResponse(code=404, message="Webhook not found")
+
+    webhook.verification_code = TBANSHelper.verify_webhook(
+        webhook.messaging_id, none_throws(webhook.secret)
+    )
+    webhook.verified = False
+    webhook.put()
+    return BaseResponse(code=200, message="Verification code sent")
+
+
+@client_api_method(WebhookIdMessage, BaseResponse)
+def delete_webhook(req: WebhookIdMessage) -> BaseResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return BaseResponse(code=401, message="Unauthorized to delete a webhook")
+
+    webhook = _get_webhook(none_throws(current_user.account_key), req["webhook_id"])
+    if webhook is None:
+        return BaseResponse(code=404, message="Webhook not found")
+
+    webhook.key.delete()
+    return BaseResponse(code=200, message="Webhook deleted")
+
+
+@client_api_method(WebhookTestMessage, BaseResponse)
+def send_webhook_test(req: WebhookTestMessage) -> BaseResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return BaseResponse(code=401, message="Unauthorized to test a webhook")
+
+    notification_type = NOTIFICATION_NAME_TO_TYPE.get(req["notification_type"])
+    if notification_type is None:
+        return BaseResponse(code=400, message="Unknown notification type")
+
+    webhook = _get_webhook(none_throws(current_user.account_key), req["webhook_id"])
+    if webhook is None:
+        return BaseResponse(code=404, message="Webhook not found")
+    if not webhook.verified:
+        return BaseResponse(code=400, message="Webhook is not verified")
+
+    sent = TBANSHelper.send_webhook_test(
+        webhook,
+        notification_type,
+        event_key=req.get("event_key"),
+        match_key=req.get("match_key"),
+        district_key=req.get("district_key"),
+    )
+    if not sent:
+        return BaseResponse(
+            code=400,
+            message="Failed to send the test. Check that the keys are valid for this notification type.",
+        )
+    return BaseResponse(code=200, message="Test notification sent")

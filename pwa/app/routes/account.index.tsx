@@ -9,6 +9,7 @@ import UserIcon from '~icons/lucide/user';
 import { listFavorites, listSubscriptions } from '~/api/tba/mobile/sdk.gen';
 import ApiKeysSection from '~/components/tba/account/apiKeys';
 import { SuggestionReviewSection } from '~/components/tba/account/suggestionReviewSection';
+import WebhooksSection from '~/components/tba/account/webhooks';
 import { useAuth } from '~/components/tba/auth/auth';
 import LoginPage from '~/components/tba/auth/loginPage';
 import { LogoutConfirmDialog } from '~/components/tba/auth/logoutConfirmDialog';
@@ -168,6 +169,8 @@ function Account() {
       <SuggestionReviewSection />
 
       <ApiKeysSection />
+
+      <WebhooksSection />
     </div>
   );
 }

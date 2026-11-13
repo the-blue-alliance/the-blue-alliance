@@ -184,3 +184,46 @@ class ApiWriteKeyRequestMessage(TypedDict):
 
 class ApiWriteKeyRequestResponse(BaseResponse):
     status: str
+
+
+class WebhookMessage(TypedDict):
+    webhook_id: str
+    name: str
+    url: str
+    secret: str
+    verified: bool
+
+
+class ListWebhooksResponse(BaseResponse):
+    webhooks: List[WebhookMessage]
+
+
+class AddWebhookMessage(TypedDict):
+    name: str
+    url: str
+
+
+class _AddWebhookResponseOptional(TypedDict, total=False):
+    webhook: WebhookMessage
+
+
+class AddWebhookResponse(BaseResponse, _AddWebhookResponseOptional):
+    pass
+
+
+class WebhookIdMessage(TypedDict):
+    webhook_id: str
+
+
+class VerifyWebhookMessage(WebhookIdMessage):
+    code: str
+
+
+class _WebhookTestMessageOptional(TypedDict, total=False):
+    event_key: str
+    match_key: str
+    district_key: str
+
+
+class WebhookTestMessage(WebhookIdMessage, _WebhookTestMessageOptional):
+    notification_type: str

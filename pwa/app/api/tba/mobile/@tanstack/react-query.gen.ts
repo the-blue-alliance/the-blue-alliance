@@ -4,15 +4,20 @@ import type { DefaultError, UseMutationOptions } from '@tanstack/react-query';
 import {
   type Options,
   addApiReadKey,
+  addWebhook,
   deleteApiReadKey,
+  deleteWebhook,
   listApiKeys,
   listFavorites,
   listMobileClients,
   listSubscriptions,
+  listWebhooks,
   pingMobileClient,
   registerMobileClient,
   requestApiWriteKey,
   resolveVideoPlaylist,
+  sendWebhookTest,
+  sendWebhookVerification,
   setModelPreferences,
   suggestEventMatchVideos,
   suggestEventMedia,
@@ -20,12 +25,17 @@ import {
   suggestTeamMedia,
   suggestTeamSocialMedia,
   unregisterMobileClient,
+  verifyWebhook,
 } from '../sdk.gen';
 import type {
   AddApiReadKeyData,
   AddApiReadKeyResponse2,
+  AddWebhookData,
+  AddWebhookResponse2,
   DeleteApiReadKeyData,
   DeleteApiReadKeyResponse,
+  DeleteWebhookData,
+  DeleteWebhookResponse,
   ListApiKeysData,
   ListApiKeysResponse,
   ListFavoritesData,
@@ -34,6 +44,8 @@ import type {
   ListMobileClientsResponse,
   ListSubscriptionsData,
   ListSubscriptionsResponse,
+  ListWebhooksData,
+  ListWebhooksResponse2,
   PingMobileClientData,
   PingMobileClientResponse,
   RegisterMobileClientData,
@@ -42,6 +54,10 @@ import type {
   RequestApiWriteKeyResponse,
   ResolveVideoPlaylistData,
   ResolveVideoPlaylistResponse,
+  SendWebhookTestData,
+  SendWebhookTestResponse,
+  SendWebhookVerificationData,
+  SendWebhookVerificationResponse,
   SetModelPreferencesData,
   SetModelPreferencesResponse,
   SuggestEventMatchVideosData,
@@ -56,6 +72,8 @@ import type {
   SuggestTeamSocialMediaResponse,
   UnregisterMobileClientData,
   UnregisterMobileClientResponse,
+  VerifyWebhookData,
+  VerifyWebhookResponse,
 } from '../types.gen';
 
 /**
@@ -513,6 +531,180 @@ export const pingMobileClientMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await pingMobileClient({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * List the signed-in account's webhooks
+ *
+ * `code` is 401 when not signed in.
+ */
+export const listWebhooksMutation = (
+  options?: Partial<Options<ListWebhooksData>>,
+): UseMutationOptions<
+  ListWebhooksResponse2,
+  DefaultError,
+  Options<ListWebhooksData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ListWebhooksResponse2,
+    DefaultError,
+    Options<ListWebhooksData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await listWebhooks({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Add a webhook
+ *
+ * Creates a webhook with a new secret and sends a verification code to its URL. If the account already has a webhook with this URL, gives it a new secret and code and marks it unverified. `code` is 400 when the name or URL is blank and 401 when not signed in.
+ */
+export const addWebhookMutation = (
+  options?: Partial<Options<AddWebhookData>>,
+): UseMutationOptions<
+  AddWebhookResponse2,
+  DefaultError,
+  Options<AddWebhookData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddWebhookResponse2,
+    DefaultError,
+    Options<AddWebhookData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addWebhook({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Verify a webhook
+ *
+ * Marks the webhook verified when `code` matches the most recently sent verification code. `code` in the response is 400 for a wrong code, 404 for an unknown webhook and 401 when not signed in.
+ */
+export const verifyWebhookMutation = (
+  options?: Partial<Options<VerifyWebhookData>>,
+): UseMutationOptions<
+  VerifyWebhookResponse,
+  DefaultError,
+  Options<VerifyWebhookData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    VerifyWebhookResponse,
+    DefaultError,
+    Options<VerifyWebhookData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await verifyWebhook({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Send a new verification code to a webhook
+ *
+ * Replaces the verification code and marks the webhook unverified. `code` is 404 for an unknown webhook and 401 when not signed in.
+ */
+export const sendWebhookVerificationMutation = (
+  options?: Partial<Options<SendWebhookVerificationData>>,
+): UseMutationOptions<
+  SendWebhookVerificationResponse,
+  DefaultError,
+  Options<SendWebhookVerificationData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SendWebhookVerificationResponse,
+    DefaultError,
+    Options<SendWebhookVerificationData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await sendWebhookVerification({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete a webhook
+ *
+ * `code` is 404 for an unknown webhook and 401 when not signed in.
+ */
+export const deleteWebhookMutation = (
+  options?: Partial<Options<DeleteWebhookData>>,
+): UseMutationOptions<
+  DeleteWebhookResponse,
+  DefaultError,
+  Options<DeleteWebhookData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteWebhookResponse,
+    DefaultError,
+    Options<DeleteWebhookData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteWebhook({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Send a test notification to a webhook
+ *
+ * Sends one sample notification of the given type to a verified webhook. `code` is 400 for an unknown type, an unverified webhook or keys the type can't use, 404 for an unknown webhook and 401 when not signed in.
+ */
+export const sendWebhookTestMutation = (
+  options?: Partial<Options<SendWebhookTestData>>,
+): UseMutationOptions<
+  SendWebhookTestResponse,
+  DefaultError,
+  Options<SendWebhookTestData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SendWebhookTestResponse,
+    DefaultError,
+    Options<SendWebhookTestData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await sendWebhookTest({
         ...options,
         ...fnOptions,
         throwOnError: true,

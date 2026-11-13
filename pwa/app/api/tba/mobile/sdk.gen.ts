@@ -10,8 +10,12 @@ import { client } from './client.gen';
 import type {
   AddApiReadKeyData,
   AddApiReadKeyResponses,
+  AddWebhookData,
+  AddWebhookResponses,
   DeleteApiReadKeyData,
   DeleteApiReadKeyResponses,
+  DeleteWebhookData,
+  DeleteWebhookResponses,
   ListApiKeysData,
   ListApiKeysResponses,
   ListFavoritesData,
@@ -20,6 +24,8 @@ import type {
   ListMobileClientsResponses,
   ListSubscriptionsData,
   ListSubscriptionsResponses,
+  ListWebhooksData,
+  ListWebhooksResponses,
   PingMobileClientData,
   PingMobileClientResponses,
   RegisterMobileClientData,
@@ -28,6 +34,10 @@ import type {
   RequestApiWriteKeyResponses,
   ResolveVideoPlaylistData,
   ResolveVideoPlaylistResponses,
+  SendWebhookTestData,
+  SendWebhookTestResponses,
+  SendWebhookVerificationData,
+  SendWebhookVerificationResponses,
   SetModelPreferencesData,
   SetModelPreferencesResponses,
   SuggestEventMatchVideosData,
@@ -42,6 +52,8 @@ import type {
   SuggestTeamSocialMediaResponses,
   UnregisterMobileClientData,
   UnregisterMobileClientResponses,
+  VerifyWebhookData,
+  VerifyWebhookResponses,
 } from './types.gen';
 
 export type Options<
@@ -383,6 +395,130 @@ export const pingMobileClient = <ThrowOnError extends boolean = false>(
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/ping',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * List the signed-in account's webhooks
+ *
+ * `code` is 401 when not signed in.
+ */
+export const listWebhooks = <ThrowOnError extends boolean = false>(
+  options?: Options<ListWebhooksData, ThrowOnError>,
+): RequestResult<ListWebhooksResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).post<
+    ListWebhooksResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/webhooks/list',
+    ...options,
+  });
+
+/**
+ * Add a webhook
+ *
+ * Creates a webhook with a new secret and sends a verification code to its URL. If the account already has a webhook with this URL, gives it a new secret and code and marks it unverified. `code` is 400 when the name or URL is blank and 401 when not signed in.
+ */
+export const addWebhook = <ThrowOnError extends boolean = false>(
+  options: Options<AddWebhookData, ThrowOnError>,
+): RequestResult<AddWebhookResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<AddWebhookResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/webhooks/add',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Verify a webhook
+ *
+ * Marks the webhook verified when `code` matches the most recently sent verification code. `code` in the response is 400 for a wrong code, 404 for an unknown webhook and 401 when not signed in.
+ */
+export const verifyWebhook = <ThrowOnError extends boolean = false>(
+  options: Options<VerifyWebhookData, ThrowOnError>,
+): RequestResult<VerifyWebhookResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    VerifyWebhookResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/webhooks/verify',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Send a new verification code to a webhook
+ *
+ * Replaces the verification code and marks the webhook unverified. `code` is 404 for an unknown webhook and 401 when not signed in.
+ */
+export const sendWebhookVerification = <ThrowOnError extends boolean = false>(
+  options: Options<SendWebhookVerificationData, ThrowOnError>,
+): RequestResult<SendWebhookVerificationResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    SendWebhookVerificationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/webhooks/send_verification',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete a webhook
+ *
+ * `code` is 404 for an unknown webhook and 401 when not signed in.
+ */
+export const deleteWebhook = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteWebhookData, ThrowOnError>,
+): RequestResult<DeleteWebhookResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    DeleteWebhookResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/webhooks/delete',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Send a test notification to a webhook
+ *
+ * Sends one sample notification of the given type to a verified webhook. `code` is 400 for an unknown type, an unverified webhook or keys the type can't use, 404 for an unknown webhook and 401 when not signed in.
+ */
+export const sendWebhookTest = <ThrowOnError extends boolean = false>(
+  options: Options<SendWebhookTestData, ThrowOnError>,
+): RequestResult<SendWebhookTestResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    SendWebhookTestResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/webhooks/test',
     ...options,
     headers: {
       'Content-Type': 'application/json',
