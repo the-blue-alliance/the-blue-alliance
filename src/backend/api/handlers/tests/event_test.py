@@ -62,16 +62,16 @@ def test_event(ndb_stub, api_client: Client) -> None:
         "/api/v3/event/2019casj", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert resp.json["key"] == "2019casj"
-    validate_nominal_event_keys(resp.json)
+    assert resp.get_json()["key"] == "2019casj"
+    validate_nominal_event_keys(resp.get_json())
 
     # Simple response
     resp = api_client.get(
         "/api/v3/event/2019casj/simple", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert resp.json["key"] == "2019casj"
-    validate_simple_event_keys(resp.json)
+    assert resp.get_json()["key"] == "2019casj"
+    validate_simple_event_keys(resp.get_json())
 
     # Keys response
     resp = api_client.get(
@@ -101,19 +101,19 @@ def test_event_remap_teams(ndb_stub, api_client: Client) -> None:
         "/api/v3/event/2019casj", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert resp.json["key"] == "2019casj"
-    assert "remap_teams" in resp.json
-    assert resp.json["remap_teams"] == remap_teams
-    validate_nominal_event_keys(resp.json)
+    assert resp.get_json()["key"] == "2019casj"
+    assert "remap_teams" in resp.get_json()
+    assert resp.get_json()["remap_teams"] == remap_teams
+    validate_nominal_event_keys(resp.get_json())
 
     # Test that remap_teams is NOT included in simple response
     resp = api_client.get(
         "/api/v3/event/2019casj/simple", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert resp.json["key"] == "2019casj"
-    assert "remap_teams" not in resp.json
-    validate_simple_event_keys(resp.json)
+    assert resp.get_json()["key"] == "2019casj"
+    assert "remap_teams" not in resp.get_json()
+    validate_simple_event_keys(resp.get_json())
 
     # Test event with null remap_teams
     Event(
@@ -128,9 +128,9 @@ def test_event_remap_teams(ndb_stub, api_client: Client) -> None:
         "/api/v3/event/2020casj", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert resp.json["key"] == "2020casj"
-    assert "remap_teams" in resp.json
-    assert resp.json["remap_teams"] is None
+    assert resp.get_json()["key"] == "2020casj"
+    assert "remap_teams" in resp.get_json()
+    assert resp.get_json()["remap_teams"] is None
 
 
 def test_event_list_all(ndb_stub, api_client: Client) -> None:
@@ -159,10 +159,10 @@ def test_event_list_all(ndb_stub, api_client: Client) -> None:
     assert resp.headers.get("Content-Type") == "application/json"
     assert resp.data.startswith(b"[") and resp.data.endswith(b"]")
     assert json.loads(resp.data) == resp.json
-    assert len(resp.json) == 2
-    for event in resp.json:
+    assert len(resp.get_json()) == 2
+    for event in resp.get_json():
         validate_nominal_event_keys(event)
-    keys = set([event["key"] for event in resp.json])
+    keys = set([event["key"] for event in resp.get_json()])
     assert "2019casj" in keys
     assert "2020casj" in keys
 
@@ -171,10 +171,10 @@ def test_event_list_all(ndb_stub, api_client: Client) -> None:
         "/api/v3/events/all/simple", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    for event in resp.json:
+    assert len(resp.get_json()) == 2
+    for event in resp.get_json():
         validate_simple_event_keys(event)
-    keys = set([event["key"] for event in resp.json])
+    keys = set([event["key"] for event in resp.get_json()])
     assert "2019casj" in keys
     assert "2020casj" in keys
 
@@ -182,9 +182,9 @@ def test_event_list_all(ndb_stub, api_client: Client) -> None:
     resp = api_client.get(
         "/api/v3/events/all/keys", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
-    assert len(resp.json) == 2
-    assert "2019casj" in resp.json
-    assert "2020casj" in resp.json
+    assert len(resp.get_json()) == 2
+    assert "2019casj" in resp.get_json()
+    assert "2020casj" in resp.get_json()
 
 
 def test_event_list_all_empty(ndb_stub, api_client: Client) -> None:
@@ -231,19 +231,19 @@ def test_event_list_year(ndb_stub, api_client: Client) -> None:
         "/api/v3/events/2019", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    for event in resp.json:
+    assert len(resp.get_json()) == 1
+    for event in resp.get_json():
         validate_nominal_event_keys(event)
-    assert resp.json[0]["key"] == "2019casj"
+    assert resp.get_json()[0]["key"] == "2019casj"
 
     resp = api_client.get(
         "/api/v3/events/2020", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    for event in resp.json:
+    assert len(resp.get_json()) == 2
+    for event in resp.get_json():
         validate_nominal_event_keys(event)
-    keys = set([event["key"] for event in resp.json])
+    keys = set([event["key"] for event in resp.get_json()])
     assert "2020casf" in keys
     assert "2020casj" in keys
 
@@ -252,19 +252,19 @@ def test_event_list_year(ndb_stub, api_client: Client) -> None:
         "/api/v3/events/2019/simple", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    for event in resp.json:
+    assert len(resp.get_json()) == 1
+    for event in resp.get_json():
         validate_simple_event_keys(event)
-    assert resp.json[0]["key"] == "2019casj"
+    assert resp.get_json()[0]["key"] == "2019casj"
 
     resp = api_client.get(
         "/api/v3/events/2020/simple", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    for event in resp.json:
+    assert len(resp.get_json()) == 2
+    for event in resp.get_json():
         validate_simple_event_keys(event)
-    keys = set([event["key"] for event in resp.json])
+    keys = set([event["key"] for event in resp.get_json()])
     assert "2020casf" in keys
     assert "2020casj" in keys
 
@@ -273,16 +273,16 @@ def test_event_list_year(ndb_stub, api_client: Client) -> None:
         "/api/v3/events/2019/keys", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    assert "2019casj" in resp.json
+    assert len(resp.get_json()) == 1
+    assert "2019casj" in resp.get_json()
 
     resp = api_client.get(
         "/api/v3/events/2020/keys", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    assert "2020casf" in resp.json
-    assert "2020casj" in resp.json
+    assert len(resp.get_json()) == 2
+    assert "2020casf" in resp.get_json()
+    assert "2020casj" in resp.get_json()
 
 
 def test_event_details(ndb_stub, api_client: Client) -> None:
@@ -383,10 +383,10 @@ def test_event_teams(ndb_stub, api_client: Client) -> None:
         "/api/v3/event/2019casj/teams", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    for team in resp.json:
+    assert len(resp.get_json()) == 2
+    for team in resp.get_json():
         validate_nominal_team_keys(team)
-    keys = set([team["key"] for team in resp.json])
+    keys = set([team["key"] for team in resp.get_json()])
     assert "frc254" in keys
     assert "frc604" in keys
 
@@ -396,10 +396,10 @@ def test_event_teams(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    for team in resp.json:
+    assert len(resp.get_json()) == 2
+    for team in resp.get_json():
         validate_simple_team_keys(team)
-    keys = set([team["key"] for team in resp.json])
+    keys = set([team["key"] for team in resp.get_json()])
     assert "frc254" in keys
     assert "frc604" in keys
 
@@ -407,7 +407,7 @@ def test_event_teams(ndb_stub, api_client: Client) -> None:
     resp = api_client.get(
         "/api/v3/event/2019casj/teams/keys", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
-    assert len(resp.json) == 2
+    assert len(resp.get_json()) == 2
     assert "frc254" in keys
     assert "frc604" in keys
 
@@ -442,10 +442,10 @@ def test_event_teams_statuses(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    assert resp.json.get("frc254") is None
+    assert len(resp.get_json()) == 2
+    assert resp.get_json().get("frc254") is None
     assert (
-        resp.json.get("frc604")["overall_status_str"]
+        resp.get_json().get("frc604")["overall_status_str"]
         == "Team 604 is waiting for the event to begin."
     )
 
@@ -482,8 +482,8 @@ def test_event_teams_statuses_pit_location(ndb_stub, api_client: Client) -> None
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert resp.json.get("frc254") == {"pit_location": "A1"}
-    assert resp.json.get("frc604")["pit_location"] == "B3"
+    assert resp.get_json().get("frc254") == {"pit_location": "A1"}
+    assert resp.get_json().get("frc604")["pit_location"] == "B3"
 
 
 def test_event_matches(ndb_stub, api_client: Client) -> None:
@@ -531,10 +531,10 @@ def test_event_matches(ndb_stub, api_client: Client) -> None:
         "/api/v3/event/2019casj/matches", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    for match in resp.json:
+    assert len(resp.get_json()) == 2
+    for match in resp.get_json():
         validate_nominal_match_keys(match)
-    keys = set([match["key"] for match in resp.json])
+    keys = set([match["key"] for match in resp.get_json()])
     assert "2019casj_qm1" in keys
     assert "2019casj_qm2" in keys
 
@@ -544,10 +544,10 @@ def test_event_matches(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    for match in resp.json:
+    assert len(resp.get_json()) == 2
+    for match in resp.get_json():
         validate_simple_match_keys(match)
-    keys = set([match["key"] for match in resp.json])
+    keys = set([match["key"] for match in resp.get_json()])
     assert "2019casj_qm1" in keys
     assert "2019casj_qm2" in keys
 
@@ -556,7 +556,7 @@ def test_event_matches(ndb_stub, api_client: Client) -> None:
         "/api/v3/event/2019casj/matches/keys",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
-    assert len(resp.json) == 2
+    assert len(resp.get_json()) == 2
     assert "2019casj_qm1" in keys
     assert "2019casj_qm2" in keys
 
@@ -591,18 +591,18 @@ def test_event_practice_matches(ndb_stub, api_client: Client) -> None:
 
     resp = api_client.get("/api/v3/event/2019casj/matches/practice", headers=headers)
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    validate_nominal_match_keys(resp.json[0])
-    assert resp.json[0]["key"] == "2019casj_pm1"
-    assert resp.json[0]["comp_level"] == "pm"
+    assert len(resp.get_json()) == 1
+    validate_nominal_match_keys(resp.get_json()[0])
+    assert resp.get_json()[0]["key"] == "2019casj_pm1"
+    assert resp.get_json()[0]["comp_level"] == "pm"
 
     resp = api_client.get(
         "/api/v3/event/2019casj/matches/practice/simple", headers=headers
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    validate_simple_match_keys(resp.json[0])
-    assert resp.json[0]["key"] == "2019casj_pm1"
+    assert len(resp.get_json()) == 1
+    validate_simple_match_keys(resp.get_json()[0])
+    assert resp.get_json()[0]["key"] == "2019casj_pm1"
 
     resp = api_client.get(
         "/api/v3/event/2019casj/matches/practice/keys", headers=headers
@@ -615,7 +615,7 @@ def test_event_practice_matches(ndb_stub, api_client: Client) -> None:
 
     resp = api_client.get("/api/v3/match/2019casj_pm1", headers=headers)
     assert resp.status_code == 200
-    assert resp.json["key"] == "2019casj_pm1"
+    assert resp.get_json()["key"] == "2019casj_pm1"
 
 
 def test_event_awards(ndb_stub, api_client: Client) -> None:
@@ -651,8 +651,8 @@ def test_event_awards(ndb_stub, api_client: Client) -> None:
         "/api/v3/event/2019casj/awards", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 2
-    names = set([award["name"] for award in resp.json])
+    assert len(resp.get_json()) == 2
+    names = set([award["name"] for award in resp.get_json()])
     assert "Winner" in names
     assert "Finalist" in names
 
@@ -696,12 +696,12 @@ def test_event_nexus_info(
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert resp.json["data_as_of_ms"] == 1721000000000
-    assert resp.json["now_queueing"] == {
+    assert resp.get_json()["data_as_of_ms"] == 1721000000000
+    assert resp.get_json()["now_queueing"] == {
         "match_key": "2019casj_qm5",
         "match_name": "Qualification 5",
     }
-    assert resp.json["matches"]["2019casj_qm5"]["status"] == "Now queuing"
+    assert resp.get_json()["matches"]["2019casj_qm5"]["status"] == "Now queuing"
 
 
 def test_event_nexus_info_without_pit_map_has_null_pit_map(
@@ -725,7 +725,7 @@ def test_event_nexus_info_without_pit_map_has_null_pit_map(
         "/api/v3/event/2019casj/nexus_info",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
-    assert resp.json["pit_map"] is None
+    assert resp.get_json()["pit_map"] is None
 
 
 def test_event_nexus_info_pit_map_only(
@@ -806,7 +806,7 @@ def test_event_nexus_info_with_queue_status_and_pit_map(
         "/api/v3/event/2019casj/nexus_info",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
-    assert (resp.json["data_as_of_ms"], resp.json["pit_map"]["size"]) == (
+    assert (resp.get_json()["data_as_of_ms"], resp.get_json()["pit_map"]["size"]) == (
         1721000000000,
         {"x": 100, "y": 100},
     )
@@ -937,8 +937,8 @@ def test_event_media(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    album = resp.json[0]
+    assert len(resp.get_json()) == 1
+    album = resp.get_json()[0]
     assert album["type"] == "smugmug-album"
     assert album["foreign_key"] == "album1"
     assert album["direct_url"] == SMUGMUG_ALBUM_DETAILS["cover_url"]
@@ -957,8 +957,8 @@ def test_event_media_excludes_team_media(ndb_stub, api_client: Client) -> None:
         "/api/v3/event/2020nyny/team_media",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
-    assert [m["foreign_key"] for m in event_media.json] == ["album1"]
-    assert [m["foreign_key"] for m in team_media.json] == ["teamvideo"]
+    assert [m["foreign_key"] for m in event_media.get_json()] == ["album1"]
+    assert [m["foreign_key"] for m in team_media.get_json()] == ["teamvideo"]
 
 
 def test_event_media_bad_key(ndb_stub, api_client: Client) -> None:

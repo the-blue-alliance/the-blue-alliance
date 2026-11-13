@@ -32,7 +32,7 @@ def test_not_authenticated(ndb_stub, api_client: FlaskClient) -> None:
         assert g.get("auth_owner_id", None) is None
 
     assert resp.status_code == 401
-    assert "required" in resp.json["Error"]
+    assert "required" in resp.get_json()["Error"]
 
 
 def test_bad_auth(ndb_stub, api_client: FlaskClient) -> None:
@@ -52,7 +52,7 @@ def test_bad_auth(ndb_stub, api_client: FlaskClient) -> None:
         assert g.get("auth_owner_id", None) is None
 
     assert resp.status_code == 401
-    assert "invalid" in resp.json["Error"]
+    assert "invalid" in resp.get_json()["Error"]
 
 
 @pytest.mark.parametrize("account", [None, Account()])
@@ -155,14 +155,14 @@ def test_team_key_invalid(ndb_stub, api_client: FlaskClient) -> None:
         "/api/v3/team/254", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "254 is not a valid team key"
+    assert resp.get_json()["Error"] == "254 is not a valid team key"
 
     # Test different model return
     resp = api_client.get(
         "/api/v3/team/254/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "254 is not a valid team key"
+    assert resp.get_json()["Error"] == "254 is not a valid team key"
 
 
 def test_team_key_does_not_exist(ndb_stub, api_client: FlaskClient) -> None:
@@ -177,14 +177,14 @@ def test_team_key_does_not_exist(ndb_stub, api_client: FlaskClient) -> None:
         "/api/v3/team/frc604", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "team key: frc604 does not exist"
+    assert resp.get_json()["Error"] == "team key: frc604 does not exist"
 
     # Test different model return
     resp = api_client.get(
         "/api/v3/team/frc604/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "team key: frc604 does not exist"
+    assert resp.get_json()["Error"] == "team key: frc604 does not exist"
 
 
 def test_event_key_valid(ndb_stub, api_client: FlaskClient) -> None:
@@ -229,14 +229,14 @@ def test_event_key_invalid(ndb_stub, api_client: FlaskClient) -> None:
         "/api/v3/event/casj", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "casj is not a valid event key"
+    assert resp.get_json()["Error"] == "casj is not a valid event key"
 
     # Test different model return
     resp = api_client.get(
         "/api/v3/event/casj/teams", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "casj is not a valid event key"
+    assert resp.get_json()["Error"] == "casj is not a valid event key"
 
 
 def test_event_key_does_not_exist(ndb_stub, api_client: FlaskClient) -> None:
@@ -256,14 +256,14 @@ def test_event_key_does_not_exist(ndb_stub, api_client: FlaskClient) -> None:
         "/api/v3/event/2019casf", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "event key: 2019casf does not exist"
+    assert resp.get_json()["Error"] == "event key: 2019casf does not exist"
 
     # Test different model return
     resp = api_client.get(
         "/api/v3/event/2019casf/teams", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "event key: 2019casf does not exist"
+    assert resp.get_json()["Error"] == "event key: 2019casf does not exist"
 
 
 def test_match_key_valid(ndb_stub, api_client: FlaskClient) -> None:
@@ -314,7 +314,7 @@ def test_match_key_invalid(ndb_stub, api_client: FlaskClient) -> None:
         "/api/v3/match/2020casj_qm", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "2020casj_qm is not a valid match key"
+    assert resp.get_json()["Error"] == "2020casj_qm is not a valid match key"
 
 
 def test_match_key_does_not_exist(ndb_stub, api_client: FlaskClient) -> None:
@@ -340,7 +340,7 @@ def test_match_key_does_not_exist(ndb_stub, api_client: FlaskClient) -> None:
         "/api/v3/match/2020casj_qm2", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "match key: 2020casj_qm2 does not exist"
+    assert resp.get_json()["Error"] == "match key: 2020casj_qm2 does not exist"
 
 
 def test_district_key_valid(ndb_stub, api_client: FlaskClient) -> None:
@@ -393,14 +393,14 @@ def test_district_key_invalid(ndb_stub, api_client: FlaskClient) -> None:
         "/api/v3/district/mar/rankings", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "mar is not a valid district key"
+    assert resp.get_json()["Error"] == "mar is not a valid district key"
 
     # Test different model return
     resp = api_client.get(
         "/api/v3/district/mar/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "mar is not a valid district key"
+    assert resp.get_json()["Error"] == "mar is not a valid district key"
 
 
 def test_district_key_does_not_exist(ndb_stub, api_client: FlaskClient) -> None:
@@ -419,14 +419,14 @@ def test_district_key_does_not_exist(ndb_stub, api_client: FlaskClient) -> None:
         "/api/v3/district/2020tx/rankings", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "district key: 2020tx does not exist"
+    assert resp.get_json()["Error"] == "district key: 2020tx does not exist"
 
     # Test different model return
     resp = api_client.get(
         "/api/v3/district/2020tx/events", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 404
-    assert resp.json["Error"] == "district key: 2020tx does not exist"
+    assert resp.get_json()["Error"] == "district key: 2020tx does not exist"
 
 
 def test_auth_key_cache_hit_on_subsequent_read(

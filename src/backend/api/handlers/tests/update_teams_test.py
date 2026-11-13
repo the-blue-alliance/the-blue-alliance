@@ -85,7 +85,7 @@ def test_set_teams(ndb_stub, api_client: Client, taskqueue_stub) -> None:
         data=request_body,
     )
     assert response.status_code == 200, response.data
-    assert "Success" in response.json
+    assert "Success" in response.get_json()
 
     db_eventteams = EventTeam.query(
         EventTeam.event == ndb.Key(Event, "2014casj")
@@ -112,7 +112,7 @@ def test_remove_teams(ndb_stub, api_client: Client, taskqueue_stub) -> None:
         data=request_body,
     )
     assert response.status_code == 200, response.data
-    assert "Success" in response.json
+    assert "Success" in response.get_json()
 
     db_eventteams = EventTeam.query(
         EventTeam.event == ndb.Key(Event, "2014casj")
@@ -135,7 +135,7 @@ def test_update_teams(ndb_stub, api_client: Client, taskqueue_stub) -> None:
         data=request_body,
     )
     assert response.status_code == 200, response.data
-    assert "Success" in response.json
+    assert "Success" in response.get_json()
 
     db_eventteams = EventTeam.query(
         EventTeam.event == ndb.Key(Event, "2014casj")
@@ -160,7 +160,7 @@ def test_unknown_teams_skipped(ndb_stub, api_client: Client, taskqueue_stub) -> 
         data=request_body,
     )
     assert response.status_code == 200, response.data
-    assert "Success" in response.json
+    assert "Success" in response.get_json()
 
     db_eventteams = EventTeam.query(
         EventTeam.event == ndb.Key(Event, "2014casj")
@@ -185,7 +185,7 @@ def test_bad_team_key(ndb_stub, api_client: Client) -> None:
         data=request_body,
     )
     assert response.status_code == 400, response.data
-    assert response.json["Error"] == "Invalid team keys provided: ['asdf']"
+    assert response.get_json()["Error"] == "Invalid team keys provided: ['asdf']"
 
     db_eventteams = EventTeam.query(
         EventTeam.event == ndb.Key(Event, "2014casj")
@@ -207,4 +207,4 @@ def test_bad_body_format(ndb_stub, api_client: Client) -> None:
         data=request_body,
     )
     assert response.status_code == 400, response.data
-    assert response.json["Error"].startswith("`254` is not a <class 'str'>")
+    assert response.get_json()["Error"].startswith("`254` is not a <class 'str'>")

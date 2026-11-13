@@ -29,7 +29,7 @@ def test_decorator_order_cache_hit_bypasses_validate_keys(
         "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp1.status_code == 200
-    assert resp1.json["key"] == "frc254"
+    assert resp1.get_json()["key"] == "frc254"
     etag = resp1.headers.get("ETag")
     assert etag is not None
 
@@ -43,7 +43,7 @@ def test_decorator_order_cache_hit_bypasses_validate_keys(
         "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp2.status_code == 200
-    assert resp2.json["key"] == "frc254"
+    assert resp2.get_json()["key"] == "frc254"
     # Team.get_by_id_async should NOT have been called because validate_keys was bypassed
     mock_get_by_id_async.assert_not_called()
 
@@ -146,7 +146,7 @@ def test_apiv3_404_returns_404_not_304_when_etag_matches(
     )
     assert resp2.status_code == 404
     assert resp2.headers.get("ETag") == etag
-    assert "Error" in resp2.json
+    assert "Error" in resp2.get_json()
 
     # 2. Invalid key format: returns 404 with ETag
     resp3 = api_client.get(
@@ -163,7 +163,7 @@ def test_apiv3_404_returns_404_not_304_when_etag_matches(
     )
     assert resp4.status_code == 404
     assert resp4.headers.get("ETag") == bad_format_etag
-    assert "Error" in resp4.json
+    assert "Error" in resp4.get_json()
 
 
 def test_apiv3_query_params_ignored_for_caching(
@@ -196,7 +196,7 @@ def test_apiv3_query_params_ignored_for_caching(
     # 2. Request with query param auth: ?X-TBA-Auth-Key=test_auth_key
     resp2 = api_client.get("/api/v3/team/frc254?X-TBA-Auth-Key=test_auth_key")
     assert resp2.status_code == 200
-    assert resp2.json["key"] == "frc254"
+    assert resp2.get_json()["key"] == "frc254"
     mock_get_by_id_async.assert_not_called()
 
     # 3. Request with arbitrary query parameters: ?foo=bar&baz=qux
@@ -205,7 +205,7 @@ def test_apiv3_query_params_ignored_for_caching(
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp3.status_code == 200
-    assert resp3.json["key"] == "frc254"
+    assert resp3.get_json()["key"] == "frc254"
     mock_get_by_id_async.assert_not_called()
 
     # 4. Request with query params and If-None-Match

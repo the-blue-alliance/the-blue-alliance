@@ -38,16 +38,16 @@ def test_match(ndb_stub, api_client: Client) -> None:
         "/api/v3/match/2020casj_qm1", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert resp.json["key"] == "2020casj_qm1"
-    validate_nominal_match_keys(resp.json)
+    assert resp.get_json()["key"] == "2020casj_qm1"
+    validate_nominal_match_keys(resp.get_json())
 
     # Simple response
     resp = api_client.get(
         "/api/v3/match/2020casj_qm1/simple", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert resp.json["key"] == "2020casj_qm1"
-    validate_simple_match_keys(resp.json)
+    assert resp.get_json()["key"] == "2020casj_qm1"
+    validate_simple_match_keys(resp.get_json())
 
     # Keys response
     resp = api_client.get(

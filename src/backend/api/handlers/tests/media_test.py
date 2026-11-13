@@ -15,7 +15,7 @@ def test_media_tags(ndb_stub, api_client: Client) -> None:
         "/api/v3/media/tags", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert len(resp.json) == len(TAG_NAMES)
-    for tag in resp.json:
+    assert len(resp.get_json()) == len(TAG_NAMES)
+    for tag in resp.get_json():
         assert tag["name"] in TAG_NAMES.values()
         assert tag["code"] in TAG_URL_NAMES.values()

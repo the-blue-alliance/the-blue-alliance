@@ -132,7 +132,7 @@ def test_upload_companion_db_success(
         )
 
     assert resp.status_code == 200
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
     mock_write.assert_called_once()
 
 
@@ -163,7 +163,7 @@ def test_upload_missing_file(
     )
 
     assert resp.status_code == 401
-    assert "Expected file upload not found" in resp.json["Error"]
+    assert "Expected file upload not found" in resp.get_json()["Error"]
 
 
 @freeze_time("2019-06-01")
@@ -205,7 +205,7 @@ def test_upload_invalid_sqlite_file(
     )
 
     assert resp.status_code == 400
-    assert "not valid" in resp.json["Error"]
+    assert "not valid" in resp.get_json()["Error"]
 
 
 @freeze_time("2019-06-01")
@@ -247,7 +247,7 @@ def test_upload_wrong_permission(
     )
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -290,7 +290,7 @@ def test_upload_mismatched_digest(
     )
 
     assert resp.status_code == 401
-    assert "File digest does not match" in resp.json["Error"]
+    assert "File digest does not match" in resp.get_json()["Error"]
 
 
 @freeze_time("2019-06-01")
@@ -368,7 +368,7 @@ def test_upload_not_authenticated(ndb_stub, api_client: Client) -> None:
     )
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -569,12 +569,12 @@ def test_upload_as_admin_without_auth_id_skips_cloudrun_job(
     assert resp.status_code == 200
     mock_write.assert_called_once()
     mock_start_job.assert_not_called()
-    assert resp.json["Success"] == "FMS Companion database successfully uploaded"
-    assert resp.json["storage_path"].startswith(
+    assert resp.get_json()["Success"] == "FMS Companion database successfully uploaded"
+    assert resp.get_json()["storage_path"].startswith(
         f"{FMSCompanionHelper.get_bucket()}/fms_companion/2019nyny/"
     )
-    assert "job_name" not in resp.json
-    assert "execution_id" not in resp.json
+    assert "job_name" not in resp.get_json()
+    assert "execution_id" not in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -640,10 +640,10 @@ def test_upload_duplicate_db_reuses_newest_path(
     expected_path = f"{FMSCompanionHelper.get_bucket()}/{newest_path}"
     assert resp.status_code == 200
     mock_write.assert_not_called()
-    assert resp.json["storage_path"] == expected_path
+    assert resp.get_json()["storage_path"] == expected_path
     mock_start_job.assert_called_once()
     assert mock_start_job.call_args[1]["args"] == [f"gs://{expected_path}"]
-    assert resp.json["execution_id"] == "exec-123"
+    assert resp.get_json()["execution_id"] == "exec-123"
 
 
 @freeze_time("2019-06-01")
@@ -700,4 +700,4 @@ def test_upload_duplicate_db_with_unknown_newest_path_does_not_start_job(
         )
 
     mock_start_job.assert_not_called()
-    assert resp.json.get("storage_path") != ""
+    assert resp.get_json().get("storage_path") != ""

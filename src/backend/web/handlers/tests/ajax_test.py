@@ -262,4 +262,4 @@ def test_remap_teams(web_client: Client) -> None:
 def test_playoff_types(web_client: Client) -> None:
     resp = web_client.get("/_/playoff_types")
     assert resp.status_code == 200
-    assert {"value": 0, "label": "Elimination Bracket (8 Alliances)"} in resp.json
+    assert {"value": 0, "label": "Elimination Bracket (8 Alliances)"} in resp.get_json()

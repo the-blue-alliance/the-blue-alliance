@@ -47,7 +47,7 @@ def test_status(fmsapi_down, ndb_stub, api_client: Client) -> None:
     expected_status.update(cast(dict, status))
     expected_status["down_events"] = []
     expected_status["is_datafeed_down"] = fmsapi_down
-    expected_status["kickoff_datetime"] = resp.json["kickoff_datetime"]
+    expected_status["kickoff_datetime"] = resp.get_json()["kickoff_datetime"]
 
     assert resp.json == expected_status
 
@@ -90,6 +90,6 @@ def test_status_kickoff_datetime(
 
     assert resp.status_code == 200
     assert (
-        resp.json["kickoff_datetime"]
+        resp.get_json()["kickoff_datetime"]
         == SeasonHelper.kickoff_datetime_utc(expected_kickoff_year).isoformat()
     )
