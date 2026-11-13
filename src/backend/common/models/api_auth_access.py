@@ -24,7 +24,7 @@ class ApiAuthAccess(ndb.Model):
 
     # For both read and write:
     description: str = ndb.TextProperty(indexed=False)  # human-readable description
-    auth_types_enum: List[AuthType] = ndb.IntegerProperty(  # pyre-ignore[8]
+    auth_types_enum: List[AuthType] = ndb.IntegerProperty(
         choices=list(AuthType), repeated=True
     )  # read and write types should never be mixed
     owner: Optional[ndb.Key] = ndb.KeyProperty(kind=Account)
@@ -35,18 +35,14 @@ class ApiAuthAccess(ndb.Model):
 
     # Write only:
     secret: Optional[str] = ndb.TextProperty(indexed=False)
-    event_list: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
+    event_list: List[ndb.Key] = ndb.KeyProperty(
         kind=Event, repeated=True
     )  # events for which auth is granted
     # On update, we resolve the events in these districts and add them to event_list
-    district_list: List[ndb.Key] = ndb.KeyProperty(  # pyre-ignore[8]
-        kind=District, repeated=True
-    )
+    district_list: List[ndb.Key] = ndb.KeyProperty(kind=District, repeated=True)
     # Only for offseason events: grant access to MATCH_VIDEO for events whose webcast
     # is here (twitch channel / youtube account)
-    offseason_webcast_channels: List[str] = ndb.StringProperty(  # pyre-ignore[8]
-        repeated=True
-    )
+    offseason_webcast_channels: List[str] = ndb.StringProperty(repeated=True)
     # Allow access for all events marked official
     all_official_events: bool = ndb.BooleanProperty()
     expiration: Optional[datetime.datetime] = ndb.DateTimeProperty()

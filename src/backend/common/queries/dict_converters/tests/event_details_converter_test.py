@@ -48,7 +48,7 @@ def test_eventDetailsConverter_v3_normalizes_stat_team_keys(ndb_context) -> None
 
 def test_eventDetailsConverter_v3_none_details(ndb_context) -> None:
     # The converter tolerates a missing EventDetails by rendering empty fields
-    converted = EventDetailsConverter.eventDetailsConverter_v3(None)  # pyre-ignore[6]
+    converted = EventDetailsConverter.eventDetailsConverter_v3(None)
     assert converted == {
         "alliances": [],
         "district_points": {},

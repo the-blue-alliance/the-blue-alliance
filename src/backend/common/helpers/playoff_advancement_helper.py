@@ -331,7 +331,7 @@ class PlayoffAdvancementHelper:
                         "winning_alliance"
                     ] = AllianceColor.BLUE
 
-        return bracket_table  # pyre-ignore[7]
+        return bracket_table
 
     @classmethod
     def generate_playoff_advancement_2015(
@@ -774,19 +774,19 @@ class PlayoffAdvancementHelper:
     def _make_alliance_rank_row_for_apiv3(
         cls, color: AllianceColor, bracket_set: BracketItem
     ) -> ApiPlayoffAdvancementAllianceRank:
-        record: WLTRecord = bracket_set["{}_record".format(color)]  # pyre-ignore[26, 9]
+        record: WLTRecord = bracket_set["{}_record".format(color)]
         return ApiPlayoffAdvancementAllianceRank(
             team_keys=list(
                 map(
                     lambda t: "frc{}".format(t),
-                    bracket_set["{}_alliance".format(color)],  # pyre-ignore[26]
+                    bracket_set["{}_alliance".format(color)],
                 )
             ),
-            alliance_name=bracket_set["{}_name".format(color)],  # pyre-ignore[26, 6]
+            alliance_name=bracket_set["{}_name".format(color)],
             alliance_color=color,
             record=record,
             matches_played=record["wins"] + record["losses"] + record["ties"],
-            sort_orders=[bracket_set["{}_wins".format(color)]],  # pyre-ignore[26]
+            sort_orders=[bracket_set["{}_wins".format(color)]],
             extra_stats=[],
         )
 

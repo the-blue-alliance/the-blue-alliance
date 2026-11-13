@@ -114,7 +114,6 @@ def test_LoggingContextFilter_with_labels() -> None:
 
     assert result is True
     assert hasattr(record, "labels")
-    # pyre-ignore[16]: labels is set dynamically by our filter
     labels: Dict[str, Any] = getattr(record, "labels")
     assert labels["user_id"] == "123"
     assert labels["request_id"] == "abc"
@@ -150,7 +149,6 @@ def test_LoggingContextFilter_merges_existing_labels() -> None:
     log_filter.filter(record)
 
     # Both existing and new labels should be present
-    # pyre-ignore[16]: labels is set dynamically by our filter
     labels: Dict[str, Any] = getattr(record, "labels")
     assert labels["existing_key"] == "existing_value"
     assert labels["user_id"] == "123"
@@ -711,15 +709,12 @@ def test_LoggingContextFilter_with_trace_context() -> None:
         log_filter.filter(record)
 
     assert hasattr(record, "trace")
-    # pyre-ignore[16]: trace is set dynamically by our filter
     trace: str = getattr(record, "trace")
     assert trace == "projects/tbatv-prod-hrd/traces/105445aa7843bc8bf206b12000100000"
     assert hasattr(record, "span_id")
-    # pyre-ignore[16]: span_id is set dynamically by our filter
     span_id: str = getattr(record, "span_id")
     assert span_id == "0000000000000001"
     assert hasattr(record, "trace_sampled")
-    # pyre-ignore[16]: trace_sampled is set dynamically by our filter
     trace_sampled: bool = getattr(record, "trace_sampled")
     assert trace_sampled is True
 
@@ -791,7 +786,7 @@ def test_configure_logging_patches_thread_delete() -> None:
         patch("backend.common.logging.Environment.is_prod", return_value=False),
     ):
         configure_logging()
-        threading.Thread._delete(Mock())  # pyre-ignore[16]
+        threading.Thread._delete(Mock())
 
     original_delete.assert_called_once()
 

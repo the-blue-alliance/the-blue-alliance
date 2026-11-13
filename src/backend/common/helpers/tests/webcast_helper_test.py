@@ -113,7 +113,7 @@ def test_stream_matches_event(
         event_short=event_short,
         event_type_enum=EventType.REGIONAL,
     )
-    video_details = ParsedVideoDetails(video_id="abc", **video)  # pyre-ignore[6]
+    video_details = ParsedVideoDetails(video_id="abc", **video)
 
     assert WebcastParser.stream_matches_event(video_details, event) is expected
 

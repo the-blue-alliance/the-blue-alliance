@@ -5,8 +5,7 @@ This optional tooling requires [Python 3](https://www.python.org/downloads/) and
 
 1. Install [Python 3](https://www.python.org/downloads/) (3.14+)
 2. Install [`pip`](https://pip.pypa.io/en/stable/installing/)
-3. *(optionally)* Install [watchman](https://facebook.github.io/watchman/)
-4. *(optionally)* Install [shfmt](https://github.com/mvdan/sh)
+3. *(optionally)* Install [shfmt](https://github.com/mvdan/sh)
 
 If you have both a Python 2 and Python 3 interpreter on your machine, run the `pip3` command instead of `pip`. To confirm, run -
 ```
@@ -26,21 +25,6 @@ $ pip install -r requirements.txt
 ### Globally Install
 ```
 $ pip install -r requirements.txt
-```
-
-## Pyre + Watchman
-
-In large projects, running [Pyre](https://pyre-check.org/) (our Python typechecker) can be slow, as there is a lot of code to parse. `pyre` can be sped up if [`watchman`](https://facebook.github.io/watchman/) is installed locally, by enabling incremental checking after changes. Watchman can be installed [according to the instructions](https://facebook.github.io/watchman/docs/install.html), or via your operating system's package manager or from source:
-
-```bash
-# On MacOS via homebrew
-$ brew install watchman
-
-# On Ubuntu (https://packages.ubuntu.com/search?keywords=watchman)
-$ sudo apt-get install watchman
-
-# On Fedora (https://koji.fedoraproject.org/koji/packageinfo?packageID=32733)
-$ sudo dnf install watchman
 ```
 
 ## Pre-Commit Hook

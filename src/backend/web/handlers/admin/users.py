@@ -46,10 +46,9 @@ def user_detail(user_id: str) -> str:
         logging.error(f"Failed to fetch Firebase user: {e}")
 
     api_keys = ApiAuthAccess.query(ApiAuthAccess.owner == user.key).fetch()
-    # Negation for descending order is valid NDB syntax, but Pyre doesn't understand it
     audit_logs = (
         AuditLogEntry.query(AuditLogEntry.account == user.key)
-        .order(-AuditLogEntry.time)  # pyre-ignore[16]
+        .order(-AuditLogEntry.time)
         .fetch(25)
     )
     audit_log_accounts_by_key = {user.key: user}

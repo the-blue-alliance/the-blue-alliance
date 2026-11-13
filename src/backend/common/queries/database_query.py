@@ -56,7 +56,7 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
         self._query_args = kwargs
 
     @abc.abstractmethod
-    def _query_async(self) -> TypedFuture[QueryReturn]: ...
+    def _query_async(self, *args: Any, **kwargs: Any) -> TypedFuture[QueryReturn]: ...
 
     @ndb.tasklet
     def _do_query(self, *args, **kwargs) -> Generator[Any, Any, QueryReturn]:
@@ -78,8 +78,7 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
                 f"{self.__class__.__name__} does not provide a Dict converter!"
             )
 
-        # See https://github.com/facebook/pyre-check/issues/267
-        return self.DICT_CONVERTER(res).convert(_dict_version)  # pyre-ignore[45]
+        return self.DICT_CONVERTER(res).convert(_dict_version)
 
     def fetch(self) -> QueryReturn:
         return self.fetch_async().get_result()
@@ -275,10 +274,9 @@ class CachedDatabaseQuery(
         if not self.DICT_CACHING_ENABLED:
             with Span(f"{self.__class__.__name__}._query_async"):
                 query_result = yield self._query_async(*args, **kwargs)
-            # See https://github.com/facebook/pyre-check/issues/267
-            converted_result = none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
-                query_result
-            ).convert(_dict_version)
+            converted_result = none_throws(self.DICT_CONVERTER)(query_result).convert(
+                _dict_version
+            )
             self._record_accessed_cache_key(cache_key, converted_result)
             return converted_result
 
@@ -292,8 +290,7 @@ class CachedDatabaseQuery(
                 with Span(f"{self.__class__.__name__}._query_async"):
                     query_result = yield self._query_async(*args, **kwargs)
 
-                # See https://github.com/facebook/pyre-check/issues/267
-                converted_result = none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
+                converted_result = none_throws(self.DICT_CONVERTER)(
                     query_result
                 ).convert(_dict_version)
 
@@ -383,9 +380,9 @@ class CachedDatabaseQuery(
                     query_result = yield self._query_async(*args, **kwargs)
 
                 converted_result = (
-                    none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
-                        query_result
-                    ).convert(_dict_version)
+                    none_throws(self.DICT_CONVERTER)(query_result).convert(
+                        _dict_version
+                    )
                     if self.DICT_CONVERTER is not None
                     else query_result
                 )

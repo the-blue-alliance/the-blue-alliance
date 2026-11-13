@@ -6,7 +6,7 @@ from backend.common.helpers.pwa_url_helper import PwaUrlHelper
 
 def render_time_context_processor() -> Dict[str, Optional[datetime]]:
     return dict(
-        render_time=datetime.now(timezone.utc)  # pyre-ignore[16]
+        render_time=datetime.now(timezone.utc)
         .astimezone(timezone.utc)
         .replace(second=0, microsecond=0)
     )  # Prevent ETag from changing too quickly

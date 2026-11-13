@@ -517,10 +517,7 @@ def add_match_zebra_motionworks_info(event_key: EventKey) -> Response:
         # Check that teams in Zebra data and teams in Match differ by at most one team on each alliance.
         for color in ALLIANCE_COLORS:
             match_teams = match.alliances[AllianceColor(color)]["teams"]
-            zebra_teams = [
-                team["team_key"]
-                for team in zebra_data["alliances"][color]  # pyre-ignore
-            ]
+            zebra_teams = [team["team_key"] for team in zebra_data["alliances"][color]]
             if len(set(match_teams).difference(set(zebra_teams))) > 1:
                 return make_response(
                     profiled_jsonify(

@@ -24,7 +24,7 @@ def test_not_authenticated(ndb_stub, api_client: Client) -> None:
     ).put()
     Team(id="frc254", team_number=254).put()
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
 
         resp = api_client.get("/api/v3/team/frc254")
@@ -42,7 +42,7 @@ def test_bad_auth(ndb_stub, api_client: Client) -> None:
     ).put()
     Team(id="frc254", team_number=254).put()
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
 
         resp = api_client.get(
@@ -66,7 +66,7 @@ def test_authenticated_header(ndb_stub, api_client: Client, account: Account) ->
     ).put()
     Team(id="frc254", team_number=254).put()
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
 
         resp = api_client.get(
@@ -90,7 +90,7 @@ def test_authenticated_urlparam(ndb_stub, api_client: Client, account: Account) 
     ).put()
     Team(id="frc254", team_number=254).put()
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
 
         resp = api_client.get("/api/v3/team/frc254?X-TBA-Auth-Key=test_auth_key")
@@ -108,7 +108,7 @@ def test_authenticated_user(ndb_stub, api_client: Client) -> None:
     Team(id="frc254", team_number=254).put()
     account.put()
 
-    with api_client.application.test_request_context():  # pyre-ignore[16]
+    with api_client.application.test_request_context():
         assert g.get("auth_owner_id", None) is None
 
         with patch.object(auth, "_decoded_claims", return_value={"email": email}):
@@ -456,7 +456,7 @@ def test_auth_key_cache_hit_on_subsequent_read(ndb_stub, api_client: Client) -> 
         "get_by_id",
         side_effect=AssertionError("Should not call get_by_id"),
     ):
-        with api_client.application.test_request_context():  # pyre-ignore[16]
+        with api_client.application.test_request_context():
             resp2 = api_client.get(
                 "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "cached_auth_key"}
             )

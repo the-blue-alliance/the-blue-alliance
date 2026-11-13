@@ -1,7 +1,7 @@
 import abc
 from typing import Generic, TypeVar
 
-TParserInput = TypeVar("TInput")
+TParserInput = TypeVar("TParserInput")
 TParsedResponse = TypeVar("TParsedResponse")
 
 

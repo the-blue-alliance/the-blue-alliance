@@ -8,7 +8,8 @@ help:
 	@echo "  make test-inline                - Run staged/related tests only (pre-commit)"
 	@echo "  make lint                       - Check code formatting (black + flake8)"
 	@echo "  make lint-fix                   - Auto-fix formatting with black, then run flake8"
-	@echo "  make typecheck                  - Run pyre type checker"
+	@echo "  make typecheck                  - Run pyrefly type checker"
+	@echo "  make typecheck ARGS='--update-baseline' - Regenerate pyrefly_baseline.json"
 	@echo "  make lint-bash                  - Check bash script formatting (shellcheck + shfmt)"
 	@echo "  make lint-bash ARGS='--fix'     - Auto-fix bash formatting with shfmt"
 	@echo "  make sync                       - Sync all dev dependencies via uv"
@@ -73,9 +74,9 @@ lint-bash:
 pwa-generate-api:
 	docker compose --profile tools run --rm --build pwa-tools
 
-# Run pyre type checker
+# Run pyrefly type checker
 typecheck:
-	uv run --group typecheck ./ops/typecheck_py3.sh
+	uv run --group typecheck ./ops/typecheck_py3.sh $(ARGS)
 
 # Generate src/requirements.txt from pyproject.toml for GAE deploys
 freeze:

@@ -10,10 +10,10 @@ import threading
 import xml.etree.ElementTree as ET
 
 import six
-import six.moves.http_client  # pyre-ignore[21]
-import six.moves.urllib.parse  # pyre-ignore[21]
+import six.moves.http_client
+import six.moves.urllib.parse
 from google.appengine.api import apiproxy_stub_map
-from six.moves import urllib  # pyre-ignore[21]
+from six.moves import urllib
 
 from backend.common.storage.clients.cloudstorage import cloudstorage_stub
 from backend.common.storage.clients.cloudstorage import common

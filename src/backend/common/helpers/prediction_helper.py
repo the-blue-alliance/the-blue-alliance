@@ -924,9 +924,7 @@ class PredictionHelper:
                             score_differences.append(
                                 abs(
                                     match.alliances[alliance_color]["score"]
-                                    - prediction[alliance_color][  # pyre-ignore[6]
-                                        "score"
-                                    ]
+                                    - prediction[alliance_color]["score"]
                                 )
                             )
                         brier_sums["score"] += pow(prediction["prob"] - 1, 2)
@@ -937,7 +935,7 @@ class PredictionHelper:
                         if match.score_breakdown is None:
                             continue
                         score_breakdown = match.score_breakdown
-                        color_prediction = prediction[str(color)]  # pyre-ignore[26]
+                        color_prediction = prediction[str(color)]
                         for actual_key, prob_key, brier_name in get_game(
                             event.year
                         ).prediction_brier_fields():
@@ -1074,7 +1072,7 @@ class PredictionHelper:
                         sampled_winner = OPPONENT[prediction["winning_alliance"]]
 
                     for alliance_color in ALLIANCE_COLORS:
-                        color_prediction = prediction[alliance_color]  # pyre-ignore[6]
+                        color_prediction = prediction[alliance_color]
                         sampled_rp_values = [
                             np.random.uniform(high=1) < color_prediction[prob_key]
                             for prob_key in rp_prediction_fields

@@ -12,7 +12,7 @@ The Blue Alliance (TBA) is a FIRST Robotics Competition (FRC) data archive and s
 - **Tasks**: Google Cloud Tasks (async execution)
 - **Data Source**: FRC Events API
 - **Testing**: pytest, pytest-cov
-- **Linting**: flake8, black (formatting), pyre-check (type checking)
+- **Linting**: flake8, black (formatting), pyrefly (type checking)
 
 ## Project Structure
 ```
@@ -42,7 +42,7 @@ ops/                    # Build, deploy, and dev scripts
 
 ## Key Conventions
 - Python 3 (migrated from Python 2, see docs/Developing/Py2ToPy3.md)
-- **All Python code must be well-typed** - use type hints and pass `pyre-check`
+- **All Python code must be well-typed** - use type hints and pass `make typecheck` (pyrefly). Fix new errors; don't add them to `pyrefly_baseline.json`
 - **Tests must accompany every change** - no code changes without corresponding tests
 - Use manipulators for all database writes
 - Use queries for database reads
@@ -101,7 +101,7 @@ uv run --group dev python3 script.py
 
 # Run with a specific dependency group
 uv run --group test python3 -c "import pytest; print(pytest.__version__)"
-uv run --group typecheck pyre check
+uv run --group typecheck pyrefly check
 ```
 
 ### Via `uv shell` (preferred for interactive sessions)
@@ -124,7 +124,7 @@ The Makefile wraps `uv run` with the correct dependency groups. Use these for al
 ```bash
 make test               # Run all tests
 make lint               # Run Python linters
-make typecheck          # Run pyre type checker
+make typecheck          # Run pyrefly type checker
 make sync               # Sync/install all dev dependencies
 make freeze             # Generate src/requirements.txt for GAE deploy
 ```
