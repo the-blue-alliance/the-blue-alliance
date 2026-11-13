@@ -8,12 +8,12 @@ from typing import List, Optional, Tuple
 from unittest.mock import Mock, patch
 
 import pytest
+from flask.testing import FlaskClient
 from freezegun import freeze_time
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from pytest import MonkeyPatch
 from werkzeug.datastructures import FileStorage
-from werkzeug.test import Client
 
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common import auth
@@ -118,7 +118,7 @@ def create_excel_file() -> bytes:
     return output.read()
 
 
-def test_no_event(ndb_stub, api_client: Client) -> None:
+def test_no_event(ndb_stub, api_client: FlaskClient) -> None:
     with api_client.application.test_request_context():
         resp = api_client.post("/api/trusted/v1/event/2019nyny/team_list/update")
 
@@ -126,7 +126,7 @@ def test_no_event(ndb_stub, api_client: Client) -> None:
     assert resp.json["Error"] == "Event 2019nyny not found"
 
 
-def test_not_authenticated(ndb_stub, api_client: Client) -> None:
+def test_not_authenticated(ndb_stub, api_client: FlaskClient) -> None:
     setup_event()
 
     with api_client.application.test_request_context():
@@ -138,7 +138,7 @@ def test_not_authenticated(ndb_stub, api_client: Client) -> None:
     )
 
 
-def test_has_auth_id_but_no_sig(ndb_stub, api_client: Client) -> None:
+def test_has_auth_id_but_no_sig(ndb_stub, api_client: FlaskClient) -> None:
     setup_event()
 
     with api_client.application.test_request_context():
@@ -155,7 +155,7 @@ def test_has_auth_id_but_no_sig(ndb_stub, api_client: Client) -> None:
 
 @freeze_time("2020-06-01")
 def test_admin_superpower(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     Admins can use the trusted API on anything, even official events in the past
@@ -175,7 +175,7 @@ def test_admin_superpower(
 
 @freeze_time("2019-06-01")
 def test_eventwizard_permission_not_offseason(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     Users with the EventWizard account permission can only use it for current-year offseason events
@@ -193,7 +193,7 @@ def test_eventwizard_permission_not_offseason(
 
 @freeze_time("2020-06-01")
 def test_eventwizard_permission_not_this_year(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     Users with the EventWizard account permission can only use it for current-year offseason events
@@ -211,7 +211,7 @@ def test_eventwizard_permission_not_this_year(
 
 @freeze_time("2019-06-01")
 def test_eventwizard_permission_passes(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     Users with the EventWizard account permission can only use it for current-year offseason events
@@ -230,7 +230,7 @@ def test_eventwizard_permission_passes(
 
 
 @freeze_time("2019-06-01")
-def test_webcast_permission_not_offseason(ndb_stub, api_client: Client) -> None:
+def test_webcast_permission_not_offseason(ndb_stub, api_client: FlaskClient) -> None:
     """
     An API key linked to a webcast will grant MATCH_VIDEO permissions for current-year offseason events
     that are using that webcast channel
@@ -259,7 +259,7 @@ def test_webcast_permission_not_offseason(ndb_stub, api_client: Client) -> None:
 
 
 @freeze_time("2020-06-01")
-def test_webcast_permission_not_this_year(ndb_stub, api_client: Client) -> None:
+def test_webcast_permission_not_this_year(ndb_stub, api_client: FlaskClient) -> None:
     """
     An API key linked to a webcast will grant MATCH_VIDEO permissions for current-year offseason events
     that are using that webcast channel
@@ -288,7 +288,7 @@ def test_webcast_permission_not_this_year(ndb_stub, api_client: Client) -> None:
 
 
 @freeze_time("2020-06-01")
-def test_webcast_permission_wrong_permission(ndb_stub, api_client: Client) -> None:
+def test_webcast_permission_wrong_permission(ndb_stub, api_client: FlaskClient) -> None:
     """
     An API key linked to a webcast will grant MATCH_VIDEO permissions for current-year offseason events
     that are using that webcast channel
@@ -319,7 +319,7 @@ def test_webcast_permission_wrong_permission(ndb_stub, api_client: Client) -> No
 
 
 @freeze_time("2019-06-01")
-def test_webcast_permission_passes(ndb_stub, api_client: Client) -> None:
+def test_webcast_permission_passes(ndb_stub, api_client: FlaskClient) -> None:
     """
     An API key linked to a webcast will grant MATCH_VIDEO permissions for current-year offseason events
     that are using that webcast channel
@@ -350,7 +350,7 @@ def test_webcast_permission_passes(ndb_stub, api_client: Client) -> None:
 
 @freeze_time("2019-06-01")
 def test_account_permission_logged_in_wrong_events(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -369,7 +369,7 @@ def test_account_permission_logged_in_wrong_events(
 
 @freeze_time("2019-06-01")
 def test_account_permission_logged_in_wrong_permissions(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -388,7 +388,7 @@ def test_account_permission_logged_in_wrong_permissions(
 
 @freeze_time("2019-06-01")
 def test_account_permission_logged_in_auth_expired(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -412,7 +412,7 @@ def test_account_permission_logged_in_auth_expired(
 
 @freeze_time("2019-06-01")
 def test_account_permission_logged_in_good_forever(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -438,7 +438,7 @@ def test_account_permission_logged_in_good_forever(
 
 @freeze_time("2019-06-01")
 def test_account_permission_logged_in_not_expired_yet(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -464,7 +464,7 @@ def test_account_permission_logged_in_not_expired_yet(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_bad_id(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -494,7 +494,7 @@ def test_explicit_auth_bad_id(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_bad_secret(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -525,7 +525,7 @@ def test_explicit_auth_bad_secret(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_wrong_event(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -557,7 +557,7 @@ def test_explicit_auth_wrong_event(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_wrong_permission(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -589,7 +589,7 @@ def test_explicit_auth_wrong_permission(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_expired(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -623,7 +623,7 @@ def test_explicit_auth_expired(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_good_forever(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -657,7 +657,7 @@ def test_explicit_auth_good_forever(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_not_expired(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -691,7 +691,7 @@ def test_explicit_auth_not_expired(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_all_official_events(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -726,7 +726,7 @@ def test_explicit_auth_all_official_events(
 
 @freeze_time("2019-06-01")
 def test_explicit_auth_with_event_code_override(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     Ensure we can support requests being made with full CMP division names
@@ -761,7 +761,7 @@ def test_explicit_auth_with_event_code_override(
 
 @freeze_time("2020-06-01")
 def test_explicit_auth_all_official_events_not_current_year_fails(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     If a user is logged in, we can automatically pull their linked auth, provided it is unexpired
@@ -799,7 +799,7 @@ def test_explicit_auth_all_official_events_not_current_year_fails(
 
 @freeze_time("2019-06-01")
 def test_file_upload_no_file_param(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     When fileParam is set but no file is provided, the request should fail
@@ -832,7 +832,7 @@ def test_file_upload_no_file_param(
 
 @freeze_time("2019-06-01")
 def test_file_upload_mismatched_digest(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     When the fileDigest in form data doesn't match the computed digest, request should fail
@@ -879,7 +879,7 @@ def test_file_upload_mismatched_digest(
 
 @freeze_time("2019-06-01")
 def test_file_upload_correct_digest(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     When the fileDigest matches the file content, and the user has correct permissions, request should succeed
@@ -936,7 +936,7 @@ def test_file_upload_succeeds_with_correct_permission(
     required_permission: AuthType,
     monkeypatch: MonkeyPatch,
     ndb_stub,
-    api_client: Client,
+    api_client: FlaskClient,
 ) -> None:
     """
     Test that each FMS report type succeeds when the correct permission is provided
@@ -982,7 +982,7 @@ def test_file_upload_succeeds_with_correct_permission(
 
 @freeze_time("2019-06-01")
 def test_error_message_with_all_official_events_and_event_keys(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     Test that error message includes "all current-season official events" when
@@ -1020,7 +1020,7 @@ def test_error_message_with_all_official_events_and_event_keys(
 
 @freeze_time("2019-06-01")
 def test_error_message_with_all_official_events_only(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     Test that error message includes only "all current-season official events" when
@@ -1058,7 +1058,7 @@ def test_error_message_with_all_official_events_only(
 
 @freeze_time("2019-06-01")
 def test_error_message_without_all_official_events(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     Test that error message does not include "all current-season official events" when
@@ -1093,7 +1093,7 @@ def test_error_message_without_all_official_events(
 
 @freeze_time("2019-06-01")
 def test_successful_request_logs_to_storage(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """Test that successful requests are logged to cloud storage"""
     setup_event(event_type=EventType.OFFSEASON)
@@ -1148,7 +1148,7 @@ def test_successful_request_logs_to_storage(
 
 @freeze_time("2019-06-01")
 def test_failed_request_does_not_log_to_storage(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """Test that failed requests are not logged to cloud storage"""
     setup_event(event_type=EventType.OFFSEASON)
@@ -1181,7 +1181,7 @@ def test_failed_request_does_not_log_to_storage(
 
 @freeze_time("2019-06-01")
 def test_get_request_does_not_log_to_storage(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """Test that GET requests are not logged to cloud storage"""
     setup_event(event_type=EventType.OFFSEASON)
@@ -1212,7 +1212,7 @@ def test_get_request_does_not_log_to_storage(
 
 @freeze_time("2019-06-01")
 def test_empty_request_body_does_not_log_to_storage(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """Test that requests with empty body are not logged to cloud storage"""
     setup_event(event_type=EventType.OFFSEASON)
@@ -1244,7 +1244,7 @@ def test_empty_request_body_does_not_log_to_storage(
 
 @freeze_time("2019-06-01")
 def test_file_upload_unknown_report_type_is_rejected(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """An upload to an unknown FMS report type is rejected and nothing is stored."""
     setup_event(event_type=EventType.OFFSEASON)
@@ -1290,7 +1290,7 @@ def test_file_upload_unknown_report_type_is_rejected(
 
 @freeze_time("2019-06-01")
 def test_file_upload_unknown_report_type_is_client_error_not_auth_error(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """A signed upload of an unknown report type gets a 400 or 404, not a 401."""
     setup_event(event_type=EventType.OFFSEASON)
@@ -1332,7 +1332,7 @@ def test_file_upload_unknown_report_type_is_client_error_not_auth_error(
 
 
 def test_explicit_auth_trusted_api_disabled(
-    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: FlaskClient
 ) -> None:
     """
     An otherwise valid auth is rejected when TBA admins have disabled

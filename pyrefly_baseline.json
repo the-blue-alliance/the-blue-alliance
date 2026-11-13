@@ -435,24 +435,10 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/apiv3_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 26,
       "path": "src/backend/api/handlers/tests/apiv3_auth_test.py",
       "name": "unsupported-operation",
       "concise_description": "`None` is not subscriptable",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/apiv3_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
       "severity": "error"
     },
     {
@@ -463,27 +449,6 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/apiv3_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/apiv3_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/apiv3_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 12,
       "path": "src/backend/api/handlers/tests/apiv3_auth_test.py",
       "name": "unsupported-operation",
@@ -579,48 +544,6 @@
       "path": "src/backend/api/handlers/tests/apiv3_auth_test.py",
       "name": "unsupported-operation",
       "concise_description": "`None` is not subscriptable",
-      "severity": "error"
-    },
-    {
-      "column": 14,
-      "path": "src/backend/api/handlers/tests/apiv3_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/clientapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/clientapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 9,
-      "path": "src/backend/api/handlers/tests/clientapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 9,
-      "path": "src/backend/api/handlers/tests/clientapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 9,
-      "path": "src/backend/api/handlers/tests/clientapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
       "severity": "error"
     },
     {
@@ -3018,24 +2941,10 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
       "name": "unsupported-operation",
       "concise_description": "`None` is not subscriptable",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
       "severity": "error"
     },
     {
@@ -3046,13 +2955,6 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 9,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
       "name": "unsupported-operation",
@@ -3060,10 +2962,24 @@
       "severity": "error"
     },
     {
-      "column": 10,
+      "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
+      "name": "not-iterable",
+      "concise_description": "`in` is not supported between `Literal['Success']` and `None`",
+      "severity": "error"
+    },
+    {
+      "column": 12,
+      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
+      "name": "not-iterable",
+      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
+      "severity": "error"
+    },
+    {
+      "column": 12,
+      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
+      "name": "not-iterable",
+      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
       "severity": "error"
     },
     {
@@ -3074,10 +2990,10 @@
       "severity": "error"
     },
     {
-      "column": 10,
+      "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
+      "name": "not-iterable",
+      "concise_description": "`in` is not supported between `Literal['Success']` and `None`",
       "severity": "error"
     },
     {
@@ -3088,13 +3004,6 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
       "name": "not-iterable",
@@ -3102,10 +3011,10 @@
       "severity": "error"
     },
     {
-      "column": 10,
+      "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
+      "name": "not-iterable",
+      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
       "severity": "error"
     },
     {
@@ -3116,31 +3025,45 @@
       "severity": "error"
     },
     {
-      "column": 10,
+      "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
+      "name": "not-iterable",
+      "concise_description": "`in` is not supported between `Literal['Success']` and `None`",
       "severity": "error"
     },
     {
-      "column": 10,
+      "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
+      "name": "not-iterable",
+      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
       "severity": "error"
     },
     {
-      "column": 10,
+      "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
+      "name": "not-iterable",
+      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
       "severity": "error"
     },
     {
-      "column": 10,
+      "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
+      "name": "not-iterable",
+      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
+      "severity": "error"
+    },
+    {
+      "column": 12,
+      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
+      "name": "not-iterable",
+      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
+      "severity": "error"
+    },
+    {
+      "column": 12,
+      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
+      "name": "not-iterable",
+      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
       "severity": "error"
     },
     {
@@ -3151,52 +3074,10 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
       "name": "not-iterable",
-      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 12,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "not-iterable",
-      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 12,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "not-iterable",
-      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
+      "concise_description": "`in` is not supported between `Literal['Success']` and `None`",
       "severity": "error"
     },
     {
@@ -3207,13 +3088,6 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
       "name": "not-iterable",
@@ -3221,150 +3095,10 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
       "name": "not-iterable",
       "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 12,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "not-iterable",
-      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 12,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "not-iterable",
-      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 12,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "not-iterable",
-      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 12,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "not-iterable",
-      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 12,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "not-iterable",
-      "concise_description": "`in` is not supported between `Literal['Success']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 12,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "not-iterable",
-      "concise_description": "`in` is not supported between `Literal['Success']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 12,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "not-iterable",
-      "concise_description": "`in` is not supported between `Literal['Success']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 12,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "not-iterable",
-      "concise_description": "`in` is not supported between `Literal['Success']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 12,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "not-iterable",
-      "concise_description": "`in` is not supported between `Literal['Error']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
       "severity": "error"
     },
     {
@@ -3375,13 +3109,6 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 44,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
       "name": "unsupported-operation",
@@ -3389,13 +3116,6 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
       "name": "not-iterable",
@@ -3403,24 +3123,10 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
       "name": "not-iterable",
       "concise_description": "`in` is not supported between `Literal['Success']` and `None`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
       "severity": "error"
     },
     {
@@ -3438,13 +3144,6 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
       "name": "not-iterable",
@@ -3459,13 +3158,6 @@
       "severity": "error"
     },
     {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 12,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
       "name": "not-iterable",
@@ -3480,59 +3172,10 @@
       "severity": "error"
     },
     {
-      "column": 14,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 14,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 14,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 14,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
-      "severity": "error"
-    },
-    {
       "column": 44,
       "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
       "name": "unsupported-operation",
       "concise_description": "`None` is not subscriptable",
-      "severity": "error"
-    },
-    {
-      "column": 10,
-      "path": "src/backend/api/handlers/tests/trustedapi_auth_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `FunctionType` has no attribute `test_request_context`",
       "severity": "error"
     },
     {
