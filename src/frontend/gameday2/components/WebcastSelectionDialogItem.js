@@ -4,7 +4,6 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 
 export default class WebcastSelectionDialogItem extends React.Component {
   static propTypes = {
@@ -21,7 +20,7 @@ export default class WebcastSelectionDialogItem extends React.Component {
 
   render() {
     return (
-      <ListItem disablePadding>
+      <ListItem disablePadding secondaryAction={this.props.rightIcon}>
         <ListItemButton onClick={() => this.handleClick()}>
           {this.props.leftIcon && (
             <ListItemIcon>{this.props.leftIcon}</ListItemIcon>
@@ -31,11 +30,6 @@ export default class WebcastSelectionDialogItem extends React.Component {
             secondary={this.props.secondaryText}
           />
         </ListItemButton>
-        {this.props.rightIcon && (
-          <ListItemSecondaryAction>
-            {this.props.rightIcon}
-          </ListItemSecondaryAction>
-        )}
       </ListItem>
     );
   }
