@@ -23,7 +23,9 @@
 
 from __future__ import with_statement
 
+import itertools
 import logging
+import urllib.parse
 import xml.etree.cElementTree as ET
 
 import six
@@ -638,7 +640,7 @@ def _validate_compose_list(
             " than file_list(%i)" % (len(files_metadata), list_len)
         )
     list_of_files = []
-    for source_file, meta_data in six.moves.zip_longest(file_list, files_metadata):
+    for source_file, meta_data in itertools.zip_longest(file_list, files_metadata):
         if not isinstance(source_file, str):
             raise TypeError("Each item of file_list must be a string")
         if source_file.startswith("/"):
@@ -684,7 +686,7 @@ class _Bucket(object):
         # Used to generate HTTP request queries. May be modified.
         self._options = options.copy()
         self._get_bucket_fut = self._api.get_bucket_async(
-            self._path + "?" + six.moves.urllib.parse.urlencode(self._options)
+            self._path + "?" + urllib.parse.urlencode(self._options)
         )
         # Fields needed by pickle.
         self._last_yield = None
@@ -726,7 +728,7 @@ class _Bucket(object):
             # Fetch next future immediately.
             if self._should_get_another_batch(content):
                 self._get_bucket_fut = self._api.get_bucket_async(
-                    self._path + "?" + six.moves.urllib.parse.urlencode(self._options)
+                    self._path + "?" + urllib.parse.urlencode(self._options)
                 )
             else:
                 self._get_bucket_fut = None

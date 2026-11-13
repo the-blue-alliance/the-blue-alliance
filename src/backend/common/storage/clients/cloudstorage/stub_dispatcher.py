@@ -5,15 +5,14 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import with_statement
 
+import http.client
 import re
 import threading
+import urllib.parse
 import xml.etree.ElementTree as ET
 
 import six
-import six.moves.http_client
-import six.moves.urllib.parse
 from google.appengine.api import apiproxy_stub_map
-from six.moves import urllib
 
 from backend.common.storage.clients.cloudstorage import cloudstorage_stub
 from backend.common.storage.clients.cloudstorage import common
@@ -81,7 +80,7 @@ def dispatch(method, headers, url, payload):
             return _handle_delete(gcs_stub, filename)
         raise ValueError(
             "Unrecognized request method %r." % method,
-            six.moves.http_client.METHOD_NOT_ALLOWED,
+            http.client.METHOD_NOT_ALLOWED,
         )
 
 
@@ -108,18 +107,16 @@ def _preprocess(method, headers, url):
     Raises:
       ValueError: invalid path.
     """
-    _, _, path, query, _ = six.moves.urllib.parse.urlsplit(url)
+    _, _, path, query, _ = urllib.parse.urlsplit(url)
 
     if not path.startswith(common.LOCAL_GCS_ENDPOINT):
-        raise ValueError(
-            "Invalid GCS path: %s" % path, six.moves.http_client.BAD_REQUEST
-        )
+        raise ValueError("Invalid GCS path: %s" % path, http.client.BAD_REQUEST)
 
     filename = path[len(common.LOCAL_GCS_ENDPOINT) :]
 
     # Note this is not safe with Python 2.5, however since the stub is not
     # supported in 2.5, this is okay.
-    param_dict = six.moves.urllib.parse.parse_qs(query, True)
+    param_dict = urllib.parse.parse_qs(query, True)
     for k in param_dict:
         param_dict[k] = urllib.parse.unquote(
             param_dict[k][0]
@@ -144,7 +141,7 @@ def _handle_post(gcs_stub, filename, headers):
         "content-type": content_type.value,
         "content-length": 0,
     }
-    return _FakeUrlFetchResult(six.moves.http_client.CREATED, response_headers, "")
+    return _FakeUrlFetchResult(http.client.CREATED, response_headers, "")
 
 
 def _handle_put(gcs_stub, filename, param_dict, headers, payload):
@@ -160,9 +157,7 @@ def _handle_put(gcs_stub, filename, param_dict, headers, payload):
         return _find_progress(gcs_stub, filename, token)
 
     if not content_range.value:
-        raise ValueError(
-            "Missing header content-range.", six.moves.http_client.BAD_REQUEST
-        )
+        raise ValueError("Missing header content-range.", http.client.BAD_REQUEST)
 
     # Return 412 Precondition Failed if x-goog-if-generation-match header is set
     # to 0 (no live object) and an object exists already (See
@@ -171,7 +166,7 @@ def _handle_put(gcs_stub, filename, param_dict, headers, payload):
         headers.get("x-goog-if-generation-match", None) == "0"
         and gcs_stub.head_object(filename) is not None
     ):
-        return _FakeUrlFetchResult(six.moves.http_client.PRECONDITION_FAILED, {}, "")
+        return _FakeUrlFetchResult(http.client.PRECONDITION_FAILED, {}, "")
 
     # If a resumable upload token has not been supplied, then treat this as a
     # direct PUT of an object into Cloud Storage.
@@ -180,12 +175,12 @@ def _handle_put(gcs_stub, filename, param_dict, headers, payload):
         if content_range.length is None:
             raise ValueError(
                 "Content-Range must have a final length.",
-                six.moves.http_client.BAD_REQUEST,
+                http.client.BAD_REQUEST,
             )
         elif not content_range.no_data and content_range.range[0] != 0:
             raise ValueError(
                 "Content-Range must specify complete object.",
-                six.moves.http_client.BAD_REQUEST,
+                http.client.BAD_REQUEST,
             )
         else:
             # Direct put - lets start the upload process by creating a token.
@@ -204,7 +199,7 @@ def _handle_put(gcs_stub, filename, param_dict, headers, payload):
         response_headers = {
             "content-length": 0,
         }
-        response_status = six.moves.http_client.OK
+        response_status = http.client.OK
     else:
         response_headers = {}
         response_status = 308
@@ -220,7 +215,7 @@ def _is_query_progress(content_range):
 def _find_progress(gcs_stub, filename, token):
     # Upload already finished.
     if gcs_stub.head_object(filename) is not None:
-        return _FakeUrlFetchResult(six.moves.http_client.OK, {}, "")
+        return _FakeUrlFetchResult(http.client.OK, {}, "")
     last_offset = gcs_stub.put_empty(token)
     if last_offset == -1:
         return _FakeUrlFetchResult(308, {}, "")
@@ -245,14 +240,14 @@ def _copy(gcs_stub, filename, headers):
     """
     source = _XGoogCopySource(headers).value
     result = _handle_head(gcs_stub, source)
-    if result.status_code == six.moves.http_client.NOT_FOUND:
+    if result.status_code == http.client.NOT_FOUND:
         return result
     directive = headers.pop("x-goog-metadata-directive", "COPY")
     if directive == "REPLACE":
         gcs_stub.put_copy(source, filename, headers)
     else:
         gcs_stub.put_copy(source, filename, None)
-    return _FakeUrlFetchResult(six.moves.http_client.OK, {}, "")
+    return _FakeUrlFetchResult(http.client.OK, {}, "")
 
 
 def _handle_get(gcs_stub, filename, param_dict, headers):
@@ -271,7 +266,7 @@ def _handle_get(gcs_stub, filename, param_dict, headers):
                 "content-length": len(body),
                 "content-type": "application/xml",
             }
-            return _FakeUrlFetchResult(six.moves.http_client.OK, response_headers, body)
+            return _FakeUrlFetchResult(http.client.OK, response_headers, body)
         elif "storageClass" in param_dict:
             builder = ET.TreeBuilder()
             builder.start("StorageClass", {})
@@ -283,14 +278,14 @@ def _handle_get(gcs_stub, filename, param_dict, headers):
                 "content-length": len(body),
                 "content-type": "application/xml",
             }
-            return _FakeUrlFetchResult(six.moves.http_client.OK, response_headers, body)
+            return _FakeUrlFetchResult(http.client.OK, response_headers, body)
         else:
             # Get bucket.
             return _handle_get_bucket(gcs_stub, mo.group(1), param_dict)
     else:
         # Get object.
         result = _handle_head(gcs_stub, filename)
-        if result.status_code == six.moves.http_client.NOT_FOUND:
+        if result.status_code == http.client.NOT_FOUND:
             return result
 
         # Cloud storage always returns HTTP 206 along with Content-Range header if
@@ -298,7 +293,7 @@ def _handle_get(gcs_stub, filename, param_dict, headers):
         start, end = _Range(headers).value
         st_size = result.headers["x-goog-stored-content-length"]
         if end is not None:
-            result.status_code = six.moves.http_client.PARTIAL_CONTENT
+            result.status_code = http.client.PARTIAL_CONTENT
             end = min(end, st_size - 1)
             result.headers["content-range"] = "bytes %d-%d/%d" % (start, end, st_size)
 
@@ -370,14 +365,14 @@ def _handle_get_bucket(gcs_stub, bucketpath, param_dict):
 
     body = ET.tostring(root)
     response_headers = {"content-length": len(body), "content-type": "application/xml"}
-    return _FakeUrlFetchResult(six.moves.http_client.OK, response_headers, body)
+    return _FakeUrlFetchResult(http.client.OK, response_headers, body)
 
 
 def _handle_head(gcs_stub, filename):
     """Handle HEAD request."""
     filestat = gcs_stub.head_object(filename)
     if not filestat:
-        return _FakeUrlFetchResult(six.moves.http_client.NOT_FOUND, {}, "")
+        return _FakeUrlFetchResult(http.client.NOT_FOUND, {}, "")
 
     http_time = common.posix_time_to_http(filestat.st_ctime)
 
@@ -392,15 +387,15 @@ def _handle_head(gcs_stub, filename):
     if filestat.metadata:
         response_headers.update(filestat.metadata)
 
-    return _FakeUrlFetchResult(six.moves.http_client.OK, response_headers, "")
+    return _FakeUrlFetchResult(http.client.OK, response_headers, "")
 
 
 def _handle_delete(gcs_stub, filename):
     """Handle DELETE object."""
     if gcs_stub.delete_object(filename):
-        return _FakeUrlFetchResult(six.moves.http_client.NO_CONTENT, {}, "")
+        return _FakeUrlFetchResult(http.client.NO_CONTENT, {}, "")
     else:
-        return _FakeUrlFetchResult(six.moves.http_client.NOT_FOUND, {}, "")
+        return _FakeUrlFetchResult(http.client.NOT_FOUND, {}, "")
 
 
 class _Header(object):
@@ -459,7 +454,7 @@ class _ContentRange(_Header):
             if not result:
                 raise ValueError(
                     "Invalid content-range header %s" % self.value,
-                    six.moves.http_client.BAD_REQUEST,
+                    http.client.BAD_REQUEST,
                 )
 
             self.no_data = result.group(1) == "*"

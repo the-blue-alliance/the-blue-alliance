@@ -5083,52 +5083,10 @@
       "severity": "error"
     },
     {
-      "column": 1,
-      "path": "src/backend/common/storage/clients/cloudstorage/api_utils.py",
-      "name": "missing-import",
-      "concise_description": "Cannot find module `six.moves`",
-      "severity": "error"
-    },
-    {
       "column": 6,
       "path": "src/backend/common/storage/clients/cloudstorage/api_utils.py",
       "name": "missing-attribute",
       "concise_description": "No attribute `_positional` in module `google.appengine.datastore.datastore_rpc`",
-      "severity": "error"
-    },
-    {
-      "column": 8,
-      "path": "src/backend/common/storage/clients/cloudstorage/cloudstorage_stub.py",
-      "name": "missing-import",
-      "concise_description": "Cannot find module `six.moves.http_client`",
-      "severity": "error"
-    },
-    {
-      "column": 1,
-      "path": "src/backend/common/storage/clients/cloudstorage/errors.py",
-      "name": "missing-import",
-      "concise_description": "Cannot find module `six.moves`",
-      "severity": "error"
-    },
-    {
-      "column": 8,
-      "path": "src/backend/common/storage/clients/cloudstorage/stub_dispatcher.py",
-      "name": "missing-import",
-      "concise_description": "Cannot find module `six.moves.http_client`",
-      "severity": "error"
-    },
-    {
-      "column": 8,
-      "path": "src/backend/common/storage/clients/cloudstorage/stub_dispatcher.py",
-      "name": "missing-import",
-      "concise_description": "Cannot find module `six.moves.urllib.parse`",
-      "severity": "error"
-    },
-    {
-      "column": 1,
-      "path": "src/backend/common/storage/clients/cloudstorage/stub_dispatcher.py",
-      "name": "missing-import",
-      "concise_description": "Cannot find module `six.moves`",
       "severity": "error"
     },
     {
