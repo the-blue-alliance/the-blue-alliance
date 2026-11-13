@@ -1,7 +1,8 @@
 from datetime import datetime, timezone
-from typing import Dict, Optional
+from typing import Callable, Dict, Mapping, Optional
 
 from backend.common.helpers.pwa_url_helper import PwaUrlHelper
+from backend.web.static_assets import static_asset_url
 
 
 def render_time_context_processor() -> Dict[str, Optional[datetime]]:
@@ -22,3 +23,7 @@ def pwa_url_context_processor() -> Dict[str, str]:
         pwa_base_url=PwaUrlHelper.base_url(),
         pwa_suggestion_review_url=PwaUrlHelper.suggestion_review_url(),
     )
+
+
+def static_asset_url_context_processor() -> Mapping[str, Callable[[str], str]]:
+    return dict(static_asset_url=static_asset_url)

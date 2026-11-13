@@ -13,6 +13,8 @@ automatic_scaling:
 handlers:
   - url: /py3_css
     static_dir: build/css
+    # Also readable by the app, which serves content-hashed copies at /py3_static
+    application_readable: true
   - url: /favicon.ico
     static_files: backend/web/static/icons/favicon.ico
     upload: backend/web/static/icons/favicon.ico
@@ -25,6 +27,7 @@ handlers:
     expiration: "1h"
   - url: /py3_javascript
     static_dir: build/javascript
+    application_readable: true
   - url: /manifest.json
     static_files: backend/web/static/manifest.json
     upload: backend/web/static/manifest.json
