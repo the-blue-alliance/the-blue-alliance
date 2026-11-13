@@ -1106,4 +1106,4 @@ def test_team_history(ndb_stub, api_client: Client) -> None:
 
     assert "events" in resp.get_json()
     assert len(resp.get_json()["events"]) == 1
-    assert resp.json["events"][0]["key"] == "2020casj"
+    assert resp.get_json()["events"][0]["key"] == "2020casj"
