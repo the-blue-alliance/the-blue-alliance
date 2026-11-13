@@ -426,7 +426,7 @@ class FRCAPI:
             for filename in gcs_files:
                 time_str = filename.split("/")[-1].replace(".json", "").strip()
                 file_time = datetime.datetime.strptime(time_str, "%Y-%m-%d %H_%M_%S.%f")
-                if file_time <= self._sim_time:
+                if file_time <= none_throws(self._sim_time):
                     last_file_name = filename
                 else:
                     break

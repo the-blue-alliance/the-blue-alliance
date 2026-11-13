@@ -33,8 +33,9 @@ class MatchTimePredictionHelper:
 
     @classmethod
     def as_utc(cls, time: datetime.datetime) -> datetime.datetime:
-        if time.utcoffset():
-            return (time - time.utcoffset()).replace(tzinfo=None)
+        offset = time.utcoffset()
+        if offset:
+            return (time - offset).replace(tzinfo=None)
         return time
 
     @classmethod
@@ -188,7 +189,7 @@ class MatchTimePredictionHelper:
         now = (
             datetime.datetime.now(timezone) + cls.MAX_IN_PAST
             if is_live
-            else cls.as_local(cls.EPOCH, timezone)
+            else none_throws(cls.as_local(cls.EPOCH, timezone))
         )
         first_unplayed_timedelta = None
         for i in range(0, len(unplayed_matches)):
