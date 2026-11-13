@@ -6,6 +6,7 @@ from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.frc_api.types import ScoreDetailModelAlliance2025
 from backend.common.game_specific.base import (
+    alliance_breakdown,
     per_robot_points,
     PredictionStatConfig,
     RobotPointsAccessor,
@@ -217,48 +218,50 @@ class GameSpecifics2025(
     def get_manual_coprs(self) -> Dict[str, StatAccessor]:
         return {
             "L1 Coral Count": lambda match, color: (
-                match.score_breakdown[color].get("autoReef", {}).get("trough", 0)
-                + match.score_breakdown[color].get("teleopReef", {}).get("trough", 0)
+                alliance_breakdown(match, color).get("autoReef", {}).get("trough", 0)
+                + alliance_breakdown(match, color)
+                .get("teleopReef", {})
+                .get("trough", 0)
             ),
             "L2 Coral Count": lambda match, color: (
-                match.score_breakdown[color]
+                alliance_breakdown(match, color)
                 .get("teleopReef", {})
                 .get("tba_botRowCount", 0)
             ),
             "L3 Coral Count": lambda match, color: (
-                match.score_breakdown[color]
+                alliance_breakdown(match, color)
                 .get("teleopReef", {})
                 .get("tba_midRowCount", 0)
             ),
             "L4 Coral Count": lambda match, color: (
-                match.score_breakdown[color]
+                alliance_breakdown(match, color)
                 .get("teleopReef", {})
                 .get("tba_topRowCount", 0)
             ),
             "Total Coral Count": lambda match, color: sum(
                 [
-                    match.score_breakdown[color].get("autoCoralCount", 0),
-                    match.score_breakdown[color].get("teleopCoralCount", 0),
+                    alliance_breakdown(match, color).get("autoCoralCount", 0),
+                    alliance_breakdown(match, color).get("teleopCoralCount", 0),
                 ]
             ),
             "Total Coral Points": lambda match, color: sum(
                 [
-                    match.score_breakdown[color].get("autoCoralPoints", 0),
-                    match.score_breakdown[color].get("teleopCoralPoints", 0),
+                    alliance_breakdown(match, color).get("autoCoralPoints", 0),
+                    alliance_breakdown(match, color).get("teleopCoralPoints", 0),
                 ]
             ),
             "Total Algae Count": lambda match, color: sum(
                 [
-                    match.score_breakdown[color].get("wallAlgaeCount", 0),
-                    match.score_breakdown[color].get("netAlgaeCount", 0),
+                    alliance_breakdown(match, color).get("wallAlgaeCount", 0),
+                    alliance_breakdown(match, color).get("netAlgaeCount", 0),
                 ]
             ),
             "Total Game Piece Count": lambda match, color: sum(
                 [
-                    match.score_breakdown[color].get("autoCoralCount", 0),
-                    match.score_breakdown[color].get("teleopCoralCount", 0),
-                    match.score_breakdown[color].get("wallAlgaeCount", 0),
-                    match.score_breakdown[color].get("netAlgaeCount", 0),
+                    alliance_breakdown(match, color).get("autoCoralCount", 0),
+                    alliance_breakdown(match, color).get("teleopCoralCount", 0),
+                    alliance_breakdown(match, color).get("wallAlgaeCount", 0),
+                    alliance_breakdown(match, color).get("netAlgaeCount", 0),
                 ]
             ),
         }

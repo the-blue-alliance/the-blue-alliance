@@ -6,6 +6,7 @@ from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.frc_api.types import ScoreDetailModelAlliance2026
 from backend.common.game_specific.base import (
+    alliance_breakdown,
     per_robot_points,
     PredictionStatConfig,
     RobotPointsAccessor,
@@ -44,33 +45,33 @@ class GameSpecifics2026(
         self, red: Dict[str, Any], blue: Dict[str, Any]
     ) -> Optional[AllianceColor]:
         # Compare total auto points
-        if red.get("totalAutoPoints") > blue.get("totalAutoPoints"):
+        if red["totalAutoPoints"] > blue["totalAutoPoints"]:
             return AllianceColor.RED
-        if blue.get("totalAutoPoints") > red.get("totalAutoPoints"):
+        if blue["totalAutoPoints"] > red["totalAutoPoints"]:
             return AllianceColor.BLUE
 
         # Auto tied: compare shift 1
-        if red.get("hubScore").get("shift1Count") > 0:
+        if red["hubScore"]["shift1Count"] > 0:
             return AllianceColor.BLUE
-        if blue.get("hubScore").get("shift1Count") > 0:
+        if blue["hubScore"]["shift1Count"] > 0:
             return AllianceColor.RED
 
         # No scoring in shift 1: compare shift 2
-        if red.get("hubScore").get("shift2Count") > 0:
+        if red["hubScore"]["shift2Count"] > 0:
             return AllianceColor.RED
-        if blue.get("hubScore").get("shift2Count") > 0:
+        if blue["hubScore"]["shift2Count"] > 0:
             return AllianceColor.BLUE
 
         # No scoring in shift 2: compare shift 3
-        if red.get("hubScore").get("shift3Count") > 0:
+        if red["hubScore"]["shift3Count"] > 0:
             return AllianceColor.BLUE
-        if blue.get("hubScore").get("shift3Count") > 0:
+        if blue["hubScore"]["shift3Count"] > 0:
             return AllianceColor.RED
 
         # No scoring in shift 3: compare shift 4
-        if red.get("hubScore").get("shift4Count") > 0:
+        if red["hubScore"]["shift4Count"] > 0:
             return AllianceColor.RED
-        if blue.get("hubScore").get("shift4Count") > 0:
+        if blue["hubScore"]["shift4Count"] > 0:
             return AllianceColor.BLUE
 
         # Fully tied
@@ -222,11 +223,11 @@ class GameSpecifics2026(
 
             auto_climb_count += _count_auto_climb(match)[0]
 
-            auto_fuel_scored += red_sb.get("hubScore").get("autoCount")
-            auto_fuel_scored += blue_sb.get("hubScore").get("autoCount")
+            auto_fuel_scored += red_sb["hubScore"]["autoCount"]
+            auto_fuel_scored += blue_sb["hubScore"]["autoCount"]
 
-            teleop_fuel_scored += red_sb.get("hubScore").get("teleopCount")
-            teleop_fuel_scored += blue_sb.get("hubScore").get("teleopCount")
+            teleop_fuel_scored += red_sb["hubScore"]["teleopCount"]
+            teleop_fuel_scored += blue_sb["hubScore"]["teleopCount"]
 
             total_fuel_scored = auto_fuel_scored + teleop_fuel_scored
 
@@ -347,44 +348,66 @@ class GameSpecifics2026(
     def get_manual_coprs(self) -> Dict[str, StatAccessor]:
         return {
             "Hub Auto Fuel Count": lambda match, color: (
-                match.score_breakdown[color].get("hubScore", {}).get("autoCount", 0)
+                alliance_breakdown(match, color).get("hubScore", {}).get("autoCount", 0)
             ),
             "Hub Teleop Fuel Count": lambda match, color: (
-                match.score_breakdown[color].get("hubScore", {}).get("teleopCount", 0)
+                alliance_breakdown(match, color)
+                .get("hubScore", {})
+                .get("teleopCount", 0)
             ),
             "Hub Endgame Fuel Count": lambda match, color: (
-                match.score_breakdown[color].get("hubScore", {}).get("endgameCount", 0)
+                alliance_breakdown(match, color)
+                .get("hubScore", {})
+                .get("endgameCount", 0)
             ),
             "Hub Total Fuel Count": lambda match, color: (
-                match.score_breakdown[color].get("hubScore", {}).get("totalCount", 0)
+                alliance_breakdown(match, color)
+                .get("hubScore", {})
+                .get("totalCount", 0)
             ),
             "Hub Transition Fuel Count": lambda match, color: (
-                match.score_breakdown[color]
+                alliance_breakdown(match, color)
                 .get("hubScore", {})
                 .get("transitionCount", 0)
             ),
             "Hub Shift 1 Fuel Count": lambda match, color: (
-                match.score_breakdown[color].get("hubScore", {}).get("shift1Count", 0)
+                alliance_breakdown(match, color)
+                .get("hubScore", {})
+                .get("shift1Count", 0)
             ),
             "Hub Shift 2 Fuel Count": lambda match, color: (
-                match.score_breakdown[color].get("hubScore", {}).get("shift2Count", 0)
+                alliance_breakdown(match, color)
+                .get("hubScore", {})
+                .get("shift2Count", 0)
             ),
             "Hub Shift 3 Fuel Count": lambda match, color: (
-                match.score_breakdown[color].get("hubScore", {}).get("shift3Count", 0)
+                alliance_breakdown(match, color)
+                .get("hubScore", {})
+                .get("shift3Count", 0)
             ),
             "Hub Shift 4 Fuel Count": lambda match, color: (
-                match.score_breakdown[color].get("hubScore", {}).get("shift4Count", 0)
+                alliance_breakdown(match, color)
+                .get("hubScore", {})
+                .get("shift4Count", 0)
             ),
             "Hub First Active Shift Count": lambda match, color: (
-                match.score_breakdown[color].get("hubScore", {}).get("shift1Count", 0)
-                + match.score_breakdown[color].get("hubScore", {}).get("shift2Count", 0)
+                alliance_breakdown(match, color)
+                .get("hubScore", {})
+                .get("shift1Count", 0)
+                + alliance_breakdown(match, color)
+                .get("hubScore", {})
+                .get("shift2Count", 0)
             ),
             "Hub Second Active Shift Count": lambda match, color: (
-                match.score_breakdown[color].get("hubScore", {}).get("shift3Count", 0)
-                + match.score_breakdown[color].get("hubScore", {}).get("shift4Count", 0)
+                alliance_breakdown(match, color)
+                .get("hubScore", {})
+                .get("shift3Count", 0)
+                + alliance_breakdown(match, color)
+                .get("hubScore", {})
+                .get("shift4Count", 0)
             ),
             "Hub Uncounted": lambda match, color: (
-                match.score_breakdown[color].get("hubScore", {}).get("uncounted", 0)
+                alliance_breakdown(match, color).get("hubScore", {}).get("uncounted", 0)
             ),
         }
 
