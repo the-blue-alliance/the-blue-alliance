@@ -94,7 +94,7 @@
     "json-schema-to-ts": "3.1.1",
     "lighthouse": "13.6.0",
     "oxc-transform-react": "0.157.0",
-    "oxlint": "1.91.0",
+    "oxlint": "1.92.0",
     "oxlint-tailwindcss": "1.17.1",
     "oxlint-tsgolint": "7.0.2006",
     "pino-pretty": "13.2.0",
