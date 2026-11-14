@@ -4,7 +4,6 @@ from typing import List, Optional
 
 import numpy as np
 import pytz
-import six
 from pyre_extensions import none_throws
 
 from backend.common import storage
@@ -303,5 +302,5 @@ class MatchTimePredictionHelper:
         log_file = "{}.txt".format(event_key)
         full_path = log_dir + log_file
 
-        existing_contents = six.ensure_str(storage.read(full_path) or b"")
-        storage.write(full_path, six.ensure_binary(existing_contents + to_log))
+        existing_contents = (storage.read(full_path) or b"").decode()
+        storage.write(full_path, (existing_contents + to_log).encode())
