@@ -65,3 +65,18 @@ $ git apply stubs/patch/*.patch
 ## `web` development
 
 If you are working on web (front-end), you should make sure to read the [[web|web]] documentation.
+
+## Firebase Realtime Database rules
+
+`database.rules.json` at the repo root is the source of truth for the production Realtime Database
+(`tbatv-prod-hrd`) security rules; `firebase.json` points the Firebase CLI at it. Every path is
+public-read with no client writes; the backend writes through the Admin SDK, which bypasses rules.
+
+Changes merged to `main` are deployed by the `deploy-firebase-rules` job in
+`.github/workflows/push.yml`. To deploy by hand (needs a Firebase-enabled login):
+
+```
+firebase deploy --only database --project tbatv-prod-hrd
+```
+
+The local emulator config lives in `ops/dev/firebase/` and runs without rules.
