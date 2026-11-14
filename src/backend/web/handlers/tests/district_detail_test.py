@@ -147,6 +147,28 @@ def test_district_details_render_events(web_client: Client, ndb_stub) -> None:
     ]
 
 
+def test_district_details_week_nav_only_on_events_tab(
+    web_client: Client, ndb_stub
+) -> None:
+    helpers.preseed_district("2020ne")
+
+    resp = web_client.get("/events/ne/2020")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    week_nav = soup.find(id="district-week-nav")
+    assert week_nav is not None
+    assert [a["href"] for a in week_nav.find_all("a")] == [
+        "#week-1",
+        "#week-2",
+        "#week-3",
+        "#week-4",
+    ]
+    scripts = "".join(s.get_text() for s in soup.find_all("script"))
+    assert "$('#district-week-nav').toggle(" in scripts
+    assert "=== '#events'" in scripts
+
+
 @freeze_time("2019-03-09")
 def test_district_details_render_active_teams(
     web_client: Client, ndb_stub, setup_full_event
