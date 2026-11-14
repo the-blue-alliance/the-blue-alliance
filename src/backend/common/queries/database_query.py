@@ -10,7 +10,9 @@ from contextvars import ContextVar
 from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
 
 import orjson
+from google.appengine.api import datastore_errors
 from google.appengine.ext import ndb
+from google.appengine.runtime import apiproxy_errors
 from pyre_extensions import none_throws
 
 from backend.common.consts.api_version import ApiMajorVersion
@@ -46,6 +48,16 @@ def track_accessed_query_cache_keys() -> Generator[Dict[str, str], None, None]:
         yield keys
     finally:
         accessed_query_cache_keys_ctx.reset(token)
+
+
+def _is_too_large_to_cache(e: Exception) -> bool:
+    # Prod Datastore: BadRequestError 'The value of property "result" is longer than 1048487 bytes.'
+    # The local API stub rejects the whole Put RPC as RequestTooLargeError instead.
+    if isinstance(e, apiproxy_errors.RequestTooLargeError):
+        return True
+    return isinstance(e, datastore_errors.BadRequestError) and "is longer than" in str(
+        e
+    )
 
 
 class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
@@ -210,6 +222,22 @@ class CachedDatabaseQuery(
             None,
         )
 
+    def _log_cache_write_failure(
+        self, cache_key: str, cqr: CachedQueryResult, e: Exception
+    ) -> None:
+        if _is_too_large_to_cache(e):
+            # Expected for very large results: serve uncached, no traceback.
+            logging.warning(
+                "Query result too large to cache; skipping write. "
+                "cache_key=%s query=%s size_bytes=%d",
+                cache_key,
+                self.__class__.__name__,
+                cqr.stored_size_bytes(),
+            )
+            return
+        logging.warning(f"CachedQueryResult.put_async() failed: {cache_key}")
+        logging.exception(e)
+
     @ndb.tasklet
     def _do_query(self, *args, **kwargs) -> Generator[Any, Any, QueryReturn]:
         cache_key = self.cache_key
@@ -242,16 +270,12 @@ class CachedDatabaseQuery(
                 with Span(f"{self.__class__.__name__}._query_async"):
                     query_result = yield self._query_async(*args, **kwargs)
                 if self.CACHE_WRITES_ENABLED:
+                    cqr = CachedQueryResult(id=cache_key, result=query_result)
                     try:
                         with Span("query.async_cache_write"):
-                            yield CachedQueryResult(
-                                id=cache_key, result=query_result
-                            ).put_async()
+                            yield cqr.put_async()
                     except Exception as e:
-                        logging.warning(
-                            f"CachedQueryResult.put_async() failed: {cache_key}"
-                        )
-                        logging.exception(e)
+                        self._log_cache_write_failure(cache_key, cqr, e)
                 self._record_accessed_cache_key(cache_key, query_result)
                 return query_result
 
@@ -299,17 +323,12 @@ class CachedDatabaseQuery(
 
                 cqr = None
                 if self.CACHE_WRITES_ENABLED:
+                    cqr = CachedQueryResult(id=cache_key, result_dict=converted_result)
                     try:
                         with Span("query.async_cache_write"):
-                            cqr = CachedQueryResult(
-                                id=cache_key, result_dict=converted_result
-                            )
                             yield cqr.put_async()
                     except Exception as e:
-                        logging.warning(
-                            f"CachedQueryResult.put_async() failed: {cache_key}"
-                        )
-                        logging.exception(e)
+                        self._log_cache_write_failure(cache_key, cqr, e)
 
                 if converted_result is None:
                     self._record_accessed_cache_key(cache_key, None)
@@ -392,17 +411,12 @@ class CachedDatabaseQuery(
 
                 cqr = None
                 if self.DICT_CACHING_ENABLED and self.CACHE_WRITES_ENABLED:
+                    cqr = CachedQueryResult(id=cache_key, result_dict=converted_result)
                     try:
                         with Span("query.async_cache_write"):
-                            cqr = CachedQueryResult(
-                                id=cache_key, result_dict=converted_result
-                            )
                             yield cqr.put_async()
                     except Exception as e:
-                        logging.warning(
-                            f"CachedQueryResult.put_async() failed: {cache_key}"
-                        )
-                        logging.exception(e)
+                        self._log_cache_write_failure(cache_key, cqr, e)
 
                 if converted_result is None:
                     self._record_accessed_cache_key(cache_key, None)
