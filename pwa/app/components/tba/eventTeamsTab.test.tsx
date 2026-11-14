@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
@@ -6,6 +7,7 @@ import type {
   Event,
   Match,
   Media,
+  NexusPitMap,
   Team,
   TeamEventStatus,
 } from '~/api/tba/read';
@@ -26,6 +28,37 @@ vi.mock('@tanstack/react-router', () => ({
       {children}
     </a>
   ),
+}));
+
+const relatedEvents: Record<
+  string,
+  {
+    pitMap: NexusPitMap;
+    statuses: Record<string, Partial<TeamEventStatus>>;
+  }
+> = {};
+
+vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
+  getEventNexusInfoOptions: ({ path }: { path: { event_key: string } }) => ({
+    queryKey: ['nexus', path.event_key],
+    queryFn: () =>
+      Promise.resolve({ pit_map: relatedEvents[path.event_key].pitMap }),
+  }),
+  getEventTeamsStatusesOptions: ({
+    path,
+  }: {
+    path: { event_key: string };
+  }) => ({
+    queryKey: ['statuses', path.event_key],
+    queryFn: () => Promise.resolve(relatedEvents[path.event_key].statuses),
+  }),
+}));
+
+vi.mock('~/api/colors/@tanstack/react-query.gen', () => ({
+  getEventColorsOptions: ({ path }: { path: { eventKey: string } }) => ({
+    queryKey: ['colors', path.eventKey],
+    queryFn: () => Promise.resolve({ teams: {} }),
+  }),
 }));
 
 vi.mock('~/components/tba/eventRankTooltip', () => ({
@@ -99,16 +132,43 @@ const avatar: Media = {
   details: { base64Image: 'AAAA' },
 };
 
+const pitMap: NexusPitMap = {
+  size: { x: 200, y: 100 },
+  pits: {
+    A1: {
+      position: { x: 50, y: 50 },
+      size: { x: 100, y: 100 },
+      team_key: null,
+    },
+    A2: {
+      position: { x: 150, y: 50 },
+      size: { x: 100, y: 100 },
+      team_key: null,
+    },
+  },
+  areas: {},
+  labels: {},
+  arrows: {},
+  walls: {},
+};
+
 function renderTeams(props: Partial<Parameters<typeof EventTeamsTab>[0]> = {}) {
   return render(
-    <EventTeamsTab
-      event={event}
-      teams={[otherTeam, team]}
-      matches={[]}
-      media={[]}
-      {...props}
-    />,
+    <QueryClientProvider client={new QueryClient()}>
+      <EventTeamsTab
+        event={event}
+        teams={[otherTeam, team]}
+        matches={[]}
+        media={[]}
+        {...props}
+      />
+    </QueryClientProvider>,
   );
+}
+
+async function openPitMap() {
+  fireEvent.click(screen.getByRole('button', { name: 'Pit map' }));
+  return screen.findByRole('group', { name: 'Pit map' });
 }
 
 describe('EventTeamsTab', () => {
@@ -354,6 +414,95 @@ describe('EventTeamsTab', () => {
         .getByRole('img', { name: 'Team 254 robot' })
         .getAttribute('src'),
     ).toBe('https://example.com/robot.png');
+  });
+
+  describe('pit map', () => {
+    test('offers the pit map when the event has one', () => {
+      renderTeams({ pitMap });
+      expect(screen.getByRole('button', { name: 'Pit map' })).toBeTruthy();
+    });
+
+    test('hides the pit map button without a pit map', () => {
+      renderTeams();
+      expect(screen.queryByRole('button', { name: 'Pit map' })).toBeNull();
+    });
+
+    test('opens the pit map in a dialog', async () => {
+      renderTeams({ pitMap });
+      const map = await openPitMap();
+      expect(within(screen.getByRole('dialog')).getByRole('group')).toBe(map);
+    });
+
+    test('labels pits with the teams assigned to them', async () => {
+      renderTeams({
+        pitMap,
+        statuses: {
+          frc254: { pit_location: 'A1' },
+          frc604: { pit_location: 'A2' },
+        },
+      });
+      const map = await openPitMap();
+      expect(
+        within(map)
+          .getAllByRole('link')
+          .map((link) => link.textContent),
+      ).toEqual(['254', '604']);
+    });
+
+    test('leaves pits unlabeled when a team pit is not on the map', async () => {
+      renderTeams({
+        pitMap,
+        statuses: {
+          frc254: { pit_location: 'A1' },
+          frc604: { pit_location: 'C33' },
+        },
+      });
+      const map = await openPitMap();
+      expect(within(map).queryAllByRole('link')).toEqual([]);
+    });
+
+    test('labels pits with teams from a related event on the same map', async () => {
+      relatedEvents['2024casj2'] = {
+        pitMap,
+        statuses: { frc1678: { pit_location: 'A2' } },
+      };
+      renderTeams({ pitMap, relatedEventKeys: ['2024casj2'] });
+      const map = await openPitMap();
+      expect(
+        await within(map).findByRole('link', { name: '1678' }),
+      ).toBeTruthy();
+    });
+
+    test('ignores teams from a related event whose map places pits elsewhere', async () => {
+      relatedEvents['2024casj2'] = {
+        pitMap,
+        statuses: { frc1678: { pit_location: 'A2' } },
+      };
+      relatedEvents['2024casj3'] = {
+        pitMap: {
+          ...pitMap,
+          pits: {
+            ...pitMap.pits,
+            A2: { ...pitMap.pits.A2, position: { x: 150, y: 150 } },
+          },
+        },
+        statuses: { frc971: { pit_location: 'A1' } },
+      };
+      renderTeams({ pitMap, relatedEventKeys: ['2024casj2', '2024casj3'] });
+      const map = await openPitMap();
+      await within(map).findByRole('link', { name: '1678' });
+      expect(within(map).queryByRole('link', { name: '971' })).toBeNull();
+    });
+
+    test('links to the event map on Nexus', async () => {
+      renderTeams({ pitMap });
+      await openPitMap();
+      expect(
+        screen
+          .getByRole('link', { name: 'Pit map data from frc.nexus' })
+          .getAttribute('href'),
+      ).toBe('https://frc.nexus/en/event/2024casj/map');
+    });
   });
 
   describe('with remapped teams', () => {

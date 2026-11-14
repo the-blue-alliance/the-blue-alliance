@@ -50,6 +50,7 @@ test('shows a team count placeholder while event teams are loading', async ({
   ['component OPRs', '/coprs'],
   ['team media', '/team_media'],
   ['team statuses', '/teams/statuses'],
+  ['team colors', 'api.frc-colors.com'],
 ].forEach(([name, path]) => {
   test(`does not request ${name} on page load`, async ({ page }) => {
     const requestUrls: string[] = [];
@@ -664,6 +665,58 @@ test.describe('event teams directory', () => {
 
     expect(label.x + label.width).toBeLessThanOrEqual(link.x);
   });
+});
+
+test.describe('/event/2026miliv pit map', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/event/2026miliv#teams');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  test('requests team colors when the pit map opens', async ({ page }) => {
+    const colorsRequest = page.waitForRequest((request) =>
+      request.url().includes('api.frc-colors.com'),
+    );
+
+    await page.getByRole('button', { name: 'Pit map' }).click();
+
+    expect((await colorsRequest).url()).toContain('/v1/event/2026miliv');
+  });
+
+  ['', ' mobile'].forEach((viewport) => {
+    test(`shows the pit map from the Teams tab${viewport}`, async ({
+      page,
+    }) => {
+      await page.getByRole('button', { name: 'Pit map' }).click();
+
+      await expect(page.getByRole('group', { name: 'Pit map' })).toBeVisible();
+    });
+  });
+
+  test('links a pit team number to the team page', async ({ page }) => {
+    await page.getByRole('button', { name: 'Pit map' }).click();
+
+    await expect(
+      page
+        .getByRole('group', { name: 'Pit map' })
+        .getByRole('link', { name: '3414', exact: true }),
+    ).toHaveAttribute('href', '/team/3414/2026');
+  });
+});
+
+test('labels the pit map with teams from the sibling division', async ({
+  page,
+}) => {
+  await page.goto('/event/2026necmp1#teams');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await page.getByRole('button', { name: 'Pit map' }).click();
+
+  await expect(
+    page
+      .getByRole('group', { name: 'Pit map' })
+      .getByRole('link', { name: '1071', exact: true }),
+  ).toBeVisible();
 });
 
 test('shows historical teams without avatars', async ({ page }) => {
