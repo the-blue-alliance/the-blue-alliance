@@ -2,7 +2,7 @@ import datetime
 from unittest.mock import ANY, Mock, patch
 
 from firebase_admin import auth
-from flask import Flask, session
+from flask import Flask, g, session
 
 import backend.common.auth as backend_auth
 from backend.common.auth import (
@@ -11,6 +11,7 @@ from backend.common.auth import (
     create_session_cookie,
     current_user,
     delete_user,
+    is_signed_in_session,
     revoke_session_cookie,
     verify_id_token,
 )
@@ -101,6 +102,30 @@ def test_decoded_claims_throw_error(secret_app: Flask) -> None:
         ) as mock_verify_session_cookie:
             assert _decoded_claims() is None
         mock_verify_session_cookie.assert_called_once()
+        # Invalid cookies are dropped so the user reads as signed out
+        assert "session" not in session
+        assert g.get(backend_auth.SESSION_AUTH_CHANGED) is True
+
+
+def test_decoded_claims_transient_error_keeps_session(secret_app: Flask) -> None:
+    with secret_app.test_request_context("/"):
+        session["session"] = "abc"
+
+        with patch.object(
+            auth,
+            "verify_session_cookie",
+            side_effect=auth.CertificateFetchError("", None),
+        ):
+            assert _decoded_claims() is None
+        assert session["session"] == "abc"
+        assert g.get(backend_auth.SESSION_AUTH_CHANGED) is None
+
+
+def test_is_signed_in_session(secret_app: Flask) -> None:
+    with secret_app.test_request_context("/"):
+        assert is_signed_in_session() is False
+        session["session"] = "abc"
+        assert is_signed_in_session() is True
 
 
 def test_decoded_claims(secret_app: Flask) -> None:

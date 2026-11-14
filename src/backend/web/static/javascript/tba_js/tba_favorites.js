@@ -1,4 +1,6 @@
 var favoriteTeamsCookieName = "tba-favorite-teams";
+// Set by the server while this browser has a signed-in session
+var signedInCookieName = "tba-signed-in";
 var cachedCsrfToken = null;
 
 function withCsrfToken(success, error) {
@@ -70,6 +72,10 @@ function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken, isCsrfRetry)
         }
       });
     }
+  } else if (!isSignedIn()) {
+    // Drop the previous session's cache so the next sign-in refetches
+    $.removeCookie(favoriteTeamsCookieName, {path: '/'});
+    updatePageFavoriteTeams({}, skipDelay);
   } else {
     if (storedFavoriteTeams == null) {
       $.ajax({
@@ -118,6 +124,10 @@ function handleFavoriteError(xhr, teamKey, action, isCsrfRetry) {
     showFavoriteError(action);
   }
   updateFavoriteTeams(null, null, false);
+}
+
+function isSignedIn() {
+  return $.cookie(signedInCookieName) != null;
 }
 
 function getLocalFavoriteTeams() {
