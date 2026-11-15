@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 import MenuIcon from '~icons/lucide/menu';
 import XIcon from '~icons/lucide/x';
 
+import { MobileMenuSponsorCredit } from '~/components/tba/navigation/sponsorCredits';
 import {
   NavigationMenuContent,
   NavigationMenuItem,
@@ -38,6 +39,9 @@ export function MobileMenu() {
             </Link>
           ))}
         </ul>
+        <MobileMenuSponsorCredit
+          animationDelayMs={NAV_ITEMS_LIST.length * 50}
+        />
       </NavigationMenuContent>
     </NavigationMenuItem>
   );

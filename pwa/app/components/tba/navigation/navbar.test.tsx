@@ -50,6 +50,10 @@ vi.mock('~/components/tba/navigation/searchModal', () => ({
   SearchModal: () => <li>Search modal</li>,
 }));
 
+vi.mock('~/components/tba/navigation/sponsorCredits', () => ({
+  MobileMenuSponsorCredit: () => null,
+}));
+
 vi.mock('~/components/tba/navigation/profileMenu', () => ({
   ProfileMenu: () => <li>Profile menu</li>,
 }));

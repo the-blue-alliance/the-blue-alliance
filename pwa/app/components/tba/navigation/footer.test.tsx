@@ -21,6 +21,10 @@ vi.mock('@tanstack/react-router', () => ({
   ),
 }));
 
+vi.mock('~/components/tba/navigation/sponsorCredits', () => ({
+  FooterSponsorCredit: () => <span>Sponsor credit</span>,
+}));
+
 describe('Footer', () => {
   test('links to internal pages and external sites', () => {
     render(<Footer />);
@@ -45,7 +49,12 @@ describe('Footer', () => {
     ).toBe('/brand');
     // A separator between each of the eleven links.
     expect(screen.getAllByText('/')).toHaveLength(10);
-    expect(screen.getByAltText('AndyMark')).toBeTruthy();
+  });
+
+  test('shows the sponsor credit', () => {
+    render(<Footer />);
+
+    expect(screen.getByText('Sponsor credit')).toBeTruthy();
   });
 
   test('shows the render time and commit after hydration', () => {
@@ -55,9 +64,9 @@ describe('Footer', () => {
 
     render(<Footer />);
 
-    const credit = screen.getByText(/Data provided by the/);
-    expect(credit.textContent).toContain(
-      '. Generated on Apr 23, 2026, 4:05 PM',
+    const credit = screen.getByText(/Data from/);
+    expect(credit.textContent).toMatch(
+      /^Data from FIRST® Events API\. Generated Apr 23, 2026, 4:05 PM\. Commit: \S+\.$/,
     );
     const commit = credit.querySelector('a[href*="/commit/"]');
     expect(commit?.getAttribute('href')).toBe(
@@ -68,6 +77,6 @@ describe('Footer', () => {
   test('omits the render time on the server', () => {
     const html = renderToString(<Footer />);
 
-    expect(html).not.toContain('Generated on');
+    expect(html).not.toContain('Generated');
   });
 });
