@@ -683,13 +683,17 @@ class PlayoffAdvancementHelper:
         cls,
         event: Event,
         playoff_advancement: Optional[TPlayoffAdvancement],
-        bracket_table: TBracketTable,
+        bracket_table: Optional[TBracketTable],
     ) -> List[ApiPlayoffAdvancement]:
         output: List[ApiPlayoffAdvancement] = []
+        if bracket_table is None:
+            bracket_table = {}
 
         if event.playoff_type == PlayoffType.AVG_SCORE_8_TEAM:
             bracket_levels_to_include = [CompLevel.F]
-            advancement2015 = cast(TPlayoffAdvancement2015Levels, playoff_advancement)
+            advancement2015 = cast(
+                TPlayoffAdvancement2015Levels, playoff_advancement or {}
+            )
             for level in ELIM_LEVELS:
                 if not advancement2015.get(level):
                     continue
@@ -702,31 +706,33 @@ class PlayoffAdvancementHelper:
                 )
         elif event.playoff_type == PlayoffType.ROUND_ROBIN_6_TEAM:
             bracket_levels_to_include = [CompLevel.F]
-            output.extend(
-                cls.transform_round_robin_advancement_level_for_apiv3(
-                    event,
-                    cast(PlayoffAdvancementRoundRobinLevels, playoff_advancement),
+            if playoff_advancement:
+                output.extend(
+                    cls.transform_round_robin_advancement_level_for_apiv3(
+                        event,
+                        cast(PlayoffAdvancementRoundRobinLevels, playoff_advancement),
+                    )
                 )
-            )
         elif event.playoff_type in [
             PlayoffType.DOUBLE_ELIM_4_TEAM,
             PlayoffType.DOUBLE_ELIM_8_TEAM,
         ]:
             bracket_levels_to_include = [CompLevel.F]
-            double_elim_advancement = cast(
-                PlayoffAdvancementDoubleElimLevels, playoff_advancement
-            )
-            for round in ORDERED_DOUBLE_ELIM_ROUNDS:
-                if round not in double_elim_advancement["rounds"]:
-                    continue
-
-                output.extend(
-                    cls.transform_double_elim_advancement_level_for_apiv3(
-                        event,
-                        double_elim_advancement,
-                        round,
-                    )
+            if playoff_advancement:
+                double_elim_advancement = cast(
+                    PlayoffAdvancementDoubleElimLevels, playoff_advancement
                 )
+                for round in ORDERED_DOUBLE_ELIM_ROUNDS:
+                    if round not in double_elim_advancement["rounds"]:
+                        continue
+
+                    output.extend(
+                        cls.transform_double_elim_advancement_level_for_apiv3(
+                            event,
+                            double_elim_advancement,
+                            round,
+                        )
+                    )
         else:
             bracket_levels_to_include = ELIM_LEVELS
 
