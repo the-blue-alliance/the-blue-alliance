@@ -47,7 +47,7 @@
     "culori": "4.0.2",
     "express": "5.3.0",
     "firebase": "13.2.0",
-    "isbot": "5.2.2",
+    "isbot": "5.2.3",
     "lodash-es": "4.18.1",
     "lru-cache": "11.5.3",
     "minisearch": "7.2.0",
