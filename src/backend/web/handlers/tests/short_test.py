@@ -58,3 +58,15 @@ def test_short_event_key_unknown_abbreviation_goes_to_event(
     resp = web_client.get("/2024xyz")
     assert resp.status_code == 301
     assert resp.headers["Location"] == "/event/2024xyz"
+
+
+def test_short_team_frc_prefix(web_client: Client) -> None:
+    resp = web_client.get("/frc254")
+    assert resp.status_code == 301
+    assert resp.headers["Location"] == "/team/254"
+
+
+def test_short_team_frc_prefix_leading_zeros(web_client: Client) -> None:
+    resp = web_client.get("/frc00254")
+    assert resp.status_code == 301
+    assert resp.headers["Location"] == "/team/254"
