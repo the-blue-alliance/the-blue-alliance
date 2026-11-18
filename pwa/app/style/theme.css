@@ -43,6 +43,7 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
   --color-brand: var(--brand);
+  --color-brand-accent: var(--brand-accent);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -114,6 +115,7 @@
   );
   /* The TBA brand indigo, pinned across themes for brand surfaces (navbar) */
   --brand: oklch(0.4782 0.1589 271.4);
+  --brand-accent: oklch(0.8848 0.1816 94.9);
   --secondary: light-dark(
     oklch(0.967 0.001 286.375),
     oklch(0.356 0.006 286.09)

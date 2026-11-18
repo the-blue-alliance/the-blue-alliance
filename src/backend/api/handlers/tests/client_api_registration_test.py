@@ -484,15 +484,7 @@ def test_register_fid_for_non_fcm_platform(
     """A FID on a platform that's never sent to must not replace the install's
     FCM token."""
     account_key = none_throws(mock_clientapi_auth.account_key)
-    token = f"{FID}:APA91bOld"
-    MobileClient(
-        parent=account_key,
-        user_id=str(account_key.id()),
-        messaging_id=token,
-        client_type=ClientType.OS_IOS,
-        device_uuid="asdf",
-        display_name="iPhone",
-    ).put()
+    token = _put_client(account_key, f"{FID}:APA91bOld")
 
     req = RegistrationRequest(
         operating_system="web",
@@ -504,21 +496,12 @@ def test_register_fid_for_non_fcm_platform(
     resp = make_clientapi_request(api_client, "/register", req)
     assert resp["code"] == 400
     assert resp["message"] == "mobile_id_type fid isn't supported for web"
-
-    clients = MobileClient.query(ancestor=account_key).fetch()
-    assert [client.messaging_id for client in clients] == [token]
+    assert _remaining_keys() == {token}
 
 
 def test_register_existing_fid(api_client: Client, mock_clientapi_auth: User) -> None:
-    MobileClient(
-        parent=mock_clientapi_auth.account_key,
-        user_id=str(none_throws(mock_clientapi_auth.account_key).id()),
-        messaging_id=FID,
-        messaging_id_type=MessagingIdType.FID,
-        client_type=ClientType.OS_IOS,
-        device_uuid="asdf",
-        display_name="iPhone",
-    ).put()
+    account_key = none_throws(mock_clientapi_auth.account_key)
+    _put_client(account_key, FID, MessagingIdType.FID)
 
     req = RegistrationRequest(
         operating_system="ios",
@@ -530,9 +513,7 @@ def test_register_existing_fid(api_client: Client, mock_clientapi_auth: User) ->
     resp = make_clientapi_request(api_client, "/register", req)
     assert resp["code"] == 304
 
-    user_clients = MobileClient.query(
-        MobileClient.user_id == str(none_throws(mock_clientapi_auth.account_key).id())
-    ).fetch()
+    user_clients = MobileClient.query(ancestor=account_key).fetch()
     assert len(user_clients) == 1
     assert user_clients[0].messaging_id_type == MessagingIdType.FID
 
@@ -576,15 +557,7 @@ def test_register_fid_keeps_token_when_write_fails(
     """The replaced token is only deleted once the FID is stored, so a failed
     write leaves the device registered."""
     account_key = none_throws(mock_clientapi_auth.account_key)
-    token = f"{FID}:APA91bOld"
-    MobileClient(
-        parent=account_key,
-        user_id=str(account_key.id()),
-        messaging_id=token,
-        client_type=ClientType.OS_IOS,
-        device_uuid="asdf",
-        display_name="iPhone",
-    ).put()
+    token = _put_client(account_key, f"{FID}:APA91bOld")
 
     req = RegistrationRequest(
         operating_system="ios",
@@ -596,9 +569,7 @@ def test_register_fid_keeps_token_when_write_fails(
     with patch.object(MobileClient, "put", side_effect=RuntimeError("write failed")):
         resp = api_client.post("/clientapi/tbaClient/v9/register", data=json.dumps(req))
     assert resp.status_code == 500
-
-    clients = MobileClient.query(ancestor=account_key).fetch()
-    assert [client.messaging_id for client in clients] == [token]
+    assert _remaining_keys() == {token}
 
 
 def test_register_token_keeps_other_tokens(
@@ -606,14 +577,7 @@ def test_register_token_keeps_other_tokens(
 ) -> None:
     """Only FID registrations replace tokens; a token registration never deletes."""
     account_key = none_throws(mock_clientapi_auth.account_key)
-    MobileClient(
-        parent=account_key,
-        user_id=str(account_key.id()),
-        messaging_id=f"{FID}:APA91bOld",
-        client_type=ClientType.OS_IOS,
-        device_uuid="asdf",
-        display_name="iPhone",
-    ).put()
+    _put_client(account_key, f"{FID}:APA91bOld")
 
     req = RegistrationRequest(
         operating_system="ios",

@@ -6,6 +6,8 @@ from pyre_extensions import none_throws
 from werkzeug.test import Client
 
 from backend.api.client_api_types import (
+    ApiWriteKeyRequestMessage,
+    ApiWriteKeyRequestResponse,
     EventMatchVideo,
     EventMatchVideosSuggestionMessage,
     EventMatchVideosSuggestionResponse,
@@ -20,6 +22,7 @@ from backend.api.client_api_types import (
     VideoPlaylistResponse,
 )
 from backend.api.handlers.tests.clientapi_test_helper import make_clientapi_request
+from backend.common.consts.auth_type import AuthType
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
@@ -629,3 +632,125 @@ def test_suggest_event_match_videos_skips_pending_suggestions(
     resp = _suggest_event_match_videos(api_client, videos)
 
     assert resp["num_added"] == 0
+
+
+def _put_offseason_event() -> None:
+    Event(
+        id="2016cthar",
+        year=2016,
+        event_short="cthar",
+        event_type_enum=EventType.OFFSEASON,
+    ).put()
+
+
+def _request_api_write_key(
+    api_client: Client,
+    event_key: str = "2016cthar",
+    affiliation: str = "Scorekeeper",
+    auth_types: list[int] = [int(AuthType.MATCH_VIDEO), int(AuthType.EVENT_TEAMS)],
+) -> ApiWriteKeyRequestResponse:
+    req = ApiWriteKeyRequestMessage(
+        event_key=event_key, affiliation=affiliation, auth_types=auth_types
+    )
+    return make_clientapi_request(
+        api_client,
+        "/api_keys/write/request",
+        req,
+        ApiWriteKeyRequestResponse,
+    )
+
+
+def test_request_api_write_key_no_auth(api_client: Client) -> None:
+    resp = _request_api_write_key(api_client)
+
+    assert (resp["code"], resp["status"]) == (401, "unauthorized")
+
+
+def test_request_api_write_key_rejects_bad_event_key(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    resp = _request_api_write_key(api_client, event_key="bad-key")
+
+    assert (resp["code"], resp["status"]) == (404, "bad_event")
+
+
+def test_request_api_write_key_rejects_missing_event(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    resp = _request_api_write_key(api_client)
+
+    assert (resp["code"], resp["status"]) == (404, "bad_event")
+
+
+def test_request_api_write_key_requires_affiliation(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_offseason_event()
+
+    resp = _request_api_write_key(api_client, affiliation="   ")
+
+    assert (resp["code"], resp["status"]) == (400, "no_affiliation")
+
+
+def test_request_api_write_key_creates_pending_suggestion(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_offseason_event()
+
+    resp = _request_api_write_key(api_client, event_key=" 2016cthar ")
+
+    suggestion = none_throws(Suggestion.query().get())
+    assert (resp["code"], resp["status"], suggestion.contents) == (
+        200,
+        "success",
+        {
+            "event_key": "2016cthar",
+            "affiliation": "Scorekeeper",
+            "auth_types": [AuthType.MATCH_VIDEO, AuthType.EVENT_TEAMS],
+        },
+    )
+
+
+def test_request_api_write_key_keeps_only_match_video_for_season_event(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_event()
+
+    _request_api_write_key(api_client, event_key="2016nyny")
+
+    suggestion = none_throws(Suggestion.query().get())
+    assert suggestion.contents["auth_types"] == [AuthType.MATCH_VIDEO]
+
+
+def test_request_api_write_key_alerts_admins(
+    api_client: Client,
+    mock_clientapi_auth: User,
+    ndb_stub,
+    taskqueue_stub,
+    run_deferred_tasks,
+    sent_admin_alerts,
+) -> None:
+    _put_offseason_event()
+    _request_api_write_key(api_client)
+
+    run_deferred_tasks()
+
+    assert [subject for subject, _ in sent_admin_alerts] == [
+        "[TBA] Needs review: 2016cthar API write keys"
+    ]
+
+
+def test_request_api_write_key_does_not_alert_admins_on_failure(
+    api_client: Client,
+    mock_clientapi_auth: User,
+    ndb_stub,
+    taskqueue_stub,
+    run_deferred_tasks,
+    sent_admin_alerts,
+) -> None:
+    _put_offseason_event()
+    _request_api_write_key(api_client, affiliation="")
+
+    run_deferred_tasks()
+
+    assert sent_admin_alerts == []

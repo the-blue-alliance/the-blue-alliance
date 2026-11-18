@@ -116,6 +116,40 @@ describe('siteSearch', () => {
     expect(siteSearch(index, 'hawaii', SEASON)[0].key).toBe('2026hiho');
   });
 
+  test('ranks a future season directly after the current season', () => {
+    const index: SearchIndex = {
+      teams: [],
+      events: [
+        { key: '2025njfla', name: 'FMA District Mount Olive Event' },
+        { key: '2027njfla', name: 'FMA District Mount Olive Event' },
+        { key: '2026njfla', name: 'FMA District Mount Olive Event' },
+      ],
+    };
+
+    expect(siteSearch(index, 'mount olive', SEASON).map((r) => r.key)).toEqual([
+      '2026njfla',
+      '2027njfla',
+      '2025njfla',
+    ]);
+  });
+
+  test('includes a future season of an event with more than ten past seasons', () => {
+    const index: SearchIndex = {
+      teams: [],
+      events: [
+        2012, 2013, 2015, 2016, 2017, 2018, 2019, 2022, 2023, 2024, 2025, 2026,
+        2027,
+      ].map((year) => ({
+        key: `${year}njfla`,
+        name: 'FMA District Mount Olive Event',
+      })),
+    };
+
+    expect(
+      siteSearch(index, 'mount olive', SEASON).map((r) => r.key),
+    ).toContain('2027njfla');
+  });
+
   test('shows a future event that has no earlier seasons', () => {
     const index: SearchIndex = {
       teams: [],

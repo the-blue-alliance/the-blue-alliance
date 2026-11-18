@@ -1,4 +1,5 @@
 import json
+import uuid
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -7,9 +8,13 @@ from backend.api.client_api_auth_helper import ClientApiAuthHelper
 from backend.api.client_api_types import (
     AddApiReadKeyMessage,
     AddApiReadKeyResponse,
+    AddWebhookMessage,
+    AddWebhookResponse,
     ApiKeysResponse,
     ApiReadKeyMessage,
     ApiWriteKeyMessage,
+    ApiWriteKeyRequestMessage,
+    ApiWriteKeyRequestResponse,
     BaseResponse,
     DeleteApiReadKeyMessage,
     EventMatchVideosSuggestionMessage,
@@ -19,6 +24,7 @@ from backend.api.client_api_types import (
     FavoriteCollection,
     FavoriteMessage,
     ListDevicesResponse,
+    ListWebhooksResponse,
     MatchVideoSuggestionMessage,
     MatchVideoSuggestionResponse,
     MediaSuggestionMessage,
@@ -31,13 +37,18 @@ from backend.api.client_api_types import (
     TeamSocialMediaSuggestionMessage,
     TeamSocialMediaSuggestionResponse,
     UpdatePreferencesInternalResponse,
+    VerifyWebhookMessage,
     VideoPlaylistMessage,
     VideoPlaylistResponse,
     VoidRequest,
+    WebhookIdMessage,
+    WebhookMessage,
+    WebhookTestMessage,
 )
 from backend.api.handlers.decorators import client_api_method
 from backend.common.consts.auth_type import WRITE_TYPE_NAMES
 from backend.common.consts.client_type import (
+    ClientType,
     ENUMS as CLIENT_TYPE_MAP,
     FCM_CLIENTS,
     NAMES as CLIENT_TYPE_NAMES,
@@ -66,6 +77,7 @@ from backend.common.suggestions.suggestion_creator import (
     SuggestionCreationStatus,
     SuggestionCreator,
 )
+from backend.common.suggestions.suggestion_notifier import SuggestionNotifier
 
 
 def _parse_messaging_id_type(req: RegistrationRequest) -> MessagingIdType | None:
@@ -78,6 +90,15 @@ def _parse_messaging_id_type(req: RegistrationRequest) -> MessagingIdType | None
     if not isinstance(mobile_id_type, str):
         return None
     return MESSAGING_ID_TYPE_MAP.get(mobile_id_type)
+
+
+def _installation_token_keys(account_key: ndb.Key, fid: str) -> list[ndb.Key]:
+    """The account's FCM registration tokens for the app install `fid` identifies."""
+    return [
+        client.key
+        for client in MobileClient.query(ancestor=account_key).fetch()
+        if client.is_token_for_installation(fid)
+    ]
 
 
 @client_api_method(RegistrationRequest, BaseResponse)
@@ -108,8 +129,8 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
             message=f"mobile_id_type fid isn't supported for {req['operating_system']}",
         )
 
-    # Dedup on the FCM token (`messaging_id`): FCM guarantees it is unique per
-    # (app install, device), so the same token re-registering is the same client.
+    # Dedup on `messaging_id`: an FCM token or FID is unique per (app install,
+    # device), so the same one re-registering is the same client.
     # `device_uuid` is unreliable as a dedup key on iOS (regenerated from
     # UIDevice.identifierForVendor on each launch / reinstall).
     existing = MobileClient.query(
@@ -140,13 +161,7 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
         # An app that switches to FID registration keeps its old FCM token valid, so
         # the device would get every notification twice. This runs after the FID is
         # stored, so a failed write can't leave the device with neither registration.
-        ndb.delete_multi(
-            [
-                client.key
-                for client in MobileClient.query(ancestor=account_key).fetch()
-                if not client.is_fid and client.is_for_installation(gcm_id)
-            ]
-        )
+        ndb.delete_multi(_installation_token_keys(account_key, gcm_id))
 
     return response
 
@@ -198,19 +213,14 @@ def unregister_mobile_client(req: RegistrationRequest) -> BaseResponse:
         )
 
     gcm_id = req["mobile_id"]
+    to_delete = MobileClient.query(
+        MobileClient.messaging_id == gcm_id,
+        ancestor=account_key,
+    ).fetch(keys_only=True)
     if messaging_id_type == MessagingIdType.FID:
-        # Includes the install's old FCM token, which is all TBA has for a device that
-        # signs out before its FID registration reaches it
-        to_delete = [
-            client.key
-            for client in MobileClient.query(ancestor=account_key).fetch()
-            if client.messaging_id == gcm_id or client.is_for_installation(gcm_id)
-        ]
-    else:
-        to_delete = MobileClient.query(
-            MobileClient.messaging_id == gcm_id,
-            ancestor=account_key,
-        ).fetch(keys_only=True)
+        # The install's old FCM token is all TBA has for a device that signs out
+        # before its FID registration reaches it
+        to_delete += _installation_token_keys(account_key, gcm_id)
     if not to_delete:
         # Record doesn't exist, so we can't remove it
         return BaseResponse(code=404, message="User doesn't exist. Can't remove it")
@@ -720,3 +730,205 @@ def delete_api_read_key(req: DeleteApiReadKeyMessage) -> BaseResponse:
 
     current_user.delete_api_key(api_key)
     return BaseResponse(code=200, message="Read API key deleted")
+
+
+@client_api_method(ApiWriteKeyRequestMessage, ApiWriteKeyRequestResponse)
+def request_api_write_key(
+    req: ApiWriteKeyRequestMessage,
+) -> ApiWriteKeyRequestResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return ApiWriteKeyRequestResponse(
+            code=401,
+            message="Unauthorized to request write keys",
+            status="unauthorized",
+        )
+
+    event_key = req["event_key"].strip()
+    if not Event.validate_key_name(event_key):
+        return ApiWriteKeyRequestResponse(
+            code=404,
+            message="Event not found",
+            status=SuggestionCreationStatus.BAD_EVENT.value,
+        )
+
+    affiliation = req["affiliation"].strip()
+    auth_types = req["auth_types"]
+    account_key = none_throws(current_user.account_key)
+    status = SuggestionCreator.createApiWriteSuggestion(
+        author_account_key=account_key,
+        event_key=event_key,
+        affiliation=affiliation,
+        auth_types=auth_types,
+    )
+
+    if status == SuggestionCreationStatus.SUCCESS:
+        SuggestionNotifier.apiwrite_requested(
+            account_key,
+            event_key,
+            role=affiliation,
+            auth_types=SuggestionCreator.requestable_auth_types(
+                none_throws(Event.get_by_id(event_key)), auth_types
+            ),
+        )
+        return ApiWriteKeyRequestResponse(
+            code=200, message="Write key request added", status=status.value
+        )
+    if status == SuggestionCreationStatus.NO_AFFILIATION:
+        return ApiWriteKeyRequestResponse(
+            code=400, message="An affiliation is required", status=status.value
+        )
+    return ApiWriteKeyRequestResponse(
+        code=404, message="Event not found", status=status.value
+    )
+
+
+def _webhook_message(webhook: MobileClient) -> WebhookMessage:
+    return WebhookMessage(
+        webhook_id=str(webhook.key.id()),
+        name=webhook.display_name,
+        url=webhook.messaging_id,
+        secret=webhook.secret or "",
+        verified=webhook.verified,
+    )
+
+
+def _get_webhook(account_key: ndb.Key, webhook_id: str) -> MobileClient | None:
+    if not webhook_id.isdigit():
+        return None
+    webhook = MobileClient.get_by_id(int(webhook_id), parent=account_key)
+    if webhook is None or webhook.client_type != ClientType.WEBHOOK:
+        return None
+    return webhook
+
+
+@client_api_method(VoidRequest, ListWebhooksResponse)
+def list_webhooks(req: VoidRequest) -> ListWebhooksResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return ListWebhooksResponse(
+            code=401, message="Unauthorized to list webhooks", webhooks=[]
+        )
+
+    webhooks = MobileClient.query(
+        MobileClient.client_type == ClientType.WEBHOOK,
+        ancestor=none_throws(current_user.account_key),
+    ).fetch()
+    return ListWebhooksResponse(
+        code=200, message="", webhooks=[_webhook_message(w) for w in webhooks]
+    )
+
+
+@client_api_method(AddWebhookMessage, AddWebhookResponse)
+def add_webhook(req: AddWebhookMessage) -> AddWebhookResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return AddWebhookResponse(code=401, message="Unauthorized to add a webhook")
+
+    name = req.get("name", "").strip()
+    url = req.get("url", "").strip()
+    if not name or not url:
+        return AddWebhookResponse(code=400, message="A name and URL are required")
+
+    account_key = none_throws(current_user.account_key)
+    secret = uuid.uuid4().hex
+    verification_code = TBANSHelper.verify_webhook(url, secret)
+    webhook = MobileClient.query(
+        MobileClient.messaging_id == url, ancestor=account_key
+    ).get()
+    if webhook is None:
+        webhook = MobileClient(
+            parent=account_key,
+            user_id=str(account_key.id()),
+            messaging_id=url,
+            display_name=name,
+            client_type=ClientType.WEBHOOK,
+        )
+    webhook.secret = secret
+    webhook.verification_code = verification_code
+    webhook.verified = False
+    webhook.put()
+    return AddWebhookResponse(
+        code=200, message="Webhook added", webhook=_webhook_message(webhook)
+    )
+
+
+@client_api_method(VerifyWebhookMessage, BaseResponse)
+def verify_webhook(req: VerifyWebhookMessage) -> BaseResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return BaseResponse(code=401, message="Unauthorized to verify a webhook")
+
+    webhook = _get_webhook(none_throws(current_user.account_key), req["webhook_id"])
+    if webhook is None:
+        return BaseResponse(code=404, message="Webhook not found")
+
+    if req.get("code", "").strip() != webhook.verification_code:
+        return BaseResponse(code=400, message="Incorrect verification code")
+
+    webhook.verified = True
+    webhook.put()
+    return BaseResponse(code=200, message="Webhook verified")
+
+
+@client_api_method(WebhookIdMessage, BaseResponse)
+def send_webhook_verification(req: WebhookIdMessage) -> BaseResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return BaseResponse(code=401, message="Unauthorized to verify a webhook")
+
+    webhook = _get_webhook(none_throws(current_user.account_key), req["webhook_id"])
+    if webhook is None:
+        return BaseResponse(code=404, message="Webhook not found")
+
+    webhook.verification_code = TBANSHelper.verify_webhook(
+        webhook.messaging_id, none_throws(webhook.secret)
+    )
+    webhook.verified = False
+    webhook.put()
+    return BaseResponse(code=200, message="Verification code sent")
+
+
+@client_api_method(WebhookIdMessage, BaseResponse)
+def delete_webhook(req: WebhookIdMessage) -> BaseResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return BaseResponse(code=401, message="Unauthorized to delete a webhook")
+
+    webhook = _get_webhook(none_throws(current_user.account_key), req["webhook_id"])
+    if webhook is None:
+        return BaseResponse(code=404, message="Webhook not found")
+
+    webhook.key.delete()
+    return BaseResponse(code=200, message="Webhook deleted")
+
+
+@client_api_method(WebhookTestMessage, BaseResponse)
+def send_webhook_test(req: WebhookTestMessage) -> BaseResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return BaseResponse(code=401, message="Unauthorized to test a webhook")
+
+    notification_type = NOTIFICATION_NAME_TO_TYPE.get(req["notification_type"])
+    if notification_type is None:
+        return BaseResponse(code=400, message="Unknown notification type")
+
+    webhook = _get_webhook(none_throws(current_user.account_key), req["webhook_id"])
+    if webhook is None:
+        return BaseResponse(code=404, message="Webhook not found")
+    if not webhook.verified:
+        return BaseResponse(code=400, message="Webhook is not verified")
+
+    sent = TBANSHelper.send_webhook_test(
+        webhook,
+        notification_type,
+        event_key=req.get("event_key"),
+        match_key=req.get("match_key"),
+        district_key=req.get("district_key"),
+    )
+    if not sent:
+        return BaseResponse(
+            code=400,
+            message="Failed to send the test. Check that the keys are valid for this notification type.",
+        )
+    return BaseResponse(code=200, message="Test notification sent")

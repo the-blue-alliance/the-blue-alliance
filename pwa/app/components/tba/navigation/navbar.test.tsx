@@ -95,6 +95,20 @@ describe('Navbar', () => {
     expect(mobileLinks()[1].style.animationDelay).toBe('50ms');
   });
 
+  test('mobile menu icons match the label color', async () => {
+    render(<Navbar />);
+    fireEvent.click(menuToggle());
+    await waitFor(() => expect(mobileLinks().length).toBeGreaterThan(0));
+
+    for (const link of mobileLinks()) {
+      const colorOf = (el: Element | null) =>
+        (el?.getAttribute('class') ?? '').match(/\btext-\S+/g);
+      expect(colorOf(link.querySelector('svg'))).toEqual(
+        colorOf(link.querySelector('p')),
+      );
+    }
+  });
+
   test('does not open the mobile menu on hover', async () => {
     render(<Navbar />);
     fireEvent.pointerEnter(menuToggle(), { pointerType: 'mouse' });

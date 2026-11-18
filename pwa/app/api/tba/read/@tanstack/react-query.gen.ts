@@ -1185,7 +1185,7 @@ export const getEventNexusInfoQueryKey = (
 ) => createQueryKey('getEventNexusInfo', options);
 
 /**
- * Gets live match-queuing info for an event from Nexus (https://frc.nexus/), or `null` if no data is currently available for this event.
+ * Gets live match-queuing info and the pit map for an event from Nexus (https://frc.nexus/), or `null` if neither is currently available for this event.
  */
 export const getEventNexusInfoOptions = (
   options: Options<GetEventNexusInfoData>,

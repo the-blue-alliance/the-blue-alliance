@@ -2874,19 +2874,77 @@ export type NexusNowQueueing = {
 };
 
 /**
- * Live match-queuing info for an event, sourced from Nexus (https://frc.nexus/) and cached by TBA.
+ * Live match-queuing info and the pit map for an event, sourced from Nexus (https://frc.nexus/) and cached by TBA.
  */
 export type NexusEventInfo = {
   /**
-   * Unix timestamp (in milliseconds) of when this data was last fetched from Nexus.
+   * Unix timestamp (in milliseconds) of when the queuing info was last fetched from Nexus, or null if no queuing info is available.
    */
-  data_as_of_ms: number;
+  data_as_of_ms: number | null;
   now_queueing: NexusNowQueueing | null;
   /**
-   * Map of TBA match key to live queuing info for that match.
+   * Map of TBA match key to live queuing info for that match. Empty if no queuing info is available.
    */
   matches: {
     [key: string]: NexusMatchInfo;
+  };
+  pit_map: NexusPitMap | null;
+};
+
+/**
+ * A pair of x and y values on a Nexus pit map, used for positions and sizes.
+ */
+export type NexusMapVector = {
+  x?: number;
+  y?: number;
+};
+
+/**
+ * A rectangle on a Nexus pit map.
+ */
+export type NexusMapElement = {
+  position?: NexusMapVector;
+  size?: NexusMapVector;
+  /**
+   * Rotation of the element, in degrees.
+   */
+  angle?: number | null;
+};
+
+export type NexusMapPit = NexusMapElement & {
+  /**
+   * TBA team key of the team in this pit, or null if the pit is unassigned.
+   */
+  team_key: string | null;
+};
+
+export type NexusMapLabel = NexusMapElement & {
+  label?: string;
+};
+
+export type NexusMapArrow = NexusMapElement & {
+  type?: 'single' | 'double';
+};
+
+/**
+ * The pit map for an event, as reported by Nexus. Each collection maps a Nexus element ID to that element.
+ */
+export type NexusPitMap = {
+  size: NexusMapVector;
+  pits: {
+    [key: string]: NexusMapPit;
+  };
+  areas: {
+    [key: string]: NexusMapLabel;
+  };
+  labels: {
+    [key: string]: NexusMapLabel;
+  };
+  arrows: {
+    [key: string]: NexusMapArrow;
+  };
+  walls: {
+    [key: string]: NexusMapElement;
   };
 };
 

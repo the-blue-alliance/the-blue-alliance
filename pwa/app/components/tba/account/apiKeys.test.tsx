@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type {
@@ -24,6 +25,23 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('~/lib/hooks/useApiKeys', () => ({ useApiKeys: mocks.useApiKeys }));
+
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({
+    children,
+    to,
+    params,
+    ...props
+  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
+    children?: ReactNode;
+    to: string;
+    params?: { eventKey: string };
+  }) => (
+    <a href={to.replace('$eventKey', params?.eventKey ?? '')} {...props}>
+      {children}
+    </a>
+  ),
+}));
 
 const READ_KEY: ApiReadKeyMessage = {
   key: 'read-key-1',
@@ -80,37 +98,70 @@ describe('ApiKeysSection', () => {
     ).toEqual(['read-key-1', '2026-03-01', 'Scouting app', '']);
   });
 
-  test('lists write keys with events, permissions, and expiry', () => {
+  test('links to the write key request page', () => {
     renderSection();
 
-    const row = screen.getByText('auth-1').closest('tr');
-    expect(
-      [...(row?.querySelectorAll('td') ?? [])].map((cell) => cell.textContent),
-    ).toEqual([
-      '2026casj, 2026cafr',
-      'event teams, event matches',
-      '2026-04-01',
-      'auth-1',
-      'secret-1',
-    ]);
     expect(
       screen
         .getByRole('link', { name: 'Request Write Key' })
         .getAttribute('href'),
-    ).toBe('https://www.thebluealliance.com/request/apiwrite');
+    ).toBe('/request/apiwrite');
   });
 
-  test('shows placeholders for missing dates and events, and raw unparseable dates', () => {
-    renderSection({
-      readKeys: [{ ...READ_KEY, created: null }],
-      writeKeys: [{ ...WRITE_KEY, event_keys: [], expiration: 'not a date' }],
-    });
+  test('shows a placeholder for a read key with no creation date', () => {
+    renderSection({ readKeys: [{ ...READ_KEY, created: null }] });
 
     const readRow = screen.getByText('read-key-1').closest('tr');
     expect(readRow?.querySelectorAll('td')[1].textContent).toBe('—');
-    const writeRow = screen.getByText('auth-1').closest('tr');
-    expect(writeRow?.querySelectorAll('td')[0].textContent).toBe('—');
-    expect(writeRow?.querySelectorAll('td')[2].textContent).toBe('not a date');
+  });
+});
+
+describe('Write key details', () => {
+  function detail(term: string) {
+    return screen.getByText(term, { selector: 'dt' }).nextElementSibling
+      ?.textContent;
+  }
+
+  test.each([
+    ['2026casj', '/event/2026casj'],
+    ['2026cafr', '/event/2026cafr'],
+  ])('links event %s to its event page', (eventKey, href) => {
+    renderSection();
+
+    expect(
+      screen.getByRole('link', { name: eventKey }).getAttribute('href'),
+    ).toBe(href);
+  });
+
+  test('shows a placeholder for a key with no events', () => {
+    renderSection({ writeKeys: [{ ...WRITE_KEY, event_keys: [] }] });
+
+    expect(detail('Events')).toBe('—');
+  });
+
+  test.each(['event teams', 'event matches'])(
+    'lists the %s permission',
+    (permission) => {
+      renderSection();
+
+      expect(detail('Permissions')).toContain(permission);
+    },
+  );
+
+  test.each([
+    ['Expires', '2026-04-01'],
+    ['Auth ID', 'auth-1'],
+    ['Auth Secret', 'secret-1'],
+  ])('shows the %s', (term, value) => {
+    renderSection();
+
+    expect(detail(term)).toBe(value);
+  });
+
+  test('shows an unparseable expiry as written', () => {
+    renderSection({ writeKeys: [{ ...WRITE_KEY, expiration: 'not a date' }] });
+
+    expect(detail('Expires')).toBe('not a date');
   });
 });
 

@@ -20,8 +20,11 @@ const staticRoutes = [
   '/add-data',
   '/apidocs',
   '/apidocs/v3',
+  '/apidocs/webhooks',
+  '/brand',
   '/contact',
   '/donate',
+  '/faq',
   '/privacy',
   '/thanks',
 ];
