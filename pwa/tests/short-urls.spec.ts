@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('short URLs', () => {
   [
     ['a team number', '/254', '/team/254'],
+    ['a team key', '/frc254', '/team/254'],
     ['an event key', '/2024miket', '/event/2024miket'],
     ['a district key', '/2024fim', '/district/fim/2024'],
   ].forEach(([name, path, expectedLocation]) => {
