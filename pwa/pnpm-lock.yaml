@@ -167,7 +167,7 @@ importers:
         version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@trivago/prettier-plugin-sort-imports':
         specifier: 6.0.2
-        version: 6.0.2(@vue/compiler-sfc@3.5.45)(prettier@3.9.10)(supports-color@10.2.2)
+        version: 6.0.2(@vue/compiler-sfc@3.5.45)(prettier@3.10.0)(supports-color@10.2.2)
       '@types/compression':
         specifier: 1.8.1
         version: 1.8.1
@@ -226,17 +226,17 @@ importers:
         specifier: 13.2.0
         version: 13.2.0
       prettier:
-        specifier: 3.9.10
-        version: 3.9.10
+        specifier: 3.10.0
+        version: 3.10.0
       prettier-plugin-classnames:
         specifier: 0.10.5
-        version: 0.10.5(prettier@3.9.10)
+        version: 0.10.5(prettier@3.10.0)
       prettier-plugin-merge:
         specifier: 0.10.2
-        version: 0.10.2(prettier@3.9.10)
+        version: 0.10.2(prettier@3.10.0)
       prettier-plugin-tailwindcss:
         specifier: 0.8.1
-        version: 0.8.1(@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.45)(prettier@3.9.10)(supports-color@10.2.2))(prettier@3.9.10)
+        version: 0.8.1(@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.45)(prettier@3.10.0)(supports-color@10.2.2))(prettier@3.10.0)
       shadcn:
         specifier: 4.23.0
         version: 4.23.0(supports-color@10.2.2)
@@ -6565,8 +6565,8 @@ packages:
       prettier-plugin-svelte:
         optional: true
 
-  prettier@3.9.10:
-    resolution: {integrity: sha512-skGHTH1Yb9QvaTC4hWnRTzEYtCpApF0UMBPz+t/0ZPzP8ihefo/btKd+QA7pUE0fEwA1SbS/NmhyEcstdXOIdA==}
+  prettier@3.10.0:
+    resolution: {integrity: sha512-mBi4765LgjO1PFjlEs7pUeK0nb1bw71c+N4/ItfeUWNdY5cV2pRKaFpbbFRYmDJMO+5ZwzGxHRqHxFZna7iv5w==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -11745,7 +11745,7 @@ snapshots:
       '@tanstack/virtual-file-routes': 1.162.0
       jiti: 2.7.0
       magic-string: 0.30.21
-      prettier: 3.9.10
+      prettier: 3.10.0
       zod: 4.6.7
     transitivePeerDependencies:
       - supports-color
@@ -11901,7 +11901,7 @@ snapshots:
       magic-string: 0.30.21
       string.prototype.matchall: 4.0.12
 
-  '@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.45)(prettier@3.9.10)(supports-color@10.2.2)':
+  '@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.45)(prettier@3.10.0)(supports-color@10.2.2)':
     dependencies:
       '@babel/generator': 7.29.7
       '@babel/parser': 7.29.7
@@ -11911,7 +11911,7 @@ snapshots:
       lodash-es: 4.18.1
       minimatch: 9.0.9
       parse-imports-exports: 0.2.4
-      prettier: 3.9.10
+      prettier: 3.10.0
     optionalDependencies:
       '@vue/compiler-sfc': 3.5.45
     transitivePeerDependencies:
@@ -15208,23 +15208,23 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-classnames@0.10.5(prettier@3.9.10):
+  prettier-plugin-classnames@0.10.5(prettier@3.10.0):
     dependencies:
-      prettier: 3.9.10
+      prettier: 3.10.0
       zod: 4.6.7
 
-  prettier-plugin-merge@0.10.2(prettier@3.9.10):
+  prettier-plugin-merge@0.10.2(prettier@3.10.0):
     dependencies:
       diff: 5.2.2
-      prettier: 3.9.10
+      prettier: 3.10.0
 
-  prettier-plugin-tailwindcss@0.8.1(@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.45)(prettier@3.9.10)(supports-color@10.2.2))(prettier@3.9.10):
+  prettier-plugin-tailwindcss@0.8.1(@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.45)(prettier@3.10.0)(supports-color@10.2.2))(prettier@3.10.0):
     dependencies:
-      prettier: 3.9.10
+      prettier: 3.10.0
     optionalDependencies:
-      '@trivago/prettier-plugin-sort-imports': 6.0.2(@vue/compiler-sfc@3.5.45)(prettier@3.9.10)(supports-color@10.2.2)
+      '@trivago/prettier-plugin-sort-imports': 6.0.2(@vue/compiler-sfc@3.5.45)(prettier@3.10.0)(supports-color@10.2.2)
 
-  prettier@3.9.10: {}
+  prettier@3.10.0: {}
 
   pretty-bytes@5.6.0: {}
 
