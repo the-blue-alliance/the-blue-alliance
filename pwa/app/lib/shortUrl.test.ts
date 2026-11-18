@@ -16,6 +16,12 @@ describe('resolveShortKey', () => {
       { type: 'team', teamNumber: '99999' },
     ],
     ['a four-digit number', '2024', { type: 'team', teamNumber: '2024' }],
+    ['a team key', 'frc254', { type: 'team', teamNumber: '254' }],
+    [
+      'a team key with leading zeros',
+      'frc00254',
+      { type: 'team', teamNumber: '254' },
+    ],
     ['an event key', '2024miket', { type: 'event', eventKey: '2024miket' }],
     [
       'an event key ending in a digit',
@@ -47,6 +53,8 @@ describe('resolveShortKey', () => {
     ['a six-digit number', '123456'],
     ['a year without a suffix', '2024-'],
     ['an uppercase event key', '2024MIKET'],
+    ['an uppercase team key', 'FRC254'],
+    ['a team key prefix without a number', 'frc'],
     ['an empty key', ''],
   ])('returns null for %s', (_name, key) => {
     expect(resolveShortKey(key)).toBeNull();

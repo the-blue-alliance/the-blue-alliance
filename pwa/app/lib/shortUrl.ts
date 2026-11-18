@@ -21,8 +21,9 @@ const KNOWN_DISTRICT_ABBREVIATIONS = new Set([
 ]);
 
 // Same patterns as the Jinja short routes in src/backend/web/main.py. Team numbers are
-// digits only, event and district keys need a letter after the year, so "/2024" is a team.
-const TEAM_NUMBER_PATTERN = /^[0-9]{1,5}$/;
+// digits with an optional "frc" prefix, event and district keys need a letter after the
+// year, so "/2024" is a team.
+const TEAM_NUMBER_PATTERN = /^(?:frc)?([0-9]{1,5})$/;
 const EVENT_OR_DISTRICT_PATTERN = /^([0-9]{4})([a-z][a-z0-9]*)$/;
 
 export type ShortKeyTarget =
@@ -31,8 +32,9 @@ export type ShortKeyTarget =
   | { type: 'event'; eventKey: string };
 
 export function resolveShortKey(key: string): ShortKeyTarget | null {
-  if (TEAM_NUMBER_PATTERN.test(key)) {
-    return { type: 'team', teamNumber: String(Number(key)) };
+  const teamMatch = TEAM_NUMBER_PATTERN.exec(key);
+  if (teamMatch) {
+    return { type: 'team', teamNumber: String(Number(teamMatch[1])) };
   }
 
   const match = EVENT_OR_DISTRICT_PATTERN.exec(key);
