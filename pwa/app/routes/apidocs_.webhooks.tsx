@@ -285,6 +285,11 @@ const notifications: NotificationDoc[] = [
       teamKeyField,
       eventNameField,
       modelField('event', 'Event'),
+      modelField(
+        'event_alliances',
+        'Elimination_Alliance',
+        "s list, one per alliance at the event, including for a team subscription. Alliances don't include status; get playoff status from the Read API's event alliances endpoint.",
+      ),
     ],
     example: {
       message_data: {
@@ -330,6 +335,48 @@ const notifications: NotificationDoc[] = [
           week: 6,
           year: 2014,
         },
+        event_alliances: [
+          {
+            name: 'Alliance 1',
+            picks: ['frc195', 'frc558', 'frc5122'],
+            declines: [],
+          },
+          {
+            name: 'Alliance 2',
+            picks: ['frc1153', 'frc125', 'frc4048'],
+            declines: [],
+          },
+          {
+            name: 'Alliance 3',
+            picks: ['frc230', 'frc177', 'frc4055'],
+            declines: [],
+          },
+          {
+            name: 'Alliance 4',
+            picks: ['frc716', 'frc78', 'frc811'],
+            declines: [],
+          },
+          {
+            name: 'Alliance 5',
+            picks: ['frc1519', 'frc3467', 'frc58'],
+            declines: [],
+          },
+          {
+            name: 'Alliance 6',
+            picks: ['frc131', 'frc175', 'frc1073'],
+            declines: [],
+          },
+          {
+            name: 'Alliance 7',
+            picks: ['frc228', 'frc3525', 'frc2168'],
+            declines: [],
+          },
+          {
+            name: 'Alliance 8',
+            picks: ['frc172', 'frc1058', 'frc2067'],
+            declines: [],
+          },
+        ],
       },
       message_type: 'alliance_selection',
     },

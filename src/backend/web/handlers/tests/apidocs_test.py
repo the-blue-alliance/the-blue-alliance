@@ -4,7 +4,9 @@ from unittest.mock import patch
 from urllib.parse import urlparse
 
 import pytest
+from bs4 import BeautifulSoup
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 from werkzeug.test import Client
 
 from backend.common.consts.alliance_color import AllianceColor
@@ -19,8 +21,12 @@ from backend.common.consts.notification_type import TYPES as NOTIFICATION_TYPES
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.models.account import Account
 from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
 from backend.common.models.match import Match, MatchAlliance
 from backend.common.models.mobile_client import MobileClient
+from backend.common.models.notifications.alliance_selection import (
+    AllianceSelectionNotification,
+)
 from backend.web.handlers.conftest import CapturedTemplate
 
 
@@ -105,6 +111,32 @@ def test_apidocs_webhooks(
     context = captured_templates[0][1]
     assert context["enabled"] == ENABLED_NOTIFICATIONS
     assert context["types"] == NOTIFICATION_TYPES
+
+
+def test_apidocs_webhooks_alliance_selection_example_matches_payload(
+    web_client: Client, apidocs_event: Event
+) -> None:
+    EventDetails(
+        id=apidocs_event.key_name,
+        alliance_selections=[
+            {"name": "Alliance 1", "picks": ["frc1", "frc2", "frc3"], "declines": []}
+        ],
+    ).put()
+    payload = none_throws(
+        AllianceSelectionNotification(apidocs_event).webhook_message_data
+    )
+
+    resp = web_client.get("/apidocs/webhooks")
+    soup = BeautifulSoup(resp.data, "html.parser")
+    heading = none_throws(soup.find("h3", id="alliance_selection"))
+    example = json.loads(
+        none_throws(heading.find_next("pre", class_="example-json")).get_text()
+    )
+
+    assert example["message_type"] == "alliance_selection"
+    assert set(example["message_data"]) == set(payload)
+    example_alliance = example["message_data"]["event_alliances"][0]
+    assert set(example_alliance) == set(payload["event_alliances"][0])
 
 
 def test_apidocs_webhooks_notification_logged_out(web_client: Client) -> None:
