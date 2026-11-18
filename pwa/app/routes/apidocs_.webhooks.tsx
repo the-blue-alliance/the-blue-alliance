@@ -288,7 +288,7 @@ const notifications: NotificationDoc[] = [
       modelField(
         'event_alliances',
         'Elimination_Alliance',
-        "s list, one per alliance at the event, including for a team subscription. Alliances don't include status; get playoff status from the Read API's event alliances endpoint.",
+        's list, one per alliance at the event, including for a team subscription.',
       ),
     ],
     example: {
