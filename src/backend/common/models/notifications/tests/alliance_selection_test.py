@@ -111,18 +111,39 @@ class TestAllianceSelectionNotification(unittest.TestCase):
         assert payload["team_key"] == team.key_name
 
     def test_webhook_message_data(self):
+        alliances = [
+            {
+                "name": "Alliance 1",
+                "picks": ["frc1", "frc2", "frc3"],
+                "declines": ["frc4"],
+            }
+        ]
+        EventDetails(id=self.event.key_name, alliance_selections=alliances).put()
+
         payload = self.notification.webhook_message_data
-        assert len(payload) == 3
+        assert len(payload) == 4
         assert payload["event_key"] == self.event.key_name
         assert payload["event_name"] == "Present Test Event"
         assert payload["event"] is not None
+        assert payload["event_alliances"] == alliances
+        assert "status" not in payload["event_alliances"][0]
 
     def test_webhook_message_data_team(self):
         team = Team.get_by_id("frc1")
+        alliances = [
+            {
+                "name": "Alliance 1",
+                "picks": ["frc1", "frc2", "frc3"],
+                "declines": [],
+            }
+        ]
+        EventDetails(id=self.event.key_name, alliance_selections=alliances).put()
+
         notification = AllianceSelectionNotification(self.event, team)
         payload = notification.webhook_message_data
-        assert len(payload) == 4
+        assert len(payload) == 5
         assert payload["event_key"] == self.event.key_name
         assert payload["team_key"] == team.key_name
         assert payload["event_name"] == "Present Test Event"
         assert payload["event"] is not None
+        assert payload["event_alliances"] == alliances
