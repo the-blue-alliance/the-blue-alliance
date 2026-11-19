@@ -6,7 +6,6 @@ import {
   within,
 } from '@testing-library/react';
 import { delay } from 'msw';
-import { type ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { type EventColors } from '~/api/colors';
@@ -34,35 +33,7 @@ import {
 import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
 import { renderWithClient } from '~/test/render';
 
-vi.mock('~/components/tba/links', () => ({
-  EventLink: ({
-    children,
-    eventOrKey,
-  }: {
-    children: ReactNode;
-    eventOrKey: string;
-  }) => <a href={`/event/${eventOrKey}`}>{children}</a>,
-  MatchLink: ({
-    children,
-    matchOrKey,
-  }: {
-    children: ReactNode;
-    matchOrKey: Match;
-  }) => <a href={`/match/${matchOrKey.key}`}>{children}</a>,
-  TeamLink: ({
-    children,
-    teamOrKey,
-    style,
-  }: {
-    children: ReactNode;
-    teamOrKey: string;
-    style?: React.CSSProperties;
-  }) => (
-    <a href={`/team/${teamOrKey.substring(3)}`} style={style}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('~/components/tba/links', () => import('~/test/linkMocks'));
 
 function makeEvent(
   key: string,

@@ -1,5 +1,4 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import {
   mockIsIntersecting,
@@ -22,7 +21,7 @@ const { router } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@tanstack/react-router', () => ({
+vi.mock('@tanstack/react-router', async () => ({
   useRouterState: () => router.match,
   useRouter: () => ({
     subscribe: (_event: string, listener: () => void) => {
@@ -30,20 +29,7 @@ vi.mock('@tanstack/react-router', () => ({
       return router.unsubscribe;
     },
   }),
-  Link: ({
-    children,
-    hash,
-    replace: _replace,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    hash: string;
-    replace?: boolean;
-  }) => (
-    <a href={`#${hash}`} {...props}>
-      {children}
-    </a>
-  ),
+  Link: (await import('~/test/linkMocks')).Link,
 }));
 
 const tocItems: TocNode[] = [

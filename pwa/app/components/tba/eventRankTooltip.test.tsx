@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { delay } from 'msw';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import { type EventRanking } from '~/api/tba/read';
@@ -9,22 +9,7 @@ import EventRankTooltip from '~/components/tba/eventRankTooltip';
 import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
 import { renderWithClient } from '~/test/render';
 
-vi.mock('~/components/tba/links', () => ({
-  TeamLink: ({
-    children,
-    teamOrKey,
-    year,
-    ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
-    children: ReactNode;
-    teamOrKey: string;
-    year: number;
-  }) => (
-    <a href={`/team/${teamOrKey.substring(3)}/${year}`} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('~/components/tba/links', () => import('~/test/linkMocks'));
 
 vi.mock('~/components/ui/tooltip', () => ({
   Tooltip: ({
