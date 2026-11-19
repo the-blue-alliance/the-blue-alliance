@@ -34,7 +34,7 @@ export default defineConfig({
     /* Test against mobile viewports. */
     {
       name: 'Mobile Chrome',
-      use: { ...devices['iPhone 15'] },
+      use: { ...devices['iPhone 15'], defaultBrowserType: 'chromium' },
       grep: /(mobile)/,
     },
   ],

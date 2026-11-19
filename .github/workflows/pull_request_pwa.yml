@@ -181,7 +181,7 @@ jobs:
 
       - name: Install Playwright browsers
         working-directory: pwa
-        run: pnpm exec playwright install --with-deps
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Build application
         working-directory: pwa
