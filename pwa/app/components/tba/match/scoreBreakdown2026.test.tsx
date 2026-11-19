@@ -181,40 +181,46 @@ describe('ScoreBreakdown2026', () => {
 
     expect(
       screen.getByRole('row', {
-        name: 'frc254=yes:left frc1114=no:left frc2056=no:left 6 Auto Tower 10 frc148=no:right frc217=no:right frc33=yes:right',
+        name: 'frc254=yes:left frc1114=no:left frc2056=no:left 6 Auto Tower Blue leads 10 frc148=no:right frc217=no:right frc33=yes:right',
       }),
     ).toBeTruthy();
   });
 
   test.each([
-    { label: 'Total Auto', red: '18', blue: '14' },
-    { label: 'Transition Fuel', red: '4', blue: '2' },
-    { label: 'Shift 1 Count', red: '10', blue: '8' },
-    { label: 'Shift 2 Count', red: '20', blue: '6' },
-    { label: 'Shift 3 Count', red: '15', blue: '4' },
-    { label: 'Shift 4 Count', red: '5', blue: '2' },
+    { label: 'Total Auto', name: '18 Red leads Total Auto 14' },
+    { label: 'Transition Fuel', name: '4 Red leads Transition Fuel 2' },
+    { label: 'Shift 1 Count', name: '10 Red leads Shift 1 Count 8' },
+    { label: 'Shift 2 Count', name: '20 Red leads Shift 2 Count 6' },
+    { label: 'Shift 3 Count', name: '15 Red leads Shift 3 Count 4' },
+    { label: 'Shift 4 Count', name: '5 Red leads Shift 4 Count 2' },
     {
       label: 'Shift Points (1/2/3/4)',
-      red: '10 / 20 / 15 / 5',
-      blue: '8 / 6 / 4 / 2',
+      name: '10 / 20 / 15 / 5 Red leads Shift Points (1/2/3/4) 8 / 6 / 4 / 2',
     },
-    { label: 'Endgame Hub Fuel', red: '7', blue: '3' },
-    { label: 'Teleop Count', red: '61', blue: '25' },
-    { label: 'Teleop Hub Points', red: '61', blue: '25' },
-    { label: 'Endgame Tower Points', red: '31', blue: '6' },
-    { label: 'Total Tower Points', red: '37', blue: '16' },
-    { label: 'Total Teleop', red: '92', blue: '31' },
+    { label: 'Endgame Hub Fuel', name: '7 Red leads Endgame Hub Fuel 3' },
+    { label: 'Teleop Count', name: '61 Red leads Teleop Count 25' },
+    { label: 'Teleop Hub Points', name: '61 Red leads Teleop Hub Points 25' },
+    {
+      label: 'Endgame Tower Points',
+      name: '31 Red leads Endgame Tower Points 6',
+    },
+    { label: 'Total Tower Points', name: '37 Red leads Total Tower Points 16' },
+    { label: 'Total Teleop', name: '92 Red leads Total Teleop 31' },
     // Fouls from 2026cmptx_sf8m1; each alliance's foulPoints come from the other's fouls.
-    { label: 'Fouls / Major Fouls Committed', red: '1 / 2', blue: '2 / 0' },
-    { label: 'Foul Points Received', red: '10', blue: '35' },
-    { label: 'Total Score', red: '119', blue: '49' },
-    { label: 'RP', red: '+5 RP', blue: '+1 RP' },
-  ])('shows $label for both alliances', ({ label, red, blue }) => {
+    {
+      label: 'Fouls / Major Fouls Committed',
+      name: '1 / 2 Fouls / Major Fouls Committed 2 / 0',
+    },
+    {
+      label: 'Foul Points Received',
+      name: '10 Foul Points Received Blue leads 35',
+    },
+    { label: 'Total Score', name: '119 Red leads Total Score 49' },
+    { label: 'RP', name: '+5 RP RP +1 RP' },
+  ])('shows $label for both alliances', ({ name }) => {
     renderBreakdown();
 
-    expect(
-      screen.getByRole('row', { name: `${red} ${label} ${blue}` }),
-    ).toBeTruthy();
+    expect(screen.getByRole('row', { name })).toBeTruthy();
   });
 
   test.each([
@@ -248,13 +254,17 @@ describe('ScoreBreakdown2026', () => {
   test('shows the adjustments row when the red alliance was adjusted', () => {
     renderBreakdown(makeBreakdown({ adjustPoints: -10 }));
 
-    expect(screen.getByRole('row', { name: '-10 Adjustments 0' })).toBeTruthy();
+    expect(
+      screen.getByRole('row', { name: '-10 Adjustments Blue leads 0' }),
+    ).toBeTruthy();
   });
 
   test('shows the adjustments row when the blue alliance was adjusted', () => {
     renderBreakdown(makeBreakdown({}, { adjustPoints: 5 }));
 
-    expect(screen.getByRole('row', { name: '0 Adjustments 5' })).toBeTruthy();
+    expect(
+      screen.getByRole('row', { name: '0 Adjustments Blue leads 5' }),
+    ).toBeTruthy();
   });
 
   test('hides the adjustments row when adjustments are missing', () => {

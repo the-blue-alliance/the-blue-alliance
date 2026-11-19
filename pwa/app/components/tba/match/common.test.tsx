@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import {
   ConditionalBadge,
@@ -7,14 +7,6 @@ import {
   ConditionalRpAchieved,
   fmtFoulsCommitted,
 } from '~/components/tba/match/common';
-
-vi.mock('~icons/mdi/check', () => ({
-  default: () => <img alt="Achieved" />,
-}));
-
-vi.mock('~icons/mdi/close', () => ({
-  default: () => <img alt="Not achieved" />,
-}));
 
 describe('ConditionalCheckmark', () => {
   test('shows a checkmark when the condition holds', () => {

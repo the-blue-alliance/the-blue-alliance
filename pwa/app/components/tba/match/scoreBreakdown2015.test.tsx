@@ -1,19 +1,11 @@
 import { render, screen, within } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import {
   MatchScoreBreakdown2015,
   MatchScoreBreakdown2015Alliance,
 } from '~/api/tba/read';
 import ScoreBreakdown2015 from '~/components/tba/match/scoreBreakdown2015';
-
-vi.mock('~icons/mdi/arrow-left', () => ({
-  default: () => <img alt="Red leads" />,
-}));
-
-vi.mock('~icons/mdi/arrow-right', () => ({
-  default: () => <img alt="Blue leads" />,
-}));
 
 function makeAlliance(
   overrides: Partial<MatchScoreBreakdown2015Alliance> = {},
