@@ -94,7 +94,7 @@
     "jsdom": "31.0.0",
     "json-schema-to-ts": "3.1.1",
     "lighthouse": "13.6.0",
-    "msw": "3.0.3",
+    "msw": "3.0.5",
     "oxc-transform-react": "0.158.0",
     "oxlint": "1.93.0",
     "oxlint-tailwindcss": "1.17.1",
