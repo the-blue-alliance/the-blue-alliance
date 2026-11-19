@@ -1,12 +1,11 @@
 import { expect, test } from '@playwright/test';
 
-import { gotoHydrated } from './helpers';
+import { gotoHydrated, hangRequests, recordRequests } from './helpers';
 
 test('past-year district championship tab stops polling', async ({ page }) => {
   await page.clock.install();
 
-  const requestUrls: string[] = [];
-  page.on('request', (request) => requestUrls.push(request.url()));
+  const requestUrls = recordRequests(page);
   const firstEventsRequest = page.waitForRequest((request) =>
     request.url().includes('/api/v3/events/2019'),
   );
@@ -105,8 +104,7 @@ test.describe('/district/fim/2024 rankings', () => {
 
 test.describe('/district/fim/2024 teams tab', () => {
   test('does not request the full team list on page load', async ({ page }) => {
-    const requestUrls: string[] = [];
-    page.on('request', (request) => requestUrls.push(request.url()));
+    const requestUrls = recordRequests(page);
 
     await gotoHydrated(page, '/district/fim/2024');
     await page.waitForLoadState('networkidle');
@@ -117,10 +115,7 @@ test.describe('/district/fim/2024 teams tab', () => {
   });
 
   test('shows a placeholder while the teams load', async ({ page }) => {
-    await page.route(
-      /\/api\/v3\/district\/2024fim\/teams(\?|$)/,
-      () => new Promise(() => {}),
-    );
+    await hangRequests(page, /\/api\/v3\/district\/2024fim\/teams(\?|$)/);
 
     await gotoHydrated(page, '/district/fim/2024#teams');
 

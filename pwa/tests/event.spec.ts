@@ -1,14 +1,14 @@
 import { type Page, expect, test } from '@playwright/test';
 
-import { gotoHydrated } from './helpers';
+import {
+  delayRequests,
+  gotoHydrated,
+  hangRequests,
+  recordRequests,
+} from './helpers';
 
 test('fetches Nexus event data in the browser', async ({ page }) => {
-  const nexusRequests: string[] = [];
-  page.on('request', (request) => {
-    if (request.url().includes('/nexus_info')) {
-      nexusRequests.push(request.url());
-    }
-  });
+  const nexusRequests = recordRequests(page, '/nexus_info');
 
   await gotoHydrated(page, '/event/2024mil');
 
@@ -18,10 +18,7 @@ test('fetches Nexus event data in the browser', async ({ page }) => {
 test('shows the qualification matches while event teams are still loading', async ({
   page,
 }) => {
-  await page.route(
-    /\/api\/v3\/event\/2024mil\/teams(\?|$)/,
-    () => new Promise(() => {}),
-  );
+  await hangRequests(page, /\/api\/v3\/event\/2024mil\/teams(\?|$)/);
 
   await page.goto('/event/2024mil');
 
@@ -33,10 +30,7 @@ test('shows the qualification matches while event teams are still loading', asyn
 test('shows a team count placeholder while event teams are loading', async ({
   page,
 }) => {
-  await page.route(
-    /\/api\/v3\/event\/2024mil\/teams(\?|$)/,
-    () => new Promise(() => {}),
-  );
+  await hangRequests(page, /\/api\/v3\/event\/2024mil\/teams(\?|$)/);
 
   await gotoHydrated(page, '/event/2024mil');
 
@@ -53,8 +47,7 @@ test('shows a team count placeholder while event teams are loading', async ({
   ['team colors', 'api.frc-colors.com'],
 ].forEach(([name, path]) => {
   test(`does not request ${name} on page load`, async ({ page }) => {
-    const requestUrls: string[] = [];
-    page.on('request', (request) => requestUrls.push(request.url()));
+    const requestUrls = recordRequests(page);
 
     await gotoHydrated(page, '/event/2024mil');
     await page.waitForLoadState('networkidle');
@@ -90,12 +83,10 @@ test('requests team media when the Teams tab opens', async ({ page }) => {
 test('does not request regional pool points for a district event', async ({
   page,
 }) => {
-  const poolPointsRequests: string[] = [];
-  page.on('request', (request) => {
-    if (request.url().includes('/regional_champs_pool_points')) {
-      poolPointsRequests.push(request.url());
-    }
-  });
+  const poolPointsRequests = recordRequests(
+    page,
+    '/regional_champs_pool_points',
+  );
 
   await gotoHydrated(page, '/event/2024mawor');
   await page.waitForLoadState('networkidle');
@@ -104,12 +95,7 @@ test('does not request regional pool points for a district event', async ({
 });
 
 test('does not request district points for a regional', async ({ page }) => {
-  const districtPointsRequests: string[] = [];
-  page.on('request', (request) => {
-    if (request.url().includes('/district_points')) {
-      districtPointsRequests.push(request.url());
-    }
-  });
+  const districtPointsRequests = recordRequests(page, '/district_points');
 
   await gotoHydrated(page, '/event/2024casj');
   await page.waitForLoadState('networkidle');
@@ -120,10 +106,7 @@ test('does not request district points for a regional', async ({ page }) => {
 test('shows the event name while awards are still loading', async ({
   page,
 }) => {
-  await page.route(
-    /\/api\/v3\/event\/[^/]+\/awards/,
-    () => new Promise(() => {}),
-  );
+  await hangRequests(page, /\/api\/v3\/event\/[^/]+\/awards/);
 
   await page.goto('/event/2024mil');
 
@@ -298,10 +281,7 @@ test.describe('/event/2024mil', () => {
 
   test('selects a tab whose content is still loading', async ({ page }) => {
     // Hold back the lazily loaded Insights chart so its tab suspends
-    await page.route(/coprScatterChart/, async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      await route.continue();
-    });
+    await delayRequests(page, /coprScatterChart/, 3000);
     await page.getByRole('tab', { name: /^Teams/ }).click();
     await page.getByRole('tab', { name: 'Insights' }).click();
 
@@ -366,10 +346,7 @@ test('loads the animated tab indicator when a tab changes', async ({
 });
 
 test('shows the District Points tab while its data loads', async ({ page }) => {
-  await page.route(/\/district_points/, async (route) => {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    await route.continue();
-  });
+  await delayRequests(page, /\/district_points/, 3000);
   await gotoHydrated(page, '/event/2026necmp1');
 
   await expect(page.getByRole('tab', { name: 'District Points' })).toBeVisible({
@@ -516,12 +493,7 @@ test('shows practice matches on the Practice tab', async ({ page }) => {
 test('skips the practice matches request for an offseason event', async ({
   page,
 }) => {
-  const practiceRequests: string[] = [];
-  page.on('request', (request) => {
-    if (request.url().includes('/matches/practice')) {
-      practiceRequests.push(request.url());
-    }
-  });
+  const practiceRequests = recordRequests(page, '/matches/practice');
 
   await gotoHydrated(page, '/event/2024cc');
 
