@@ -3,7 +3,7 @@ import type { Page } from '@playwright/test';
 import { getTeam } from '~/api/tba/read';
 
 import { expect, test } from './fixtures';
-import { gotoHydrated } from './helpers';
+import { gotoHydrated, hangRequests } from './helpers';
 
 test('shows the team name while event alliances are still loading', async ({
   page,
@@ -33,10 +33,7 @@ test('shows the team name while event alliances are still loading', async ({
       motto: null,
     },
   );
-  await page.route(
-    /\/api\/v3\/event\/[^/]+\/alliances/,
-    () => new Promise(() => {}),
-  );
+  await hangRequests(page, /\/api\/v3\/event\/[^/]+\/alliances/);
 
   await page.goto('/team/604/2024');
 
@@ -46,10 +43,7 @@ test('shows the team name while event alliances are still loading', async ({
 test('shows a social media placeholder while team social media is loading', async ({
   page,
 }) => {
-  await page.route(
-    /\/api\/v3\/team\/frc604\/social_media/,
-    () => new Promise(() => {}),
-  );
+  await hangRequests(page, /\/api\/v3\/team\/frc604\/social_media/);
 
   await page.goto('/team/604/2024');
 

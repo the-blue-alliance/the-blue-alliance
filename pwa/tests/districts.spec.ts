@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { gotoHydrated } from './helpers';
+import { delayRequests, gotoHydrated } from './helpers';
 
 test.describe('/districts/2024', () => {
   test.beforeEach(async ({ page }) => {
@@ -39,12 +39,10 @@ test.describe('/districts/2024', () => {
 });
 
 test('shows placeholders while district details load', async ({ page }) => {
-  await page.route(
+  await delayRequests(
+    page,
     /\/district\/[^/]+\/(advancement|teams\/keys)$/,
-    async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      await route.continue();
-    },
+    1500,
   );
 
   await gotoHydrated(page, '/districts/2024');
