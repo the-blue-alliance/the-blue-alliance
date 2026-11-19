@@ -3,7 +3,6 @@ import { type AnchorHTMLAttributes, type ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
-  AllianceColor,
   CompLevel,
   type EliminationAlliance,
   type Event,
@@ -12,6 +11,12 @@ import {
   PlayoffType,
 } from '~/api/tba/read';
 import TraditionalBracket from '~/components/tba/traditionalBracket';
+import {
+  makeEvent as baseEvent,
+  makeMatch as baseMatch,
+  makeAlliance,
+  winningAlliance,
+} from '~/test/factories';
 
 vi.mock('~/components/tba/teamTooltip', () => ({
   TeamLinkWithTooltip: ({
@@ -54,40 +59,14 @@ function allianceTeams(n: number): string[] {
 }
 
 function makeEvent(overrides: Partial<Event> = {}): Event {
-  return {
+  return baseEvent({
     key: '2022test',
-    name: 'Test Event',
-    event_code: 'test',
-    event_type: EventType.REGIONAL,
-    district: null,
-    city: null,
-    state_prov: null,
-    country: null,
     start_date: '2022-03-01',
     end_date: '2022-03-03',
     year: 2022,
-    short_name: null,
-    event_type_string: 'Regional',
-    week: 0,
-    address: null,
-    postal_code: null,
-    gmaps_place_id: null,
-    gmaps_url: null,
-    lat: null,
-    lng: null,
-    location_name: null,
-    timezone: 'America/New_York',
-    website: null,
-    first_event_id: null,
-    first_event_code: null,
-    webcasts: [],
-    division_keys: [],
-    parent_event_key: null,
     playoff_type: PlayoffType.BRACKET_8_TEAM,
-    playoff_type_string: null,
-    remap_teams: null,
     ...overrides,
-  };
+  });
 }
 
 function makeMatch(
@@ -99,40 +78,18 @@ function makeMatch(
   redScore: number,
   blueScore: number,
 ): Match {
-  const winning_alliance =
-    redScore > blueScore
-      ? AllianceColor.RED
-      : blueScore > redScore
-        ? AllianceColor.BLUE
-        : AllianceColor.NO_ALLIANCE;
-  return {
+  return baseMatch({
     key: `2022test_${compLevel}${compLevel === CompLevel.QM ? '' : `${setNumber}m`}${matchNumber}`,
     comp_level: compLevel,
     set_number: setNumber,
     match_number: matchNumber,
     alliances: {
-      red: {
-        score: redScore,
-        team_keys: red,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: blueScore,
-        team_keys: blue,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
+      red: makeAlliance(redScore, red),
+      blue: makeAlliance(blueScore, blue),
     },
-    winning_alliance,
+    winning_alliance: winningAlliance(redScore, blueScore),
     event_key: '2022test',
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
-  };
+  });
 }
 
 const eightTeamMatches: Match[] = [

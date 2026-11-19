@@ -3,13 +3,17 @@ import { type ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import {
-  AllianceColor,
   CompLevel,
   type Event,
   type Match,
   type MatchScoreBreakdown2025,
 } from '~/api/tba/read';
 import TeamMatchStats from '~/components/tba/teamMatchStats';
+import {
+  makeMatch as baseMatch,
+  makeAlliance,
+  winningAlliance,
+} from '~/test/factories';
 
 vi.mock('~/components/tba/links', () => ({
   TeamLink: ({
@@ -55,44 +59,23 @@ function makeMatch({
   blueScore: number;
   scoreBreakdown?: MatchScoreBreakdown2025 | null;
 }): Match {
-  const winning_alliance =
-    redScore > blueScore
-      ? AllianceColor.RED
-      : blueScore > redScore
-        ? AllianceColor.BLUE
-        : AllianceColor.NO_ALLIANCE;
   const suffix =
     compLevel === CompLevel.QM
       ? `qm${matchNumber}`
       : `${compLevel}${setNumber}m${matchNumber}`;
-  return {
+  return baseMatch({
     key: `${eventKey}_${suffix}`,
     comp_level: compLevel,
     set_number: setNumber,
     match_number: matchNumber,
     alliances: {
-      red: {
-        score: redScore,
-        team_keys: red,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: blueScore,
-        team_keys: blue,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
+      red: makeAlliance(redScore, red),
+      blue: makeAlliance(blueScore, blue),
     },
-    winning_alliance,
+    winning_alliance: winningAlliance(redScore, blueScore),
     event_key: eventKey,
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
     score_breakdown: scoreBreakdown,
-    videos: [],
-  };
+  });
 }
 
 const partners = [TEAM, 'frc1', 'frc2'];

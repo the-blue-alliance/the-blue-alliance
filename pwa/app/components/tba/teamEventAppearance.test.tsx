@@ -5,6 +5,7 @@ import { describe, expect, test, vi } from 'vitest';
 import {
   type Award,
   AwardType,
+  type CompLevel,
   type EliminationAlliance,
   type Event,
   type EventDistrictPoints,
@@ -18,6 +19,11 @@ import TeamEventAppearance, {
   TeamStatus,
   getTotalRankingPoints,
 } from '~/components/tba/teamEventAppearance';
+import {
+  makeMatch as baseMatch,
+  makeAlliance,
+  makeEvent,
+} from '~/test/factories';
 
 vi.mock('~/components/tba/links', () => ({
   EventLink: ({
@@ -158,39 +164,20 @@ describe('TeamStatus', () => {
 
 const team = { key: 'frc254', team_number: 254 } as Team;
 
-const fullEvent: Event = {
+const fullEvent = makeEvent({
   key: '2026casj',
   name: 'Silicon Valley Regional',
   event_code: 'casj',
-  event_type: EventType.REGIONAL,
-  district: null,
   city: 'San Jose',
   state_prov: 'CA',
   country: 'USA',
   start_date: '2026-03-26',
   end_date: '2026-03-29',
-  year: 2026,
   short_name: 'Silicon Valley',
-  event_type_string: 'Regional',
   week: 4,
-  address: null,
-  postal_code: null,
-  gmaps_place_id: null,
-  gmaps_url: null,
-  lat: null,
-  lng: null,
   location_name: 'San Jose State',
   timezone: 'America/Los_Angeles',
-  website: null,
-  first_event_id: null,
-  first_event_code: null,
-  webcasts: [],
-  division_keys: [],
-  parent_event_key: null,
-  playoff_type: null,
-  playoff_type_string: null,
-  remap_teams: null,
-};
+});
 
 const fullStatus = {
   qual: {
@@ -272,34 +259,16 @@ function makeMatch(
   blue: string[] = [],
   scores: { red?: number; blue?: number } = {},
 ) {
-  return {
+  return baseMatch({
     key,
-    comp_level: compLevel,
-    set_number: 1,
+    comp_level: compLevel as CompLevel,
     match_number: matchNumber,
     event_key: key.split('_')[0],
-    winning_alliance: 'red',
     alliances: {
-      red: {
-        score: scores.red ?? 1,
-        team_keys: red,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: scores.blue ?? 0,
-        team_keys: blue,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
+      red: makeAlliance(scores.red ?? 1, red),
+      blue: makeAlliance(scores.blue ?? 0, blue),
     },
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
-  } as unknown as Match;
+  });
 }
 
 describe('TeamEventAppearance', () => {

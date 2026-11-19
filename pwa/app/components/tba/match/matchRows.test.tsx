@@ -14,8 +14,6 @@ import {
 import {
   AllianceColor,
   CompLevel,
-  type Event,
-  EventType,
   type Match,
   PlayoffType,
 } from '~/api/tba/read';
@@ -28,6 +26,7 @@ import SimpleMatchRowsWithBreaks, {
 import type { TeamTooltipProps } from '~/components/tba/teamTooltip';
 import { TooltipProvider } from '~/components/ui/tooltip';
 import { formatMatchTime } from '~/lib/matchUtils';
+import { makeAlliance, makeEvent, makeMatch } from '~/test/factories';
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({
@@ -95,87 +94,17 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-const event: Event = {
-  key: '2026test',
-  name: 'Test Event',
-  event_code: 'test',
-  event_type: EventType.REGIONAL,
-  district: null,
-  city: null,
-  state_prov: null,
-  country: null,
+const event = makeEvent({
   start_date: '2026-03-06',
   end_date: '2026-03-08',
-  year: 2026,
-  short_name: null,
-  event_type_string: 'Regional',
-  week: 0,
-  address: null,
-  postal_code: null,
-  gmaps_place_id: null,
-  gmaps_url: null,
-  lat: null,
-  lng: null,
-  location_name: null,
-  timezone: 'America/New_York',
-  website: null,
-  first_event_id: null,
-  first_event_code: null,
-  webcasts: [],
-  division_keys: [],
-  parent_event_key: null,
   playoff_type: PlayoffType.DOUBLE_ELIM_8_TEAM,
-  playoff_type_string: null,
-  remap_teams: null,
-};
-
-function makeMatch(overrides: Partial<Match> = {}): Match {
-  return {
-    key: '2026test_qm1',
-    comp_level: CompLevel.QM,
-    set_number: 1,
-    match_number: 1,
-    alliances: {
-      red: {
-        score: 94,
-        team_keys: ['frc254', 'frc1114', 'frc2056'],
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: 43,
-        team_keys: ['frc148', 'frc217', 'frc33'],
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-    },
-    winning_alliance: AllianceColor.RED,
-    event_key: '2026test',
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
-    ...overrides,
-  };
-}
+});
 
 function makeUnplayedMatch(overrides: Partial<Match> = {}): Match {
   return makeMatch({
     alliances: {
-      red: {
-        score: -1,
-        team_keys: ['frc254', 'frc1114', 'frc2056'],
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: -1,
-        team_keys: ['frc148', 'frc217', 'frc33'],
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
+      red: makeAlliance(-1, ['frc254', 'frc1114', 'frc2056']),
+      blue: makeAlliance(-1, ['frc148', 'frc217', 'frc33']),
     },
     winning_alliance: '' as AllianceColor,
     ...overrides,

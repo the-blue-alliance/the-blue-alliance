@@ -9,6 +9,7 @@ import {
   PlayoffType,
 } from '~/api/tba/read';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
+import { makeAlliance } from '~/test/factories';
 
 vi.mock('~/components/tba/teamTooltip', () => ({
   TeamLinkWithTooltip: ({ teamKey }: { teamKey: string }) => (
@@ -43,18 +44,8 @@ function final(red: string[], blue: string[], winner: AllianceColor): Match {
     set_number: 1,
     match_number: 1,
     alliances: {
-      red: {
-        score: 100,
-        team_keys: red,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: 90,
-        team_keys: blue,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
+      red: makeAlliance(100, red),
+      blue: makeAlliance(90, blue),
     },
     winning_alliance: winner,
     time: null,
