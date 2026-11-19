@@ -472,7 +472,7 @@ describe('DistrictChampsTab', () => {
       .closest('td');
     expect(team1?.style.backgroundColor).toBe('rgb(0, 0, 255)');
     expect(team1?.style.color).toBe('white');
-    expect(team1?.style.outline).toBe('2px solid #ffcc00');
+    expect(team1?.style.outline).toBe('2px solid rgb(255, 204, 0)');
     expect(team1?.querySelector('div')?.className).toBe('font-bold');
     // Unverified light primary: black text, no outline.
     const team2 = within(matchRows[1])
