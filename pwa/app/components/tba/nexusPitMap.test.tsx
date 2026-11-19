@@ -1,26 +1,10 @@
 import { render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import type { NexusMapPit, NexusPitMap } from '~/api/tba/read';
 import NexusPitMapView from '~/components/tba/nexusPitMap';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    params,
-    to: _to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children: ReactNode;
-    params: { teamNumber: string; year?: string };
-    to: string;
-  }) => (
-    <a href={`/team/${params.teamNumber}/${params.year}`} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
 
 function pitMap(pits: Record<string, NexusMapPit>): NexusPitMap {
   return {

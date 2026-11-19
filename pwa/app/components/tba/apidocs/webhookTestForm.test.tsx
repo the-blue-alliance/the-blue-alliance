@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { Webhook } from '~/api/tba/mobile/types.gen';
@@ -14,20 +13,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('~/components/tba/auth/auth', () => ({ useAuth: mocks.useAuth }));
 vi.mock('~/lib/hooks/useWebhooks', () => ({ useWebhooks: mocks.useWebhooks }));
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    to: string;
-  }) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
 
 const UNVERIFIED: Webhook = {
   webhook_id: '1',

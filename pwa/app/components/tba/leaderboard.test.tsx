@@ -9,22 +9,7 @@ import {
   type LeaderboardShape,
 } from '~/components/tba/leaderboard';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    params,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    params: { eventKey: string };
-    to: string;
-  }) => (
-    <a href={to.replace('$eventKey', params.eventKey)} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
 
 vi.mock('~/components/tba/links', () => ({
   TeamLink: ({

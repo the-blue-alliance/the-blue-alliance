@@ -1,6 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { HttpResponse } from 'msw';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { requestApiWriteKey } from '~/api/tba/mobile/sdk.gen';
@@ -18,18 +18,7 @@ vi.mock('@tanstack/react-router', async (importOriginal) => {
     await importOriginal<typeof import('@tanstack/react-router')>();
   return {
     ...actual,
-    Link: ({
-      children,
-      to,
-      ...props
-    }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-      children?: ReactNode;
-      to: string;
-    }) => (
-      <a href={to} {...props}>
-        {children}
-      </a>
-    ),
+    Link: (await import('~/test/linkMocks')).Link,
   };
 });
 

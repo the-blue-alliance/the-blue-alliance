@@ -1,5 +1,4 @@
 import { screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { SearchIndex } from '~/api/tba/read';
@@ -13,22 +12,7 @@ import {
 import { mockTbaApi } from '~/test/msw';
 import { renderWithClient } from '~/test/render';
 
-vi.mock('~/components/tba/links', () => ({
-  TeamLink: ({
-    children,
-    teamOrKey,
-    year,
-    ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
-    children?: ReactNode;
-    teamOrKey: string;
-    year: number;
-  }) => (
-    <a href={`/team/${teamOrKey.substring(3)}/${year}`} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('~/components/tba/links', () => import('~/test/linkMocks'));
 
 const searchIndex: SearchIndex = {
   teams: [{ key: 'frc254', nickname: 'The Cheesy Poofs' }],

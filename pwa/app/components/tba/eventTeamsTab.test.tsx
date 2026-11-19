@@ -1,5 +1,4 @@
 import { fireEvent, screen, within } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { getEventColors } from '~/api/colors/sdk.gen';
@@ -19,22 +18,7 @@ import EventTeamsTab from '~/components/tba/eventTeamsTab';
 import { mockTbaApi } from '~/test/msw';
 import { renderWithClient } from '~/test/render';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    params,
-    to: _to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children: ReactNode;
-    params: { teamNumber: string; year?: string };
-    to: string;
-  }) => (
-    <a href={`/team/${params.teamNumber}/${params.year}`} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
 
 vi.mock('~/components/tba/eventRankTooltip', () => ({
   default: ({ rank }: { rank: number }) => <div>Rank {rank}</div>,
