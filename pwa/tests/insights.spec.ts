@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test';
 
+import { gotoHydrated } from './helpers';
+
 test.describe('/insights/2026 leaderboards', () => {
   test('match leaderboards name the event and match rather than the key', async ({
     page,
   }) => {
-    await page.goto('/insights/2026');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/insights/2026');
     const link = page
       .locator('a[href^="/match/"]')
       .filter({ hasNot: page.locator('[data-slot="tooltip-content"]') })

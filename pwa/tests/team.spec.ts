@@ -3,6 +3,7 @@ import type { Page } from '@playwright/test';
 import { getTeam } from '~/api/tba/read';
 
 import { expect, test } from './fixtures';
+import { gotoHydrated } from './helpers';
 
 test('shows the team name while event alliances are still loading', async ({
   page,
@@ -65,8 +66,7 @@ test('shows a social media placeholder while team social media is loading', asyn
   test(`keeps the year selector the same size on the ${pageName} page`, async ({
     page,
   }) => {
-    await page.goto(path);
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, path);
 
     const boundingBox = await page
       .getByRole('button', { name: currentYearLabel, exact: true })
@@ -81,8 +81,7 @@ test('shows a social media placeholder while team social media is loading', asyn
 
 test.describe('/team/1768/2026', () => {
   test('links Onshape models from the media gallery', async ({ page }) => {
-    await page.goto('/team/1768/2026');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/1768/2026');
 
     await expect(
       page
@@ -94,8 +93,7 @@ test.describe('/team/1768/2026', () => {
 
 test.describe('/team/604/2015', () => {
   test('shows the team avatar from a recent year', async ({ page }) => {
-    await page.goto('/team/604/2015');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/604/2015');
 
     await expect(
       page.getByRole('img', { name: 'Team Avatar', exact: true }),
@@ -105,8 +103,7 @@ test.describe('/team/604/2015', () => {
 
 test.describe('/team/604/2024', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/team/604/2024');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/604/2024');
   });
 
   test('displays the team name', async ({ page }) => {
@@ -342,8 +339,7 @@ test.describe('/team/604/2024', () => {
 
 test.describe('/team/2713/2024', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/team/2713/2024');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/2713/2024');
   });
 
   test('displays the district ranking summary', async ({ page }) => {
@@ -364,8 +360,7 @@ test.describe('/team/2713/2024', () => {
 test.describe('/team/4946/2026', () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 1600, height: 900 });
-    await page.goto('/team/4946/2026');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/4946/2026');
   });
 
   test('keeps blue banners from adjacent event appearances separated', async ({
@@ -387,8 +382,7 @@ test.describe('/team/3467/2026', () => {
   const mayhemSection = (page: Page) => page.locator('section[id="2026nhmm"]');
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/team/3467/2026');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/3467/2026');
   });
 
   test('offers a tab for the remapped B robot', async ({ page }) => {
@@ -418,8 +412,7 @@ test.describe('/team/3467/2026', () => {
 
 test.describe('/team/11175/2026', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/team/11175/2026');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/11175/2026');
   });
 
   test('strikes through and underlines the team in a match it was disqualified from', async ({
@@ -436,8 +429,7 @@ test.describe('/team/11175/2026', () => {
 
 test.describe('/team/6324/history', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/team/6324/history');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/6324/history');
   });
 
   test('alternates highlights between years', async ({ page }) => {
@@ -485,8 +477,7 @@ function isImgurOriginal(url: string): boolean {
 
 test.describe('/team/254/2026', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/team/254/2026');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/254/2026');
   });
 
   test('renders multiple robot picture slides', async ({ page }) => {
@@ -673,8 +664,7 @@ test.describe('/team/604/2025', () => {
   test('links the regional pool ranking to the regional rankings page', async ({
     page,
   }) => {
-    await page.goto('/team/604/2025');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/604/2025');
 
     await expect(
       page.getByRole('link', { name: 'regional pool', exact: true }),
@@ -687,8 +677,7 @@ test.describe('/team/604/2025', () => {
   ['hides', '/team/1002/2017', 0],
 ].forEach(([verb, path, count]) => {
   test(`${verb} the blue banners section on ${path}`, async ({ page }) => {
-    await page.goto(String(path));
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, String(path));
 
     await expect(page.getByTestId('blue-banners')).toHaveCount(Number(count));
   });

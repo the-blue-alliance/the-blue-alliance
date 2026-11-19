@@ -1,8 +1,9 @@
 import { Page, expect, test } from '@playwright/test';
 
+import { gotoHydrated } from './helpers';
+
 test.beforeEach(async ({ page }) => {
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 });
 
 // Navbar
@@ -131,8 +132,7 @@ test.describe('hamburger menu (narrow viewport)', () => {
   test.use({ viewport: { width: 500, height: 800 } });
 
   test('does not open on hover', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/');
 
     const trigger = page.getByRole('button', { name: 'Toggle Menu' });
     await trigger.hover();
@@ -146,8 +146,7 @@ test.describe('hamburger menu (narrow viewport)', () => {
   test('opens on click and fully unmounts on second click', async ({
     page,
   }) => {
-    await page.goto('/');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/');
 
     const trigger = page.getByRole('button', { name: 'Toggle Menu' });
     await trigger.click();
@@ -185,8 +184,7 @@ test('search dialog opens while search_index is still loading', async ({
     });
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 
   const searchButton = page.getByRole('button', {
     name: 'Search teams and events...',
@@ -226,8 +224,7 @@ test('search trigger stays enabled while search_index is pending', async ({
     });
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 
   const searchButton = page.getByRole('button', {
     name: 'Search teams and events...',
@@ -265,8 +262,7 @@ test('requests the search index when the pointer reaches search', async ({
     }
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
   expect(searchIndexUrls).toEqual([]);
 
   await page.getByRole('button', { name: /Search teams and events/ }).hover();
@@ -284,8 +280,7 @@ test('(mobile) opening search focuses the input', async ({ page }) => {
     });
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 
   const searchButton = page.getByRole('button', { name: 'Search' });
   await searchButton.click();
