@@ -30,7 +30,6 @@ from backend.api.handlers.helpers.profiled_jsonify import (
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
-from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.memcache_models.event_nexus_queue_status_memcache import (
@@ -308,18 +307,10 @@ def event_playoff_advancement(event_key: EventKey) -> TypedFlaskResponse[Any]:
     track_call_after_response("event/playoff_advancement", event_key)
 
     # Fetch data
-    event_future = EventQuery(event_key).fetch_async()
-    matches_future = EventMatchesQuery(event_key).fetch_async()
-    event = event_future.get_result()
+    event = EventQuery(event_key).fetch()
     if event is None:
         abort(404)
     event.prep_details()
-    matches = matches_future.get_result()
-
-    # Clean matches
-    # TODO: Unify with web handler
-    cleaned_matches, _ = MatchHelper.delete_invalid_matches(matches, event)
-    _, matches = MatchHelper.organized_matches(cleaned_matches)
 
     bracket_table = event.playoff_bracket
     playoff_advancement = event.playoff_advancement

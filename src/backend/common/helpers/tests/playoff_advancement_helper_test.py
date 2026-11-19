@@ -388,3 +388,23 @@ def test_unplayed_matches_are_skipped() -> None:
         )
     )
     assert all(not r.complete for r in double_elim["rounds"].values())
+
+
+@pytest.mark.parametrize(
+    "playoff_type",
+    [
+        PlayoffType.BRACKET_8_TEAM,
+        PlayoffType.AVG_SCORE_8_TEAM,
+        PlayoffType.ROUND_ROBIN_6_TEAM,
+        PlayoffType.DOUBLE_ELIM_8_TEAM,
+        PlayoffType.DOUBLE_ELIM_4_TEAM,
+    ],
+)
+def test_apiv3_response_empty_without_advancement_data(playoff_type) -> None:
+    event = create_event("2027test", playoff_type)
+    assert (
+        PlayoffAdvancementHelper.create_playoff_advancement_response_for_apiv3(
+            event, None, None
+        )
+        == []
+    )

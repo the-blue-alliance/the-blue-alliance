@@ -885,6 +885,29 @@ def test_event_playoff_advancement(
     assert resp.json == expected_response
 
 
+def test_event_playoff_advancement_empty_before_playoffs(
+    ndb_stub, api_client: Client
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2027mil",
+        year=2027,
+        event_short="mil",
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/event/2027mil/playoff_advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == []
+
+
 SMUGMUG_ALBUM_DETAILS = {
     "title": "2020nyny Photos",
     "web_uri": "https://example.smugmug.com/2020nyny",
