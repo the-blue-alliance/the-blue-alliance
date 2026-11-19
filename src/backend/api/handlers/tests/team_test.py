@@ -3,6 +3,7 @@ import json
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
+from backend.api.handlers.tests.api_spec import response_schema_errors
 from backend.api.handlers.tests.helpers import (
     validate_nominal_event_keys,
     validate_nominal_match_keys,
@@ -1106,3 +1107,71 @@ def test_team_history(ndb_stub, api_client: Client) -> None:
     assert "events" in resp.json
     assert len(resp.json["events"]) == 1
     assert resp.json["events"][0]["key"] == "2020casj"
+
+
+INSTAGRAM_OEMBED_DETAILS = {
+    "author_id": 1538948524,
+    "author_name": "team254",
+    "author_url": "https://www.instagram.com/team254",
+    "height": None,
+    "html": '<blockquote class="instagram-media"></blockquote>',
+    "media_id": "2209076549960165331_1538948524",
+    "provider_name": "Instagram",
+    "provider_url": "https://www.instagram.com",
+    "thumbnail_height": 359,
+    "thumbnail_url": "https://scontent.cdninstagram.com/v/t51.2885-15/e35/s640x640/n.jpg",
+    "thumbnail_width": 640,
+    "title": "Check out our offseason recap video!",
+    "type": "rich",
+    "version": "1.0",
+    "width": 658,
+}
+
+
+def test_team_media_instagram_oembed_details_match_spec(
+    ndb_stub, api_client: Client
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Media(
+        references=[ndb.Key("Team", "frc254")],
+        year=2019,
+        media_type_enum=MediaType.INSTAGRAM_IMAGE,
+        foreign_key="B6oN2sCBWfT",
+        details_json=json.dumps(INSTAGRAM_OEMBED_DETAILS),
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/media/2019",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+
+    assert resp.json[0]["details"] == INSTAGRAM_OEMBED_DETAILS
+    assert response_schema_errors("/team/{team_key}/media/{year}", resp.json) == []
+
+
+def test_team_media_instagram_without_details_matches_spec(
+    ndb_stub, api_client: Client
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Media(
+        references=[ndb.Key("Team", "frc254")],
+        year=2024,
+        media_type_enum=MediaType.INSTAGRAM_IMAGE,
+        foreign_key="C4bhT7FsmAW",
+        details_json=None,
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/media/2024",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+
+    assert response_schema_errors("/team/{team_key}/media/{year}", resp.json) == []

@@ -2699,6 +2699,9 @@ export type Media =
       type: 'grabcad';
     } & MediaGrabCad)
   | ({
+      type: 'instagram-image';
+    } & MediaInstagramImage)
+  | ({
       type:
         | 'youtube'
         | 'imgur'
@@ -2709,7 +2712,6 @@ export type Media =
         | 'instagram-profile'
         | 'periscope-profile'
         | 'gitlab-profile'
-        | 'instagram-image'
         | 'external-link';
     } & MediaNoDetails)
   | ({
@@ -2801,6 +2803,75 @@ export type MediaGrabCad = MediaBase & {
   };
 };
 
+export type MediaInstagramImage = MediaBase & {
+  type?: 'instagram-image';
+  /**
+   * The Instagram oEmbed response stored when the media was added. Only instagram-image media added before TBA stopped calling Instagram's oEmbed API (November 2022) carry these fields; newer instagram-image media have empty details.
+   */
+  details?: {
+    /**
+     * oEmbed version, `1.0`.
+     */
+    version?: string;
+    /**
+     * oEmbed resource type, `rich`.
+     */
+    type?: string;
+    /**
+     * The post's caption.
+     */
+    title?: string;
+    /**
+     * Instagram username of the post's author.
+     */
+    author_name?: string;
+    /**
+     * URL of the author's Instagram profile.
+     */
+    author_url?: string;
+    /**
+     * Instagram user ID of the post's author.
+     */
+    author_id?: number;
+    /**
+     * Instagram media ID of the post.
+     */
+    media_id?: string;
+    /**
+     * `Instagram`.
+     */
+    provider_name?: string;
+    /**
+     * `https://www.instagram.com`.
+     */
+    provider_url?: string;
+    /**
+     * Instagram's embed HTML for the post.
+     */
+    html?: string;
+    /**
+     * Width of the embed in pixels.
+     */
+    width?: number;
+    /**
+     * Height of the embed in pixels; null, since the embed sizes itself.
+     */
+    height?: number | null;
+    /**
+     * URL of the post's thumbnail image, as of when the media was added. Instagram CDN URLs expire, so it may no longer load.
+     */
+    thumbnail_url?: string;
+    /**
+     * Width of the thumbnail in pixels.
+     */
+    thumbnail_width?: number;
+    /**
+     * Height of the thumbnail in pixels.
+     */
+    thumbnail_height?: number;
+  };
+};
+
 export type MediaNoDetails = MediaBase & {
   type?:
     | 'youtube'
@@ -2812,7 +2883,6 @@ export type MediaNoDetails = MediaBase & {
     | 'instagram-profile'
     | 'periscope-profile'
     | 'gitlab-profile'
-    | 'instagram-image'
     | 'external-link';
   details?: {};
 };

@@ -659,6 +659,7 @@ export {
   type MediaCdPhotoThread,
   type MediaCdThread,
   type MediaGrabCad,
+  type MediaInstagramImage,
   type MediaNoDetails,
   type MediaOnshape,
   type MediaSmugmugAlbum,

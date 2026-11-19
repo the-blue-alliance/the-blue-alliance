@@ -926,6 +926,31 @@ export const zMediaGrabCad = zMediaBase.and(
   }),
 );
 
+export const zMediaInstagramImage = zMediaBase.and(
+  z.object({
+    type: z.literal('instagram-image').optional(),
+    details: z
+      .object({
+        version: z.string().optional(),
+        type: z.string().optional(),
+        title: z.string().optional(),
+        author_name: z.string().optional(),
+        author_url: z.string().optional(),
+        author_id: z.int().optional(),
+        media_id: z.string().optional(),
+        provider_name: z.string().optional(),
+        provider_url: z.string().optional(),
+        html: z.string().optional(),
+        width: z.int().optional(),
+        height: z.int().nullish(),
+        thumbnail_url: z.string().optional(),
+        thumbnail_width: z.int().optional(),
+        thumbnail_height: z.int().optional(),
+      })
+      .optional(),
+  }),
+);
+
 export const zMediaNoDetails = zMediaBase.and(
   z.object({
     type: z
@@ -939,7 +964,6 @@ export const zMediaNoDetails = zMediaBase.and(
         'instagram-profile',
         'periscope-profile',
         'gitlab-profile',
-        'instagram-image',
         'external-link',
       ])
       .optional(),
@@ -1019,6 +1043,11 @@ export const zMedia = z.union([
     .and(zMediaGrabCad),
   z
     .object({
+      type: z.literal('instagram-image'),
+    })
+    .and(zMediaInstagramImage),
+  z
+    .object({
       type: z.literal('youtube'),
     })
     .and(zMediaNoDetails),
@@ -1060,11 +1089,6 @@ export const zMedia = z.union([
   z
     .object({
       type: z.literal('gitlab-profile'),
-    })
-    .and(zMediaNoDetails),
-  z
-    .object({
-      type: z.literal('instagram-image'),
     })
     .and(zMediaNoDetails),
   z
