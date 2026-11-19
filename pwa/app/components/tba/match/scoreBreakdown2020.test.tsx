@@ -2,46 +2,24 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 
 import {
-  AllianceColor,
-  CompLevel,
   EndgameRobot2020,
   EndgameRungIsLevel2020,
   InitLineRobot2020,
-  Match,
   MatchScoreBreakdown2020,
   MatchScoreBreakdown2020Alliance,
   Stage3TargetColor2020,
 } from '~/api/tba/read';
 import ScoreBreakdown2020 from '~/components/tba/match/scoreBreakdown2020';
+import { makeMatch, makeAlliance as makeMatchAlliance } from '~/test/factories';
 
-const match: Match = {
+const match = makeMatch({
   key: '2020nytr_qm1',
-  comp_level: CompLevel.QM,
-  set_number: 1,
-  match_number: 1,
   alliances: {
-    red: {
-      score: 150,
-      team_keys: ['frc254', 'frc1678', 'frc971'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
-    blue: {
-      score: 90,
-      team_keys: ['frc148', 'frc2056', 'frc118'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
+    red: makeMatchAlliance(150, ['frc254', 'frc1678', 'frc971']),
+    blue: makeMatchAlliance(90, ['frc148', 'frc2056', 'frc118']),
   },
-  winning_alliance: AllianceColor.RED,
   event_key: '2020nytr',
-  time: null,
-  actual_time: null,
-  predicted_time: null,
-  post_result_time: null,
-  score_breakdown: null,
-  videos: [],
-};
+});
 
 function makeAlliance(
   overrides: Partial<MatchScoreBreakdown2020Alliance> = {},

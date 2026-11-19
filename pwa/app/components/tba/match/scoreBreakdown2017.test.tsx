@@ -2,44 +2,22 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 
 import {
-  AllianceColor,
-  CompLevel,
-  Match,
   MatchScoreBreakdown2017,
   MatchScoreBreakdown2017Alliance,
   RobotAuto2017,
   Touchpad2017,
 } from '~/api/tba/read';
 import ScoreBreakdown2017 from '~/components/tba/match/scoreBreakdown2017';
+import { makeMatch, makeAlliance as makeMatchAlliance } from '~/test/factories';
 
-const match: Match = {
+const match = makeMatch({
   key: '2017nytr_qm1',
-  comp_level: CompLevel.QM,
-  set_number: 1,
-  match_number: 1,
   alliances: {
-    red: {
-      score: 320,
-      team_keys: ['frc254', 'frc1678', 'frc971'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
-    blue: {
-      score: 180,
-      team_keys: ['frc148', 'frc2056', 'frc118'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
+    red: makeMatchAlliance(320, ['frc254', 'frc1678', 'frc971']),
+    blue: makeMatchAlliance(180, ['frc148', 'frc2056', 'frc118']),
   },
-  winning_alliance: AllianceColor.RED,
   event_key: '2017nytr',
-  time: null,
-  actual_time: null,
-  predicted_time: null,
-  post_result_time: null,
-  score_breakdown: null,
-  videos: [],
-};
+});
 
 function makeAlliance(
   overrides: Partial<MatchScoreBreakdown2017Alliance> = {},

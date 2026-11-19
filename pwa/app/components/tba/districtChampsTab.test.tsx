@@ -12,7 +12,6 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { type EventColors } from '~/api/colors';
 import { getEventColors } from '~/api/colors/sdk.gen';
 import {
-  AllianceColor,
   CompLevel,
   type Event,
   type EventRanking,
@@ -26,6 +25,12 @@ import {
   getEventsByYear,
 } from '~/api/tba/read/sdk.gen';
 import { DistrictChampsTab } from '~/components/tba/districtChampsTab';
+import {
+  makeEvent as baseEvent,
+  makeMatch as baseMatch,
+  makeAlliance,
+  winningAlliance,
+} from '~/test/factories';
 import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
 import { renderWithClient } from '~/test/render';
 
@@ -65,39 +70,19 @@ function makeEvent(
   short_name: string | null,
   event_type = EventType.CMP_DIVISION,
 ): Event {
-  return {
+  return baseEvent({
     key,
     name,
     short_name,
     event_type,
     event_code: key.substring(4),
-    district: null,
-    city: null,
-    state_prov: null,
-    country: null,
     start_date: '2026-04-15',
     end_date: '2026-04-18',
-    year: 2026,
     event_type_string: 'Championship Division',
     week: null,
-    address: null,
-    postal_code: null,
-    gmaps_place_id: null,
-    gmaps_url: null,
-    lat: null,
-    lng: null,
-    location_name: null,
     timezone: 'America/Chicago',
-    website: null,
-    first_event_id: null,
-    first_event_code: null,
-    webcasts: [],
-    division_keys: [],
     parent_event_key: '2026cmptx',
-    playoff_type: null,
-    playoff_type_string: null,
-    remap_teams: null,
-  };
+  });
 }
 
 function makeMatch(
@@ -110,44 +95,22 @@ function makeMatch(
   redScore: number,
   blueScore: number,
 ): Match {
-  const winning_alliance =
-    redScore > blueScore
-      ? AllianceColor.RED
-      : blueScore > redScore
-        ? AllianceColor.BLUE
-        : AllianceColor.NO_ALLIANCE;
   const suffix =
     compLevel === CompLevel.QM
       ? `qm${matchNumber}`
       : `${compLevel}${setNumber}m${matchNumber}`;
-  return {
+  return baseMatch({
     key: `${eventKey}_${suffix}`,
     comp_level: compLevel,
     set_number: setNumber,
     match_number: matchNumber,
     alliances: {
-      red: {
-        score: redScore,
-        team_keys: red,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: blueScore,
-        team_keys: blue,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
+      red: makeAlliance(redScore, red),
+      blue: makeAlliance(blueScore, blue),
     },
-    winning_alliance,
+    winning_alliance: winningAlliance(redScore, blueScore),
     event_key: eventKey,
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
-  };
+  });
 }
 
 function makeRanking(

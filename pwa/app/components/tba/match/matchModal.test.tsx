@@ -3,16 +3,10 @@ import { HttpResponse, delay } from 'msw';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import {
-  AllianceColor,
-  CompLevel,
-  type Event,
-  EventType,
-  type Match,
-  PlayoffType,
-} from '~/api/tba/read';
+import { CompLevel, type Event, type Match, PlayoffType } from '~/api/tba/read';
 import { getEvent, getMatch } from '~/api/tba/read/sdk.gen';
 import { MatchModal } from '~/components/tba/match/matchModal';
+import { makeEvent, makeMatch } from '~/test/factories';
 import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
 import { renderWithClient } from '~/test/render';
 
@@ -73,68 +67,17 @@ vi.mock('~/components/ui/credenza', () => ({
   CredenzaTitle: ({ children }: { children: ReactNode }) => <h2>{children}</h2>,
 }));
 
-const event: Event = {
-  key: '2026test',
-  name: 'Test Event',
-  event_code: 'test',
-  event_type: EventType.REGIONAL,
-  district: null,
-  city: null,
-  state_prov: null,
-  country: null,
+const event = makeEvent({
   start_date: '2026-03-06',
   end_date: '2026-03-08',
-  year: 2026,
-  short_name: null,
-  event_type_string: 'Regional',
-  week: 0,
-  address: null,
-  postal_code: null,
-  gmaps_place_id: null,
-  gmaps_url: null,
-  lat: null,
-  lng: null,
-  location_name: null,
-  timezone: 'America/New_York',
-  website: null,
-  first_event_id: null,
-  first_event_code: null,
-  webcasts: [],
-  division_keys: [],
-  parent_event_key: null,
   playoff_type: PlayoffType.DOUBLE_ELIM_8_TEAM,
-  playoff_type_string: null,
-  remap_teams: null,
-};
+});
 
-const match: Match = {
+const match = makeMatch({
   key: '2026test_sf2m1',
   comp_level: CompLevel.SF,
   set_number: 2,
-  match_number: 1,
-  alliances: {
-    red: {
-      score: 94,
-      team_keys: ['frc254', 'frc1114', 'frc2056'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
-    blue: {
-      score: 43,
-      team_keys: ['frc148', 'frc217', 'frc33'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
-  },
-  winning_alliance: AllianceColor.RED,
-  event_key: '2026test',
-  time: null,
-  actual_time: null,
-  predicted_time: null,
-  post_result_time: null,
-  score_breakdown: null,
-  videos: [],
-};
+});
 
 const MATCH_PATH = { path: { match_key: '2026test_sf2m1' } };
 const EVENT_PATH = { path: { event_key: '2026test' } };
