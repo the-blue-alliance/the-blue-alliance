@@ -13,16 +13,11 @@ import {
 } from '~/api/tba/mobile/sdk.gen';
 import type { Webhook } from '~/api/tba/mobile/types.gen';
 import { useWebhooks } from '~/lib/hooks/useWebhooks';
+import { signIn, signOut } from '~/test/auth';
 import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
 import { renderHookWithClient } from '~/test/render';
 
-const mocks = vi.hoisted(() => ({
-  useAuth: vi.fn<() => { user: unknown }>(),
-}));
-
-vi.mock('~/components/tba/auth/auth', () => ({ useAuth: mocks.useAuth }));
-
-const USER = { uid: 'user-1', getIdToken: () => Promise.resolve('token-1') };
+vi.mock('~/components/tba/auth/auth', () => import('~/test/auth'));
 
 const HOOK_A: Webhook = {
   webhook_id: '1',
@@ -47,12 +42,12 @@ async function renderLoaded() {
 
 describe('useWebhooks', () => {
   beforeEach(() => {
-    mocks.useAuth.mockReturnValue({ user: USER });
+    signIn();
     mockTbaApi(listWebhooks, {}, { code: 200, webhooks: [HOOK_A] });
   });
 
   test('does not load webhooks when signed out', async () => {
-    mocks.useAuth.mockReturnValue({ user: null });
+    signOut();
 
     const { result } = await renderLoaded();
 
