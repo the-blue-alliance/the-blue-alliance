@@ -1,6 +1,7 @@
 import { type Event, getEventsByYear } from '~/api/tba/read';
 
 import { expect, test } from './fixtures';
+import { gotoHydrated } from './helpers';
 import events2025 from './mocks/data/events/2025.json' with { type: 'json' };
 
 test('/events/2025 drops the parent event name from division rows', async ({
@@ -22,8 +23,7 @@ test('/events/2025 drops the parent event name from division rows', async ({
 
 test.describe('/events/2025', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/events/2025');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/events/2025');
   });
 
   test('lists championship divisions immediately after Einstein Field', async ({
@@ -84,8 +84,7 @@ test.describe('/events/2025', () => {
 test('/events/2024 leaves Regional Events out of the district selector', async ({
   page,
 }) => {
-  await page.goto('/events/2024');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/events/2024');
   await page.getByRole('combobox').filter({ hasText: 'All Events' }).click();
 
   await expect(
@@ -95,8 +94,7 @@ test('/events/2024 leaves Regional Events out of the district selector', async (
 
 test.describe('/events', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/events');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/events');
   });
 
   test('labels the district selector as All Events', async ({ page }) => {
