@@ -6,7 +6,8 @@ from backend.common.models.keys import DistrictAbbreviation, EventKey
 
 
 def short_team(team_number: str) -> Response:
-    return redirect(f"/team/{int(team_number)}", code=301)
+    number = int(team_number.removeprefix("frc"))
+    return redirect(f"/team/{number}", code=301)
 
 
 def short_event_or_district(short_key: str) -> Response:

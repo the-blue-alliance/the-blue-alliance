@@ -15,6 +15,22 @@ test('scrolls to Alliance Selection when its table of contents link is clicked',
   ).toBeInViewport();
 });
 
+test('documents the alliances in the Alliance Selection payload', async ({
+  page,
+}) => {
+  const section = page.locator('section#alliance_selection');
+
+  await expect(
+    section.getByRole('cell', { name: 'event_alliances', exact: true }),
+  ).toBeVisible();
+  const example = JSON.parse(await section.locator('pre').innerText());
+  expect(example.message_data.event_alliances[0]).toEqual({
+    name: 'Alliance 1',
+    picks: ['frc195', 'frc558', 'frc5122'],
+    declines: [],
+  });
+});
+
 test('shows the verification message example', async ({ page }) => {
   await expect(
     page.getByText(

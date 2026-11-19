@@ -216,7 +216,7 @@ app.add_url_rule("/avatar/<int:year>/<team_key>.png", view_func=avatar_png)
 
 # Short routes: /<team_number> and /<event_or_district_key>
 app.add_url_rule(
-    '/<regex("[0-9]{1,5}"):team_number>',
+    '/<regex("(?:frc)?[0-9]{1,5}"):team_number>',
     view_func=short_team,
 )
 app.add_url_rule(

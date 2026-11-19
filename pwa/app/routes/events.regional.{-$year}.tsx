@@ -1,4 +1,5 @@
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import type { QueryClient } from '@tanstack/react-query';
+import { createFileRoute, isNotFound, notFound } from '@tanstack/react-router';
 import { useState } from 'react';
 
 import { RegionalAdvancement, RegionalRanking } from '~/api/tba/read';
@@ -29,6 +30,43 @@ import {
 
 const FIRST_REGIONAL_POOL_YEAR = 2025;
 
+async function loadRegionalPool(queryClient: QueryClient, year: number) {
+  const staleTime = staleTimeForYear(year);
+  const [rankings, advancement, events] = await Promise.all([
+    queryClient
+      .ensureQueryData({
+        ...getRegionalRankingsOptions({ path: { year } }),
+        staleTime,
+      })
+      .catch(doThrowNotFound),
+    queryClient
+      .ensureQueryData({
+        ...getRegionalAdvancementOptions({ path: { year } }),
+        staleTime,
+      })
+      .catch(() => null),
+    queryClient
+      .ensureQueryData({
+        ...getEventsByYearOptions({ path: { year } }),
+        staleTime,
+      })
+      .catch(() => []),
+  ]);
+
+  if (rankings === null) {
+    throw notFound();
+  }
+
+  return {
+    year,
+    rankings,
+    advancement,
+    eventNames: Object.fromEntries(
+      events.map((event) => [event.key, event.short_name || event.name]),
+    ),
+  };
+}
+
 export const Route = createFileRoute('/events/regional/{-$year}')({
   loader: async ({ params, context: { queryClient, currentSeason } }) => {
     const year = parseParamsForYearElseDefault(currentSeason, params);
@@ -36,40 +74,19 @@ export const Route = createFileRoute('/events/regional/{-$year}')({
       throw notFound();
     }
 
-    const staleTime = staleTimeForYear(year);
-    const [rankings, advancement, events] = await Promise.all([
-      queryClient
-        .ensureQueryData({
-          ...getRegionalRankingsOptions({ path: { year } }),
-          staleTime,
-        })
-        .catch(doThrowNotFound),
-      queryClient
-        .ensureQueryData({
-          ...getRegionalAdvancementOptions({ path: { year } }),
-          staleTime,
-        })
-        .catch(() => null),
-      queryClient
-        .ensureQueryData({
-          ...getEventsByYearOptions({ path: { year } }),
-          staleTime,
-        })
-        .catch(() => []),
-    ]);
-
-    if (rankings === null) {
-      throw notFound();
+    // Before the current season's pool exists (e.g. right after the season
+    // rolls over), the default page shows the previous season's pool.
+    if (params.year === undefined && year > FIRST_REGIONAL_POOL_YEAR) {
+      try {
+        return await loadRegionalPool(queryClient, year);
+      } catch (error) {
+        if (!isNotFound(error)) {
+          throw error;
+        }
+        return loadRegionalPool(queryClient, year - 1);
+      }
     }
-
-    return {
-      year,
-      rankings,
-      advancement,
-      eventNames: Object.fromEntries(
-        events.map((event) => [event.key, event.short_name || event.name]),
-      ),
-    };
+    return loadRegionalPool(queryClient, year);
   },
   headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
