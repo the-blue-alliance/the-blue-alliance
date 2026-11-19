@@ -1,8 +1,13 @@
 import json
 
+import pytest
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
+from backend.api.handlers.tests.api_spec import (
+    component_schema_errors,
+    undeclared_fields,
+)
 from backend.api.handlers.tests.helpers import (
     validate_nominal_match_keys,
     validate_simple_match_keys,
@@ -152,3 +157,47 @@ def test_zebra_motionworks(ndb_stub, api_client: Client) -> None:
     )
     assert resp.status_code == 200
     assert resp.json == data
+
+
+SCORE_BREAKDOWN_MATCH_KEYS = ["2015new_qm109", "2023flor_f1m1", "2026hiho_qm20"]
+
+
+def _get_score_breakdown(
+    match_key: str, api_client: Client, test_data_importer
+) -> dict:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    test_data_importer.import_match_list(__file__, "data/score_breakdown_matches.json")
+    resp = api_client.get(
+        f"/api/v3/match/{match_key}", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    return resp.json["score_breakdown"]
+
+
+@pytest.mark.parametrize("match_key", SCORE_BREAKDOWN_MATCH_KEYS)
+def test_match_score_breakdown_matches_spec_types(
+    match_key: str,
+    ndb_stub,
+    api_client: Client,
+    test_data_importer,
+) -> None:
+    breakdown = _get_score_breakdown(match_key, api_client, test_data_importer)
+
+    assert (
+        component_schema_errors(f"Match_Score_Breakdown_{match_key[:4]}", breakdown)
+        == []
+    )
+
+
+@pytest.mark.parametrize("match_key", SCORE_BREAKDOWN_MATCH_KEYS)
+def test_match_score_breakdown_fields_declared_in_spec(
+    match_key: str,
+    ndb_stub,
+    api_client: Client,
+    test_data_importer,
+) -> None:
+    breakdown = _get_score_breakdown(match_key, api_client, test_data_importer)
+
+    assert undeclared_fields(f"Match_Score_Breakdown_{match_key[:4]}", breakdown) == []

@@ -351,6 +351,7 @@ export const zHubScore2026 = z.object({
   totalPoints: z.int(),
   transitionCount: z.int(),
   transitionPoints: z.int(),
+  uncounted: z.int().optional(),
 });
 
 export const zEndgameRobot2018 = z.enum([
@@ -616,7 +617,7 @@ export const zMatchScoreBreakdown2015Alliance = z.object({
 export const zMatchScoreBreakdown2015 = z.object({
   blue: zMatchScoreBreakdown2015Alliance,
   red: zMatchScoreBreakdown2015Alliance,
-  coopertition: z.enum(['None', 'Unknown', 'Stack']),
+  coopertition: z.enum(['None', 'Unknown', 'Set', 'Stack']),
   coopertition_points: z.int(),
 });
 
@@ -744,6 +745,7 @@ export const zMatchScoreBreakdown2026Alliance = z.object({
   energizedAchieved: z.boolean(),
   foulPoints: z.int(),
   g206Penalty: z.boolean(),
+  penalties: z.string().optional(),
   hubScore: zHubScore2026,
   majorFoulCount: z.int(),
   minorFoulCount: z.int(),
@@ -1150,11 +1152,13 @@ export const zMatchScoreBreakdown2023Alliance = z.object({
   foulCount: z.int(),
   foulPoints: z.int(),
   techFoulCount: z.int(),
+  g405Penalty: z.boolean().optional(),
+  h111Penalty: z.boolean().optional(),
   linkPoints: z.int().optional(),
   links: z
     .array(
       z.object({
-        nodes: z.array(z.enum(['None', 'Cone', 'Cube'])),
+        nodes: z.array(z.int().gte(0).lte(8)),
         row: z.enum(['Bottom', 'Mid', 'Top']),
       }),
     )
