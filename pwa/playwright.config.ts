@@ -41,7 +41,8 @@ export default defineConfig({
 
   /* Run build and run prod server before starting the tests */
   webServer: {
-    command: 'pnpm run start',
+    command:
+      'cross-env NODE_ENV=production node --import ./tests/mocks/ssrPreload.ts ./server.js',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     stderr: 'pipe',

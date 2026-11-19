@@ -64,7 +64,7 @@ export default defineConfig({
     {
       // Standalone scripts are outside the `~/` alias, so relative sibling
       // imports are the only option.
-      files: ['scripts/**/*.{ts,mjs}'],
+      files: ['scripts/**/*.{ts,mjs}', 'tests/**/*.ts'],
       rules: {
         'no-relative-import-paths/no-relative-import-paths': 'off',
       },

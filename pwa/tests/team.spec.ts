@@ -1,8 +1,37 @@
-import { type Page, expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+
+import { getTeam } from '~/api/tba/read';
+
+import { expect, test } from './fixtures';
 
 test('shows the team name while event alliances are still loading', async ({
   page,
+  mockTba,
 }) => {
+  await mockTba(
+    getTeam,
+    { path: { team_key: 'frc604' } },
+    {
+      key: 'frc604',
+      team_number: 604,
+      nickname: 'Mocked Quixilver',
+      name: 'Leland High School',
+      school_name: 'Leland High School',
+      city: 'San Jose',
+      state_prov: 'California',
+      country: 'USA',
+      address: null,
+      postal_code: '95120',
+      gmaps_place_id: null,
+      gmaps_url: null,
+      lat: null,
+      lng: null,
+      location_name: null,
+      website: 'https://frc604.org',
+      rookie_year: 2001,
+      motto: null,
+    },
+  );
   await page.route(
     /\/api\/v3\/event\/[^/]+\/alliances/,
     () => new Promise(() => {}),
@@ -10,7 +39,7 @@ test('shows the team name while event alliances are still loading', async ({
 
   await page.goto('/team/604/2024');
 
-  await expect(page.locator('h1')).toHaveText('Team 604 - Quixilver');
+  await expect(page.locator('h1')).toHaveText('Team 604 - Mocked Quixilver');
 });
 
 test('shows a social media placeholder while team social media is loading', async ({
