@@ -1,8 +1,8 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
-import { describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { getEventColors } from '~/api/colors/sdk.gen';
 import type {
   Event,
   Match,
@@ -11,7 +11,13 @@ import type {
   Team,
   TeamEventStatus,
 } from '~/api/tba/read';
+import {
+  getEventNexusInfo,
+  getEventTeamsStatuses,
+} from '~/api/tba/read/sdk.gen';
 import EventTeamsTab from '~/components/tba/eventTeamsTab';
+import { mockTbaApi } from '~/test/msw';
+import { renderWithClient } from '~/test/render';
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({
@@ -28,37 +34,6 @@ vi.mock('@tanstack/react-router', () => ({
       {children}
     </a>
   ),
-}));
-
-const relatedEvents: Record<
-  string,
-  {
-    pitMap: NexusPitMap;
-    statuses: Record<string, Partial<TeamEventStatus>>;
-  }
-> = {};
-
-vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
-  getEventNexusInfoOptions: ({ path }: { path: { event_key: string } }) => ({
-    queryKey: ['nexus', path.event_key],
-    queryFn: () =>
-      Promise.resolve({ pit_map: relatedEvents[path.event_key].pitMap }),
-  }),
-  getEventTeamsStatusesOptions: ({
-    path,
-  }: {
-    path: { event_key: string };
-  }) => ({
-    queryKey: ['statuses', path.event_key],
-    queryFn: () => Promise.resolve(relatedEvents[path.event_key].statuses),
-  }),
-}));
-
-vi.mock('~/api/colors/@tanstack/react-query.gen', () => ({
-  getEventColorsOptions: ({ path }: { path: { eventKey: string } }) => ({
-    queryKey: ['colors', path.eventKey],
-    queryFn: () => Promise.resolve({ teams: {} }),
-  }),
 }));
 
 vi.mock('~/components/tba/eventRankTooltip', () => ({
@@ -152,17 +127,34 @@ const pitMap: NexusPitMap = {
   walls: {},
 };
 
+function mockRelatedEvent(
+  eventKey: string,
+  pitMap: NexusPitMap,
+  statuses: Record<string, Partial<TeamEventStatus>>,
+) {
+  const path = { path: { event_key: eventKey } };
+  mockTbaApi(getEventNexusInfo, path, {
+    data_as_of_ms: null,
+    now_queueing: null,
+    matches: {},
+    pit_map: pitMap,
+  });
+  mockTbaApi(
+    getEventTeamsStatuses,
+    path,
+    statuses as Record<string, TeamEventStatus>,
+  );
+}
+
 function renderTeams(props: Partial<Parameters<typeof EventTeamsTab>[0]> = {}) {
-  return render(
-    <QueryClientProvider client={new QueryClient()}>
-      <EventTeamsTab
-        event={event}
-        teams={[otherTeam, team]}
-        matches={[]}
-        media={[]}
-        {...props}
-      />
-    </QueryClientProvider>,
+  return renderWithClient(
+    <EventTeamsTab
+      event={event}
+      teams={[otherTeam, team]}
+      matches={[]}
+      media={[]}
+      {...props}
+    />,
   );
 }
 
@@ -172,6 +164,12 @@ async function openPitMap() {
 }
 
 describe('EventTeamsTab', () => {
+  beforeEach(() => {
+    ['2024casj', '2024casj2', '2024casj3'].forEach((eventKey) =>
+      mockTbaApi(getEventColors, { path: { eventKey } }, { teams: {} }),
+    );
+  });
+
   test('shows teams in numerical order', () => {
     renderTeams();
     expect(
@@ -462,10 +460,9 @@ describe('EventTeamsTab', () => {
     });
 
     test('labels pits with teams from a related event on the same map', async () => {
-      relatedEvents['2024casj2'] = {
-        pitMap,
-        statuses: { frc1678: { pit_location: 'A2' } },
-      };
+      mockRelatedEvent('2024casj2', pitMap, {
+        frc1678: { pit_location: 'A2' },
+      });
       renderTeams({ pitMap, relatedEventKeys: ['2024casj2'] });
       const map = await openPitMap();
       expect(
@@ -474,20 +471,20 @@ describe('EventTeamsTab', () => {
     });
 
     test('ignores teams from a related event whose map places pits elsewhere', async () => {
-      relatedEvents['2024casj2'] = {
-        pitMap,
-        statuses: { frc1678: { pit_location: 'A2' } },
-      };
-      relatedEvents['2024casj3'] = {
-        pitMap: {
+      mockRelatedEvent('2024casj2', pitMap, {
+        frc1678: { pit_location: 'A2' },
+      });
+      mockRelatedEvent(
+        '2024casj3',
+        {
           ...pitMap,
           pits: {
             ...pitMap.pits,
             A2: { ...pitMap.pits.A2, position: { x: 150, y: 150 } },
           },
         },
-        statuses: { frc971: { pit_location: 'A1' } },
-      };
+        { frc971: { pit_location: 'A1' } },
+      );
       renderTeams({ pitMap, relatedEventKeys: ['2024casj2', '2024casj3'] });
       const map = await openPitMap();
       await within(map).findByRole('link', { name: '1678' });
