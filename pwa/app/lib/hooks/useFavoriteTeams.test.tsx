@@ -10,16 +10,11 @@ import {
   useFavoriteTeams,
 } from '~/lib/hooks/useFavoriteTeams';
 import { MODEL_TYPE } from '~/lib/utils';
+import { signIn, signOut } from '~/test/auth';
 import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
 import { renderHookWithClient } from '~/test/render';
 
-const mocks = vi.hoisted(() => ({
-  useAuth: vi.fn<() => { user: unknown }>(),
-}));
-
-vi.mock('~/components/tba/auth/auth', () => ({ useAuth: mocks.useAuth }));
-
-const USER = { uid: 'user-1', getIdToken: () => Promise.resolve('token-1') };
+vi.mock('~/components/tba/auth/auth', () => import('~/test/auth'));
 
 function team(teamNumber: number): TeamSimple {
   return {
@@ -43,11 +38,11 @@ function mockTeam(teamNumber: number) {
 
 describe('useFavoriteTeams', () => {
   beforeEach(() => {
-    mocks.useAuth.mockReturnValue({ user: USER });
+    signIn();
   });
 
   test('does not fetch favorites when signed out', () => {
-    mocks.useAuth.mockReturnValue({ user: null });
+    signOut();
     const requests = mockTbaApi(listFavorites, {}, { favorites: [] });
 
     const { result } = renderHookWithClient(() => useFavoriteTeams());
@@ -121,7 +116,7 @@ describe('useFavoriteTeams', () => {
 
 describe('useFavoriteTeamKeys', () => {
   beforeEach(() => {
-    mocks.useAuth.mockReturnValue({ user: USER });
+    signIn();
   });
 
   test('returns only favorited team keys', async () => {
@@ -145,7 +140,7 @@ describe('useFavoriteTeamKeys', () => {
   });
 
   test('returns no team keys when signed out', () => {
-    mocks.useAuth.mockReturnValue({ user: null });
+    signOut();
 
     const { result } = renderHookWithClient(() => useFavoriteTeamKeys());
 

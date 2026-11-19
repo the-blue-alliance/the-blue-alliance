@@ -12,16 +12,12 @@ import type {
   SubscriptionCollection,
 } from '~/api/tba/mobile/types.gen';
 import { useMyTBA } from '~/lib/hooks/useMyTBA';
+import { signIn, signOut } from '~/test/auth';
 import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
 import { renderHookWithClient } from '~/test/render';
 
-const mocks = vi.hoisted(() => ({
-  useAuth: vi.fn<() => { user: unknown }>(),
-}));
+vi.mock('~/components/tba/auth/auth', () => import('~/test/auth'));
 
-vi.mock('~/components/tba/auth/auth', () => ({ useAuth: mocks.useAuth }));
-
-const USER = { uid: 'user-1', getIdToken: () => Promise.resolve('token-1') };
 const TEAM = 1;
 
 const FAVORITES: FavoriteCollection = {
@@ -82,14 +78,14 @@ async function renderLoaded(modelKey: string) {
 
 describe('useMyTBA', () => {
   beforeEach(() => {
-    mocks.useAuth.mockReturnValue({ user: USER });
+    signIn();
     mockTbaApi(listFavorites, {}, FAVORITES);
     mockTbaApi(listSubscriptions, {}, SUBSCRIPTIONS);
     mockTbaApi(setModelPreferences, {}, { code: 200 });
   });
 
   test('reports nothing and fetches nothing when signed out', () => {
-    mocks.useAuth.mockReturnValue({ user: null });
+    signOut();
     const favoritesRequests = mockTbaApi(listFavorites, {}, FAVORITES);
     const subscriptionsRequests = mockTbaApi(
       listSubscriptions,
@@ -107,7 +103,7 @@ describe('useMyTBA', () => {
   });
 
   test('refuses to save preferences when signed out', async () => {
-    mocks.useAuth.mockReturnValue({ user: null });
+    signOut();
     const saveRequests = mockTbaApi(setModelPreferences, {}, { code: 200 });
     const { result, queryClient } = renderMyTBA('frc254');
 

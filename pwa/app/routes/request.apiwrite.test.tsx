@@ -6,12 +6,9 @@ import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { requestApiWriteKey } from '~/api/tba/mobile/sdk.gen';
 import type { ApiWriteKeyRequestResponse } from '~/api/tba/mobile/types.gen';
 import { Route } from '~/routes/request.apiwrite';
+import { signIn, signOut } from '~/test/auth';
 import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
 import { renderWithClient } from '~/test/render';
-
-const mocks = vi.hoisted(() => ({
-  useAuth: vi.fn<() => unknown>(),
-}));
 
 vi.mock('@tanstack/react-router', async (importOriginal) => {
   const actual =
@@ -22,16 +19,11 @@ vi.mock('@tanstack/react-router', async (importOriginal) => {
   };
 });
 
-vi.mock('~/components/tba/auth/auth', () => ({ useAuth: mocks.useAuth }));
+vi.mock('~/components/tba/auth/auth', () => import('~/test/auth'));
 
 vi.mock('~/components/tba/auth/loginPage', () => ({
   default: () => <h1>Please log in to your TBA Account</h1>,
 }));
-
-const USER = {
-  email: 'volunteer@example.com',
-  getIdToken: () => Promise.resolve('token-1'),
-};
 
 async function renderPage() {
   const Component = Route.options.component as () => ReactNode;
@@ -64,11 +56,11 @@ describe('request api write route', () => {
   });
 
   beforeEach(() => {
-    mocks.useAuth.mockReturnValue({ isInitialLoading: false, user: USER });
+    signIn();
   });
 
   test('shows the sign-in page to a signed-out user', async () => {
-    mocks.useAuth.mockReturnValue({ isInitialLoading: false, user: null });
+    signOut();
 
     await renderPage();
 

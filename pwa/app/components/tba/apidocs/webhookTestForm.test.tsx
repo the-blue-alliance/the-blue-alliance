@@ -3,14 +3,14 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { Webhook } from '~/api/tba/mobile/types.gen';
 import WebhookTestForm from '~/components/tba/apidocs/webhookTestForm';
+import { signIn, signOut } from '~/test/auth';
 
 const mocks = vi.hoisted(() => ({
-  useAuth: vi.fn<() => unknown>(),
   useWebhooks: vi.fn<() => unknown>(),
   sendTest: vi.fn<(body: unknown) => Promise<unknown>>(),
 }));
 
-vi.mock('~/components/tba/auth/auth', () => ({ useAuth: mocks.useAuth }));
+vi.mock('~/components/tba/auth/auth', () => import('~/test/auth'));
 vi.mock('~/lib/hooks/useWebhooks', () => ({ useWebhooks: mocks.useWebhooks }));
 
 vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
@@ -61,7 +61,7 @@ function sendButton() {
 
 describe('WebhookTestForm signed out', () => {
   test('asks the user to sign in', () => {
-    mocks.useAuth.mockReturnValue({ isInitialLoading: false, user: null });
+    signOut();
 
     renderForm();
 
@@ -73,7 +73,7 @@ describe('WebhookTestForm signed out', () => {
 
 describe('WebhookTestForm signed in', () => {
   beforeEach(() => {
-    mocks.useAuth.mockReturnValue({ isInitialLoading: false, user: {} });
+    signIn();
   });
 
   test('points to the account page when no webhook is verified', () => {

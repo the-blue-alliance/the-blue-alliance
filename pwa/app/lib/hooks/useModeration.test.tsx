@@ -20,16 +20,12 @@ import {
   useModerationSuggestions,
   useReviewSubmission,
 } from '~/lib/hooks/useModeration';
+import { signIn, signOut } from '~/test/auth';
 import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
 import { renderHookWithClient } from '~/test/render';
 
-const mocks = vi.hoisted(() => ({
-  useAuth: vi.fn<() => { user: unknown }>(),
-}));
+vi.mock('~/components/tba/auth/auth', () => import('~/test/auth'));
 
-vi.mock('~/components/tba/auth/auth', () => ({ useAuth: mocks.useAuth }));
-
-const USER = { uid: 'user-1', getIdToken: () => Promise.resolve('token-1') };
 const TYPE = SuggestionType.OFFSEASON_EVENT;
 
 function renderQueue() {
@@ -51,11 +47,11 @@ function mockAccept(key: string, status: number, body: object) {
 
 describe('useModerationQueue', () => {
   beforeEach(() => {
-    mocks.useAuth.mockReturnValue({ user: USER });
+    signIn();
   });
 
   test('stays idle when signed out', () => {
-    mocks.useAuth.mockReturnValue({ user: null });
+    signOut();
     const requests = mockTbaApi(
       getModerationQueue,
       {},
@@ -120,11 +116,11 @@ describe('useModerationQueue', () => {
 
 describe('useModerationSuggestions', () => {
   beforeEach(() => {
-    mocks.useAuth.mockReturnValue({ user: USER });
+    signIn();
   });
 
   test('stays idle when signed out', () => {
-    mocks.useAuth.mockReturnValue({ user: null });
+    signOut();
     const requests = mockTbaApi(
       listModerationSuggestions,
       { path: { suggestion_type: TYPE } },
@@ -159,7 +155,7 @@ describe('useModerationSuggestions', () => {
 
 describe('useReviewSubmission', () => {
   beforeEach(() => {
-    mocks.useAuth.mockReturnValue({ user: USER });
+    signIn();
   });
 
   function renderSubmission() {
@@ -169,7 +165,7 @@ describe('useReviewSubmission', () => {
   }
 
   test('rejects the submission when signed out', async () => {
-    mocks.useAuth.mockReturnValue({ user: null });
+    signOut();
     const requests = mockAccept('a', 200, {
       result: ReviewResult.ACCEPTED,
       suggestion_key: 'a',

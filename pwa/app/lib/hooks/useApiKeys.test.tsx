@@ -12,16 +12,11 @@ import type {
   ApiWriteKeyMessage,
 } from '~/api/tba/mobile/types.gen';
 import { useApiKeys } from '~/lib/hooks/useApiKeys';
+import { signIn, signOut } from '~/test/auth';
 import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
 import { renderHookWithClient } from '~/test/render';
 
-const mocks = vi.hoisted(() => ({
-  useAuth: vi.fn<() => { user: unknown }>(),
-}));
-
-vi.mock('~/components/tba/auth/auth', () => ({ useAuth: mocks.useAuth }));
-
-const USER = { uid: 'user-1', getIdToken: () => Promise.resolve('token-1') };
+vi.mock('~/components/tba/auth/auth', () => import('~/test/auth'));
 
 const READ_KEY_A: ApiReadKeyMessage = {
   key: 'read-a',
@@ -56,7 +51,7 @@ function failListApiKeys() {
 
 describe('useApiKeys', () => {
   beforeEach(() => {
-    mocks.useAuth.mockReturnValue({ user: USER });
+    signIn();
     mockTbaApi(
       listApiKeys,
       {},
@@ -65,7 +60,7 @@ describe('useApiKeys', () => {
   });
 
   test('does not load keys when signed out, and refuses writes', async () => {
-    mocks.useAuth.mockReturnValue({ user: null });
+    signOut();
     const listRequests = mockTbaApi(listApiKeys, {}, {});
     const addRequests = mockTbaApi(addApiReadKey, {}, {});
     const deleteRequests = mockTbaApi(deleteApiReadKey, {}, {});
