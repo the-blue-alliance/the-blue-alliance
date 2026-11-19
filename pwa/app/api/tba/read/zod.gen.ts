@@ -415,8 +415,8 @@ export const zEventDistrictPoints = z.object({
  * A year-specific event insight object expressed as a JSON string, separated in to `qual` and `playoff` fields. See also Event_Insights_2016, Event_Insights_2017, etc.
  */
 export const zEventInsights = z.object({
-  qual: z.record(z.string(), z.unknown()).optional(),
-  playoff: z.record(z.string(), z.unknown()).optional(),
+  qual: z.record(z.string(), z.unknown()).nullish(),
+  playoff: z.record(z.string(), z.unknown()).nullish(),
 });
 
 /**

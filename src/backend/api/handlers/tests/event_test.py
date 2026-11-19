@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.api.handlers.helpers.add_alliance_status import add_alliance_status
+from backend.api.handlers.tests.api_spec import response_schema_errors
 from backend.api.handlers.tests.helpers import (
     validate_nominal_event_keys,
     validate_nominal_match_keys,
@@ -18,6 +19,7 @@ from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.helpers.event_insights_helper import EventInsightsHelper
 from backend.common.memcache_models.event_nexus_queue_status_memcache import (
     EventNexusQueueStatusMemcache,
 )
@@ -1102,3 +1104,60 @@ def test_event_playoff_advancement_404_when_event_deleted_after_key_cache_warm(
 
     resp = api_client.get("/api/v3/event/2019nyny/playoff_advancement", headers=headers)
     assert resp.status_code == 404
+
+
+def _seed_event_insights(event_key: str, comp_level: str) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id=event_key,
+        year=2024,
+        event_short=event_key[4:],
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    matches = [
+        Match(
+            id=f"{event_key}_{comp_level}1",
+            comp_level=comp_level,
+            match_number=1,
+            year=2024,
+            set_number=1,
+            event=ndb.Key("Event", event_key),
+            alliances_json=json.dumps(
+                {
+                    "red": {"score": 50, "teams": ["frc1", "frc2", "frc3"]},
+                    "blue": {"score": 40, "teams": ["frc4", "frc5", "frc6"]},
+                }
+            ),
+        )
+    ]
+    EventDetails(
+        id=event_key,
+        insights=EventInsightsHelper.calculate_event_insights(matches, 2024),
+    ).put()
+
+
+def test_event_insights_without_quals_match_spec(ndb_stub, api_client: Client) -> None:
+    _seed_event_insights("2024cmptx", "f")
+
+    resp = api_client.get(
+        "/api/v3/event/2024cmptx/insights", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+
+    assert resp.json["qual"] is None
+    assert response_schema_errors("/event/{event_key}/insights", resp.json) == []
+
+
+def test_event_insights_without_playoffs_match_spec(
+    ndb_stub, api_client: Client
+) -> None:
+    _seed_event_insights("2024casj", "qm")
+
+    resp = api_client.get(
+        "/api/v3/event/2024casj/insights", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+
+    assert resp.json["playoff"] is None
+    assert response_schema_errors("/event/{event_key}/insights", resp.json) == []
