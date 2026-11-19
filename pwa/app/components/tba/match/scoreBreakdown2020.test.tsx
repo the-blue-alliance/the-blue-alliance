@@ -1,5 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import {
   AllianceColor,
@@ -13,22 +13,6 @@ import {
   Stage3TargetColor2020,
 } from '~/api/tba/read';
 import ScoreBreakdown2020 from '~/components/tba/match/scoreBreakdown2020';
-
-vi.mock('~icons/mdi/check', () => ({
-  default: () => <img alt="Achieved" />,
-}));
-
-vi.mock('~icons/mdi/close', () => ({
-  default: () => <img alt="Not achieved" />,
-}));
-
-vi.mock('~icons/mdi/arrow-left', () => ({
-  default: () => <img alt="Red leads" />,
-}));
-
-vi.mock('~icons/mdi/arrow-right', () => ({
-  default: () => <img alt="Blue leads" />,
-}));
 
 const match: Match = {
   key: '2020nytr_qm1',
