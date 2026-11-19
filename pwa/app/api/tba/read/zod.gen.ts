@@ -17,6 +17,18 @@ export const zApiStatus = z.object({
   kickoff_datetime: z.string().optional(),
 });
 
+export const zSponsor = z.object({
+  name: z.string(),
+  url: z.string(),
+  logo_style: z.string(),
+  logo_url: z.string().nullable(),
+  logo_url_dark: z.string().nullable(),
+});
+
+export const zSponsorsList = z.object({
+  sponsors: z.array(zSponsor),
+});
+
 /**
  * AllianceColor
  *
@@ -3109,6 +3121,15 @@ export const zGetStatusHeaders = z.object({
  * Successful response
  */
 export const zGetStatusResponse = zApiStatus;
+
+export const zGetSponsorsHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetSponsorsResponse = zSponsorsList;
 
 export const zGetTeamHeaders = z.object({
   'If-None-Match': z.string().optional(),

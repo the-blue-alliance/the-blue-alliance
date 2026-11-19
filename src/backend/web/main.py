@@ -8,6 +8,7 @@ from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
 from backend.web.context_processors import (
+    platinum_sponsors_context_processor,
     pwa_url_context_processor,
     render_time_context_processor,
 )
@@ -239,6 +240,7 @@ app.register_error_handler(500, handle_500)
 app.context_processor(_user_context_processor)
 app.context_processor(render_time_context_processor)
 app.context_processor(pwa_url_context_processor)
+app.context_processor(platinum_sponsors_context_processor)
 
 register_template_filters(app)
 maybe_install_local_routes(app, csrf)

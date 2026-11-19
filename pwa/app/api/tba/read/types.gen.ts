@@ -44,6 +44,36 @@ export type ApiStatusAppVersion = {
   latest_app_version: number;
 };
 
+export type SponsorsList = {
+  /**
+   * Platinum sponsors in display order. Contains 0 to 3 entries.
+   */
+  sponsors: Array<Sponsor>;
+};
+
+export type Sponsor = {
+  /**
+   * Sponsor name. Use as the logo's alt text, or show it as text when there is no logo.
+   */
+  name: string;
+  /**
+   * Absolute https URL the sponsor credit links to.
+   */
+  url: string;
+  /**
+   * How to show the logo. `wordmark`: the logo already spells the sponsor's name, so show it alone. `mark`: a square logo, shown with the name beside it. Other values may be added later; clients must treat any value they do not recognize as `wordmark`.
+   */
+  logo_style: string;
+  /**
+   * Absolute https URL of a full-color PNG logo for light backgrounds, or null if there is none.
+   */
+  logo_url: string | null;
+  /**
+   * Absolute https URL of a white PNG logo for dark or brand-colored backgrounds, or null if there is none.
+   */
+  logo_url_dark: string | null;
+};
+
 /**
  * AllianceColor
  *
@@ -6676,6 +6706,43 @@ export type GetStatusResponses = {
 };
 
 export type GetStatusResponse = GetStatusResponses[keyof GetStatusResponses];
+
+export type GetSponsorsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/sponsors';
+};
+
+export type GetSponsorsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+};
+
+export type GetSponsorsError = GetSponsorsErrors[keyof GetSponsorsErrors];
+
+export type GetSponsorsResponses = {
+  /**
+   * Successful response
+   */
+  200: SponsorsList;
+};
+
+export type GetSponsorsResponse =
+  GetSponsorsResponses[keyof GetSponsorsResponses];
 
 export type GetTeamData = {
   body?: never;
