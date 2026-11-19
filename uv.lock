@@ -644,7 +644,7 @@ wheels = [
 
 [[package]]
 name = "google-cloud-run"
-version = "0.16.2"
+version = "0.16.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "google-api-core", extra = ["grpc"] },
@@ -654,9 +654,9 @@ dependencies = [
     { name = "proto-plus" },
     { name = "protobuf" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cb/95/303555b84bc111068c1ea9bd5a792c049b09f641ecf89b8e87d6dc048f10/google_cloud_run-0.16.2.tar.gz", hash = "sha256:480ecde89b18dc99aac4584048f6477e856002af4d7a8e7a6eb894801d01190b", size = 496276, upload-time = "2026-10-01T18:17:57.468Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9f/bb/f974a6d853b8e22a1621fad636c0e309470f4fa6c9990cde18950b0b2dad/google_cloud_run-0.16.3.tar.gz", hash = "sha256:3a87db9012059639b0c3d8f3f05d4a692c1f7b417c667ccca7b80cda47caa622", size = 553537, upload-time = "2026-11-12T14:23:22.273Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f2/65/61f0a0d8f61519606082f129f53769a84b8abf5298c413a0eeffd4671fc1/google_cloud_run-0.16.2-py3-none-any.whl", hash = "sha256:cf21a6ee67fb237f694b444862fb0a717f0e0dfeabfdb64b927c7d1303f18957", size = 448656, upload-time = "2026-10-01T18:12:04.178Z" },
+    { url = "https://files.pythonhosted.org/packages/52/51/1a2f411f0fdf106d8ccb6a9e0c83aee3171dce0c1af99c73d7ab92f6debf/google_cloud_run-0.16.3-py3-none-any.whl", hash = "sha256:e1d659cd1a58fbcfa6c0d2b7dfa2e316805657303ca219660112734127d30659", size = 500352, upload-time = "2026-11-12T14:22:35.335Z" },
 ]
 
 [[package]]
@@ -1980,7 +1980,7 @@ requires-dist = [
     { name = "google-api-core", specifier = "==2.44.0" },
     { name = "google-api-python-client", specifier = "==2.202.0" },
     { name = "google-cloud-logging", specifier = "==3.17.0" },
-    { name = "google-cloud-run", specifier = "==0.16.2" },
+    { name = "google-cloud-run", specifier = "==0.16.3" },
     { name = "grpcio", specifier = "==1.85.1" },
     { name = "gunicorn", specifier = "==27.0.0" },
     { name = "jinja2", specifier = "==3.1.6" },
