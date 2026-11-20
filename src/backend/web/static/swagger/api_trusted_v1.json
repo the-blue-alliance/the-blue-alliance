@@ -7,9 +7,7 @@
   },
   "security": [
     {
-      "authId": []
-    },
-    {
+      "authId": [],
       "authSig": []
     }
   ],
@@ -33,7 +31,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EventInfo"
+                  "$ref": "#/components/schemas/EventInfoResponse"
                 }
               }
             }
@@ -228,6 +226,44 @@
             }
           },
           "description": "List of match keys",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/matches/delete_all": {
+      "post": {
+        "tags": [
+          "Event Matches"
+        ],
+        "summary": "Delete all matches at an event",
+        "description": "Delete every match at an event. As a safeguard, the request body must be exactly the event key.",
+        "operationId": "deleteAllMatches",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": "2014casj"
+              }
+            }
+          },
+          "description": "The event key, matching the `eventKey` path parameter",
           "required": true
         },
         "responses": {
@@ -544,6 +580,46 @@
         }
       }
     },
+    "/event/{eventKey}/zebra_motionworks/add": {
+      "post": {
+        "tags": [
+          "Zebra MotionWorks"
+        ],
+        "summary": "Add Zebra MotionWorks data",
+        "description": "Add or overwrite Zebra MotionWorks robot tracking data for one or more matches at an event. Each match must already exist, and each alliance's teams may differ from the match's teams by at most one.",
+        "operationId": "addZebraMotionWorks",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ZebraMotionWorks"
+                }
+              }
+            }
+          },
+          "description": "List of Zebra MotionWorks data, one entry per match",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
     "/event/{eventKey}/match_videos/delete": {
       "delete": {
         "tags": [
@@ -675,9 +751,10 @@
       "EventInfo": {
         "type": "object",
         "properties": {
-          "first_code": {
+          "first_event_code": {
             "type": "string",
-            "description": "Event code used to sync data with FIRST",
+            "nullable": true,
+            "description": "Event code used to sync data with FIRST. Setting a code marks the event as official so it syncs from FIRST; null or an empty string clears it",
             "example": "IRI"
           },
           "playoff_type": {
@@ -736,6 +813,68 @@
                 "type": "boolean"
               }
             }
+          }
+        }
+      },
+      "EventInfoResponse": {
+        "type": "object",
+        "properties": {
+          "first_event_code": {
+            "type": "string",
+            "nullable": true,
+            "description": "Event code used to sync data with FIRST. Null when the event does not sync from FIRST",
+            "example": "IRI"
+          },
+          "playoff_type": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Integer constant representing the playoff format. References constants defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py",
+            "example": 10
+          },
+          "webcasts": {
+            "type": "array",
+            "description": "The event's current webcasts",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "youtube"
+                },
+                "channel": {
+                  "type": "string",
+                  "example": "abc123"
+                },
+                "file": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "string",
+                  "example": "2024-01-15"
+                }
+              }
+            }
+          },
+          "remap_teams": {
+            "type": "object",
+            "description": "A mapping of temp key --> remapped key (including B team keys)",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "frc1337": "frc337B"
+            }
+          },
+          "timezone": {
+            "type": "string",
+            "nullable": true,
+            "description": "Timezone name for the event",
+            "example": "America/New_York"
+          },
+          "sync_disabled_flags": {
+            "type": "integer",
+            "description": "Bitmask of the sync parts disabled via `disable_sync`: event_alliances = 1, event_rankings = 2, event_qual_matches = 4, event_playoff_matches = 8, event_awards = 16",
+            "example": 0
           }
         }
       },
@@ -830,9 +969,33 @@
             }
           },
           "score_breakdown": {
-            "type": "string",
-            "description": "Dict of {'red': {K1: V1, K2: V2, ...}, 'blue': {...}}. Where Kn are keys and Vn are values for those keys. Valid keys Kn vary by year. For 2014, valid keys are: 'auto', 'assist', 'truss+catch', 'teleop_goal+foul'.",
-            "example": "{ \"red\": { \"auto\": 20, \"assist\": 40, \"truss+catch\": 20, \"teleop_goal+foul\": 20 }, \"blue\": { \"auto\": 40, \"assist\": 60, \"truss+catch\": 10, \"teleop_goal+foul\": 40 } }"
+            "type": "object",
+            "nullable": true,
+            "description": "Score breakdown for each alliance. Valid keys vary by year and match the score breakdown fields in APIv3 (the example uses 2026 keys); a key that is not valid for the event's year is rejected with a 400 that lists the valid keys.",
+            "properties": {
+              "red": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "blue": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "example": {
+              "red": {
+                "totalAutoPoints": 20,
+                "totalTeleopPoints": 40,
+                "foulPoints": 0,
+                "totalPoints": 60
+              },
+              "blue": {
+                "totalAutoPoints": 15,
+                "totalTeleopPoints": 35,
+                "foulPoints": 5,
+                "totalPoints": 55
+              }
+            }
           },
           "time_str": {
             "type": "string",
@@ -902,6 +1065,104 @@
             "description": "List of webcasts to add or remove",
             "items": {
               "$ref": "#/components/schemas/Webcast"
+            }
+          }
+        }
+      },
+      "ZebraTeam": {
+        "type": "object",
+        "required": [
+          "team_key",
+          "xs",
+          "ys"
+        ],
+        "properties": {
+          "team_key": {
+            "type": "string",
+            "description": "Team key, like `frcXXXX` where `XXXX` is the team number",
+            "example": "frc254"
+          },
+          "xs": {
+            "type": "array",
+            "description": "X coordinates in feet, one per entry in `times`. Null where no position was recorded; must be null at the same indices as `ys`",
+            "items": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            },
+            "example": [
+              null,
+              1.2,
+              1.3
+            ]
+          },
+          "ys": {
+            "type": "array",
+            "description": "Y coordinates in feet, one per entry in `times`. Null where no position was recorded; must be null at the same indices as `xs`",
+            "items": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            },
+            "example": [
+              null,
+              0.1,
+              0.1
+            ]
+          }
+        }
+      },
+      "ZebraMotionWorks": {
+        "type": "object",
+        "required": [
+          "key",
+          "times",
+          "alliances"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Full match key. Must belong to the event in the path",
+            "example": "2020casj_qm1"
+          },
+          "times": {
+            "type": "array",
+            "description": "Elapsed match time in seconds for each sample. Must be non-empty floats",
+            "items": {
+              "type": "number",
+              "format": "float"
+            },
+            "example": [
+              0.0,
+              0.5,
+              1.0
+            ]
+          },
+          "alliances": {
+            "type": "object",
+            "required": [
+              "red",
+              "blue"
+            ],
+            "properties": {
+              "red": {
+                "type": "array",
+                "description": "Exactly 3 teams",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "$ref": "#/components/schemas/ZebraTeam"
+                }
+              },
+              "blue": {
+                "type": "array",
+                "description": "Exactly 3 teams",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "$ref": "#/components/schemas/ZebraTeam"
+                }
+              }
             }
           }
         }
