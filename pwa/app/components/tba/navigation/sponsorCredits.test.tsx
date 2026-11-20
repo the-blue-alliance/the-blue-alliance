@@ -50,8 +50,18 @@ function renderWithClient(ui: ReactNode) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  return render(
+  const result = render(
     <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
+  );
+  return { ...result, queryClient };
+}
+
+// Resolves once the sponsors request has succeeded or failed.
+async function sponsorsSettled(queryClient: QueryClient) {
+  await vi.waitFor(() =>
+    expect(['success', 'error']).toContain(
+      queryClient.getQueryState(['sponsors'])?.status,
+    ),
   );
 }
 
@@ -62,21 +72,21 @@ beforeEach(() => {
 describe('MobileMenuSponsorCredit', () => {
   test('renders nothing when there are no sponsors', async () => {
     sponsorsMock.mockResolvedValue({ sponsors: [] });
-    const { container } = renderWithClient(
+    const { container, queryClient } = renderWithClient(
       <MobileMenuSponsorCredit animationDelayMs={0} />,
     );
 
-    await vi.waitFor(() => expect(sponsorsMock).toHaveBeenCalled());
+    await sponsorsSettled(queryClient);
     expect(container.textContent).toBe('');
   });
 
   test('renders nothing when the request fails', async () => {
     sponsorsMock.mockRejectedValue(new Error('boom'));
-    const { container } = renderWithClient(
+    const { container, queryClient } = renderWithClient(
       <MobileMenuSponsorCredit animationDelayMs={0} />,
     );
 
-    await vi.waitFor(() => expect(sponsorsMock).toHaveBeenCalled());
+    await sponsorsSettled(queryClient);
     expect(container.textContent).toBe('');
   });
 
@@ -151,29 +161,55 @@ describe('MobileMenuSponsorCredit', () => {
 describe('FooterSponsorCredit', () => {
   test('renders nothing when there are no sponsors', async () => {
     sponsorsMock.mockResolvedValue({ sponsors: [] });
-    const { container } = renderWithClient(<FooterSponsorCredit />);
+    const { container, queryClient } = renderWithClient(
+      <FooterSponsorCredit />,
+    );
 
-    await vi.waitFor(() => expect(sponsorsMock).toHaveBeenCalled());
+    await sponsorsSettled(queryClient);
     expect(container.textContent).toBe('');
   });
 
-  test('shows the full-color logo outside dark mode', async () => {
+  test('offers the full-color logo and the white logo for dark mode', async () => {
     sponsorsMock.mockResolvedValue({ sponsors: [andymark] });
     renderWithClient(<FooterSponsorCredit />);
 
-    const [light] = await screen.findAllByAltText('AndyMark');
-    expect(light.getAttribute('src')).toBe(andymark.logo_url);
-    expect(light.className).toContain('dark:hidden');
+    const logos = await screen.findAllByAltText('AndyMark');
+    expect(new Set(logos.map((img) => img.getAttribute('src')))).toEqual(
+      new Set([andymark.logo_url, andymark.logo_url_dark]),
+    );
   });
 
-  test('shows the white logo dimmed to the text color in dark mode', async () => {
-    sponsorsMock.mockResolvedValue({ sponsors: [andymark] });
+  test('names a sponsor that only has a white logo', async () => {
+    sponsorsMock.mockResolvedValue({
+      sponsors: [{ ...andymark, logo_url: null }],
+    });
     renderWithClient(<FooterSponsorCredit />);
 
-    const [, dark] = await screen.findAllByAltText('AndyMark');
-    expect(dark.getAttribute('src')).toBe(andymark.logo_url_dark);
-    expect(dark.className).toContain('dark:inline');
-    expect(dark.className).toContain('brightness-90');
+    const link = await screen.findByRole('link', { name: 'AndyMark' });
+    expect(link.querySelector('img')).toBeNull();
+  });
+
+  test('loads sponsor logos lazily', async () => {
+    sponsorsMock.mockResolvedValue({ sponsors: [andymark, quillfeather] });
+    renderWithClient(<FooterSponsorCredit />);
+
+    await screen.findByRole('link', { name: 'Quillfeather Robotics' });
+    const loading = screen
+      .getAllByRole('img', { hidden: true })
+      .map((img) => img.getAttribute('loading'));
+    expect(new Set(loading)).toEqual(new Set(['lazy']));
+  });
+
+  test('separates sponsor names in the credit text', async () => {
+    sponsorsMock.mockResolvedValue({
+      sponsors: [plainText, { ...plainText, name: 'Other Co' }],
+    });
+    const { container } = renderWithClient(<FooterSponsorCredit />);
+
+    await screen.findByRole('link', { name: 'Other Co' });
+    expect(container.textContent).toBe(
+      'Thanks to our platinum sponsors Plain Text Co Other Co',
+    );
   });
 
   test('uses one logo when there is no dark variant', async () => {

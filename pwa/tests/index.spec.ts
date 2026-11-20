@@ -122,6 +122,7 @@ const ANDYMARK_SPONSOR = {
     'https://www.thebluealliance.com/images/sponsors/andymark-on-dark.png',
 };
 
+// Resolves once this navigation has received the mocked sponsors.
 async function gotoWithSponsors(page: Page, sponsors: object[]) {
   await page.route('**/api/v3/sponsors**', (route) =>
     route.fulfill({
@@ -130,8 +131,10 @@ async function gotoWithSponsors(page: Page, sponsors: object[]) {
       body: JSON.stringify({ sponsors }),
     }),
   );
+  const sponsorsResponse = page.waitForResponse('**/api/v3/sponsors**');
   await page.goto('/');
   await page.locator('body[data-hydrated]').waitFor();
+  await sponsorsResponse;
 }
 
 test('footer links to the platinum sponsor', async ({ page }) => {
@@ -141,6 +144,25 @@ test('footer links to the platinum sponsor', async ({ page }) => {
     page.locator('footer').getByRole('link', { name: 'AndyMark' }),
   ).toBeVisible();
 });
+
+for (const [colorScheme, logo] of [
+  ['light', ANDYMARK_SPONSOR.logo_url],
+  ['dark', ANDYMARK_SPONSOR.logo_url_dark],
+] as const) {
+  test(`footer shows the ${colorScheme}-mode sponsor logo`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme });
+    await gotoWithSponsors(page, [ANDYMARK_SPONSOR]);
+
+    const visible = page
+      .locator('footer')
+      .getByRole('link', { name: 'AndyMark' })
+      .locator('img:visible');
+    await expect(visible).toHaveCount(1);
+    await expect(visible).toHaveAttribute('src', logo);
+  });
+}
 
 test('footer fits three sponsors on one line above the data credit', async ({
   page,
@@ -167,22 +189,23 @@ test('footer fits three sponsors on one line above the data credit', async ({
   await expect(
     credit.getByRole('link', { name: 'Ironbark Machining' }),
   ).toBeVisible();
-  const creditBox = await credit.boundingBox();
+  const creditBox = await credit.first().boundingBox();
   const dataBox = await page
     .locator('footer p')
     .filter({ hasText: 'Data from' })
     .boundingBox();
+  if (!creditBox || !dataBox) {
+    throw new Error('footer credit or data line is not laid out');
+  }
 
-  expect(creditBox!.height).toBeLessThan(30);
-  expect(dataBox!.y).toBeGreaterThanOrEqual(creditBox!.y + creditBox!.height);
+  expect(creditBox.height).toBeLessThan(30);
+  expect(dataBox.y).toBeGreaterThanOrEqual(creditBox.y + creditBox.height);
 });
 
 test('footer omits the sponsor credit when there are no sponsors', async ({
   page,
 }) => {
-  const sponsorsRequest = page.waitForResponse('**/api/v3/sponsors**');
   await gotoWithSponsors(page, []);
-  await sponsorsRequest;
 
   await expect(page.locator('footer')).not.toContainText('platinum sponsor');
 });
@@ -249,9 +272,7 @@ test.describe('hamburger menu (narrow viewport)', () => {
   test('omits the sponsor credit when there are no sponsors', async ({
     page,
   }) => {
-    const sponsorsRequest = page.waitForResponse('**/api/v3/sponsors**');
     await gotoWithSponsors(page, []);
-    await sponsorsRequest;
 
     await page.getByRole('button', { name: 'Toggle Menu' }).click();
 

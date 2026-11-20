@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { cn } from 'cn';
+import { Fragment } from 'react';
 
 import type { Sponsor } from '~/api/tba/read';
 import { getSponsorsOptions } from '~/api/tba/read/@tanstack/react-query.gen';
@@ -31,12 +32,14 @@ function SponsorLogo({
 }: {
   sponsor: Sponsor;
   logoUrl: string | null;
-  /** Shown instead of `logoUrl` in dark mode, when given. */
+  /**
+   * Shown instead of `logoUrl` in dark mode, when given. Never used alone: it
+   * is a white logo, unreadable on a light background.
+   */
   darkLogoUrl?: string | null;
   className?: string;
 }) {
-  const lightUrl = logoUrl ?? darkLogoUrl ?? null;
-  if (!lightUrl) {
+  if (!logoUrl) {
     return <span>{sponsor.name}</span>;
   }
   const isMark = sponsor.logo_style === 'mark';
@@ -44,9 +47,14 @@ function SponsorLogo({
   const imgClass = cn(isMark && 'aspect-square', className);
   // brightness-90 scales the white logo to the dark-mode text color (#e5e5e5).
   const images =
-    darkLogoUrl && darkLogoUrl !== lightUrl ? (
+    darkLogoUrl && darkLogoUrl !== logoUrl ? (
       <>
-        <img src={lightUrl} alt={alt} className={cn(imgClass, 'dark:hidden')} />
+        <img
+          src={logoUrl}
+          alt={alt}
+          loading="lazy"
+          className={cn(imgClass, 'dark:hidden')}
+        />
         <img
           src={darkLogoUrl}
           alt={alt}
@@ -55,7 +63,7 @@ function SponsorLogo({
         />
       </>
     ) : (
-      <img src={lightUrl} alt={alt} className={imgClass} />
+      <img src={logoUrl} alt={alt} loading="lazy" className={imgClass} />
     );
   if (isMark) {
     return (
@@ -76,23 +84,21 @@ export function FooterSponsorCredit() {
   }
 
   return (
-    <span>
-      {sponsorLabel(sponsors.length)}
+    <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+      <span>{sponsorLabel(sponsors.length)}</span>
       {sponsors.map((sponsor) => (
-        <a
-          key={sponsor.name}
-          href={sponsor.url}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="ml-2"
-        >
-          <SponsorLogo
-            sponsor={sponsor}
-            logoUrl={sponsor.logo_url}
-            darkLogoUrl={sponsor.logo_url_dark}
-            className="inline h-4 w-auto"
-          />
-        </a>
+        // The space keeps names apart in the text read aloud and copied
+        <Fragment key={sponsor.name}>
+          {' '}
+          <a href={sponsor.url} target="_blank" rel="noreferrer noopener">
+            <SponsorLogo
+              sponsor={sponsor}
+              logoUrl={sponsor.logo_url}
+              darkLogoUrl={sponsor.logo_url_dark}
+              className="inline h-4 w-auto"
+            />
+          </a>
+        </Fragment>
       ))}
     </span>
   );
