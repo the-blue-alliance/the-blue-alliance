@@ -1999,6 +1999,10 @@ export type MatchScoreBreakdown2015Alliance = {
   litter_count_landfill?: number;
   litter_count_unprocessed?: number;
   robot_set?: boolean;
+  /**
+   * Coopertition points, present only on breakdowns uploaded through the trusted API (such as offseason events), which record them per alliance. FMS-sourced breakdowns record them in the top-level `coopertition_points` instead.
+   */
+  coopertition_points?: number;
 };
 
 /**

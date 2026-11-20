@@ -625,6 +625,7 @@ export const zMatchScoreBreakdown2015Alliance = z.object({
   litter_count_landfill: z.int().optional(),
   litter_count_unprocessed: z.int().optional(),
   robot_set: z.boolean().optional(),
+  coopertition_points: z.int().optional(),
 });
 
 /**
