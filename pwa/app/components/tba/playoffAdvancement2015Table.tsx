@@ -35,7 +35,7 @@ export default function PlayoffAdvancement2015Table({
       <h2 className="mb-2 text-xl font-medium">Playoff Advancement</h2>
 
       {averageScoreAdvancements.map((advancement) => {
-        const rankings = advancement.rankings ?? [];
+        const { rankings } = advancement;
         const scoreInfo = advancement.sort_order_info[0];
         const advanceInfo = advancement.extra_stats_info[0];
 

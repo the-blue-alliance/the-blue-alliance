@@ -25,7 +25,7 @@ export default function RoundRobinRankingsTable({
   year,
   remapTeams,
 }: RoundRobinRankingsTableProps): JSX.Element {
-  const rankings = advancement.rankings ?? [];
+  const { rankings } = advancement;
   const tiebreakerInfo = advancement.sort_order_info.slice(1);
   const showAdvance = advancement.extra_stats_info.length > 0;
 

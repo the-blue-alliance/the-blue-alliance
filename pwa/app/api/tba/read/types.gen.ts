@@ -3545,11 +3545,11 @@ export type RegionalRanking = {
   /**
    * Any points added to a team as a result of the rookie bonus.
    */
-  rookie_bonus?: number;
+  rookie_bonus: number;
   /**
    * Additional points awarded in lieu of a second event, based on first event performance
    */
-  single_event_bonus?: number;
+  single_event_bonus: number;
   /**
    * Total district points for the team.
    */
@@ -3557,7 +3557,7 @@ export type RegionalRanking = {
   /**
    * List of events that contributed to the point total for the team.
    */
-  event_points?: Array<{
+  event_points: Array<{
     /**
      * Total points awarded at this event.
      */
@@ -3590,7 +3590,7 @@ export type RegionalRanking = {
   /**
    * Any points adjustments applied to the team.
    */
-  adjustments?: number;
+  adjustments: number;
 };
 
 export enum RobotAuto2016WithUnknown {
@@ -3990,7 +3990,7 @@ export type PlayoffAdvancement = {
   /**
    * Ranked alliances for this level.
    */
-  rankings?: Array<PlayoffAdvancementAllianceRank> | null;
+  rankings: Array<PlayoffAdvancementAllianceRank>;
   /**
    * Describes each element of every ranking's `sort_orders` array, in order.
    */

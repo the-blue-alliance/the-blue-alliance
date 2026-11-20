@@ -1702,23 +1702,21 @@ export const zRegionalAdvancement = z.object({
 export const zRegionalRanking = z.object({
   team_key: z.string(),
   rank: z.int(),
-  rookie_bonus: z.int().optional(),
-  single_event_bonus: z.int().optional(),
+  rookie_bonus: z.int(),
+  single_event_bonus: z.int(),
   point_total: z.int(),
-  event_points: z
-    .array(
-      z.object({
-        total: z.int(),
-        alliance_points: z.int(),
-        elim_points: z.int(),
-        award_points: z.int(),
-        event_key: z.string(),
-        qual_points: z.int(),
-        rookie_bonus: z.int().optional(),
-      }),
-    )
-    .optional(),
-  adjustments: z.int().optional(),
+  event_points: z.array(
+    z.object({
+      total: z.int(),
+      alliance_points: z.int(),
+      elim_points: z.int(),
+      award_points: z.int(),
+      event_key: z.string(),
+      qual_points: z.int(),
+      rookie_bonus: z.int().optional(),
+    }),
+  ),
+  adjustments: z.int(),
 });
 
 export const zRobotAuto2016WithUnknown = z.enum([
@@ -2263,7 +2261,7 @@ export const zPlayoffAdvancement = z.object({
   level: z.string(),
   level_name: z.string(),
   type: z.string(),
-  rankings: z.array(zPlayoffAdvancementAllianceRank).nullish(),
+  rankings: z.array(zPlayoffAdvancementAllianceRank),
   sort_order_info: z.array(zPlayoffAdvancementSortOrderInfo),
   extra_stats_info: z.array(zPlayoffAdvancementSortOrderInfo),
 });
