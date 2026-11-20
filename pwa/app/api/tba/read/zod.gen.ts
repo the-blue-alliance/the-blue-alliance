@@ -2271,7 +2271,7 @@ export const zPlayoffAdvancement = z.object({
 /**
  * WebcastStatus
  *
- * Online status of a webcast. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/webcast_status.py for full definitions.
+ * Online status of a webcast, as GameDay reports it. Not returned by APIv3. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/webcast_status.py for full definitions.
  */
 export const zWebcastStatus = z.enum(['unknown', 'online', 'offline']);
 
@@ -2293,9 +2293,6 @@ export const zWebcast = z.object({
   channel: z.string(),
   date: z.string().nullish(),
   file: z.string().nullish(),
-  status: zWebcastStatus.nullish(),
-  stream_title: z.string().nullish(),
-  viewer_count: z.int().nullish(),
 });
 
 export const zEvent = z.object({

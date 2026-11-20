@@ -4022,7 +4022,7 @@ export type WltRecord = {
 /**
  * WebcastStatus
  *
- * Online status of a webcast. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/webcast_status.py for full definitions.
+ * Online status of a webcast, as GameDay reports it. Not returned by APIv3. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/webcast_status.py for full definitions.
  */
 export enum WebcastStatus {
   /**
@@ -4068,18 +4068,6 @@ export type Webcast = {
    * File identification as may be required for some types. May be null.
    */
   file?: string | null;
-  /**
-   * The online status of the webcast, fetched from the streaming provider's API. May be null if not available.
-   */
-  status?: WebcastStatus | null;
-  /**
-   * The title of the stream from the streaming provider. May be null.
-   */
-  stream_title?: string | null;
-  /**
-   * The current viewer count from the streaming provider. May be null.
-   */
-  viewer_count?: number | null;
 };
 
 export type Zebra = {
