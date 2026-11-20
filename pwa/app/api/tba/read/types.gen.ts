@@ -2426,7 +2426,7 @@ export type MatchScoreBreakdown2025Alliance = {
   autoLineRobot3: AutoLineRobot2024;
   autoMobilityPoints: number;
   autoPoints: number;
-  autoReef: {
+  autoReef?: {
     topRow: ReefRow2025;
     midRow: ReefRow2025;
     botRow: ReefRow2025;
@@ -2448,22 +2448,22 @@ export type MatchScoreBreakdown2025Alliance = {
   coopertitionCriteriaMet?: boolean;
   coralBonusAchieved?: boolean;
   endGameBargePoints: number;
-  endGameRobot1: EndGameRobot2025;
-  endGameRobot2: EndGameRobot2025;
-  endGameRobot3: EndGameRobot2025;
-  foulCount: number;
+  endGameRobot1?: EndGameRobot2025;
+  endGameRobot2?: EndGameRobot2025;
+  endGameRobot3?: EndGameRobot2025;
+  foulCount?: number;
   foulPoints: number;
-  g206Penalty: boolean;
-  g410Penalty: boolean;
-  g418Penalty: boolean;
-  g428Penalty: boolean;
+  g206Penalty?: boolean;
+  g410Penalty?: boolean;
+  g418Penalty?: boolean;
+  g428Penalty?: boolean;
   netAlgaeCount: number;
   rp: number;
-  techFoulCount: number;
+  techFoulCount?: number;
   teleopCoralCount: number;
   teleopCoralPoints: number;
   teleopPoints: number;
-  teleopReef: {
+  teleopReef?: {
     topRow: ReefRow2025;
     midRow: ReefRow2025;
     botRow: ReefRow2025;
@@ -2494,7 +2494,7 @@ export type MatchScoreBreakdown2026 = {
 };
 
 export type MatchScoreBreakdown2026Alliance = {
-  adjustPoints: number;
+  adjustPoints?: number;
   autoTowerPoints: number;
   autoTowerRobot1: TowerRobot2026;
   autoTowerRobot2: TowerRobot2026;
