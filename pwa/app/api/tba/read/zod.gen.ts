@@ -2217,7 +2217,7 @@ export const zTeamEventStatus = z.object({
  */
 export const zPlayoffAdvancementAllianceRank = z.object({
   team_keys: z.array(z.string()),
-  alliance_name: z.string(),
+  alliance_name: z.string().nullable(),
   alliance_color: z.string().nullish(),
   rank: z.int().nullish(),
   record: zWltRecord.nullish(),

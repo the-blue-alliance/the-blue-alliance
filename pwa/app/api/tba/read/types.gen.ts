@@ -3875,9 +3875,9 @@ export type PlayoffAdvancementAllianceRank = {
    */
   team_keys: Array<string>;
   /**
-   * Name of the alliance (eg `Turing`, `Alliance 1`).
+   * Name of the alliance (eg `Turing`, `Alliance 1`), or null if the alliance does not match one in the event's alliance selections (for example, an event with no alliance selections).
    */
-  alliance_name: string;
+  alliance_name: string | null;
   /**
    * For bracket levels, `red` or `blue`. Absent for round robin standings.
    */
