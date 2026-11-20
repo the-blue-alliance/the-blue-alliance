@@ -149,7 +149,7 @@
               }
             }
           },
-          "description": "List of awards. An award is a dict of:\n\n*name_str*: String of award name. ex: \"Tournament Winner\" or \"Dean's List Finalist\"  *team_key*: String in the format `frcXXX` for the team that won the award. Can be null.  *awardee*: String corresponding to the name of an individual that won the award. Can be null.",
+          "description": "List of awards. An award is a dict of:\n\n*name_str*: String of award name. ex: \"Tournament Winner\" or \"Dean's List Finalist\"  *type_enum*: Integer award type. Can be null, in which case it is determined from name_str.  *team_key*: String in the format `frcXXX` for the team that won the award. Can be null.  *awardee*: String corresponding to the name of an individual that won the award. Can be null. At least one of team_key or awardee must be set.",
           "required": true
         },
         "responses": {
@@ -342,7 +342,8 @@
                       "type": "string",
                       "description": "A ranking breakdown title. Breakdowns will be shown in the order given",
                       "example": "Qual Score"
-                    }
+                    },
+                    "description": "Ranking breakdown titles, shown in the order given. `wins`, `losses`, and `ties` are removed from this list because they are already shown as the W-L-T record"
                   },
                   "rankings": {
                     "type": "array",
@@ -379,6 +380,12 @@
                           "description": "Number of non-surrogate ties",
                           "example": 0
                         },
+                        "qual_average": {
+                          "type": "number",
+                          "format": "float",
+                          "description": "Average qualification score, for years that rank by it",
+                          "example": 85.5
+                        },
                         "played": {
                           "type": "integer",
                           "format": "int32",
@@ -391,7 +398,13 @@
                           "description": "Number of non-surrogate DQ'd matches",
                           "example": 0
                         }
-                      }
+                      },
+                      "required": [
+                        "team_key",
+                        "rank",
+                        "played",
+                        "dqs"
+                      ]
                     }
                   }
                 }
@@ -423,7 +436,7 @@
           "Team List"
         ],
         "summary": "Update the list of teams attending an event",
-        "description": "Replaces the list of teams attending",
+        "description": "Replaces the list of teams attending. Team keys for teams that do not exist on TBA are skipped",
         "operationId": "updateTeamList",
         "parameters": [
           {
@@ -831,8 +844,9 @@
         "properties": {
           "type_enum": {
             "type": "integer",
-            "description": "Type enum of the award. If null, this will be automatically determined from the name_str. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py",
-            "example": "1"
+            "description": "Type enum of the award. If null or unrecognized, this will be automatically determined from the name_str. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py",
+            "example": "1",
+            "nullable": true
           },
           "name_str": {
             "type": "string",
@@ -842,14 +856,17 @@
           "team_key": {
             "type": "string",
             "description": "Key of the team winning this award. Formatted like `frcXXXX` where `XXXX` is the team number. Can be null",
-            "example": "frc254"
+            "example": "frc254",
+            "nullable": true
           },
           "awardee": {
             "type": "string",
             "description": "Name of the individual winning this award. Can be null",
-            "example": "Bob Bobby"
+            "example": "Bob Bobby",
+            "nullable": true
           }
-        }
+        },
+        "description": "At least one of `team_key` or `awardee` must be set. Awards that resolve to the same award type are merged into a single award with multiple recipients"
       },
       "EventInfo": {
         "type": "object",
@@ -868,15 +885,43 @@
           },
           "webcasts": {
             "type": "array",
-            "description": "A list of webcast URLs to set for this event. This will overwrite the existing webcast list",
+            "description": "A list of webcasts to set for this event. This will overwrite the existing webcast list. Provide either `url`, or `type` and `channel`. YouTube webcasts must set `date`, and the date must fall within the event's dates",
             "items": {
               "type": "object",
               "description": "A webcast object",
               "properties": {
                 "url": {
                   "type": "string",
-                  "description": "A webcast url",
+                  "description": "A webcast url, parsed to extract the webcast type and channel",
                   "example": "https://youtu.be/abc123"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "twitch",
+                    "youtube",
+                    "iframe",
+                    "mms",
+                    "rtmp",
+                    "ustream",
+                    "livestream",
+                    "html5",
+                    "dacast",
+                    "stemtv"
+                  ],
+                  "description": "Type of webcast. Required if url is not provided",
+                  "example": "youtube"
+                },
+                "channel": {
+                  "type": "string",
+                  "description": "Channel identifier for the webcast. Required if url is not provided",
+                  "example": "abc123"
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Date in YYYY-MM-DD format for when the webcast aired. Required for YouTube webcasts",
+                  "example": "2024-01-15"
                 }
               }
             }
@@ -898,7 +943,7 @@
           },
           "disable_sync": {
             "type": "object",
-            "description": "flags controlling disabling certain aspects of sync",
+            "description": "Flags controlling disabling certain aspects of sync. Unknown keys are rejected",
             "properties": {
               "event_alliances": {
                 "type": "boolean"
@@ -915,7 +960,8 @@
               "event_awards": {
                 "type": "boolean"
               }
-            }
+            },
+            "additionalProperties": false
           }
         }
       },
@@ -942,7 +988,19 @@
               "properties": {
                 "type": {
                   "type": "string",
-                  "example": "youtube"
+                  "example": "youtube",
+                  "enum": [
+                    "twitch",
+                    "youtube",
+                    "iframe",
+                    "mms",
+                    "rtmp",
+                    "ustream",
+                    "livestream",
+                    "html5",
+                    "dacast",
+                    "stemtv"
+                  ]
                 },
                 "channel": {
                   "type": "string",
@@ -1000,7 +1058,8 @@
             "type": "integer",
             "format": "int32",
             "description": "Score of the match. Null means the match has not been played",
-            "example": 10
+            "example": 10,
+            "nullable": true
           },
           "surrogates": {
             "type": "array",
@@ -1032,6 +1091,7 @@
           "comp_level": {
             "type": "string",
             "enum": [
+              "pm",
               "qm",
               "ef",
               "qf",
@@ -1045,7 +1105,7 @@
             "type": "integer",
             "format": "int32",
             "minimum": 1,
-            "description": "Set number of the match",
+            "description": "Set number of the match. Ignored for `qm` matches, which always use set 1",
             "example": 1
           },
           "match_number": {
@@ -1108,17 +1168,20 @@
           "time_utc": {
             "type": "string",
             "description": "UTC time of the match's scheduled time in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
-            "example": "2008-01-02T10:30:00.000Z"
+            "example": "2008-01-02T10:30:00.000Z",
+            "format": "date-time"
           },
           "actual_start_time_utc": {
             "type": "string",
             "description": "UTC time of when the match actually started in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
-            "example": "2008-01-02T10:30:00.000Z"
+            "example": "2008-01-02T10:30:00.000Z",
+            "format": "date-time"
           },
           "post_results_time_utc": {
             "type": "string",
             "description": "UTC time of when the match results were shown to the audience in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
-            "example": "2008-01-02T10:30:00.000Z"
+            "example": "2008-01-02T10:30:00.000Z",
+            "format": "date-time"
           },
           "display_name": {
             "type": "string",
@@ -1137,8 +1200,20 @@
           },
           "type": {
             "type": "string",
-            "description": "Type of webcast (e.g., youtube, twitch, livestream, http_stream). Required if url is not provided",
-            "example": "youtube"
+            "description": "Type of webcast. Required if url is not provided",
+            "example": "youtube",
+            "enum": [
+              "twitch",
+              "youtube",
+              "iframe",
+              "mms",
+              "rtmp",
+              "ustream",
+              "livestream",
+              "html5",
+              "dacast",
+              "stemtv"
+            ]
           },
           "channel": {
             "type": "string",
