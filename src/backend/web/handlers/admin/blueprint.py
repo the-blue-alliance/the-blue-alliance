@@ -98,6 +98,10 @@ from backend.web.handlers.admin.mobile_clients import (
     mobile_clients_dedupe_post,
 )
 from backend.web.handlers.admin.regional_champs_pool import regional_champs_pool_list
+from backend.web.handlers.admin.score_breakdown_alliance_key import (
+    score_breakdown_alliance_key_dashboard,
+    score_breakdown_alliance_key_strip_post,
+)
 from backend.web.handlers.admin.sitevars import (
     sitevar_create,
     sitevar_edit,
@@ -497,6 +501,16 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/mobile_clients/dedupe",
     view_func=mobile_clients_dedupe_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/score_breakdown_alliance_key",
+    view_func=score_breakdown_alliance_key_dashboard,
+    methods=["GET"],
+)
+admin_routes.add_url_rule(
+    "/score_breakdown_alliance_key/strip",
+    view_func=score_breakdown_alliance_key_strip_post,
     methods=["POST"],
 )
 admin_routes.add_url_rule(

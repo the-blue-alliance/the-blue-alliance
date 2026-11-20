@@ -1,0 +1,57 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Score Breakdown Cleanup - TBA Admin{% endblock %}
+
+{% block content %}
+
+<h1>Remove <code>{{ stray_key }}</code> from {{ event_key }} score breakdowns</h1>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-info">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="panel panel-default" data-testid="score-breakdown-alliance-key-status">
+  <div class="panel-heading">
+    <h3 class="panel-title">Matches with the key: {{ match_keys|length }}</h3>
+  </div>
+  <div class="panel-body">
+    {% if match_keys %}
+    <ul>
+      {% for key in match_keys %}
+      <li><a href="/admin/match/{{ key }}">{{ key }}</a></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>None. The cleanup is done.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="panel panel-warning">
+  <div class="panel-heading">
+    <h3 class="panel-title">Clean up</h3>
+  </div>
+  <div class="panel-body">
+    <p>
+      These matches were uploaded through the trusted API while it still accepted
+      <code>{{ stray_key }}</code> as a score breakdown key. It is not a scoring field and
+      the API now rejects it. This removes only that key from each alliance's breakdown
+      and saves the matches through <code>MatchManipulator</code>, which clears their
+      cached queries. Safe to re-run.
+    </p>
+    <form action="{{ url_for('admin.score_breakdown_alliance_key_strip_post') }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <button type="submit" class="btn btn-danger"
+              onclick="return confirm('Remove {{ stray_key }} from {{ match_keys|length }} match breakdowns?')"
+              {% if not match_keys %}disabled{% endif %}>
+        Remove key
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
