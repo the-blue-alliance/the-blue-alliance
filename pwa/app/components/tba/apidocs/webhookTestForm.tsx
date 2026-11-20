@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { useId, useState } from 'react';
 
+import type { WebhookTestNotificationType } from '~/api/tba/mobile/types.gen';
 import { useAuth } from '~/components/tba/auth/auth';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -14,7 +15,7 @@ import {
 import { useWebhooks } from '~/lib/hooks/useWebhooks';
 
 export interface WebhookTestFormProps {
-  notificationType: string;
+  notificationType: WebhookTestNotificationType;
   label: string;
   eventKey?: string;
   matchKey?: string;

@@ -2,8 +2,9 @@
   "openapi": "3.1.0",
   "info": {
     "title": "TBA Mobile API",
-    "version": "v9",
-    "description": "API for TBA Mobile clients"
+    "version": "9.1.0",
+    "description": "API for TBA Mobile clients",
+    "x-changes": "9.1.0: Fix NotificationType to the names the server accepts and returns (`match_video`, not `match_video_added`) and add `starting_comp_level` and `schedule_updated`. /model/setPreferences now returns code 400 for an unknown notification type instead of failing, and its description documents the JSON-encoded `message`. /unregister takes UnregistrationRequest, which only requires `mobile_id`. FavoriteCollection, SubscriptionCollection, ApiKeysResponse and AddApiReadKeyResponse now include the `code` and `message` the server always sent. Mark always-present list fields required and drop the never-returned `device_key` from FavoriteMessage and SubscriptionMessage. Document MediaSuggestionMessage's `reference_type` and `details_json`. Add WebhookTestNotificationType for /webhooks/test. Remove the unused ApiKey security scheme."
   },
   "servers": [
     {
@@ -43,22 +44,48 @@
         "enum": [
           "upcoming_match",
           "match_score",
+          "starting_comp_level",
           "alliance_selection",
           "awards_posted",
-          "match_video_added"
+          "schedule_updated",
+          "match_video"
         ],
-        "description": "Notification type (upcoming_match=Upcoming Match, match_score=Match Score, alliance_selection=Alliance Selection, awards_posted=Awards Posted, match_video_added=Match Video Added)"
+        "description": "Notification type (upcoming_match=Upcoming Match, match_score=Match Score, starting_comp_level=Competition Level Starting, alliance_selection=Alliance Selection, awards_posted=Awards Posted, schedule_updated=Event Schedule Updated, match_video=Match Video Added)"
+      },
+      "WebhookTestNotificationType": {
+        "type": "string",
+        "enum": [
+          "upcoming_match",
+          "match_score",
+          "starting_comp_level",
+          "alliance_selection",
+          "awards_posted",
+          "schedule_updated",
+          "match_video",
+          "district_points_updated"
+        ],
+        "description": "A notification type `/webhooks/test` can send. `alliance_selection`, `awards_posted` and `schedule_updated` need `event_key`; `upcoming_match`, `match_score`, `starting_comp_level` and `match_video` need `match_key`; `district_points_updated` needs `district_key`."
       },
       "FavoriteCollection": {
-        "type": "object",
-        "properties": {
-          "favorites": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FavoriteMessage"
-            }
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "favorites": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FavoriteMessage"
+                }
+              }
+            },
+            "required": [
+              "favorites"
+            ]
           }
-        }
+        ]
       },
       "FavoriteMessage": {
         "type": "object",
@@ -67,9 +94,6 @@
           "model_type"
         ],
         "properties": {
-          "device_key": {
-            "type": "string"
-          },
           "model_key": {
             "type": "string"
           },
@@ -79,15 +103,25 @@
         }
       },
       "SubscriptionCollection": {
-        "type": "object",
-        "properties": {
-          "subscriptions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SubscriptionMessage"
-            }
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "subscriptions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SubscriptionMessage"
+                }
+              }
+            },
+            "required": [
+              "subscriptions"
+            ]
           }
-        }
+        ]
       },
       "MediaSuggestionMessage": {
         "type": "object",
@@ -105,7 +139,10 @@
           },
           "reference_type": {
             "type": "string",
-            "description": "The type of model the suggestion is for (currently only 'team' is supported)"
+            "enum": [
+              "team"
+            ],
+            "description": "The type of model the suggestion is for"
           },
           "year": {
             "type": "integer",
@@ -117,7 +154,7 @@
           },
           "details_json": {
             "type": "string",
-            "description": "Optional JSON-encoded details about the media"
+            "description": "JSON-encoded details about the media, or an empty string for none"
           }
         }
       },
@@ -381,12 +418,10 @@
         "type": "object",
         "required": [
           "model_key",
-          "model_type"
+          "model_type",
+          "notifications"
         ],
         "properties": {
-          "device_key": {
-            "type": "string"
-          },
           "model_key": {
             "type": "string"
           },
@@ -466,29 +501,47 @@
         }
       },
       "ApiKeysResponse": {
-        "type": "object",
-        "properties": {
-          "read_keys": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ApiReadKeyMessage"
-            }
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
           },
-          "write_keys": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ApiWriteKeyMessage"
-            }
+          {
+            "type": "object",
+            "properties": {
+              "read_keys": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ApiReadKeyMessage"
+                }
+              },
+              "write_keys": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ApiWriteKeyMessage"
+                }
+              }
+            },
+            "required": [
+              "read_keys",
+              "write_keys"
+            ]
           }
-        }
+        ]
       },
       "AddApiReadKeyResponse": {
-        "type": "object",
-        "properties": {
-          "read_key": {
-            "$ref": "#/components/schemas/ApiReadKeyMessage"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "read_key": {
+                "$ref": "#/components/schemas/ApiReadKeyMessage"
+              }
+            }
           }
-        }
+        ]
       },
       "OperatingSystem": {
         "type": "string",
@@ -533,6 +586,21 @@
           "name": {
             "type": "string",
             "description": "Display name for the device. Defaults to \"Unnamed Device\"."
+          }
+        }
+      },
+      "UnregistrationRequest": {
+        "type": "object",
+        "required": [
+          "mobile_id"
+        ],
+        "properties": {
+          "mobile_id": {
+            "type": "string",
+            "description": "The FCM registration token, Firebase Installation ID, or webhook URL to remove"
+          },
+          "mobile_id_type": {
+            "$ref": "#/components/schemas/MobileIdType"
           }
         }
       },
@@ -719,20 +787,12 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
-      },
-      "ApiKey": {
-        "type": "apiKey",
-        "in": "query",
-        "name": "key"
       }
     }
   },
   "security": [
     {
       "BearerAuth": []
-    },
-    {
-      "ApiKey": []
     }
   ],
   "paths": {
@@ -762,6 +822,7 @@
     "/model/setPreferences": {
       "post": {
         "summary": "Set model preferences",
+        "description": "Sets whether the model is a favorite and which notifications it sends. `code` is 401 when not signed in and 400 for an unknown notification type, and nothing is changed. Otherwise `code` is 0 and `message` is a JSON-encoded object with `favorite` and `subscription`, each a `BaseResponse` whose `code` is 200 when changed, 304 when already set, or 404 when there was nothing to remove.",
         "operationId": "setModelPreferences",
         "security": [
           {
@@ -862,6 +923,7 @@
     "/team/media/suggest": {
       "post": {
         "summary": "Suggest team media",
+        "description": "`code` is 200 when the suggestion is added, 304 if it already exists, 400 for a bad `reference_type`, year or URL, and 401 when not signed in.",
         "operationId": "suggestTeamMedia",
         "security": [
           {
@@ -1236,7 +1298,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RegistrationRequest"
+                "$ref": "#/components/schemas/UnregistrationRequest"
               }
             }
           }
@@ -1554,8 +1616,7 @@
                     "description": "The webhook's ID, from `/webhooks/list`"
                   },
                   "notification_type": {
-                    "type": "string",
-                    "description": "A notification type name, such as `upcoming_match`"
+                    "$ref": "#/components/schemas/WebhookTestNotificationType"
                   },
                   "event_key": {
                     "type": "string"

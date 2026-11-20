@@ -593,6 +593,12 @@ def update_model_preferences(req: ModelPreferenceMessage) -> BaseResponse:
     model_key = req["model_key"]
     model_type = req["model_type"]
 
+    unknown = [t for t in req["notifications"] if t not in NOTIFICATION_NAME_TO_TYPE]
+    if unknown:
+        return BaseResponse(
+            code=400, message=f"Unknown notification types: {', '.join(unknown)}"
+        )
+
     favorite_response: BaseResponse
     subscription_response: BaseResponse
 
