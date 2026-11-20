@@ -1,4 +1,4 @@
-from typing import Any, List, Literal, Optional, TypedDict
+from typing import Any, List, Literal, Optional, TypedDict, TypeGuard
 
 from backend.common.sitevars.sitevar import Sitevar
 
@@ -29,7 +29,7 @@ class ContentType(TypedDict):
     sponsors: List[Sponsor]
 
 
-def _is_https_url(value: Any) -> bool:
+def _is_https_url(value: Any) -> TypeGuard[str]:
     return isinstance(value, str) and value.startswith("https://")
 
 
