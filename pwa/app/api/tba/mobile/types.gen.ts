@@ -16,27 +16,41 @@ export type BaseResponse = {
 export type ModelType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 /**
- * Notification type (upcoming_match=Upcoming Match, match_score=Match Score, alliance_selection=Alliance Selection, awards_posted=Awards Posted, match_video_added=Match Video Added)
+ * Notification type (upcoming_match=Upcoming Match, match_score=Match Score, starting_comp_level=Competition Level Starting, alliance_selection=Alliance Selection, awards_posted=Awards Posted, schedule_updated=Event Schedule Updated, match_video=Match Video Added)
  */
 export type NotificationType =
   | 'upcoming_match'
   | 'match_score'
+  | 'starting_comp_level'
   | 'alliance_selection'
   | 'awards_posted'
-  | 'match_video_added';
+  | 'schedule_updated'
+  | 'match_video';
 
-export type FavoriteCollection = {
-  favorites?: Array<FavoriteMessage>;
+/**
+ * A notification type `/webhooks/test` can send. `alliance_selection`, `awards_posted` and `schedule_updated` need `event_key`; `upcoming_match`, `match_score`, `starting_comp_level` and `match_video` need `match_key`; `district_points_updated` needs `district_key`.
+ */
+export type WebhookTestNotificationType =
+  | 'upcoming_match'
+  | 'match_score'
+  | 'starting_comp_level'
+  | 'alliance_selection'
+  | 'awards_posted'
+  | 'schedule_updated'
+  | 'match_video'
+  | 'district_points_updated';
+
+export type FavoriteCollection = BaseResponse & {
+  favorites: Array<FavoriteMessage>;
 };
 
 export type FavoriteMessage = {
-  device_key?: string;
   model_key: string;
   model_type: ModelType;
 };
 
-export type SubscriptionCollection = {
-  subscriptions?: Array<SubscriptionMessage>;
+export type SubscriptionCollection = BaseResponse & {
+  subscriptions: Array<SubscriptionMessage>;
 };
 
 export type MediaSuggestionMessage = {
@@ -45,9 +59,9 @@ export type MediaSuggestionMessage = {
    */
   reference_key: string;
   /**
-   * The type of model the suggestion is for (currently only 'team' is supported)
+   * The type of model the suggestion is for
    */
-  reference_type: string;
+  reference_type: 'team';
   /**
    * The year the media is from
    */
@@ -57,7 +71,7 @@ export type MediaSuggestionMessage = {
    */
   media_url: string;
   /**
-   * Optional JSON-encoded details about the media
+   * JSON-encoded details about the media, or an empty string for none
    */
   details_json: string;
 };
@@ -183,10 +197,9 @@ export type EventMatchVideosSuggestionResponse = {
 };
 
 export type SubscriptionMessage = {
-  device_key?: string;
   model_key: string;
   model_type: ModelType;
-  notifications?: Array<NotificationType>;
+  notifications: Array<NotificationType>;
 };
 
 export type ApiReadKeyMessage = {
@@ -216,12 +229,12 @@ export type ApiWriteKeyMessage = {
   expiration?: string | null;
 };
 
-export type ApiKeysResponse = {
-  read_keys?: Array<ApiReadKeyMessage>;
-  write_keys?: Array<ApiWriteKeyMessage>;
+export type ApiKeysResponse = BaseResponse & {
+  read_keys: Array<ApiReadKeyMessage>;
+  write_keys: Array<ApiWriteKeyMessage>;
 };
 
-export type AddApiReadKeyResponse = {
+export type AddApiReadKeyResponse = BaseResponse & {
   read_key?: ApiReadKeyMessage;
 };
 
@@ -247,6 +260,14 @@ export type RegistrationRequest = {
    * Display name for the device. Defaults to "Unnamed Device".
    */
   name?: string;
+};
+
+export type UnregistrationRequest = {
+  /**
+   * The FCM registration token, Firebase Installation ID, or webhook URL to remove
+   */
+  mobile_id: string;
+  mobile_id_type?: MobileIdType;
 };
 
 export type RegisteredMobileClient = {
@@ -584,7 +605,7 @@ export type RegisterMobileClientResponse =
   RegisterMobileClientResponses[keyof RegisterMobileClientResponses];
 
 export type UnregisterMobileClientData = {
-  body: RegistrationRequest;
+  body: UnregistrationRequest;
   path?: never;
   query?: never;
   url: '/unregister';
@@ -747,10 +768,7 @@ export type SendWebhookTestData = {
      * The webhook's ID, from `/webhooks/list`
      */
     webhook_id: string;
-    /**
-     * A notification type name, such as `upcoming_match`
-     */
-    notification_type: string;
+    notification_type: WebhookTestNotificationType;
     event_key?: string;
     match_key?: string;
     district_key?: string;

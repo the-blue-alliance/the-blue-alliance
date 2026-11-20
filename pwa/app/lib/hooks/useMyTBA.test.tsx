@@ -147,15 +147,6 @@ describe('useMyTBA', () => {
     expect(result.current.notifications).toEqual([]);
   });
 
-  test('treats collections without lists as empty', async () => {
-    mockTbaApi(listFavorites, {}, {});
-    mockTbaApi(listSubscriptions, {}, {});
-    const { result } = await renderLoaded('frc254');
-
-    expect(result.current.isFavorite).toBe(false);
-    expect(result.current.notifications).toEqual([]);
-  });
-
   test('reports nothing when loading fails', async () => {
     mockTbaApiWith(
       listFavorites,

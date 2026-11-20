@@ -61,7 +61,14 @@ describe('useApiKeys', () => {
 
   test('does not load keys when signed out, and refuses writes', async () => {
     signOut();
-    const listRequests = mockTbaApi(listApiKeys, {}, {});
+    const listRequests = mockTbaApi(
+      listApiKeys,
+      {},
+      {
+        read_keys: [],
+        write_keys: [],
+      },
+    );
     const addRequests = mockTbaApi(addApiReadKey, {}, {});
     const deleteRequests = mockTbaApi(deleteApiReadKey, {}, {});
     const { result } = renderApiKeys();
@@ -92,14 +99,6 @@ describe('useApiKeys', () => {
     expect(requests[0].headers.get('Authorization')).toBe('Bearer token-1');
     expect(result.current.readKeys).toEqual([READ_KEY_A]);
     expect(result.current.writeKeys).toEqual([WRITE_KEY]);
-  });
-
-  test('falls back to empty lists when the response omits them', async () => {
-    mockTbaApi(listApiKeys, {}, {});
-    const { result } = await renderLoaded();
-
-    expect(result.current.readKeys).toEqual([]);
-    expect(result.current.writeKeys).toEqual([]);
   });
 
   test('returns empty lists when loading fails', async () => {

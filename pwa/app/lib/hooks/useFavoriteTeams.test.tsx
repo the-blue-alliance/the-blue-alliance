@@ -91,15 +91,6 @@ describe('useFavoriteTeams', () => {
     expect(eventAsTeamRequests).toEqual([]);
   });
 
-  test('treats a missing favorites list as empty', async () => {
-    mockTbaApi(listFavorites, {}, {});
-
-    const { result } = renderHookWithClient(() => useFavoriteTeams());
-
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(result.current.favoriteTeams).toEqual([]);
-  });
-
   test('returns no teams when the favorites request fails', async () => {
     mockTbaApiWith(
       listFavorites,
