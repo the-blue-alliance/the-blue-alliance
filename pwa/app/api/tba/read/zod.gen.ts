@@ -2083,10 +2083,12 @@ export const zWltRecord = z.object({
 });
 
 export const zDistrictInsight = z.object({
-  district_data: z.object({
-    region_data: z.record(z.string(), zDistrictInsightRegionData).nullable(),
-    district_wide_data: zDistrictInsightRegionData.nullable(),
-  }),
+  district_data: z
+    .object({
+      region_data: z.record(z.string(), zDistrictInsightRegionData).nullable(),
+      district_wide_data: zDistrictInsightRegionData.nullable(),
+    })
+    .nullable(),
   team_data: z
     .record(
       z.string(),
@@ -2100,6 +2102,7 @@ export const zDistrictInsight = z.object({
         individual_awards: z.int(),
         quals_record: zWltRecord,
         elims_record: zWltRecord,
+        blue_banners: z.int(),
         in_district_extra_play_count: z.int(),
         total_matches_played: z.int(),
         dcmp_appearances: z.int(),
@@ -2107,6 +2110,7 @@ export const zDistrictInsight = z.object({
       }),
     )
     .nullable(),
+  seasonal_insights: z.record(z.string(), z.record(z.string(), z.unknown())),
 });
 
 export const zEliminationAlliance = z.object({
