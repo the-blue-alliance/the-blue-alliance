@@ -36,11 +36,11 @@
               }
             }
           },
-          "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
-          },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -74,10 +74,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -111,10 +114,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -151,10 +157,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -191,10 +200,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -230,13 +242,32 @@
         },
         "responses": {
           "200": {
-            "$ref": "#/components/responses/successResponse"
+            "description": "The keys of the matches that were deleted. Keys that are not valid match keys are skipped",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "keys_deleted": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "qm1"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -271,10 +302,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -372,10 +406,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -414,10 +451,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -459,10 +499,20 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "description": "The event key is malformed, the event does not exist, or one of the matches does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -500,10 +550,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -537,10 +590,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       },
@@ -572,10 +628,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -612,10 +671,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -657,10 +719,20 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "description": "The event key is malformed, the event does not exist, or one of the matches does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -685,13 +757,44 @@
     },
     "responses": {
       "successResponse": {
-        "description": "The operation completed successfully"
+        "description": "The operation completed successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Success"
+            }
+          }
+        }
       },
-      "invalidHeadersResponse": {
-        "description": "One or both of `X-TBA-Auth-ID` `X-TBA-Auth-Sig` were missing"
+      "badRequestResponse": {
+        "description": "The request body could not be parsed or failed validation",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
       },
-      "invalidSigResponse": {
-        "description": "One or both of `X-TBA-Auth-ID` `X-TBA-Auth-Sig` were invalid"
+      "unauthorizedResponse": {
+        "description": "The request was not authorized: `X-TBA-Auth-Id` or `X-TBA-Auth-Sig` is missing or invalid, the keys are not allowed to edit this event or lack the permission this endpoint needs, the keys have expired, or the trusted API has been disabled by the TBA admins",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "notFoundResponse": {
+        "description": "The event key is malformed or the event does not exist",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
       }
     },
     "securitySchemes": {
@@ -1164,6 +1267,22 @@
                 }
               }
             }
+          }
+        }
+      },
+      "Success": {
+        "type": "object",
+        "properties": {
+          "Success": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string"
           }
         }
       }
