@@ -43,7 +43,7 @@ def test_sponsors_requires_auth(api_client: Client) -> None:
 
 def test_sponsors_default(api_client: Client) -> None:
     resp = api_client.get("/api/v3/sponsors", headers=AUTH_HEADERS)
-    assert resp.json == {
+    assert resp.get_json() == {
         "sponsors": [
             {
                 "name": "AndyMark",
@@ -61,13 +61,13 @@ def test_sponsors_default(api_client: Client) -> None:
 def test_sponsors_empty(api_client: Client) -> None:
     _put([])
     resp = api_client.get("/api/v3/sponsors", headers=AUTH_HEADERS)
-    assert resp.json == {"sponsors": []}
+    assert resp.get_json() == {"sponsors": []}
 
 
 def test_sponsors_one(api_client: Client) -> None:
     _put([_sponsor("Acme", "mark")])
     resp = api_client.get("/api/v3/sponsors", headers=AUTH_HEADERS)
-    assert resp.json == {
+    assert resp.get_json() == {
         "sponsors": [
             {
                 "name": "Acme",
@@ -83,15 +83,15 @@ def test_sponsors_one(api_client: Client) -> None:
 def test_sponsors_three_in_order(api_client: Client) -> None:
     _put([_sponsor("C"), _sponsor("A"), _sponsor("B")])
     resp = api_client.get("/api/v3/sponsors", headers=AUTH_HEADERS)
-    assert [s["name"] for s in resp.json["sponsors"]] == ["C", "A", "B"]
+    assert [s["name"] for s in resp.get_json()["sponsors"]] == ["C", "A", "B"]
 
 
 def test_sponsors_malformed_entry_dropped(api_client: Client) -> None:
     PlatinumSponsors.put(
-        ContentType(sponsors=[{"name": "Broken"}, _sponsor("A")])  # pyre-ignore[55]
+        ContentType(sponsors=[cast(Any, {"name": "Broken"}), _sponsor("A")])
     )
     resp = api_client.get("/api/v3/sponsors", headers=AUTH_HEADERS)
-    assert [s["name"] for s in resp.json["sponsors"]] == ["A"]
+    assert [s["name"] for s in resp.get_json()["sponsors"]] == ["A"]
 
 
 def test_sponsors_cache_control(api_client: Client) -> None:
@@ -104,4 +104,4 @@ def test_sponsors_unknown_logo_style_served_as_wordmark(api_client: Client) -> N
     sponsor["logo_style"] = "banner"
     PlatinumSponsors.put(ContentType(sponsors=[cast(Sponsor, sponsor)]))
     resp = api_client.get("/api/v3/sponsors", headers=AUTH_HEADERS)
-    assert resp.json["sponsors"][0]["logo_style"] == "wordmark"
+    assert resp.get_json()["sponsors"][0]["logo_style"] == "wordmark"

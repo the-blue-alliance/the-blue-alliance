@@ -164,6 +164,42 @@ Type-aware rules are enabled via `oxlint-tsgolint`.
   - **Playwright**: observe real requests or visible content relative to navigation / hover / tab click (mirror `tests/event.spec.ts` `does not request … on page load` / `requests … when …`)
   - **Component tests**: placeholder then content appears; content withheld until near viewport — not the scheduling API
 
+#### Mocking the TBA API
+
+- **Vitest**: every request goes through MSW, and a request without a handler fails the test. Use `mockTbaApi(sdkFn, options, body)` or `mockTbaApiWith(sdkFn, options, resolver)` from `~/test/msw`, and `renderWithClient` / `renderHookWithClient` from `~/test/render`. Do not `vi.mock` the generated API modules.
+- **Playwright**: import `test` and `expect` from `./fixtures` and call `mockTba(sdkFn, options, body)` before `page.goto`. It mocks the request for both the SSR render and the browser. Requests you don't mock go to production.
+- **Stub any data a test asserts on that production can change**: the current season, live events, rankings, or anything else that is not settled history. Otherwise a season rollover or a data fix breaks CI.
+- Both helpers take the generated SDK function (`getEventsByYear`, `getTeam`, ...), so the URL follows the regenerated client and `pnpm typecheck` checks the body against the endpoint's response type. `mockTba` also validates the body with the endpoint's generated zod schema when it is registered, so a bad fixture fails on that line with a `ZodError` naming the field.
+- **Bodies longer than about 10 lines go in a JSON file named after the API route**, under `tests/mocks/data/`: `/events/2025` → `tests/mocks/data/events/2025.json`, `/team/frc604` → `tests/mocks/data/team/frc604.json`.
+  - Save the full, unmodified production response. Do not trim it by hand: `curl -H "X-TBA-Auth-Key: $VITE_TBA_API_READ_KEY" https://www.thebluealliance.com/api/v3/events/2025`.
+  - To add a variant, put a short note between the route and `.json`: `/event/2026nytr/matches` partway through the event → `tests/mocks/data/event/2026nytr/matches.partial.json`. Start from the production response and change only what the note says. A file without a note is always the unmodified response.
+  - Import it with `with { type: 'json' }`, because Playwright loads specs as native ESM.
+  - Cast it to the generated type (`events2025 as Event[]`). JSON imports widen string-literal unions such as a webcast's `type` to `string`, so they won't typecheck otherwise. The zod check covers what the cast skips.
+
+```ts
+import { type Event, getEventsByYear } from '~/api/tba/read';
+
+import { expect, test } from './fixtures';
+import events2025 from './mocks/data/events/2025.json' with { type: 'json' };
+
+test('drops the parent event name from division rows', async ({
+  page,
+  mockTba,
+}) => {
+  await mockTba(
+    getEventsByYear,
+    { path: { year: 2025 } },
+    events2025 as Event[],
+  );
+
+  await page.goto('/events/2025');
+
+  await expect(
+    page.getByRole('link', { name: 'Mercury Division', exact: true }),
+  ).toBeVisible();
+});
+```
+
 #### Isolation
 
 - Each test runs alone, in any order, with no shared mutable state.

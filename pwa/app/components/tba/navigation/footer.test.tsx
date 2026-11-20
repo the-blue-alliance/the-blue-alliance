@@ -1,25 +1,11 @@
 import { render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { renderToString } from 'react-dom/server';
 import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test, vi } from 'vitest';
 
 import { Footer } from '~/components/tba/navigation/footer';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    to: string;
-  }) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
 
 vi.mock('~/components/tba/navigation/sponsorCredits', () => ({
   FooterSponsorCredit: () => <span>Sponsor credit</span>,

@@ -1,11 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import type {
-  EliminationAlliance,
-  Event,
-  Match,
-  MatchAlliance,
-} from '~/api/tba/read';
+import type { EliminationAlliance, Event, Match } from '~/api/tba/read';
 import {
   AllianceColor,
   CompLevel,
@@ -33,6 +28,7 @@ import {
   sortMatchComparator,
   sortMultipleEventsMatches,
 } from '~/lib/matchUtils';
+import { makeMatch as baseMatch, makeAlliance } from '~/test/factories';
 
 describe('isValidMatchKey', () => {
   test.each([
@@ -77,18 +73,8 @@ describe('getAllianceMatchResult', () => {
       set_number: 1,
       match_number: 1,
       alliances: {
-        red: {
-          score: redScore,
-          team_keys: ['frc254', 'frc1678', 'frc2056'],
-          surrogate_team_keys: [],
-          dq_team_keys: [],
-        },
-        blue: {
-          score: blueScore,
-          team_keys: ['frc1323', 'frc2910', 'frc604'],
-          surrogate_team_keys: [],
-          dq_team_keys: [],
-        },
+        red: makeAlliance(redScore, ['frc254', 'frc1678', 'frc2056']),
+        blue: makeAlliance(blueScore, ['frc1323', 'frc2910', 'frc604']),
       },
       winning_alliance: winningAlliance,
       event_key: key.split('_')[0],
@@ -344,34 +330,16 @@ describe('formatMatchKeyName', () => {
   });
 });
 
-function alliance(score: number, teamKeys: string[]): MatchAlliance {
-  return {
-    score,
-    team_keys: teamKeys,
-    surrogate_team_keys: [],
-    dq_team_keys: [],
-  };
-}
-
 function makeMatch(overrides: Partial<Match> & { key: string }): Match {
-  return {
-    comp_level: CompLevel.QM,
-    set_number: 1,
-    match_number: 1,
+  return baseMatch({
     alliances: {
-      red: alliance(-1, ['frc254', 'frc1678', 'frc2056']),
-      blue: alliance(-1, ['frc1323', 'frc2910', 'frc604']),
+      red: makeAlliance(-1, ['frc254', 'frc1678', 'frc2056']),
+      blue: makeAlliance(-1, ['frc1323', 'frc2910', 'frc604']),
     },
     winning_alliance: AllianceColor.NO_ALLIANCE,
     event_key: overrides.key.split('_')[0],
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
     ...overrides,
-  };
+  });
 }
 
 function breakdown(
@@ -391,8 +359,8 @@ describe('calculateRobotsRecord', () => {
             makeMatch({
               key: '2026nhmm_qm1',
               alliances: {
-                red: alliance(100, ['frc3467B', 'frc1', 'frc2']),
-                blue: alliance(50, ['frc3', 'frc4', 'frc5']),
+                red: makeAlliance(100, ['frc3467B', 'frc1', 'frc2']),
+                blue: makeAlliance(50, ['frc3', 'frc4', 'frc5']),
               },
               winning_alliance: AllianceColor.RED,
             }),
@@ -405,8 +373,8 @@ describe('calculateRobotsRecord', () => {
               key: '2026nhmm_sf1m1',
               comp_level: CompLevel.SF,
               alliances: {
-                red: alliance(100, ['frc6', 'frc7', 'frc8']),
-                blue: alliance(50, ['frc3467C', 'frc9', 'frc10']),
+                red: makeAlliance(100, ['frc6', 'frc7', 'frc8']),
+                blue: makeAlliance(50, ['frc3467C', 'frc9', 'frc10']),
               },
               winning_alliance: AllianceColor.RED,
             }),
@@ -559,7 +527,7 @@ describe('matchHasBeenPlayed', () => {
   test('is true once both alliances have a score', () => {
     const match = makeMatch({
       key: '2024test_qm1',
-      alliances: { red: alliance(10, []), blue: alliance(0, []) },
+      alliances: { red: makeAlliance(10, []), blue: makeAlliance(0, []) },
     });
 
     expect(matchHasBeenPlayed(match)).toBe(true);
@@ -568,7 +536,7 @@ describe('matchHasBeenPlayed', () => {
   test('is false while either alliance is unscored', () => {
     const match = makeMatch({
       key: '2024test_qm1',
-      alliances: { red: alliance(10, []), blue: alliance(-1, []) },
+      alliances: { red: makeAlliance(10, []), blue: makeAlliance(-1, []) },
     });
 
     expect(matchHasBeenPlayed(match)).toBe(false);
@@ -580,8 +548,8 @@ describe('getTeamMatchResults', () => {
     makeMatch({
       key: '2024test_qm1',
       alliances: {
-        red: alliance(50, ['frc254']),
-        blue: alliance(10, ['frc1']),
+        red: makeAlliance(50, ['frc254']),
+        blue: makeAlliance(10, ['frc1']),
       },
       winning_alliance: AllianceColor.RED,
     }),
@@ -589,8 +557,8 @@ describe('getTeamMatchResults', () => {
       key: '2024test_qm2',
       match_number: 2,
       alliances: {
-        red: alliance(10, ['frc254']),
-        blue: alliance(50, ['frc1']),
+        red: makeAlliance(10, ['frc254']),
+        blue: makeAlliance(50, ['frc1']),
       },
       winning_alliance: AllianceColor.BLUE,
     }),
@@ -598,22 +566,25 @@ describe('getTeamMatchResults', () => {
       key: '2024test_qm3',
       match_number: 3,
       alliances: {
-        red: alliance(30, ['frc254']),
-        blue: alliance(30, ['frc1']),
+        red: makeAlliance(30, ['frc254']),
+        blue: makeAlliance(30, ['frc1']),
       },
     }),
     makeMatch({
       key: '2024test_qm4',
       match_number: 4,
-      alliances: { red: alliance(50, ['frc1']), blue: alliance(10, ['frc2']) },
+      alliances: {
+        red: makeAlliance(50, ['frc1']),
+        blue: makeAlliance(10, ['frc2']),
+      },
       winning_alliance: AllianceColor.RED,
     }),
     makeMatch({
       key: '2024test_sf1m1',
       comp_level: CompLevel.SF,
       alliances: {
-        red: alliance(10, ['frc1']),
-        blue: alliance(50, ['frc254']),
+        red: makeAlliance(10, ['frc1']),
+        blue: makeAlliance(50, ['frc254']),
       },
       winning_alliance: AllianceColor.BLUE,
     }),
@@ -621,8 +592,8 @@ describe('getTeamMatchResults', () => {
       key: '2024test_f1m1',
       comp_level: CompLevel.F,
       alliances: {
-        red: alliance(60, ['frc1']),
-        blue: alliance(50, ['frc254']),
+        red: makeAlliance(60, ['frc1']),
+        blue: makeAlliance(50, ['frc254']),
       },
       winning_alliance: AllianceColor.RED,
     }),
@@ -631,8 +602,8 @@ describe('getTeamMatchResults', () => {
       comp_level: CompLevel.F,
       match_number: 2,
       alliances: {
-        red: alliance(-1, ['frc1']),
-        blue: alliance(-1, ['frc254']),
+        red: makeAlliance(-1, ['frc1']),
+        blue: makeAlliance(-1, ['frc254']),
       },
     }),
   ];
@@ -687,16 +658,16 @@ describe('calculateTeamAvgScore', () => {
         makeMatch({
           key: '2015nytr_qm1',
           alliances: {
-            red: alliance(-1, ['frc2791']),
-            blue: alliance(-1, ['frc1']),
+            red: makeAlliance(-1, ['frc2791']),
+            blue: makeAlliance(-1, ['frc1']),
           },
         }),
         makeMatch({
           key: '2015nytr_qm2',
           match_number: 2,
           alliances: {
-            red: alliance(50, ['frc1']),
-            blue: alliance(40, ['frc2']),
+            red: makeAlliance(50, ['frc1']),
+            blue: makeAlliance(40, ['frc2']),
           },
         }),
       ]),
@@ -709,24 +680,24 @@ describe('calculateTeamAvgScore', () => {
         makeMatch({
           key: '2015nytr_qm1',
           alliances: {
-            red: alliance(44, ['frc340', 'frc145', 'frc2791']),
-            blue: alliance(68, ['frc4508', 'frc303', 'frc527']),
+            red: makeAlliance(44, ['frc340', 'frc145', 'frc2791']),
+            blue: makeAlliance(68, ['frc4508', 'frc303', 'frc527']),
           },
         }),
         makeMatch({
           key: '2015nytr_qm2',
           match_number: 2,
           alliances: {
-            red: alliance(114, ['frc639', 'frc2791', 'frc303']),
-            blue: alliance(70, ['frc533', 'frc263', 'frc3687']),
+            red: makeAlliance(114, ['frc639', 'frc2791', 'frc303']),
+            blue: makeAlliance(70, ['frc533', 'frc263', 'frc3687']),
           },
         }),
         makeMatch({
           key: '2015nytr_qf1m1',
           comp_level: CompLevel.QF,
           alliances: {
-            red: alliance(49, ['frc870', 'frc2791', 'frc1111']),
-            blue: alliance(137, ['frc2852', 'frc303', 'frc4203']),
+            red: makeAlliance(49, ['frc870', 'frc2791', 'frc1111']),
+            blue: makeAlliance(137, ['frc2852', 'frc303', 'frc4203']),
           },
         }),
         makeMatch({
@@ -734,8 +705,8 @@ describe('calculateTeamAvgScore', () => {
           comp_level: CompLevel.QF,
           match_number: 2,
           alliances: {
-            red: alliance(82, ['frc870', 'frc2791', 'frc1111']),
-            blue: alliance(137, ['frc340', 'frc195', 'frc4930']),
+            red: makeAlliance(82, ['frc870', 'frc2791', 'frc1111']),
+            blue: makeAlliance(137, ['frc340', 'frc195', 'frc4930']),
           },
         }),
       ]),
@@ -759,7 +730,10 @@ describe('getTeamsUnpenalizedHighScore', () => {
   test('is undefined when the team played none of the matches', () => {
     const match = makeMatch({
       key: '2024test_qm1',
-      alliances: { red: alliance(50, ['frc1']), blue: alliance(10, ['frc2']) },
+      alliances: {
+        red: makeAlliance(50, ['frc1']),
+        blue: makeAlliance(10, ['frc2']),
+      },
     });
 
     expect(getTeamsUnpenalizedHighScore('frc254', [match])).toBeUndefined();
@@ -769,8 +743,8 @@ describe('getTeamsUnpenalizedHighScore', () => {
     const penalized = makeMatch({
       key: '2024test_qm1',
       alliances: {
-        red: alliance(100, ['frc254']),
-        blue: alliance(10, ['frc1']),
+        red: makeAlliance(100, ['frc254']),
+        blue: makeAlliance(10, ['frc1']),
       },
       score_breakdown: breakdown({ foulPoints: 40 }, { foulPoints: 0 }),
     });
@@ -778,8 +752,8 @@ describe('getTeamsUnpenalizedHighScore', () => {
       key: '2024test_qm2',
       match_number: 2,
       alliances: {
-        red: alliance(80, ['frc254']),
-        blue: alliance(10, ['frc1']),
+        red: makeAlliance(80, ['frc254']),
+        blue: makeAlliance(10, ['frc1']),
       },
       score_breakdown: breakdown({ foulPoints: 0 }, { foulPoints: 0 }),
     });
@@ -794,8 +768,8 @@ describe('getTeamsUnpenalizedHighScore', () => {
     const match = makeMatch({
       key: '2015test_qm1',
       alliances: {
-        red: alliance(100, ['frc254']),
-        blue: alliance(10, ['frc1']),
+        red: makeAlliance(100, ['frc254']),
+        blue: makeAlliance(10, ['frc1']),
       },
       score_breakdown: breakdown({ foul_points: 12 }, { foul_points: 0 }),
     });
@@ -807,8 +781,8 @@ describe('getTeamsUnpenalizedHighScore', () => {
     const match = makeMatch({
       key: '2010test_qm1',
       alliances: {
-        red: alliance(100, ['frc254']),
-        blue: alliance(10, ['frc1']),
+        red: makeAlliance(100, ['frc254']),
+        blue: makeAlliance(10, ['frc1']),
       },
     });
 
@@ -819,8 +793,8 @@ describe('getTeamsUnpenalizedHighScore', () => {
     const match = makeMatch({
       key: '2024test_qm1',
       alliances: {
-        red: alliance(100, ['frc254']),
-        blue: alliance(10, ['frc1']),
+        red: makeAlliance(100, ['frc254']),
+        blue: makeAlliance(10, ['frc1']),
       },
       score_breakdown: breakdown({ totalPoints: 100 }, { totalPoints: 10 }),
     });
@@ -832,8 +806,8 @@ describe('getTeamsUnpenalizedHighScore', () => {
     const match = makeMatch({
       key: '2024test_qm1',
       alliances: {
-        red: alliance(100, ['frc1']),
-        blue: alliance(60, ['frc254']),
+        red: makeAlliance(100, ['frc1']),
+        blue: makeAlliance(60, ['frc254']),
       },
       score_breakdown: breakdown({ foulPoints: 0 }, { foulPoints: 5 }),
     });
@@ -849,7 +823,7 @@ describe('getMatchScoreWithoutAdjustPoints', () => {
   test('subtracts camelCase adjust points', () => {
     const match = makeMatch({
       key: '2024test_qm1',
-      alliances: { red: alliance(100, []), blue: alliance(50, []) },
+      alliances: { red: makeAlliance(100, []), blue: makeAlliance(50, []) },
       score_breakdown: breakdown({ adjustPoints: 10 }, { adjustPoints: 5 }),
     });
 
@@ -862,7 +836,7 @@ describe('getMatchScoreWithoutAdjustPoints', () => {
   test('subtracts 2015 snake_case adjust points', () => {
     const match = makeMatch({
       key: '2015test_qm1',
-      alliances: { red: alliance(100, []), blue: alliance(50, []) },
+      alliances: { red: makeAlliance(100, []), blue: makeAlliance(50, []) },
       score_breakdown: breakdown({ adjust_points: 10 }, { adjust_points: 5 }),
     });
 
@@ -875,7 +849,7 @@ describe('getMatchScoreWithoutAdjustPoints', () => {
   test('returns the raw scores without adjust points in the breakdown', () => {
     const match = makeMatch({
       key: '2010test_qm1',
-      alliances: { red: alliance(100, []), blue: alliance(50, []) },
+      alliances: { red: makeAlliance(100, []), blue: makeAlliance(50, []) },
     });
 
     expect(getMatchScoreWithoutAdjustPoints(match)).toEqual({
@@ -938,8 +912,8 @@ describe('getFinalsResult', () => {
       match_number: matchNumber,
       winning_alliance: winner,
       alliances: {
-        red: alliance(played ? 100 : -1, ['frc254', 'frc1678', 'frc2056']),
-        blue: alliance(played ? 90 : -1, ['frc1323', 'frc2910', 'frc604']),
+        red: makeAlliance(played ? 100 : -1, ['frc254', 'frc1678', 'frc2056']),
+        blue: makeAlliance(played ? 90 : -1, ['frc1323', 'frc2910', 'frc604']),
       },
     });
   }
@@ -1012,8 +986,8 @@ describe('getFinalsResult', () => {
       comp_level: CompLevel.SF,
       winning_alliance: AllianceColor.RED,
       alliances: {
-        red: alliance(100, ['frc1', 'frc2', 'frc3']),
-        blue: alliance(90, ['frc254', 'frc1678', 'frc2056']),
+        red: makeAlliance(100, ['frc1', 'frc2', 'frc3']),
+        blue: makeAlliance(90, ['frc254', 'frc1678', 'frc2056']),
       },
     });
 

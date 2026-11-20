@@ -1,15 +1,16 @@
 import { type Page, expect, test } from '@playwright/test';
 
-test('fetches Nexus event data in the browser', async ({ page }) => {
-  const nexusRequests: string[] = [];
-  page.on('request', (request) => {
-    if (request.url().includes('/nexus_info')) {
-      nexusRequests.push(request.url());
-    }
-  });
+import {
+  delayRequests,
+  gotoHydrated,
+  hangRequests,
+  recordRequests,
+} from './helpers';
 
-  await page.goto('/event/2024mil');
-  await page.locator('body[data-hydrated]').waitFor();
+test('fetches Nexus event data in the browser', async ({ page }) => {
+  const nexusRequests = recordRequests(page, '/nexus_info');
+
+  await gotoHydrated(page, '/event/2024mil');
 
   await expect.poll(() => nexusRequests.length).toBeGreaterThan(0);
 });
@@ -17,10 +18,7 @@ test('fetches Nexus event data in the browser', async ({ page }) => {
 test('shows the qualification matches while event teams are still loading', async ({
   page,
 }) => {
-  await page.route(
-    /\/api\/v3\/event\/2024mil\/teams(\?|$)/,
-    () => new Promise(() => {}),
-  );
+  await hangRequests(page, /\/api\/v3\/event\/2024mil\/teams(\?|$)/);
 
   await page.goto('/event/2024mil');
 
@@ -32,13 +30,9 @@ test('shows the qualification matches while event teams are still loading', asyn
 test('shows a team count placeholder while event teams are loading', async ({
   page,
 }) => {
-  await page.route(
-    /\/api\/v3\/event\/2024mil\/teams(\?|$)/,
-    () => new Promise(() => {}),
-  );
+  await hangRequests(page, /\/api\/v3\/event\/2024mil\/teams(\?|$)/);
 
-  await page.goto('/event/2024mil');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2024mil');
 
   await expect(
     page.getByRole('status', { name: 'Loading team count' }),
@@ -53,11 +47,9 @@ test('shows a team count placeholder while event teams are loading', async ({
   ['team colors', 'api.frc-colors.com'],
 ].forEach(([name, path]) => {
   test(`does not request ${name} on page load`, async ({ page }) => {
-    const requestUrls: string[] = [];
-    page.on('request', (request) => requestUrls.push(request.url()));
+    const requestUrls = recordRequests(page);
 
-    await page.goto('/event/2024mil');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2024mil');
     await page.waitForLoadState('networkidle');
 
     expect(requestUrls.filter((url) => url.includes(path))).toHaveLength(0);
@@ -67,8 +59,7 @@ test('shows a team count placeholder while event teams are loading', async ({
 test('requests insights success rates when the pointer reaches the Insights tab', async ({
   page,
 }) => {
-  await page.goto('/event/2024mil');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2024mil');
   const gameStatsRequest = page.waitForRequest((request) =>
     request.url().includes('/game_stats'),
   );
@@ -79,8 +70,7 @@ test('requests insights success rates when the pointer reaches the Insights tab'
 });
 
 test('requests team media when the Teams tab opens', async ({ page }) => {
-  await page.goto('/event/2024mil');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2024mil');
   const teamMediaRequest = page.waitForRequest((request) =>
     request.url().includes('/team_media'),
   );
@@ -93,30 +83,21 @@ test('requests team media when the Teams tab opens', async ({ page }) => {
 test('does not request regional pool points for a district event', async ({
   page,
 }) => {
-  const poolPointsRequests: string[] = [];
-  page.on('request', (request) => {
-    if (request.url().includes('/regional_champs_pool_points')) {
-      poolPointsRequests.push(request.url());
-    }
-  });
+  const poolPointsRequests = recordRequests(
+    page,
+    '/regional_champs_pool_points',
+  );
 
-  await page.goto('/event/2024mawor');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2024mawor');
   await page.waitForLoadState('networkidle');
 
   expect(poolPointsRequests).toEqual([]);
 });
 
 test('does not request district points for a regional', async ({ page }) => {
-  const districtPointsRequests: string[] = [];
-  page.on('request', (request) => {
-    if (request.url().includes('/district_points')) {
-      districtPointsRequests.push(request.url());
-    }
-  });
+  const districtPointsRequests = recordRequests(page, '/district_points');
 
-  await page.goto('/event/2024casj');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2024casj');
   await page.waitForLoadState('networkidle');
 
   expect(districtPointsRequests).toEqual([]);
@@ -125,10 +106,7 @@ test('does not request district points for a regional', async ({ page }) => {
 test('shows the event name while awards are still loading', async ({
   page,
 }) => {
-  await page.route(
-    /\/api\/v3\/event\/[^/]+\/awards/,
-    () => new Promise(() => {}),
-  );
+  await hangRequests(page, /\/api\/v3\/event\/[^/]+\/awards/);
 
   await page.goto('/event/2024mil');
 
@@ -137,8 +115,7 @@ test('shows the event name while awards are still loading', async ({
 
 test.describe('/event/2024mil', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/event/2024mil');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2024mil');
   });
 
   test('focuses the match dialog when it opens', async ({ page }) => {
@@ -304,10 +281,7 @@ test.describe('/event/2024mil', () => {
 
   test('selects a tab whose content is still loading', async ({ page }) => {
     // Hold back the lazily loaded Insights chart so its tab suspends
-    await page.route(/coprScatterChart/, async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      await route.continue();
-    });
+    await delayRequests(page, /coprScatterChart/, 3000);
     await page.getByRole('tab', { name: /^Teams/ }).click();
     await page.getByRole('tab', { name: 'Insights' }).click();
 
@@ -335,8 +309,7 @@ test.describe('/event/2024mil', () => {
 test('shows the closest team when hovering overlapping insights chart dots', async ({
   page,
 }) => {
-  await page.goto('/event/2026new#insights');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2026new#insights');
   await page.getByTestId('dot-frc4206').hover({ force: true });
 
   await expect(page.locator('.recharts-tooltip-wrapper')).toContainText('4206');
@@ -352,8 +325,7 @@ test('defers the animated tab indicator until a tab changes', async ({
     }
   });
 
-  await page.goto('/event/2024mil');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2024mil');
 
   expect(scriptUrls.some((url) => url.includes('animatedTabIndicator'))).toBe(
     false,
@@ -363,8 +335,7 @@ test('defers the animated tab indicator until a tab changes', async ({
 test('loads the animated tab indicator when a tab changes', async ({
   page,
 }) => {
-  await page.goto('/event/2024mil');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2024mil');
 
   const indicatorRequest = page.waitForRequest((request) =>
     request.url().includes('animatedTabIndicator'),
@@ -375,12 +346,8 @@ test('loads the animated tab indicator when a tab changes', async ({
 });
 
 test('shows the District Points tab while its data loads', async ({ page }) => {
-  await page.route(/\/district_points/, async (route) => {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    await route.continue();
-  });
-  await page.goto('/event/2026necmp1');
-  await page.locator('body[data-hydrated]').waitFor();
+  await delayRequests(page, /\/district_points/, 3000);
+  await gotoHydrated(page, '/event/2026necmp1');
 
   await expect(page.getByRole('tab', { name: 'District Points' })).toBeVisible({
     timeout: 1000,
@@ -389,8 +356,7 @@ test('shows the District Points tab while its data loads', async ({ page }) => {
 
 test.describe('/event/2026necmp Media tab', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/event/2026necmp');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2026necmp');
     await page.getByRole('tab', { name: 'Media' }).click();
   });
 
@@ -426,8 +392,7 @@ test.describe('/event/2026necmp Media tab', () => {
 
 test.describe('/event/2019cmptx', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/event/2019cmptx');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2019cmptx');
   });
 
   test('shows the Round Robin Semifinals standings', async ({ page }) => {
@@ -460,8 +425,7 @@ test.describe('/event/2019cmptx', () => {
 test('hides round robin standings for a non-round-robin event', async ({
   page,
 }) => {
-  await page.goto('/event/2023cmptx');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2023cmptx');
 
   await expect(
     page.getByRole('heading', { name: 'Round Robin Semifinals' }),
@@ -471,8 +435,7 @@ test('hides round robin standings for a non-round-robin event', async ({
 test('shows finished qualification matches before elims are posted mobile', async ({
   page,
 }) => {
-  await page.goto('/event/2018nhmm');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2018nhmm');
 
   await expect(
     page.getByRole('link', { name: 'Quals 1', exact: true }),
@@ -481,8 +444,7 @@ test('shows finished qualification matches before elims are posted mobile', asyn
 
 test.describe('/event/2015rismi', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/event/2015rismi');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2015rismi');
   });
 
   test('shows playoff advancement below the playoff matches', async ({
@@ -511,8 +473,7 @@ test.describe('/event/2015rismi', () => {
 test('hides average-score advancement for a non-2015-format event', async ({
   page,
 }) => {
-  await page.goto('/event/2024mil');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2024mil');
 
   await expect(
     page.getByRole('heading', { name: 'Playoff Advancement' }),
@@ -520,8 +481,7 @@ test('hides average-score advancement for a non-2015-format event', async ({
 });
 
 test('shows practice matches on the Practice tab', async ({ page }) => {
-  await page.goto('/event/2026nysu');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2026nysu');
 
   await page.getByRole('tab', { name: 'Practice' }).click();
 
@@ -533,22 +493,15 @@ test('shows practice matches on the Practice tab', async ({ page }) => {
 test('skips the practice matches request for an offseason event', async ({
   page,
 }) => {
-  const practiceRequests: string[] = [];
-  page.on('request', (request) => {
-    if (request.url().includes('/matches/practice')) {
-      practiceRequests.push(request.url());
-    }
-  });
+  const practiceRequests = recordRequests(page, '/matches/practice');
 
-  await page.goto('/event/2024cc');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2024cc');
 
   expect(practiceRequests).toEqual([]);
 });
 
 test('hides the practice tab for an offseason event', async ({ page }) => {
-  await page.goto('/event/2024cc');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2024cc');
 
   await expect(page.getByRole('tab', { name: 'Practice' })).toHaveCount(0);
 });
@@ -568,8 +521,7 @@ async function openQuixilverDialog(page: Page) {
 
 test.describe('event teams directory', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/event/2024mil');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2024mil');
     await page.getByRole('tab', { name: /^Teams/ }).click();
     await page.getByRole('searchbox', { name: 'Search teams' }).waitFor();
   });
@@ -669,8 +621,7 @@ test.describe('event teams directory', () => {
 
 test.describe('/event/2026miliv pit map', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/event/2026miliv#teams');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2026miliv#teams');
   });
 
   test('requests team colors when the pit map opens', async ({ page }) => {
@@ -707,8 +658,7 @@ test.describe('/event/2026miliv pit map', () => {
 test('labels the pit map with teams from the sibling division', async ({
   page,
 }) => {
-  await page.goto('/event/2026necmp1#teams');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2026necmp1#teams');
 
   await page.getByRole('button', { name: 'Pit map' }).click();
 
@@ -720,8 +670,7 @@ test('labels the pit map with teams from the sibling division', async ({
 });
 
 test('shows historical teams without avatars', async ({ page }) => {
-  await page.goto('/event/2017casj');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/event/2017casj');
   await page.getByRole('tab', { name: /^Teams/ }).click();
   await page.getByRole('searchbox', { name: 'Search teams' }).fill('254');
 
@@ -739,8 +688,7 @@ test.describe('/event/2024mil tabs and the URL hash', () => {
   test('clicking a tab puts it in the hash without a new history entry', async ({
     page,
   }) => {
-    await page.goto('/event/2024mil');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2024mil');
     await page.getByRole('tab', { name: 'Rankings' }).click();
     await expect(page).toHaveURL(/#rankings$/);
     await page.getByRole('tab', { name: 'Awards' }).click();
@@ -751,8 +699,7 @@ test.describe('/event/2024mil tabs and the URL hash', () => {
   });
 
   test('opens the tab named by the hash on load', async ({ page }) => {
-    await page.goto('/event/2024mil#media');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2024mil#media');
     await expect(page.getByRole('tab', { name: 'Media' })).toHaveAttribute(
       'aria-selected',
       'true',
@@ -760,8 +707,7 @@ test.describe('/event/2024mil tabs and the URL hash', () => {
   });
 
   test("understands the old site's hash names", async ({ page }) => {
-    await page.goto('/event/2024mil#event-insights');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2024mil#event-insights');
     await expect(page.getByRole('tab', { name: 'Insights' })).toHaveAttribute(
       'aria-selected',
       'true',
@@ -769,8 +715,7 @@ test.describe('/event/2024mil tabs and the URL hash', () => {
   });
 
   test('ignores a hash that is not a tab', async ({ page }) => {
-    await page.goto('/event/2024mil#not-a-tab');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2024mil#not-a-tab');
     await expect(page.getByRole('tab', { name: 'Results' })).toHaveAttribute(
       'aria-selected',
       'true',
@@ -780,8 +725,7 @@ test.describe('/event/2024mil tabs and the URL hash', () => {
 
 test.describe('/event/2025camb Champs Qual Points tab', () => {
   test('links to the full regional pool rankings', async ({ page }) => {
-    await page.goto('/event/2025camb');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2025camb');
     await page.getByRole('tab', { name: 'Champs Qual Points' }).click();
 
     await expect(
@@ -792,8 +736,7 @@ test.describe('/event/2025camb Champs Qual Points tab', () => {
 
 test.describe('/event/2016casd', () => {
   test('labels the event with its 2016 week', async ({ page }) => {
-    await page.goto('/event/2016casd');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2016casd');
 
     await expect(page.getByText('Week 1', { exact: true })).toBeVisible();
   });
@@ -801,8 +744,7 @@ test.describe('/event/2016casd', () => {
 
 test.describe('/event/2023micmp playoff matches', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/event/2023micmp');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2023micmp');
   });
 
   [['Round 1'], ['Round 3']].forEach(([round]) => {
@@ -820,8 +762,7 @@ test.describe('/event/2024mil hash', () => {
   test('opens the default tab when the hash has a stray percent sign', async ({
     page,
   }) => {
-    await page.goto('/event/2024mil#100%');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/event/2024mil#100%');
 
     await expect(page.getByRole('tab', { name: 'Results' })).toHaveAttribute(
       'aria-selected',

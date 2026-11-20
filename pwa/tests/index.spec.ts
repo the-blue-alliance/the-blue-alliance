@@ -1,8 +1,9 @@
 import { Page, expect, test } from '@playwright/test';
 
+import { gotoHydrated, recordRequests } from './helpers';
+
 test.beforeEach(async ({ page }) => {
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 });
 
 // Navbar
@@ -224,8 +225,7 @@ test.describe('hamburger menu (narrow viewport)', () => {
   test.use({ viewport: { width: 500, height: 800 } });
 
   test('does not open on hover', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/');
 
     const trigger = page.getByRole('button', { name: 'Toggle Menu' });
     await trigger.hover();
@@ -239,8 +239,7 @@ test.describe('hamburger menu (narrow viewport)', () => {
   test('opens on click and fully unmounts on second click', async ({
     page,
   }) => {
-    await page.goto('/');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/');
 
     const trigger = page.getByRole('button', { name: 'Toggle Menu' });
     await trigger.click();
@@ -304,8 +303,7 @@ test('search dialog opens while search_index is still loading', async ({
     });
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 
   const searchButton = page.getByRole('button', {
     name: 'Search teams and events...',
@@ -345,8 +343,7 @@ test('search trigger stays enabled while search_index is pending', async ({
     });
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 
   const searchButton = page.getByRole('button', {
     name: 'Search teams and events...',
@@ -358,8 +355,7 @@ test('search trigger stays enabled while search_index is pending', async ({
 test('(mobile) loads the page without downloading the search index', async ({
   page,
 }) => {
-  const requestUrls: string[] = [];
-  page.on('request', (request) => requestUrls.push(request.url()));
+  const requestUrls = recordRequests(page);
 
   await page.reload();
   await page.locator('body[data-hydrated]').waitFor();
@@ -377,15 +373,9 @@ test('requests the search index when the pointer reaches search', async ({
   // cannot intend search before this test does.
   await page.mouse.move(0, 0);
 
-  const searchIndexUrls: string[] = [];
-  page.on('request', (request) => {
-    if (request.url().includes('search_index')) {
-      searchIndexUrls.push(request.url());
-    }
-  });
+  const searchIndexUrls = recordRequests(page, 'search_index');
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
   expect(searchIndexUrls).toEqual([]);
 
   await page.getByRole('button', { name: /Search teams and events/ }).hover();
@@ -403,8 +393,7 @@ test('(mobile) opening search focuses the input', async ({ page }) => {
     });
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 
   const searchButton = page.getByRole('button', { name: 'Search' });
   await searchButton.click();
