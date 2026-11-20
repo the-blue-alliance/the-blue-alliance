@@ -14,7 +14,10 @@ from backend.api.api_trusted_parsers.json_event_info_parser import (
     EventInfoParsed,
     JSONEventInfoParser,
 )
-from backend.api.api_trusted_parsers.json_match_video_parser import JSONMatchVideoParser
+from backend.api.api_trusted_parsers.json_match_video_parser import (
+    JSONMatchVideoParser,
+    YOUTUBE_ID_PATTERN,
+)
 from backend.api.api_trusted_parsers.json_matches_parser import JSONMatchesParser
 from backend.api.api_trusted_parsers.json_rankings_parser import JSONRankingsParser
 from backend.api.api_trusted_parsers.json_team_list_parser import (
@@ -32,6 +35,7 @@ from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_code_exceptions import EventCodeExceptions
 from backend.common.consts.media_type import MediaType
+from backend.common.datafeed_parsers.exceptions import ParserInputException
 from backend.common.futures import TypedFuture
 from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
@@ -421,6 +425,12 @@ def add_event_media(event_key: EventKey) -> Response:
     event: Event = none_throws(Event.get_by_id(event_key))
 
     video_list = safe_json.loads(request.data, List[str])
+    bad_video_ids = [v for v in video_list if not YOUTUBE_ID_PATTERN.fullmatch(v)]
+    if bad_video_ids:
+        raise ParserInputException(
+            f"Invalid YouTube video IDs provided: {bad_video_ids}"
+        )
+
     media_to_put: List[Media] = []
     event_reference = Media.create_reference("event", event.key_name)
     for youtube_id in video_list:

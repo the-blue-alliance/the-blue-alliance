@@ -102,11 +102,28 @@ def test_bad_json(api_client: Client) -> None:
     assert resp.status_code == 401
 
 
+def test_bad_video_id(api_client: Client) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.MATCH_VIDEO])
+
+    request_body = json.dumps(["aFZy8iibMD0", "abc123", "aFZy8iibMD0?t=10"])
+    resp = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert resp.status_code == 400
+    assert resp.json == {
+        "Error": "Invalid YouTube video IDs provided: ['abc123', 'aFZy8iibMD0?t=10']"
+    }
+    assert Media.query().fetch() == []
+
+
 def test_add_media(api_client: Client) -> None:
     setup_event()
     setup_auth(access_types=[AuthType.MATCH_VIDEO])
 
-    request_body = json.dumps(["abc123"])
+    request_body = json.dumps(["aFZy8iibMD0"])
     resp = api_client.post(
         REQUEST_PATH,
         headers=get_auth_headers(REQUEST_PATH, request_body),
@@ -120,7 +137,7 @@ def test_add_media(api_client: Client) -> None:
     assert len(medias) == 1
 
     media = medias[0]
-    assert media.foreign_key == "abc123"
+    assert media.foreign_key == "aFZy8iibMD0"
     assert media.year == 2014
     assert media.media_type_enum == MediaType.YOUTUBE_VIDEO
 
@@ -130,7 +147,7 @@ def test_add_media_cmp_remap(api_client: Client) -> None:
     setup_auth(access_types=[AuthType.MATCH_VIDEO], event_key="2014cur")
 
     path = "/api/trusted/v1/event/2014curie/media/add"
-    request_body = json.dumps(["abc123"])
+    request_body = json.dumps(["aFZy8iibMD0"])
     resp = api_client.post(
         path,
         headers=get_auth_headers(path, request_body),
@@ -144,6 +161,6 @@ def test_add_media_cmp_remap(api_client: Client) -> None:
     assert len(medias) == 1
 
     media = medias[0]
-    assert media.foreign_key == "abc123"
+    assert media.foreign_key == "aFZy8iibMD0"
     assert media.year == 2014
     assert media.media_type_enum == MediaType.YOUTUBE_VIDEO
