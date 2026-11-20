@@ -399,6 +399,7 @@ export const zEventDistrictPoints = z.object({
       elim_points: z.int(),
       award_points: z.int(),
       qual_points: z.int(),
+      rookie_bonus: z.int().optional(),
     }),
   ),
   tiebreakers: z
@@ -1696,6 +1697,7 @@ export const zRegionalRanking = z.object({
         award_points: z.int(),
         event_key: z.string(),
         qual_points: z.int(),
+        rookie_bonus: z.int().optional(),
       }),
     )
     .optional(),
