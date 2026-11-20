@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "The Blue Alliance Trusted APIv1",
-    "description": "# Overview\nImport FIRST Robotics Competition Data to The Blue Alliance. The API is accessed through POST requests made to the endpoints described below. To simplify the removal of incorrect data, most endpoints must be called with the full dataset. For example, there is no endpoint to add a single award-- only to update all awards. It must be called with all awards, and the ones that are no longer present will be deleted. **The exception to this is the matches endpoint**, where there are separate endpoints to update and delete matches. Also, the **match videos endpoint** only allows the addition (and not the removal) of videos.\n# Authentication\nThe X-TBA-Auth-Id and X-TBA-Auth-Sig must be included as request headers in all requests.\n\n*auth_id*: ``  *auth_secret*: ``\n\n*X-TBA-Auth-Id*: `auth_id`  *X-TBA-Auth-Sig*: `md5_hexdigest()`\n\nFor example, an X-TBA-Auth-Sig may look like `md5_hexdigest(ExqeZK3Gbo9v95YnqmsiADzESo9HNgyhIOYSMyRpqJqYv13EazNRaDIPPJuOXrQp/api/trusted/v1/event/2014casj/matches/delete[\"qm1\"])`\n\nWhich, after hashing, becomes: `ca5c3e5c1b0e7132e4af13f805eca0be`",
+    "description": "# Overview\nImport FIRST Robotics Competition Data to The Blue Alliance. The API is accessed through POST requests made to the endpoints described below. To simplify the removal of incorrect data, most endpoints must be called with the full dataset. For example, there is no endpoint to add a single award-- only to update all awards. It must be called with all awards, and the ones that are no longer present will be deleted. **The exceptions are the matches, match videos, and webcasts endpoints**, which have separate endpoints to add and to delete individual items. The **event media endpoint** only allows the addition (and not the removal) of videos.\n# Authentication\nThe X-TBA-Auth-Id and X-TBA-Auth-Sig must be included as request headers in all requests. Request an auth ID and secret for your event at https://www.thebluealliance.com/request/apiwrite.\n\n*X-TBA-Auth-Id*: your auth ID\n\n*X-TBA-Auth-Sig*: `md5_hexdigest(auth_secret + request_path + request_body)`, where `request_path` is the full path starting with `/api/trusted/v1` and `request_body` is the exact body sent (empty for GET requests)\n\nFor example, an X-TBA-Auth-Sig may look like `md5_hexdigest(ExqeZK3Gbo9v95YnqmsiADzESo9HNgyhIOYSMyRpqJqYv13EazNRaDIPPJuOXrQp/api/trusted/v1/event/2014casj/matches/delete[\"qm1\"])`\n\nWhich, after hashing, becomes: `ca5c3e5c1b0e7132e4af13f805eca0be`",
     "version": "3.1"
   },
   "security": [
@@ -411,7 +411,7 @@
               }
             }
           },
-          "description": "A dict of `breakdowns` and `rankings",
+          "description": "A dict of `breakdowns` and `rankings`",
           "required": true
         },
         "responses": {
@@ -820,7 +820,7 @@
       "authSig": {
         "type": "apiKey",
         "in": "header",
-        "description": "The MD5 digest computed from the concatenation of",
+        "description": "The MD5 hex digest of the concatenation of your auth secret, the request path (starting with `/api/trusted/v1`), and the request body",
         "name": "X-TBA-Auth-Sig"
       }
     },
@@ -845,7 +845,7 @@
           "type_enum": {
             "type": "integer",
             "description": "Type enum of the award. If null or unrecognized, this will be automatically determined from the name_str. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py",
-            "example": "1",
+            "example": 1,
             "nullable": true
           },
           "name_str": {
@@ -881,7 +881,7 @@
             "type": "integer",
             "nullable": true,
             "description": "Integer constant representing the playoff format. References constants defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py#L37",
-            "example": "0"
+            "example": 0
           },
           "webcasts": {
             "type": "array",
