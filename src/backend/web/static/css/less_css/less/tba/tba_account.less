@@ -162,8 +162,6 @@
   }
 
   .account-write-key-event {
-    white-space: nowrap;
-
     & + & {
       margin-top: 8px;
     }
@@ -209,8 +207,16 @@
     gap: 4px;
     max-width: 100%;
 
+    // A short fixed mask that never wraps or spills out of its cell.
     .account-secret-dots {
+      white-space: nowrap;
+      word-break: normal;
       letter-spacing: 1px;
+    }
+
+    // Dots, Show and Copy stay on one line while the secret is hidden.
+    &.is-masked {
+      flex-wrap: nowrap;
     }
 
     &.is-masked .account-secret-value,
@@ -239,6 +245,12 @@
   .account-secret-short {
     white-space: nowrap;
     word-break: normal;
+  }
+
+  // Auth IDs can be 32 characters; let them wrap so the secret column keeps room.
+  .account-auth-id {
+    word-break: break-all;
+    white-space: normal;
   }
 
   .account-danger-button {

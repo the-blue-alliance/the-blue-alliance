@@ -830,6 +830,50 @@ def test_api_write_keys_show_event_names(login_user, web_client: FlaskClient) ->
     assert events[1].find(class_="account-event-key") is None
 
 
+def test_api_write_keys_event_name_falls_back_from_empty_short_name(
+    login_user, web_client: FlaskClient
+) -> None:
+    for key, name in [
+        ("2026azrl4", "Arizona Robotics League Qualifier 4"),
+        ("2023nytv", ""),
+    ]:
+        Event(
+            id=key,
+            year=int(key[:4]),
+            event_short=key[4:],
+            event_type_enum=EventType.OFFSEASON,
+            name=name,
+            short_name="",
+        ).put()
+
+    def event_key(key_id: str) -> Mock:
+        event = Mock()
+        event.configure_mock(**{"id.return_value": key_id})
+        return event
+
+    api_write_key = Mock(
+        event_list=[event_key("2026azrl4"), event_key("2023nytv")],
+        auth_types_enum=[],
+    )
+    api_write_key.expiration = None
+    api_write_key.secret = "secret"
+    api_write_key.key.configure_mock(**{"id.return_value": "key"})
+    login_user.api_write_keys = [api_write_key]
+
+    response = web_client.get("/account")
+
+    assert response.status_code == 200
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    events = soup.find("tr", class_="api-write-key").find_all(
+        "div", class_="account-write-key-event"
+    )
+    # Empty short name uses the full name; no name at all falls back to the key.
+    assert [e.find("a").text for e in events] == [
+        "2026 Arizona Robotics League Qualifier 4",
+        "2023nytv",
+    ]
+
+
 def test_delete_account_is_last_section(login_user, web_client: FlaskClient) -> None:
     response = web_client.get("/account")
 
