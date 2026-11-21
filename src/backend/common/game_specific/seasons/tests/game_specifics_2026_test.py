@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import json
-from typing import Any, cast
+import os
+from typing import Any, cast, get_type_hints
 
 import pytest
 from google.appengine.ext import ndb
@@ -9,7 +10,10 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
-from backend.common.frc_api.types import ScoreDetailModelAlliance2026
+from backend.common.frc_api.types import (
+    ScoreDetailModelAlliance2026,
+    ScoreDetailModelGoal2026,
+)
 from backend.common.game_specific.seasons.game_specifics_2026 import GameSpecifics2026
 from backend.common.game_specific.seasons.tests.conftest import (
     assert_partial_breakdowns_split_counters,
@@ -30,6 +34,30 @@ def auto_add_ndb_context(ndb_context) -> None:
 
 def test_ranking_sort_order_info() -> None:
     assert GameSpecifics2026().ranking_sort_order_info() == SORT_ORDER_INFO[2026]
+
+
+def _marea_alliance_breakdowns() -> list[dict[str, Any]]:
+    path = os.path.join(os.path.dirname(HELPERS_TESTS), "data/2026marea_matches.json")
+    with open(path) as f:
+        matches = json.load(f)
+    return [
+        m["score_breakdown"][color]
+        for m in matches
+        if m["score_breakdown"]
+        for color in ("red", "blue")
+    ]
+
+
+def test_valid_score_breakdown_keys_cover_frc_api_fields() -> None:
+    # Every per-alliance key FIRST sends must be uploadable via the trusted API
+    seen = {k for b in _marea_alliance_breakdowns() for k in b}
+    assert seen - GameSpecifics2026().valid_score_breakdown_keys() == set()
+
+
+def test_hub_score_model_covers_frc_api_fields() -> None:
+    # hubScore TypedDict declares every field FIRST sends
+    seen = {k for b in _marea_alliance_breakdowns() for k in b["hubScore"]}
+    assert seen - set(get_type_hints(ScoreDetailModelGoal2026)) == set()
 
 
 def test_finals_can_be_tiebroken() -> None:

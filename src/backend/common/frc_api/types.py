@@ -706,6 +706,8 @@ class ScoreDetailModelAlliance2025(TypedDict):
 
 
 class ScoreDetailModelGoal2026(TypedDict):
+    autoCount: int
+    transitionCount: int
     shift1Count: int
     shift2Count: int
     shift3Count: int
@@ -722,6 +724,7 @@ class ScoreDetailModelGoal2026(TypedDict):
     endgamePoints: int
     teleopPoints: int
     totalPoints: int
+    uncounted: int
 
 
 class ScoreDetailModel2015(TypedDict):
@@ -1108,6 +1111,7 @@ class ScoreDetailModelAlliance2026(TypedDict):
     minorFoulCount: int
     majorFoulCount: int
     g206Penalty: bool
+    penalties: str
     adjustPoints: int
     foulPoints: int
     rp: int
