@@ -628,6 +628,8 @@ export {
   type Match,
   type MatchAlliance,
   type MatchKey,
+  type MatchScoreBreakdown2014,
+  type MatchScoreBreakdown2014Alliance,
   type MatchScoreBreakdown2015,
   type MatchScoreBreakdown2015Alliance,
   type MatchScoreBreakdown2016,

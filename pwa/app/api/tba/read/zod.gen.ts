@@ -583,6 +583,21 @@ export const zLeaderboardInsight = z.object({
   year: z.int(),
 });
 
+export const zMatchScoreBreakdown2014Alliance = z.object({
+  auto: z.int().optional(),
+  assist: z.int().optional(),
+  'truss+catch': z.int().optional(),
+  'teleop_goal+foul': z.int().optional(),
+});
+
+/**
+ * 2014 score breakdowns exist only for matches uploaded through the trusted API, such as offseason events.
+ */
+export const zMatchScoreBreakdown2014 = z.object({
+  blue: zMatchScoreBreakdown2014Alliance,
+  red: zMatchScoreBreakdown2014Alliance,
+});
+
 export const zMatchScoreBreakdown2015Alliance = z.object({
   auto: z.string().nullish(),
   auto_points: z.int().nullish(),
@@ -2049,6 +2064,7 @@ export const zMatch = z.object({
     .nullable(),
   score_breakdown: z
     .union([
+      zMatchScoreBreakdown2014,
       zMatchScoreBreakdown2015,
       zMatchScoreBreakdown2016,
       zMatchScoreBreakdown2017,

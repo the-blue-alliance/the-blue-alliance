@@ -1907,6 +1907,7 @@ export type Match = {
    * Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null.
    */
   score_breakdown:
+    | MatchScoreBreakdown2014
     | MatchScoreBreakdown2015
     | MatchScoreBreakdown2016
     | MatchScoreBreakdown2017
@@ -1932,6 +1933,33 @@ export type Match = {
      */
     key: string;
   }>;
+};
+
+/**
+ * 2014 score breakdowns exist only for matches uploaded through the trusted API, such as offseason events.
+ */
+export type MatchScoreBreakdown2014 = {
+  blue: MatchScoreBreakdown2014Alliance;
+  red: MatchScoreBreakdown2014Alliance;
+};
+
+export type MatchScoreBreakdown2014Alliance = {
+  /**
+   * Autonomous points.
+   */
+  auto?: number;
+  /**
+   * Assist points.
+   */
+  assist?: number;
+  /**
+   * Truss and catch points.
+   */
+  'truss+catch'?: number;
+  /**
+   * Teleop goal points plus foul points.
+   */
+  'teleop_goal+foul'?: number;
 };
 
 /**
