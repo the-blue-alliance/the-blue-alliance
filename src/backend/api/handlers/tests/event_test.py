@@ -1146,8 +1146,9 @@ def test_event_insights_without_quals_match_spec(ndb_stub, api_client: Client) -
         "/api/v3/event/2024cmptx/insights", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
 
-    assert resp.json["qual"] is None
-    assert response_schema_errors("/event/{event_key}/insights", resp.json) == []
+    body = resp.get_json()
+    assert body["qual"] is None
+    assert response_schema_errors("/event/{event_key}/insights", body) == []
 
 
 def test_event_insights_without_playoffs_match_spec(
@@ -1159,5 +1160,6 @@ def test_event_insights_without_playoffs_match_spec(
         "/api/v3/event/2024casj/insights", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
 
-    assert resp.json["playoff"] is None
-    assert response_schema_errors("/event/{event_key}/insights", resp.json) == []
+    body = resp.get_json()
+    assert body["playoff"] is None
+    assert response_schema_errors("/event/{event_key}/insights", body) == []
