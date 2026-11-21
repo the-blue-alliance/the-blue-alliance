@@ -4,10 +4,10 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { ModelType } from '~/api/tba/mobile/types.gen';
 import FavoriteButton from '~/components/tba/favoriteButton';
+import { signIn, signOut } from '~/test/auth';
 
-const { toggleFavoriteMock, useAuthMock, useMyTBAMock } = vi.hoisted(() => ({
+const { toggleFavoriteMock, useMyTBAMock } = vi.hoisted(() => ({
   toggleFavoriteMock: vi.fn<() => void>(),
-  useAuthMock: vi.fn<() => { user: object | null }>(),
   useMyTBAMock: vi.fn<
     (
       modelKey: string,
@@ -20,9 +20,7 @@ const { toggleFavoriteMock, useAuthMock, useMyTBAMock } = vi.hoisted(() => ({
   >(),
 }));
 
-vi.mock('~/components/tba/auth/auth', () => ({
-  useAuth: useAuthMock,
-}));
+vi.mock('~/components/tba/auth/auth', () => import('~/test/auth'));
 
 vi.mock('~/lib/hooks/useMyTBA', () => ({
   useMyTBA: useMyTBAMock,
@@ -59,7 +57,7 @@ function renderFavoriteButton() {
 describe('FavoriteButton', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    useAuthMock.mockReturnValue({ user: {} });
+    signIn();
     useMyTBAMock.mockReturnValue({
       isFavorite: false,
       toggleFavorite: toggleFavoriteMock,
@@ -117,7 +115,7 @@ describe('FavoriteButton', () => {
   });
 
   test('prompts an unauthenticated user to sign in', () => {
-    useAuthMock.mockReturnValue({ user: null });
+    signOut();
     renderFavoriteButton();
 
     fireEvent.click(screen.getByRole('button', { name: 'Add to favorites' }));
@@ -128,7 +126,7 @@ describe('FavoriteButton', () => {
   });
 
   test('does not toggle the favorite for an unauthenticated user', () => {
-    useAuthMock.mockReturnValue({ user: null });
+    signOut();
     renderFavoriteButton();
 
     fireEvent.click(screen.getByRole('button', { name: 'Add to favorites' }));
@@ -137,7 +135,7 @@ describe('FavoriteButton', () => {
   });
 
   test('offers Google and Apple sign-in options', () => {
-    useAuthMock.mockReturnValue({ user: null });
+    signOut();
     renderFavoriteButton();
 
     fireEvent.click(screen.getByRole('button', { name: 'Add to favorites' }));

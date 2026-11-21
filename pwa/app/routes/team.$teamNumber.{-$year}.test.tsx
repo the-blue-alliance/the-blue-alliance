@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
@@ -18,18 +18,7 @@ vi.mock('@tanstack/react-router', async (importOriginal) => {
     await importOriginal<typeof import('@tanstack/react-router')>();
   return {
     ...actual,
-    Link: ({
-      children,
-      to,
-      ...props
-    }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-      children?: ReactNode;
-      to: string;
-    }) => (
-      <a href={to} {...props}>
-        {children}
-      </a>
-    ),
+    Link: (await import('~/test/linkMocks')).Link,
   };
 });
 

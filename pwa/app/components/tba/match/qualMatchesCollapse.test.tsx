@@ -1,38 +1,18 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 
-import { AllianceColor, CompLevel, type Match } from '~/api/tba/read';
+import { type Match } from '~/api/tba/read';
 import QualMatchesCollapse from '~/components/tba/match/qualMatchesCollapse';
+import { makeMatch as baseMatch, makeAlliance } from '~/test/factories';
 
 function makeMatch(key: string, redScore: number, blueScore: number): Match {
-  return {
+  return baseMatch({
     key,
-    comp_level: CompLevel.QM,
-    set_number: 1,
-    match_number: 1,
     alliances: {
-      red: {
-        score: redScore,
-        team_keys: ['frc254', 'frc1114', 'frc2056'],
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: blueScore,
-        team_keys: ['frc148', 'frc217', 'frc33'],
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
+      red: makeAlliance(redScore, ['frc254', 'frc1114', 'frc2056']),
+      blue: makeAlliance(blueScore, ['frc148', 'frc217', 'frc33']),
     },
-    winning_alliance: AllianceColor.RED,
-    event_key: '2026test',
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
-  };
+  });
 }
 
 describe('QualMatchesCollapse', () => {

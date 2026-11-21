@@ -5,11 +5,9 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
-import { type AnchorHTMLAttributes, type ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
-  AllianceColor,
   CompLevel,
   type EliminationAlliance,
   type Event,
@@ -18,31 +16,16 @@ import {
   PlayoffType,
 } from '~/api/tba/read';
 import DoubleElim4TeamBracket from '~/components/tba/doubleElim4TeamBracket';
+import {
+  makeEvent as baseEvent,
+  makeMatch as baseMatch,
+  makeAlliance,
+  winningAlliance,
+} from '~/test/factories';
 
-vi.mock('~/components/tba/teamTooltip', () => ({
-  TeamLinkWithTooltip: ({
-    teamKey,
-    year,
-    ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
-    teamKey: string;
-    year: number;
-  }) => (
-    <a href={`/team/${teamKey.substring(3)}/${year}`} {...props}>
-      {teamKey.substring(3)}
-    </a>
-  ),
-}));
+vi.mock('~/components/tba/teamTooltip', () => import('~/test/linkMocks'));
 
-vi.mock('~/components/tba/links', () => ({
-  MatchLink: ({
-    children,
-    matchOrKey,
-  }: {
-    children: ReactNode;
-    matchOrKey: Match;
-  }) => <a href={`/match/${matchOrKey.key}`}>{children}</a>,
-}));
+vi.mock('~/components/tba/links', () => import('~/test/linkMocks'));
 
 /** Alliance n is teams n01, n02, n03 plus backup n04. */
 const alliances: EliminationAlliance[] = [1, 2, 3, 4].map((n) => ({
@@ -55,40 +38,12 @@ function allianceTeams(n: number): string[] {
 }
 
 function makeEvent(overrides: Partial<Event> = {}): Event {
-  return {
-    key: '2026test',
-    name: 'Test Event',
-    event_code: 'test',
+  return baseEvent({
     event_type: EventType.DISTRICT,
-    district: null,
-    city: null,
-    state_prov: null,
-    country: null,
-    start_date: '2026-03-01',
-    end_date: '2026-03-03',
-    year: 2026,
-    short_name: null,
     event_type_string: 'District',
-    week: 0,
-    address: null,
-    postal_code: null,
-    gmaps_place_id: null,
-    gmaps_url: null,
-    lat: null,
-    lng: null,
-    location_name: null,
-    timezone: 'America/New_York',
-    website: null,
-    first_event_id: null,
-    first_event_code: null,
-    webcasts: [],
-    division_keys: [],
-    parent_event_key: null,
     playoff_type: PlayoffType.DOUBLE_ELIM_4_TEAM,
-    playoff_type_string: null,
-    remap_teams: null,
     ...overrides,
-  };
+  });
 }
 
 function makeMatch(
@@ -100,40 +55,17 @@ function makeMatch(
   redScore: number,
   blueScore: number,
 ): Match {
-  const winning_alliance =
-    redScore > blueScore
-      ? AllianceColor.RED
-      : blueScore > redScore
-        ? AllianceColor.BLUE
-        : AllianceColor.NO_ALLIANCE;
-  return {
+  return baseMatch({
     key: `2026test_${compLevel}${setNumber}m${matchNumber}`,
     comp_level: compLevel,
     set_number: setNumber,
     match_number: matchNumber,
     alliances: {
-      red: {
-        score: redScore,
-        team_keys: red,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: blueScore,
-        team_keys: blue,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
+      red: makeAlliance(redScore, red),
+      blue: makeAlliance(blueScore, blue),
     },
-    winning_alliance,
-    event_key: '2026test',
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
-  };
+    winning_alliance: winningAlliance(redScore, blueScore),
+  });
 }
 
 // Match 1: 1 v 4 (1 wins). Match 2: 2 v 3 (3 wins).

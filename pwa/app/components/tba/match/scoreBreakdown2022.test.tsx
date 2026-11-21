@@ -2,15 +2,13 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
-  AllianceColor,
-  CompLevel,
   EndgameRobot2022,
-  type Match,
   type MatchScoreBreakdown2022,
   type MatchScoreBreakdown2022Alliance,
   TaxiRobot2022,
 } from '~/api/tba/read';
 import ScoreBreakdown2022 from '~/components/tba/match/scoreBreakdown2022';
+import { makeMatch } from '~/test/factories';
 
 // The icon-only helpers are swapped for text so each robot's condition is
 // visible in the rendered row. The real helpers are covered in common.test.tsx.
@@ -102,34 +100,10 @@ function makeBreakdown(
   };
 }
 
-const match: Match = {
+const match = makeMatch({
   key: '2022test_qm1',
-  comp_level: CompLevel.QM,
-  set_number: 1,
-  match_number: 1,
-  alliances: {
-    red: {
-      score: 94,
-      team_keys: ['frc254', 'frc1114', 'frc2056'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
-    blue: {
-      score: 43,
-      team_keys: ['frc148', 'frc217', 'frc33'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
-  },
-  winning_alliance: AllianceColor.RED,
   event_key: '2022test',
-  time: null,
-  actual_time: null,
-  predicted_time: null,
-  post_result_time: null,
-  score_breakdown: null,
-  videos: [],
-};
+});
 
 function renderBreakdown(scoreBreakdown = makeBreakdown()) {
   return render(
@@ -143,30 +117,43 @@ describe('ScoreBreakdown2022', () => {
 
     expect(
       screen.getByRole('row', {
-        name: 'frc254=yes frc1114=yes frc2056=no (+4) Taxi frc148=no frc217=no frc33=yes (+2)',
+        name: 'frc254=yes frc1114=yes frc2056=no (+4) Red leads Taxi frc148=no frc217=no frc33=yes (+2)',
       }),
     ).toBeTruthy();
   });
 
   test.each([
-    { label: 'Auto Cargo Lower Hub', red: '1', blue: '0' },
-    { label: 'Auto Cargo Upper Hub', red: '3', blue: '2' },
-    { label: 'Auto Cargo Points', red: '14', blue: '8' },
-    { label: 'Total Auto', red: '18', blue: '10' },
-    { label: 'Teleop Cargo Lower Hub', red: '5', blue: '3' },
-    { label: 'Teleop Cargo Upper Hub', red: '12', blue: '7' },
-    { label: 'Teleop Cargo Points', red: '29', blue: '17' },
-    { label: 'Endgame Points', red: '31', blue: '4' },
-    { label: 'Total Teleop', red: '60', blue: '21' },
-    { label: 'Adjustments', red: '0', blue: '-5' },
-    { label: 'Total Score', red: '94', blue: '43' },
-    { label: 'RP', red: '+4 RP', blue: '+1 RP' },
-  ])('shows $label for both alliances', ({ label, red, blue }) => {
+    {
+      label: 'Auto Cargo Lower Hub',
+      name: '1 Red leads Auto Cargo Lower Hub 0',
+    },
+    {
+      label: 'Auto Cargo Upper Hub',
+      name: '3 Red leads Auto Cargo Upper Hub 2',
+    },
+    { label: 'Auto Cargo Points', name: '14 Red leads Auto Cargo Points 8' },
+    { label: 'Total Auto', name: '18 Red leads Total Auto 10' },
+    {
+      label: 'Teleop Cargo Lower Hub',
+      name: '5 Red leads Teleop Cargo Lower Hub 3',
+    },
+    {
+      label: 'Teleop Cargo Upper Hub',
+      name: '12 Red leads Teleop Cargo Upper Hub 7',
+    },
+    {
+      label: 'Teleop Cargo Points',
+      name: '29 Red leads Teleop Cargo Points 17',
+    },
+    { label: 'Endgame Points', name: '31 Red leads Endgame Points 4' },
+    { label: 'Total Teleop', name: '60 Red leads Total Teleop 21' },
+    { label: 'Adjustments', name: '0 Red leads Adjustments -5' },
+    { label: 'Total Score', name: '94 Red leads Total Score 43' },
+    { label: 'RP', name: '+4 RP Red leads RP +1 RP' },
+  ])('shows $label for both alliances', ({ name }) => {
     renderBreakdown();
 
-    expect(
-      screen.getByRole('row', { name: `${red} ${label} ${blue}` }),
-    ).toBeTruthy();
+    expect(screen.getByRole('row', { name })).toBeTruthy();
   });
 
   test('shows zero cargo counts when the near-hub counts are missing', () => {
@@ -264,7 +251,7 @@ describe('ScoreBreakdown2022', () => {
       }),
     ).toBeTruthy();
     expect(
-      screen.getByRole('row', { name: '4 Foul Points Received 28' }),
+      screen.getByRole('row', { name: '4 Foul Points Received Blue leads 28' }),
     ).toBeTruthy();
   });
 

@@ -105,6 +105,8 @@ export const listFavoritesMutation = (
 
 /**
  * Set model preferences
+ *
+ * Sets whether the model is a favorite and which notifications it sends. `code` is 401 when not signed in and 400 for an unknown notification type, and nothing is changed. Otherwise `code` is 0 and `message` is a JSON-encoded object with `favorite` and `subscription`, each a `BaseResponse` whose `code` is 200 when changed, 304 when already set, or 404 when there was nothing to remove.
  */
 export const setModelPreferencesMutation = (
   options?: Partial<Options<SetModelPreferencesData>>,
@@ -159,6 +161,8 @@ export const suggestEventMediaMutation = (
 
 /**
  * Suggest team media
+ *
+ * `code` is 200 when the suggestion is added, 304 if it already exists, 400 for a bad `reference_type`, year or URL, and 401 when not signed in.
  */
 export const suggestTeamMediaMutation = (
   options?: Partial<Options<SuggestTeamMediaData>>,

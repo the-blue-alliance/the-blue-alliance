@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { type ReactNode, useState } from 'react';
 
+import type { WebhookTestNotificationType } from '~/api/tba/mobile/types.gen';
 import WebhookTestForm from '~/components/tba/apidocs/webhookTestForm';
 import {
   TableOfContents,
@@ -37,15 +38,22 @@ interface Field {
   example?: string;
 }
 
-interface NotificationDoc {
+interface NotificationDocBase {
   slug: string;
   title: string;
-  messageType: string;
   description: ReactNode;
   fields: Field[];
   example: object;
-  test?: { eventKey?: string; matchKey?: string };
 }
+
+type NotificationDoc = NotificationDocBase &
+  (
+    | {
+        messageType: WebhookTestNotificationType;
+        test?: { eventKey?: string; matchKey?: string };
+      }
+    | { messageType: 'ping' | 'broadcast' | 'verification'; test?: undefined }
+  );
 
 const Optional = () => <strong>Optional.</strong>;
 

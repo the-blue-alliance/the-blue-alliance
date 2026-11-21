@@ -11,8 +11,6 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI ? [['list'], ['github'], ['blob']] : [['line']],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -34,14 +32,15 @@ export default defineConfig({
     /* Test against mobile viewports. */
     {
       name: 'Mobile Chrome',
-      use: { ...devices['iPhone 15'] },
+      use: { ...devices['iPhone 15'], defaultBrowserType: 'chromium' },
       grep: /(mobile)/,
     },
   ],
 
   /* Run build and run prod server before starting the tests */
   webServer: {
-    command: 'pnpm run start',
+    command:
+      'cross-env NODE_ENV=production node --import ./tests/mocks/ssrPreload.ts ./server.js',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     stderr: 'pipe',

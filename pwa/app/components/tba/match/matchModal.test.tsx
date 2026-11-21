@@ -1,17 +1,14 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { HttpResponse, delay } from 'msw';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import {
-  AllianceColor,
-  CompLevel,
-  type Event,
-  EventType,
-  type Match,
-  PlayoffType,
-} from '~/api/tba/read';
+import { CompLevel, type Event, type Match, PlayoffType } from '~/api/tba/read';
+import { getEvent, getMatch } from '~/api/tba/read/sdk.gen';
 import { MatchModal } from '~/components/tba/match/matchModal';
+import { makeEvent, makeMatch } from '~/test/factories';
+import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
+import { renderWithClient } from '~/test/render';
 
 interface NavigateOptions {
   to: string;
@@ -20,40 +17,17 @@ interface NavigateOptions {
   resetScroll: boolean;
 }
 
-const { useSearchMock, navigateMock, matchQueryFn, eventQueryFn } = vi.hoisted(
-  () => ({
-    useSearchMock: vi.fn<() => { matchKey?: string }>(),
-    navigateMock: vi.fn<(options: NavigateOptions) => Promise<void>>(),
-    matchQueryFn: vi.fn<() => Promise<Match | null>>(),
-    eventQueryFn: vi.fn<() => Promise<Event | null>>(),
-  }),
-);
+const { useSearchMock, navigateMock } = vi.hoisted(() => ({
+  useSearchMock: vi.fn<() => { matchKey?: string }>(),
+  navigateMock: vi.fn<(options: NavigateOptions) => Promise<void>>(),
+}));
 
 vi.mock('@tanstack/react-router', () => ({
   useSearch: useSearchMock,
   useRouter: () => ({ navigate: navigateMock }),
 }));
 
-vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
-  getMatchOptions: ({ path }: { path: { match_key: string } }) => ({
-    queryKey: ['match', path.match_key],
-    queryFn: matchQueryFn,
-  }),
-  getEventOptions: ({ path }: { path: { event_key: string } }) => ({
-    queryKey: ['event', path.event_key],
-    queryFn: eventQueryFn,
-  }),
-}));
-
-vi.mock('~/components/tba/links', () => ({
-  MatchLink: ({
-    children,
-    matchOrKey,
-  }: {
-    children: ReactNode;
-    matchOrKey: Match;
-  }) => <a href={`/match/${matchOrKey.key}`}>{children}</a>,
-}));
+vi.mock('~/components/tba/links', () => import('~/test/linkMocks'));
 
 vi.mock('~/components/tba/match/matchDetails', () => ({
   default: ({ match, event }: { match: Match; event: Event }) => (
@@ -85,87 +59,30 @@ vi.mock('~/components/ui/credenza', () => ({
   CredenzaTitle: ({ children }: { children: ReactNode }) => <h2>{children}</h2>,
 }));
 
-const event: Event = {
-  key: '2026test',
-  name: 'Test Event',
-  event_code: 'test',
-  event_type: EventType.REGIONAL,
-  district: null,
-  city: null,
-  state_prov: null,
-  country: null,
+const event = makeEvent({
   start_date: '2026-03-06',
   end_date: '2026-03-08',
-  year: 2026,
-  short_name: null,
-  event_type_string: 'Regional',
-  week: 0,
-  address: null,
-  postal_code: null,
-  gmaps_place_id: null,
-  gmaps_url: null,
-  lat: null,
-  lng: null,
-  location_name: null,
-  timezone: 'America/New_York',
-  website: null,
-  first_event_id: null,
-  first_event_code: null,
-  webcasts: [],
-  division_keys: [],
-  parent_event_key: null,
   playoff_type: PlayoffType.DOUBLE_ELIM_8_TEAM,
-  playoff_type_string: null,
-  remap_teams: null,
-};
+});
 
-const match: Match = {
+const match = makeMatch({
   key: '2026test_sf2m1',
   comp_level: CompLevel.SF,
   set_number: 2,
-  match_number: 1,
-  alliances: {
-    red: {
-      score: 94,
-      team_keys: ['frc254', 'frc1114', 'frc2056'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
-    blue: {
-      score: 43,
-      team_keys: ['frc148', 'frc217', 'frc33'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
-  },
-  winning_alliance: AllianceColor.RED,
-  event_key: '2026test',
-  time: null,
-  actual_time: null,
-  predicted_time: null,
-  post_result_time: null,
-  score_breakdown: null,
-  videos: [],
-};
+});
+
+const MATCH_PATH = { path: { match_key: '2026test_sf2m1' } };
+const EVENT_PATH = { path: { event_key: '2026test' } };
 
 function renderModal() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  const ui = (
-    <QueryClientProvider client={queryClient}>
-      <MatchModal />
-    </QueryClientProvider>
-  );
-
-  return { ...render(ui), ui };
+  return renderWithClient(<MatchModal />);
 }
 
 describe('MatchModal', () => {
   beforeEach(() => {
     useSearchMock.mockReturnValue({ matchKey: '2026test_sf2m1' });
-    matchQueryFn.mockResolvedValue(match);
-    eventQueryFn.mockResolvedValue(event);
+    mockTbaApi(getMatch, MATCH_PATH, match);
+    mockTbaApi(getEvent, EVENT_PATH, event);
   });
 
   test('stays closed when the URL has no match key', () => {
@@ -200,7 +117,7 @@ describe('MatchModal', () => {
   });
 
   test('falls back to a custom bracket title when the event has no playoff type', async () => {
-    eventQueryFn.mockResolvedValue({ ...event, playoff_type: null });
+    mockTbaApi(getEvent, EVENT_PATH, { ...event, playoff_type: null });
 
     renderModal();
 
@@ -220,7 +137,7 @@ describe('MatchModal', () => {
   });
 
   test('shows a placeholder while the match is loading', () => {
-    matchQueryFn.mockReturnValue(new Promise(() => {}));
+    mockTbaApiWith(getMatch, MATCH_PATH, () => delay('infinite'));
 
     renderModal();
 
@@ -228,7 +145,11 @@ describe('MatchModal', () => {
   });
 
   test('reports a missing match when the match lookup returns nothing', async () => {
-    matchQueryFn.mockResolvedValue(null);
+    mockTbaApiWith(
+      getMatch,
+      MATCH_PATH,
+      () => new HttpResponse(null, { status: 404 }),
+    );
 
     renderModal();
 
@@ -238,7 +159,11 @@ describe('MatchModal', () => {
   });
 
   test('reports a missing match when the event lookup returns nothing', async () => {
-    eventQueryFn.mockResolvedValue(null);
+    mockTbaApiWith(
+      getEvent,
+      EVENT_PATH,
+      () => new HttpResponse(null, { status: 404 }),
+    );
 
     renderModal();
 
@@ -281,11 +206,11 @@ describe('MatchModal', () => {
   });
 
   test('keeps showing the last match while the dialog closes', async () => {
-    const { rerender, ui } = renderModal();
+    const { rerender } = renderModal();
     await screen.findByText('Details for 2026test_sf2m1 at 2026test');
     useSearchMock.mockReturnValue({});
 
-    rerender(ui);
+    rerender(<MatchModal />);
 
     expect(
       screen.getByText('Details for 2026test_sf2m1 at 2026test'),

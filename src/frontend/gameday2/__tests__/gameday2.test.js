@@ -125,6 +125,7 @@ describe("gameday2 entry point", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     Object.keys(mockListeners).forEach((key) => delete mockListeners[key]);
+    document.cookie = "tba-signed-in=1; path=/";
     global.fetch = jest.fn(() =>
       Promise.resolve({
         status: 200,
@@ -222,6 +223,16 @@ describe("gameday2 entry point", () => {
     expect(mockStore.getState().videoGrid.layoutSet).toBe(false);
     expect(mockStore.getState().visibility.chatSidebar).toBe(false);
     await flushPromises();
+    expect(mockStore.getState().favoriteTeams).toEqual(new Set());
+  });
+
+  it("doesn't fetch favorites when signed out", async () => {
+    document.cookie =
+      "tba-signed-in=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+    setUpPage({ hash: "", defaultChat: "svr" });
+    loadGameday();
+    await flushPromises();
+    expect(global.fetch).not.toHaveBeenCalled();
     expect(mockStore.getState().favoriteTeams).toEqual(new Set());
   });
 
