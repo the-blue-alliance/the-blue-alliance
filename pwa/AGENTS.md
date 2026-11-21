@@ -253,6 +253,8 @@ CI does not capture screenshots. Capture them yourself, for public routes and fo
 5. Diff each pair from the repo root: `uv run --group dev python3 ops/pr_screenshots/diff_screenshots.py /tmp/before-light.png /tmp/after-light.png /tmp/diff-light.png`. It prints the changed-pixel percentage; note it under the diff image in the table.
 6. Copy the PNGs into a worktree of the `ci-screenshots` branch as `pr-<N>-<what>-{before,after,diff}-{light,dark}.png`, commit, push, and reference them in the PR table as `https://github.com/the-blue-alliance/the-blue-alliance/raw/ci-screenshots/<file>`.
 
+Before capturing, check the change at every standard width with worst-case data, as the root `AGENTS.md` describes: no horizontal scroll and nothing past its container from 320 to 1920px (Tailwind breakpoints: 640, 768, 1024, 1280, 1536).
+
 If `pnpm install` leaves Playwright without a browser, run `npx playwright install chromium` once.
 
 ## Running
