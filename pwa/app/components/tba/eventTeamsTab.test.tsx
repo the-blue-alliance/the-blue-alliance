@@ -1,32 +1,24 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
-import { describe, expect, test, vi } from 'vitest';
+import { fireEvent, screen, within } from '@testing-library/react';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { getEventColors } from '~/api/colors/sdk.gen';
 import type {
   Event,
   Match,
   Media,
+  NexusPitMap,
   Team,
   TeamEventStatus,
 } from '~/api/tba/read';
+import {
+  getEventNexusInfo,
+  getEventTeamsStatuses,
+} from '~/api/tba/read/sdk.gen';
 import EventTeamsTab from '~/components/tba/eventTeamsTab';
+import { mockTbaApi } from '~/test/msw';
+import { renderWithClient } from '~/test/render';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    params,
-    to: _to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children: ReactNode;
-    params: { teamNumber: string; year?: string };
-    to: string;
-  }) => (
-    <a href={`/team/${params.teamNumber}/${params.year}`} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
 
 vi.mock('~/components/tba/eventRankTooltip', () => ({
   default: ({ rank }: { rank: number }) => <div>Rank {rank}</div>,
@@ -99,8 +91,47 @@ const avatar: Media = {
   details: { base64Image: 'AAAA' },
 };
 
+const pitMap: NexusPitMap = {
+  size: { x: 200, y: 100 },
+  pits: {
+    A1: {
+      position: { x: 50, y: 50 },
+      size: { x: 100, y: 100 },
+      team_key: null,
+    },
+    A2: {
+      position: { x: 150, y: 50 },
+      size: { x: 100, y: 100 },
+      team_key: null,
+    },
+  },
+  areas: {},
+  labels: {},
+  arrows: {},
+  walls: {},
+};
+
+function mockRelatedEvent(
+  eventKey: string,
+  pitMap: NexusPitMap,
+  statuses: Record<string, Partial<TeamEventStatus>>,
+) {
+  const path = { path: { event_key: eventKey } };
+  mockTbaApi(getEventNexusInfo, path, {
+    data_as_of_ms: null,
+    now_queueing: null,
+    matches: {},
+    pit_map: pitMap,
+  });
+  mockTbaApi(
+    getEventTeamsStatuses,
+    path,
+    statuses as Record<string, TeamEventStatus>,
+  );
+}
+
 function renderTeams(props: Partial<Parameters<typeof EventTeamsTab>[0]> = {}) {
-  return render(
+  return renderWithClient(
     <EventTeamsTab
       event={event}
       teams={[otherTeam, team]}
@@ -111,7 +142,18 @@ function renderTeams(props: Partial<Parameters<typeof EventTeamsTab>[0]> = {}) {
   );
 }
 
+async function openPitMap() {
+  fireEvent.click(screen.getByRole('button', { name: 'Pit map' }));
+  return screen.findByRole('group', { name: 'Pit map' });
+}
+
 describe('EventTeamsTab', () => {
+  beforeEach(() => {
+    ['2024casj', '2024casj2', '2024casj3'].forEach((eventKey) =>
+      mockTbaApi(getEventColors, { path: { eventKey } }, { teams: {} }),
+    );
+  });
+
   test('shows teams in numerical order', () => {
     renderTeams();
     expect(
@@ -354,6 +396,94 @@ describe('EventTeamsTab', () => {
         .getByRole('img', { name: 'Team 254 robot' })
         .getAttribute('src'),
     ).toBe('https://example.com/robot.png');
+  });
+
+  describe('pit map', () => {
+    test('offers the pit map when the event has one', () => {
+      renderTeams({ pitMap });
+      expect(screen.getByRole('button', { name: 'Pit map' })).toBeTruthy();
+    });
+
+    test('hides the pit map button without a pit map', () => {
+      renderTeams();
+      expect(screen.queryByRole('button', { name: 'Pit map' })).toBeNull();
+    });
+
+    test('opens the pit map in a dialog', async () => {
+      renderTeams({ pitMap });
+      const map = await openPitMap();
+      expect(within(screen.getByRole('dialog')).getByRole('group')).toBe(map);
+    });
+
+    test('labels pits with the teams assigned to them', async () => {
+      renderTeams({
+        pitMap,
+        statuses: {
+          frc254: { pit_location: 'A1' },
+          frc604: { pit_location: 'A2' },
+        },
+      });
+      const map = await openPitMap();
+      expect(
+        within(map)
+          .getAllByRole('link')
+          .map((link) => link.textContent),
+      ).toEqual(['254', '604']);
+    });
+
+    test('leaves pits unlabeled when a team pit is not on the map', async () => {
+      renderTeams({
+        pitMap,
+        statuses: {
+          frc254: { pit_location: 'A1' },
+          frc604: { pit_location: 'C33' },
+        },
+      });
+      const map = await openPitMap();
+      expect(within(map).queryAllByRole('link')).toEqual([]);
+    });
+
+    test('labels pits with teams from a related event on the same map', async () => {
+      mockRelatedEvent('2024casj2', pitMap, {
+        frc1678: { pit_location: 'A2' },
+      });
+      renderTeams({ pitMap, relatedEventKeys: ['2024casj2'] });
+      const map = await openPitMap();
+      expect(
+        await within(map).findByRole('link', { name: '1678' }),
+      ).toBeTruthy();
+    });
+
+    test('ignores teams from a related event whose map places pits elsewhere', async () => {
+      mockRelatedEvent('2024casj2', pitMap, {
+        frc1678: { pit_location: 'A2' },
+      });
+      mockRelatedEvent(
+        '2024casj3',
+        {
+          ...pitMap,
+          pits: {
+            ...pitMap.pits,
+            A2: { ...pitMap.pits.A2, position: { x: 150, y: 150 } },
+          },
+        },
+        { frc971: { pit_location: 'A1' } },
+      );
+      renderTeams({ pitMap, relatedEventKeys: ['2024casj2', '2024casj3'] });
+      const map = await openPitMap();
+      await within(map).findByRole('link', { name: '1678' });
+      expect(within(map).queryByRole('link', { name: '971' })).toBeNull();
+    });
+
+    test('links to the event map on Nexus', async () => {
+      renderTeams({ pitMap });
+      await openPitMap();
+      expect(
+        screen
+          .getByRole('link', { name: 'Pit map data from frc.nexus' })
+          .getAttribute('href'),
+      ).toBe('https://frc.nexus/en/event/2024casj/map');
+    });
   });
 
   describe('with remapped teams', () => {

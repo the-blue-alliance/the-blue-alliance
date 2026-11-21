@@ -94,6 +94,7 @@ export function useMyTBA(
           notifications: notifs,
           favorite,
         },
+        throwOnError: true,
       });
     },
     onMutate: async ({ favorite, notifs }) => {

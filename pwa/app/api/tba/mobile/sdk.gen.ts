@@ -10,16 +10,34 @@ import { client } from './client.gen';
 import type {
   AddApiReadKeyData,
   AddApiReadKeyResponses,
+  AddWebhookData,
+  AddWebhookResponses,
   DeleteApiReadKeyData,
   DeleteApiReadKeyResponses,
+  DeleteWebhookData,
+  DeleteWebhookResponses,
   ListApiKeysData,
   ListApiKeysResponses,
   ListFavoritesData,
   ListFavoritesResponses,
+  ListMobileClientsData,
+  ListMobileClientsResponses,
   ListSubscriptionsData,
   ListSubscriptionsResponses,
+  ListWebhooksData,
+  ListWebhooksResponses,
+  PingMobileClientData,
+  PingMobileClientResponses,
+  RegisterMobileClientData,
+  RegisterMobileClientResponses,
+  RequestApiWriteKeyData,
+  RequestApiWriteKeyResponses,
   ResolveVideoPlaylistData,
   ResolveVideoPlaylistResponses,
+  SendWebhookTestData,
+  SendWebhookTestResponses,
+  SendWebhookVerificationData,
+  SendWebhookVerificationResponses,
   SetModelPreferencesData,
   SetModelPreferencesResponses,
   SuggestEventMatchVideosData,
@@ -32,6 +50,10 @@ import type {
   SuggestTeamMediaResponses,
   SuggestTeamSocialMediaData,
   SuggestTeamSocialMediaResponses,
+  UnregisterMobileClientData,
+  UnregisterMobileClientResponses,
+  VerifyWebhookData,
+  VerifyWebhookResponses,
 } from './types.gen';
 
 export type Options<
@@ -70,6 +92,8 @@ export const listFavorites = <ThrowOnError extends boolean = false>(
 
 /**
  * Set model preferences
+ *
+ * Sets whether the model is a favorite and which notifications it sends. `code` is 401 when not signed in and 400 for an unknown notification type, and nothing is changed. Otherwise `code` is 0 and `message` is a JSON-encoded object with `favorite` and `subscription`, each a `BaseResponse` whose `code` is 200 when changed, 304 when already set, or 404 when there was nothing to remove.
  */
 export const setModelPreferences = <ThrowOnError extends boolean = false>(
   options: Options<SetModelPreferencesData, ThrowOnError>,
@@ -110,6 +134,8 @@ export const suggestEventMedia = <ThrowOnError extends boolean = false>(
 
 /**
  * Suggest team media
+ *
+ * `code` is 200 when the suggestion is added, 304 if it already exists, 400 for a bad `reference_type`, year or URL, and 401 when not signed in.
  */
 export const suggestTeamMedia = <ThrowOnError extends boolean = false>(
   options: Options<SuggestTeamMediaData, ThrowOnError>,
@@ -271,6 +297,232 @@ export const deleteApiReadKey = <ThrowOnError extends boolean = false>(
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api_keys/read/delete',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Request write API keys for an event
+ */
+export const requestApiWriteKey = <ThrowOnError extends boolean = false>(
+  options: Options<RequestApiWriteKeyData, ThrowOnError>,
+): RequestResult<RequestApiWriteKeyResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    RequestApiWriteKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api_keys/write/request',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Register a device for notifications
+ *
+ * Registers the device for the signed-in account, or updates it if this account already has `mobile_id`. `code` is 200 for a new device, 304 for an existing one, 400 for an unknown `mobile_id_type` or a `fid` from a platform other than `ios` or `android-fcm`, and 401 when not signed in. Registering a FID also deletes this account's FCM registration token for the same installation (`<fid>:...`), so the device isn't notified twice.
+ */
+export const registerMobileClient = <ThrowOnError extends boolean = false>(
+  options: Options<RegisterMobileClientData, ThrowOnError>,
+): RequestResult<RegisterMobileClientResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    RegisterMobileClientResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/register',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Unregister a device
+ *
+ * Deletes the signed-in account's device with `mobile_id`. With `mobile_id_type: fid`, also deletes this account's FCM registration token for the same installation (`<fid>:...`), which is all TBA has for a device whose FID registration hasn't reached it yet. `code` is 200 when anything was deleted, 404 if nothing matched, 400 for an unknown `mobile_id_type`, and 401 when not signed in.
+ */
+export const unregisterMobileClient = <ThrowOnError extends boolean = false>(
+  options: Options<UnregisterMobileClientData, ThrowOnError>,
+): RequestResult<UnregisterMobileClientResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    UnregisterMobileClientResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/unregister',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * List registered devices
+ */
+export const listMobileClients = <ThrowOnError extends boolean = false>(
+  options?: Options<ListMobileClientsData, ThrowOnError>,
+): RequestResult<ListMobileClientsResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).post<
+    ListMobileClientsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/list_clients',
+    ...options,
+  });
+
+/**
+ * Send a test notification to a device
+ *
+ * `code` is 200 when sent, 404 if the account has no such device, 500 if the send failed, and 401 when not signed in.
+ */
+export const pingMobileClient = <ThrowOnError extends boolean = false>(
+  options: Options<PingMobileClientData, ThrowOnError>,
+): RequestResult<PingMobileClientResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    PingMobileClientResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/ping',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * List the signed-in account's webhooks
+ *
+ * `code` is 401 when not signed in.
+ */
+export const listWebhooks = <ThrowOnError extends boolean = false>(
+  options?: Options<ListWebhooksData, ThrowOnError>,
+): RequestResult<ListWebhooksResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).post<
+    ListWebhooksResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/webhooks/list',
+    ...options,
+  });
+
+/**
+ * Add a webhook
+ *
+ * Creates a webhook with a new secret and sends a verification code to its URL. If the account already has a webhook with this URL, gives it a new secret and code and marks it unverified. `code` is 400 when the name or URL is blank and 401 when not signed in.
+ */
+export const addWebhook = <ThrowOnError extends boolean = false>(
+  options: Options<AddWebhookData, ThrowOnError>,
+): RequestResult<AddWebhookResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<AddWebhookResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/webhooks/add',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Verify a webhook
+ *
+ * Marks the webhook verified when `code` matches the most recently sent verification code. `code` in the response is 400 for a wrong code, 404 for an unknown webhook and 401 when not signed in.
+ */
+export const verifyWebhook = <ThrowOnError extends boolean = false>(
+  options: Options<VerifyWebhookData, ThrowOnError>,
+): RequestResult<VerifyWebhookResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    VerifyWebhookResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/webhooks/verify',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Send a new verification code to a webhook
+ *
+ * Replaces the verification code and marks the webhook unverified. `code` is 404 for an unknown webhook and 401 when not signed in.
+ */
+export const sendWebhookVerification = <ThrowOnError extends boolean = false>(
+  options: Options<SendWebhookVerificationData, ThrowOnError>,
+): RequestResult<SendWebhookVerificationResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    SendWebhookVerificationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/webhooks/send_verification',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete a webhook
+ *
+ * `code` is 404 for an unknown webhook and 401 when not signed in.
+ */
+export const deleteWebhook = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteWebhookData, ThrowOnError>,
+): RequestResult<DeleteWebhookResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    DeleteWebhookResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/webhooks/delete',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Send a test notification to a webhook
+ *
+ * Sends one sample notification of the given type to a verified webhook. `code` is 400 for an unknown type, an unverified webhook or keys the type can't use, 404 for an unknown webhook and 401 when not signed in.
+ */
+export const sendWebhookTest = <ThrowOnError extends boolean = false>(
+  options: Options<SendWebhookTestData, ThrowOnError>,
+): RequestResult<SendWebhookTestResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    SendWebhookTestResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/webhooks/test',
     ...options,
     headers: {
       'Content-Type': 'application/json',

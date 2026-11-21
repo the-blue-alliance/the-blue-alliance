@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { delayRequests, gotoHydrated } from './helpers';
+
 test.describe('/districts/2024', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/districts/2024');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/districts/2024');
   });
 
   ['DCMP Cutoff', 'CMP Cutoff'].forEach((name) => {
@@ -38,16 +39,13 @@ test.describe('/districts/2024', () => {
 });
 
 test('shows placeholders while district details load', async ({ page }) => {
-  await page.route(
+  await delayRequests(
+    page,
     /\/district\/[^/]+\/(advancement|teams\/keys)$/,
-    async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      await route.continue();
-    },
+    1500,
   );
 
-  await page.goto('/districts/2024');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/districts/2024');
 
   await expect(page.locator('[data-slot="skeleton"]').first()).toBeVisible();
 });

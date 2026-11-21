@@ -447,3 +447,31 @@ def test_update_preferences_remove_subscription_doesnt_exist(
         None,
     )
     assert subscription is None
+
+
+def test_update_preferences_rejects_unknown_notification_type(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    req = ModelPreferenceMessage(
+        model_type=ModelType.EVENT,
+        model_key="2023test",
+        favorite=True,
+        notifications=["match_video_added"],
+        device_key="test",
+    )
+    resp = make_clientapi_request(api_client, "/model/setPreferences", req)
+    assert resp["code"] == 400
+
+
+def test_update_preferences_unknown_notification_type_doesnt_add_favorite(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    req = ModelPreferenceMessage(
+        model_type=ModelType.EVENT,
+        model_key="2023test",
+        favorite=True,
+        notifications=["match_video_added"],
+        device_key="test",
+    )
+    make_clientapi_request(api_client, "/model/setPreferences", req)
+    assert Favorite.query(ancestor=mock_clientapi_auth.account_key).get() is None

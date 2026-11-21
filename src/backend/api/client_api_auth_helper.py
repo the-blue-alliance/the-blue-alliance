@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from flask import request
 
@@ -11,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class ClientApiAuthHelper:
     @staticmethod
-    def get_current_user() -> Optional[User]:
+    def get_current_user() -> User | None:
         auth_header = request.headers.get("Authorization")
         bearer_token_prefix = "Bearer "
         if not auth_header or not auth_header.startswith(bearer_token_prefix):

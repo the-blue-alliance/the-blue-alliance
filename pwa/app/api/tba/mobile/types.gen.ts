@@ -16,27 +16,41 @@ export type BaseResponse = {
 export type ModelType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 /**
- * Notification type (upcoming_match=Upcoming Match, match_score=Match Score, alliance_selection=Alliance Selection, awards_posted=Awards Posted, match_video_added=Match Video Added)
+ * Notification type (upcoming_match=Upcoming Match, match_score=Match Score, starting_comp_level=Competition Level Starting, alliance_selection=Alliance Selection, awards_posted=Awards Posted, schedule_updated=Event Schedule Updated, match_video=Match Video Added)
  */
 export type NotificationType =
   | 'upcoming_match'
   | 'match_score'
+  | 'starting_comp_level'
   | 'alliance_selection'
   | 'awards_posted'
-  | 'match_video_added';
+  | 'schedule_updated'
+  | 'match_video';
 
-export type FavoriteCollection = {
-  favorites?: Array<FavoriteMessage>;
+/**
+ * A notification type `/webhooks/test` can send. `alliance_selection`, `awards_posted` and `schedule_updated` need `event_key`; `upcoming_match`, `match_score`, `starting_comp_level` and `match_video` need `match_key`; `district_points_updated` needs `district_key`.
+ */
+export type WebhookTestNotificationType =
+  | 'upcoming_match'
+  | 'match_score'
+  | 'starting_comp_level'
+  | 'alliance_selection'
+  | 'awards_posted'
+  | 'schedule_updated'
+  | 'match_video'
+  | 'district_points_updated';
+
+export type FavoriteCollection = BaseResponse & {
+  favorites: Array<FavoriteMessage>;
 };
 
 export type FavoriteMessage = {
-  device_key?: string;
   model_key: string;
   model_type: ModelType;
 };
 
-export type SubscriptionCollection = {
-  subscriptions?: Array<SubscriptionMessage>;
+export type SubscriptionCollection = BaseResponse & {
+  subscriptions: Array<SubscriptionMessage>;
 };
 
 export type MediaSuggestionMessage = {
@@ -45,9 +59,9 @@ export type MediaSuggestionMessage = {
    */
   reference_key: string;
   /**
-   * The type of model the suggestion is for (currently only 'team' is supported)
+   * The type of model the suggestion is for
    */
-  reference_type: string;
+  reference_type: 'team';
   /**
    * The year the media is from
    */
@@ -57,7 +71,7 @@ export type MediaSuggestionMessage = {
    */
   media_url: string;
   /**
-   * Optional JSON-encoded details about the media
+   * JSON-encoded details about the media, or an empty string for none
    */
   details_json: string;
 };
@@ -183,10 +197,9 @@ export type EventMatchVideosSuggestionResponse = {
 };
 
 export type SubscriptionMessage = {
-  device_key?: string;
   model_key: string;
   model_type: ModelType;
-  notifications?: Array<NotificationType>;
+  notifications: Array<NotificationType>;
 };
 
 export type ApiReadKeyMessage = {
@@ -216,13 +229,113 @@ export type ApiWriteKeyMessage = {
   expiration?: string | null;
 };
 
-export type ApiKeysResponse = {
-  read_keys?: Array<ApiReadKeyMessage>;
-  write_keys?: Array<ApiWriteKeyMessage>;
+export type ApiKeysResponse = BaseResponse & {
+  read_keys: Array<ApiReadKeyMessage>;
+  write_keys: Array<ApiWriteKeyMessage>;
 };
 
-export type AddApiReadKeyResponse = {
+export type AddApiReadKeyResponse = BaseResponse & {
   read_key?: ApiReadKeyMessage;
+};
+
+/**
+ * The client platform. With `webhook`, `mobile_id` is the URL to send to.
+ */
+export type OperatingSystem = 'ios' | 'android-fcm' | 'web' | 'webhook';
+
+/**
+ * The kind of ID in `mobile_id` (token=legacy FCM registration token, fid=Firebase Installation ID)
+ */
+export type MobileIdType = 'token' | 'fid';
+
+export type RegistrationRequest = {
+  operating_system: OperatingSystem;
+  /**
+   * The FCM registration token, Firebase Installation ID, or webhook URL to send to
+   */
+  mobile_id: string;
+  mobile_id_type?: MobileIdType;
+  device_uuid: string;
+  /**
+   * Display name for the device. Defaults to "Unnamed Device".
+   */
+  name?: string;
+};
+
+export type UnregistrationRequest = {
+  /**
+   * The FCM registration token, Firebase Installation ID, or webhook URL to remove
+   */
+  mobile_id: string;
+  mobile_id_type?: MobileIdType;
+};
+
+export type RegisteredMobileClient = {
+  name: string;
+  /**
+   * The platform the device registered as. Usually an `OperatingSystem` value, but older registrations can report others.
+   */
+  operating_system: string;
+  mobile_id: string;
+  device_uuid: string;
+  /**
+   * Omitted for webhooks, whose `mobile_id` is a URL
+   */
+  mobile_id_type?: MobileIdType;
+};
+
+export type ListDevicesResponse = BaseResponse & {
+  devices: Array<RegisteredMobileClient>;
+};
+
+export type PingRequest = {
+  mobile_id: string;
+};
+
+export type ApiWriteKeyRequestMessage = {
+  /**
+   * The event the write keys are for
+   */
+  event_key: string;
+  /**
+   * The requester's role at the event
+   */
+  affiliation: string;
+  /**
+   * Requested write types (1=match video, 2=event teams, 3=event matches, 4=event rankings, 5=event alliances, 6=event awards, 7=event info, 8=zebra motionworks). Official events only receive match video.
+   */
+  auth_types: Array<number>;
+};
+
+export type ApiWriteKeyRequestResponse = {
+  code: number;
+  message: string;
+  status: 'success' | 'no_affiliation' | 'bad_event' | 'unauthorized';
+};
+
+export type Webhook = {
+  webhook_id: string;
+  name: string;
+  /**
+   * The URL notifications are sent to
+   */
+  url: string;
+  /**
+   * The key used to sign each request in the `X-TBA-HMAC` header
+   */
+  secret: string;
+  /**
+   * Only verified webhooks receive notifications other than pings
+   */
+  verified: boolean;
+};
+
+export type ListWebhooksResponse = BaseResponse & {
+  webhooks: Array<Webhook>;
+};
+
+export type AddWebhookResponse = BaseResponse & {
+  webhook?: Webhook;
 };
 
 export type ListFavoritesData = {
@@ -456,3 +569,221 @@ export type DeleteApiReadKeyResponses = {
 
 export type DeleteApiReadKeyResponse =
   DeleteApiReadKeyResponses[keyof DeleteApiReadKeyResponses];
+
+export type RequestApiWriteKeyData = {
+  body: ApiWriteKeyRequestMessage;
+  path?: never;
+  query?: never;
+  url: '/api_keys/write/request';
+};
+
+export type RequestApiWriteKeyResponses = {
+  /**
+   * Successful response
+   */
+  200: ApiWriteKeyRequestResponse;
+};
+
+export type RequestApiWriteKeyResponse =
+  RequestApiWriteKeyResponses[keyof RequestApiWriteKeyResponses];
+
+export type RegisterMobileClientData = {
+  body: RegistrationRequest;
+  path?: never;
+  query?: never;
+  url: '/register';
+};
+
+export type RegisterMobileClientResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type RegisterMobileClientResponse =
+  RegisterMobileClientResponses[keyof RegisterMobileClientResponses];
+
+export type UnregisterMobileClientData = {
+  body: UnregistrationRequest;
+  path?: never;
+  query?: never;
+  url: '/unregister';
+};
+
+export type UnregisterMobileClientResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type UnregisterMobileClientResponse =
+  UnregisterMobileClientResponses[keyof UnregisterMobileClientResponses];
+
+export type ListMobileClientsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/list_clients';
+};
+
+export type ListMobileClientsResponses = {
+  /**
+   * Successful response
+   */
+  200: ListDevicesResponse;
+};
+
+export type ListMobileClientsResponse =
+  ListMobileClientsResponses[keyof ListMobileClientsResponses];
+
+export type PingMobileClientData = {
+  body: PingRequest;
+  path?: never;
+  query?: never;
+  url: '/ping';
+};
+
+export type PingMobileClientResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type PingMobileClientResponse =
+  PingMobileClientResponses[keyof PingMobileClientResponses];
+
+export type ListWebhooksData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/webhooks/list';
+};
+
+export type ListWebhooksResponses = {
+  /**
+   * Successful response
+   */
+  200: ListWebhooksResponse;
+};
+
+export type ListWebhooksResponse2 =
+  ListWebhooksResponses[keyof ListWebhooksResponses];
+
+export type AddWebhookData = {
+  body: {
+    name: string;
+    url: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/webhooks/add';
+};
+
+export type AddWebhookResponses = {
+  /**
+   * Successful response
+   */
+  200: AddWebhookResponse;
+};
+
+export type AddWebhookResponse2 =
+  AddWebhookResponses[keyof AddWebhookResponses];
+
+export type VerifyWebhookData = {
+  body: {
+    /**
+     * The webhook's ID, from `/webhooks/list`
+     */
+    webhook_id: string;
+    /**
+     * The `verification_key` the webhook received
+     */
+    code: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/webhooks/verify';
+};
+
+export type VerifyWebhookResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type VerifyWebhookResponse =
+  VerifyWebhookResponses[keyof VerifyWebhookResponses];
+
+export type SendWebhookVerificationData = {
+  body: {
+    /**
+     * The webhook's ID, from `/webhooks/list`
+     */
+    webhook_id: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/webhooks/send_verification';
+};
+
+export type SendWebhookVerificationResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type SendWebhookVerificationResponse =
+  SendWebhookVerificationResponses[keyof SendWebhookVerificationResponses];
+
+export type DeleteWebhookData = {
+  body: {
+    /**
+     * The webhook's ID, from `/webhooks/list`
+     */
+    webhook_id: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/webhooks/delete';
+};
+
+export type DeleteWebhookResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type DeleteWebhookResponse =
+  DeleteWebhookResponses[keyof DeleteWebhookResponses];
+
+export type SendWebhookTestData = {
+  body: {
+    /**
+     * The webhook's ID, from `/webhooks/list`
+     */
+    webhook_id: string;
+    notification_type: WebhookTestNotificationType;
+    event_key?: string;
+    match_key?: string;
+    district_key?: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/webhooks/test';
+};
+
+export type SendWebhookTestResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type SendWebhookTestResponse =
+  SendWebhookTestResponses[keyof SendWebhookTestResponses];

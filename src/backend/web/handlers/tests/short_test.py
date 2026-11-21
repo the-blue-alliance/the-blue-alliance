@@ -20,6 +20,28 @@ def test_short_team_five_digits(web_client: Client) -> None:
     assert resp.headers["Location"] == "/team/99999"
 
 
+def test_short_team_frc_prefix(web_client: Client) -> None:
+    resp = web_client.get("/frc254")
+    assert resp.status_code == 301
+    assert resp.headers["Location"] == "/team/254"
+
+
+def test_short_team_frc_prefix_leading_zeros(web_client: Client) -> None:
+    resp = web_client.get("/frc00254")
+    assert resp.status_code == 301
+    assert resp.headers["Location"] == "/team/254"
+
+
+def test_short_team_uppercase_frc_prefix_not_found(web_client: Client) -> None:
+    resp = web_client.get("/FRC254")
+    assert resp.status_code == 404
+
+
+def test_short_team_frc_prefix_without_number_not_found(web_client: Client) -> None:
+    resp = web_client.get("/frc")
+    assert resp.status_code == 404
+
+
 def test_short_event_key(web_client: Client) -> None:
     resp = web_client.get("/2024miket")
     assert resp.status_code == 301

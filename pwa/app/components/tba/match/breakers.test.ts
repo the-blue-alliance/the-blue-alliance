@@ -2,12 +2,7 @@ import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test } from 'vitest';
 
 import type { Event, Match } from '~/api/tba/read';
-import {
-  AllianceColor,
-  CompLevel,
-  EventType,
-  PlayoffType,
-} from '~/api/tba/read';
+import { CompLevel, PlayoffType } from '~/api/tba/read';
 import {
   CHANGE_IN_COMP_LEVEL_BREAKER,
   CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER,
@@ -16,78 +11,21 @@ import {
   START_OF_FINALS_BREAKER,
   START_OF_QUALS_BREAKER,
 } from '~/components/tba/match/breakers';
+import {
+  makeEvent as baseEvent,
+  makeMatch as baseMatch,
+} from '~/test/factories';
 
 function timestamp(isoString: string): number {
   return Temporal.Instant.from(isoString).epochMilliseconds / 1000;
 }
 
 function makeMatch(overrides: Partial<Match> = {}): Match {
-  return {
-    key: '2026test_qm1',
-    comp_level: CompLevel.QM,
-    set_number: 1,
-    match_number: 1,
-    alliances: {
-      red: {
-        score: -1,
-        team_keys: [],
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: -1,
-        team_keys: [],
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-    },
-    winning_alliance: AllianceColor.NO_ALLIANCE,
-    event_key: '2026test',
-    time: timestamp('2026-03-01T04:30:00Z'),
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
-    ...overrides,
-  };
+  return baseMatch({ time: timestamp('2026-03-01T04:30:00Z'), ...overrides });
 }
 
 function makeEvent(overrides: Partial<Event> = {}): Event {
-  return {
-    key: '2026test',
-    name: 'Test Event',
-    event_code: 'test',
-    event_type: EventType.REGIONAL,
-    district: null,
-    city: null,
-    state_prov: null,
-    country: null,
-    start_date: '2026-03-01',
-    end_date: '2026-03-03',
-    year: 2026,
-    short_name: null,
-    event_type_string: 'Regional',
-    week: 0,
-    address: null,
-    postal_code: null,
-    gmaps_place_id: null,
-    gmaps_url: null,
-    lat: null,
-    lng: null,
-    location_name: null,
-    timezone: 'America/New_York',
-    website: null,
-    first_event_id: null,
-    first_event_code: null,
-    webcasts: [],
-    division_keys: [],
-    parent_event_key: null,
-    playoff_type: PlayoffType.BRACKET_8_TEAM,
-    playoff_type_string: null,
-    remap_teams: null,
-    ...overrides,
-  };
+  return baseEvent({ playoff_type: PlayoffType.BRACKET_8_TEAM, ...overrides });
 }
 
 describe('END_OF_DAY_BREAKER', () => {

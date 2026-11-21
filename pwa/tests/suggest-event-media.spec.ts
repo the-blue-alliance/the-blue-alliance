@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { gotoHydrated } from './helpers';
+
 test.describe('/suggest/event/media', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/suggest/event/media?event_key=2026necmp');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/suggest/event/media?event_key=2026necmp');
   });
 
   test('shows the selected event', async ({ page }) => {

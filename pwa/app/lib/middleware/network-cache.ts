@@ -11,7 +11,10 @@
  * stale it is revalidated with `If-None-Match` against the stored `ETag`: a 304
  * refreshes the entry's TTL without re-transferring the body. APIv3 emits a
  * strong `ETag` on every 200 and has a fast path that answers conditional
- * requests with 304 without running the handler.
+ * requests with 304 without running the handler. Within `STALE_GRACE` of
+ * expiry the stale body is served while that revalidation runs in the
+ * background; past it the request waits, so an idle key never serves data of
+ * unbounded age.
  *
  * Installed only on the server via `client.setConfig` in `__root.tsx`. Client
  * freshness is owned by React Query `staleTime`; this must not run in the
@@ -38,6 +41,8 @@ interface CacheEntry {
 const CACHE_MAX_ENTRIES = 1_000;
 /** Fallback when the origin omits Cache-Control / max-age — matches TBA API max-age. */
 const CACHE_TTL = secondsToMilliseconds(61);
+/** How long past expiry an entry may still be served while it revalidates. */
+const STALE_GRACE = secondsToMilliseconds(61);
 
 /**
  * Global singleton LRU cache - shared across all SSR sessions on this process
@@ -154,17 +159,16 @@ export function createCachedFetch(
     const cacheKey = generateCacheKey(url, init);
 
     const cachedEntry = cache.get(cacheKey, { allowStale: true });
-    const isFresh =
-      cachedEntry !== undefined && cache.getRemainingTTL(cacheKey) > 0;
+    const remainingTtl = cache.getRemainingTTL(cacheKey);
 
-    if (cachedEntry !== undefined && isFresh) {
+    if (cachedEntry !== undefined && remainingTtl > 0) {
       hits++;
       countMetric('network.cache.hit');
       logger.debug({ method, url }, 'Cache HIT');
       return jsonResponse(cachedEntry.body);
     }
 
-    if (cachedEntry !== undefined) {
+    if (cachedEntry !== undefined && remainingTtl > -STALE_GRACE) {
       // Stale-while-revalidate: serve the stale body now, refresh off the
       // request's critical path. Keeps SSR TTFB flat when an entry has just
       // expired instead of blocking on an origin round-trip.
@@ -196,7 +200,7 @@ export function createCachedFetch(
       cacheKey,
       method,
       url,
-      undefined,
+      cachedEntry,
     );
     return new Response(result.body, {
       status: result.status,

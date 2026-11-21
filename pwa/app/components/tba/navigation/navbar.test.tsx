@@ -5,7 +5,6 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { Navbar } from '~/components/tba/navigation/navbar';
@@ -21,23 +20,8 @@ const mocks = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    params: _params,
-    activeProps: _activeProps,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    to: string;
-    params?: unknown;
-    activeProps?: unknown;
-  }) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
+vi.mock('@tanstack/react-router', async () => ({
+  Link: (await import('~/test/linkMocks')).Link,
   useLocation: () => ({ pathname: mocks.pathname }),
   useRouter: () => mocks.router,
 }));
@@ -93,6 +77,20 @@ describe('Navbar', () => {
       expect(mobileLinks()).toHaveLength(NAV_ITEMS_LIST.length),
     );
     expect(mobileLinks()[1].style.animationDelay).toBe('50ms');
+  });
+
+  test('mobile menu icons match the label color', async () => {
+    render(<Navbar />);
+    fireEvent.click(menuToggle());
+    await waitFor(() => expect(mobileLinks().length).toBeGreaterThan(0));
+
+    for (const link of mobileLinks()) {
+      const colorOf = (el: Element | null) =>
+        (el?.getAttribute('class') ?? '').match(/\btext-\S+/g);
+      expect(colorOf(link.querySelector('svg'))).toEqual(
+        colorOf(link.querySelector('p')),
+      );
+    }
   });
 
   test('does not open the mobile menu on hover', async () => {

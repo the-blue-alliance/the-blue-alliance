@@ -2,17 +2,15 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
-  AllianceColor,
   AutoChargeStationRobot2023,
   BridgeState2023,
-  CompLevel,
   EndGameChargeStationRobot2023,
-  type Match,
   type MatchScoreBreakdown2023,
   type MatchScoreBreakdown2023Alliance,
   MobilityRobot2023,
 } from '~/api/tba/read';
 import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
+import { makeMatch, makeAlliance as makeMatchAlliance } from '~/test/factories';
 
 // The icon-only helpers are swapped for text so each robot's condition is
 // visible in the rendered row. The real helpers are covered in common.test.tsx.
@@ -115,34 +113,14 @@ function makeBreakdown(
   };
 }
 
-const match: Match = {
+const match = makeMatch({
   key: '2023test_qm1',
-  comp_level: CompLevel.QM,
-  set_number: 1,
-  match_number: 1,
   alliances: {
-    red: {
-      score: 120,
-      team_keys: ['frc254', 'frc1114', 'frc2056'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
-    blue: {
-      score: 53,
-      team_keys: ['frc148', 'frc217', 'frc33'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
+    red: makeMatchAlliance(120, ['frc254', 'frc1114', 'frc2056']),
+    blue: makeMatchAlliance(53, ['frc148', 'frc217', 'frc33']),
   },
-  winning_alliance: AllianceColor.RED,
   event_key: '2023test',
-  time: null,
-  actual_time: null,
-  predicted_time: null,
-  post_result_time: null,
-  score_breakdown: null,
-  videos: [],
-};
+});
 
 function renderBreakdown(scoreBreakdown = makeBreakdown()) {
   return render(

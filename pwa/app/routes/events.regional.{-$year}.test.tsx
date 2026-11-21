@@ -4,15 +4,19 @@ import { describe, expect, test, vi } from 'vitest';
 import { runHead, runLoader } from '~/routes/-testUtils';
 import { Route } from '~/routes/events.regional.{-$year}';
 
+// Response keys are an operation id, or `id:year` for one year only.
 function load(responses: Record<string, unknown>, year: string | undefined) {
   const queryClient = {
     ensureQueryData: vi.fn<
-      (options: { queryKey: [{ _id: string }] }) => Promise<unknown>
-    >(({ queryKey }) =>
-      queryKey[0]._id in responses
-        ? Promise.resolve(responses[queryKey[0]._id])
-        : Promise.reject(new Error('500')),
-    ),
+      (options: {
+        queryKey: [{ _id: string; path?: { year?: number } }];
+      }) => Promise<unknown>
+    >(({ queryKey: [{ _id, path }] }) => {
+      const key = [`${_id}:${path?.year}`, _id].find((k) => k in responses);
+      return key === undefined
+        ? Promise.reject(new Error('404'))
+        : Promise.resolve(responses[key]);
+    }),
   } as unknown as QueryClient;
   return runLoader(Route, {
     params: { year },
@@ -47,6 +51,24 @@ describe('regional rankings route loader', () => {
     await expect(
       load({ getRegionalRankings: [] }, undefined),
     ).resolves.toMatchObject({ year: 2026 });
+  });
+
+  test('defaults to the previous season before the current pool exists', async () => {
+    await expect(
+      load({ 'getRegionalRankings:2025': [] }, undefined),
+    ).resolves.toMatchObject({ year: 2025 });
+  });
+
+  test('throws not-found when neither season has a pool', async () => {
+    await expect(load({}, undefined)).rejects.toMatchObject({
+      isNotFound: true,
+    });
+  });
+
+  test('throws not-found for an explicit year without a pool', async () => {
+    await expect(
+      load({ 'getRegionalRankings:2025': [] }, '2026'),
+    ).rejects.toMatchObject({ isNotFound: true });
   });
 
   test('falls back to null advancement when it fails to load', async () => {

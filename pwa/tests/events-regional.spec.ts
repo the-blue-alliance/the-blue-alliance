@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { gotoHydrated } from './helpers';
+
 test.describe('/events/regional/2025', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/events/regional/2025');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/events/regional/2025');
   });
 
   test('shows how the top-ranked team qualified', async ({ page }) => {
@@ -56,8 +57,7 @@ test.describe('/events/regional/2025', () => {
 test('/events/regional stays on the regional rankings page', async ({
   page,
 }) => {
-  await page.goto('/events/regional');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/events/regional');
 
   await expect(
     page.getByRole('heading', { name: /Regional Pool Rankings/ }),
@@ -65,8 +65,7 @@ test('/events/regional stays on the regional rankings page', async ({
 });
 
 test('/events/regional/2024 shows the not found page', async ({ page }) => {
-  await page.goto('/events/regional/2024');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/events/regional/2024');
 
   await expect(page.getByText('Error 404 - Page Not Found')).toBeVisible();
 });

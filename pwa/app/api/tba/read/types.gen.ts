@@ -44,6 +44,36 @@ export type ApiStatusAppVersion = {
   latest_app_version: number;
 };
 
+export type SponsorsList = {
+  /**
+   * Platinum sponsors in display order. Contains 0 to 3 entries.
+   */
+  sponsors: Array<Sponsor>;
+};
+
+export type Sponsor = {
+  /**
+   * Sponsor name. Use as the logo's alt text, or show it as text when there is no logo.
+   */
+  name: string;
+  /**
+   * Absolute https URL the sponsor credit links to.
+   */
+  url: string;
+  /**
+   * How to show the logo. `wordmark`: the logo already spells the sponsor's name, so show it alone. `mark`: a square logo, shown with the name beside it. Other values may be added later; clients must treat any value they do not recognize as `wordmark`.
+   */
+  logo_style: string;
+  /**
+   * Absolute https URL of a full-color PNG logo for light backgrounds, or null if there is none.
+   */
+  logo_url: string | null;
+  /**
+   * Absolute https URL of a white PNG logo for dark or brand-colored backgrounds, or null if there is none.
+   */
+  logo_url_dark: string | null;
+};
+
 /**
  * AllianceColor
  *
@@ -2874,19 +2904,77 @@ export type NexusNowQueueing = {
 };
 
 /**
- * Live match-queuing info for an event, sourced from Nexus (https://frc.nexus/) and cached by TBA.
+ * Live match-queuing info and the pit map for an event, sourced from Nexus (https://frc.nexus/) and cached by TBA.
  */
 export type NexusEventInfo = {
   /**
-   * Unix timestamp (in milliseconds) of when this data was last fetched from Nexus.
+   * Unix timestamp (in milliseconds) of when the queuing info was last fetched from Nexus, or null if no queuing info is available.
    */
-  data_as_of_ms: number;
+  data_as_of_ms: number | null;
   now_queueing: NexusNowQueueing | null;
   /**
-   * Map of TBA match key to live queuing info for that match.
+   * Map of TBA match key to live queuing info for that match. Empty if no queuing info is available.
    */
   matches: {
     [key: string]: NexusMatchInfo;
+  };
+  pit_map: NexusPitMap | null;
+};
+
+/**
+ * A pair of x and y values on a Nexus pit map, used for positions and sizes.
+ */
+export type NexusMapVector = {
+  x?: number;
+  y?: number;
+};
+
+/**
+ * A rectangle on a Nexus pit map.
+ */
+export type NexusMapElement = {
+  position?: NexusMapVector;
+  size?: NexusMapVector;
+  /**
+   * Rotation of the element, in degrees.
+   */
+  angle?: number | null;
+};
+
+export type NexusMapPit = NexusMapElement & {
+  /**
+   * TBA team key of the team in this pit, or null if the pit is unassigned.
+   */
+  team_key: string | null;
+};
+
+export type NexusMapLabel = NexusMapElement & {
+  label?: string;
+};
+
+export type NexusMapArrow = NexusMapElement & {
+  type?: 'single' | 'double';
+};
+
+/**
+ * The pit map for an event, as reported by Nexus. Each collection maps a Nexus element ID to that element.
+ */
+export type NexusPitMap = {
+  size: NexusMapVector;
+  pits: {
+    [key: string]: NexusMapPit;
+  };
+  areas: {
+    [key: string]: NexusMapLabel;
+  };
+  labels: {
+    [key: string]: NexusMapLabel;
+  };
+  arrows: {
+    [key: string]: NexusMapArrow;
+  };
+  walls: {
+    [key: string]: NexusMapElement;
   };
 };
 
@@ -3440,7 +3528,7 @@ export type Team = {
    */
   country: string | null;
   /**
-   * Will be NULL, for future development.
+   * Always null. Teams are not geocoded, so there is no address or location name; use city, state_prov, country, and postal_code.
    */
   address: string | null;
   /**
@@ -3464,7 +3552,7 @@ export type Team = {
    */
   lng: number | null;
   /**
-   * Will be NULL, for future development.
+   * Always null. Teams are not geocoded, so there is no address or location name; use city, state_prov, country, and postal_code.
    */
   location_name: string | null;
   /**
@@ -6618,6 +6706,43 @@ export type GetStatusResponses = {
 };
 
 export type GetStatusResponse = GetStatusResponses[keyof GetStatusResponses];
+
+export type GetSponsorsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/sponsors';
+};
+
+export type GetSponsorsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+};
+
+export type GetSponsorsError = GetSponsorsErrors[keyof GetSponsorsErrors];
+
+export type GetSponsorsResponses = {
+  /**
+   * Successful response
+   */
+  200: SponsorsList;
+};
+
+export type GetSponsorsResponse =
+  GetSponsorsResponses[keyof GetSponsorsResponses];
 
 export type GetTeamData = {
   body?: never;

@@ -1,31 +1,16 @@
 import { render, screen, within } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { Event, EventType } from '~/api/tba/read';
 import EventListTable from '~/components/tba/eventListTable';
+import { makeEvent as baseEvent } from '~/test/factories';
 
 const { isEventActiveMock, isEventOnlineMock } = vi.hoisted(() => ({
   isEventActiveMock: vi.fn<(event: Event) => boolean>(),
   isEventOnlineMock: vi.fn<(event: Event) => boolean>(),
 }));
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    params,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children: ReactNode;
-    params: { eventKey: string };
-    to: string;
-  }) => (
-    <a href={to.replace('$eventKey', params.eventKey)} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
 
 vi.mock('~/lib/eventUtils', async (importOriginal) => {
   const actual = await importOriginal<typeof import('~/lib/eventUtils')>();
@@ -37,40 +22,19 @@ vi.mock('~/lib/gameday/useOnlineEventWebcasts', () => ({
 }));
 
 function makeEvent(overrides: Partial<Event> = {}): Event {
-  return {
+  return baseEvent({
     key: '2026miket',
     name: 'Kettering University Event #1',
     event_code: 'miket',
     event_type: EventType.DISTRICT,
-    district: null,
     city: 'Flint',
     state_prov: 'MI',
     country: 'USA',
-    start_date: '2026-03-01',
-    end_date: '2026-03-03',
-    year: 2026,
     short_name: 'Kettering #1',
     event_type_string: 'District',
-    week: 0,
-    address: null,
-    postal_code: null,
-    gmaps_place_id: null,
-    gmaps_url: null,
-    lat: null,
-    lng: null,
-    location_name: null,
     timezone: 'America/Detroit',
-    website: null,
-    first_event_id: null,
-    first_event_code: null,
-    webcasts: [],
-    division_keys: [],
-    parent_event_key: null,
-    playoff_type: null,
-    playoff_type_string: null,
-    remap_teams: null,
     ...overrides,
-  };
+  });
 }
 
 describe('EventListTable', () => {
