@@ -1149,8 +1149,9 @@ def test_team_media_instagram_oembed_details_match_spec(
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
 
-    assert resp.json[0]["details"] == INSTAGRAM_OEMBED_DETAILS
-    assert response_schema_errors("/team/{team_key}/media/{year}", resp.json) == []
+    body = resp.get_json()
+    assert body[0]["details"] == INSTAGRAM_OEMBED_DETAILS
+    assert response_schema_errors("/team/{team_key}/media/{year}", body) == []
 
 
 def test_team_media_instagram_without_details_matches_spec(
@@ -1174,4 +1175,6 @@ def test_team_media_instagram_without_details_matches_spec(
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
 
-    assert response_schema_errors("/team/{team_key}/media/{year}", resp.json) == []
+    assert (
+        response_schema_errors("/team/{team_key}/media/{year}", resp.get_json()) == []
+    )
