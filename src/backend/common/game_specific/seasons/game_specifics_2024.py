@@ -6,6 +6,7 @@ from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.frc_api.types import ScoreDetailModelAlliance2024
 from backend.common.game_specific.base import (
+    alliance_breakdown,
     per_robot_points,
     PredictionStatConfig,
     RobotPointsAccessor,
@@ -206,51 +207,51 @@ class GameSpecifics2024(
         return {
             "Total Mic": lambda match, color: sum(
                 [
-                    match.score_breakdown[color].get("micCenterStage", 0),
-                    match.score_breakdown[color].get("micStageLeft", 0),
-                    match.score_breakdown[color].get("micStageRight", 0),
+                    alliance_breakdown(match, color).get("micCenterStage", 0),
+                    alliance_breakdown(match, color).get("micStageLeft", 0),
+                    alliance_breakdown(match, color).get("micStageRight", 0),
                 ]
             ),
             "Total Trap": lambda match, color: sum(
                 [
-                    match.score_breakdown[color].get("trapCenterStage", 0),
-                    match.score_breakdown[color].get("trapStageLeft", 0),
-                    match.score_breakdown[color].get("trapStageRight", 0),
+                    alliance_breakdown(match, color).get("trapCenterStage", 0),
+                    alliance_breakdown(match, color).get("trapStageLeft", 0),
+                    alliance_breakdown(match, color).get("trapStageRight", 0),
                 ]
             ),
             "Total Teleop Game Pieces": lambda match, color: sum(
                 [
-                    match.score_breakdown[color].get("teleopAmpNoteCount", 0),
-                    match.score_breakdown[color].get("teleopSpeakerNoteCount", 0),
-                    match.score_breakdown[color].get(
+                    alliance_breakdown(match, color).get("teleopAmpNoteCount", 0),
+                    alliance_breakdown(match, color).get("teleopSpeakerNoteCount", 0),
+                    alliance_breakdown(match, color).get(
                         "teleopSpeakerNoteAmplifiedCount", 0
                     ),
                 ]
             ),
             "Total Auto Game Pieces": lambda match, color: sum(
                 [
-                    match.score_breakdown[color].get("autoAmpNoteCount", 0),
-                    match.score_breakdown[color].get("autoSpeakerNoteCount", 0),
+                    alliance_breakdown(match, color).get("autoAmpNoteCount", 0),
+                    alliance_breakdown(match, color).get("autoSpeakerNoteCount", 0),
                 ]
             ),
             "Total Overall Game Pieces": lambda match, color: sum(
                 [
-                    match.score_breakdown[color].get("autoAmpNoteCount", 0),
-                    match.score_breakdown[color].get("autoSpeakerNoteCount", 0),
-                    match.score_breakdown[color].get("teleopAmpNoteCount", 0),
-                    match.score_breakdown[color].get("teleopSpeakerNoteCount", 0),
-                    match.score_breakdown[color].get(
+                    alliance_breakdown(match, color).get("autoAmpNoteCount", 0),
+                    alliance_breakdown(match, color).get("autoSpeakerNoteCount", 0),
+                    alliance_breakdown(match, color).get("teleopAmpNoteCount", 0),
+                    alliance_breakdown(match, color).get("teleopSpeakerNoteCount", 0),
+                    alliance_breakdown(match, color).get(
                         "teleopSpeakerNoteAmplifiedCount", 0
                     ),
                 ]
             ),
-            "Amplification Rate": lambda match, color: match.score_breakdown[color].get(
-                "teleopSpeakerNoteAmplifiedCount", 0
-            )
+            "Amplification Rate": lambda match, color: alliance_breakdown(
+                match, color
+            ).get("teleopSpeakerNoteAmplifiedCount", 0)
             / max(
                 1,
-                match.score_breakdown[color].get("teleopSpeakerNoteCount", 0)
-                + match.score_breakdown[color].get(
+                alliance_breakdown(match, color).get("teleopSpeakerNoteCount", 0)
+                + alliance_breakdown(match, color).get(
                     "teleopSpeakerNoteAmplifiedCount", 0
                 ),
             ),

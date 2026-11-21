@@ -13,6 +13,7 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2023
 from backend.common.game_specific.base import (
+    alliance_breakdown,
     per_robot_points,
     PredictionStatConfig,
     RobotPointsAccessor,
@@ -331,35 +332,35 @@ class GameSpecifics2023(
     def get_manual_coprs(self) -> Dict[str, StatAccessor]:
         return {
             "Total Game Piece Count": lambda match, color: (
-                match.score_breakdown[color].get("teleopGamePieceCount", 0)
-                + match.score_breakdown[color].get("extraGamePieceCount", 0)
+                alliance_breakdown(match, color).get("teleopGamePieceCount", 0)
+                + alliance_breakdown(match, color).get("extraGamePieceCount", 0)
             ),
             "Total Game Piece Points": lambda match, color: (
-                match.score_breakdown[color].get("autoGamePiecePoints", 0)
-                + match.score_breakdown[color].get("teleopGamePiecePoints", 0)
+                alliance_breakdown(match, color).get("autoGamePiecePoints", 0)
+                + alliance_breakdown(match, color).get("teleopGamePiecePoints", 0)
             ),
             "Foul Count Received": lambda match, color: (
-                match.score_breakdown[OPPONENT[color]].get("foulCount", 0)
+                alliance_breakdown(match, OPPONENT[color]).get("foulCount", 0)
             ),
             "Foul Points Received": lambda match, color: (
-                match.score_breakdown[OPPONENT[color]].get("foulPoints", 0)
+                alliance_breakdown(match, OPPONENT[color]).get("foulPoints", 0)
             ),
             "Total Points Less Fouls": lambda match, color: (
-                match.score_breakdown[color].get("totalPoints", 0)
-                - match.score_breakdown[color].get("foulPoints", 0)
+                alliance_breakdown(match, color).get("totalPoints", 0)
+                - alliance_breakdown(match, color).get("foulPoints", 0)
             ),
             "Total Cones Scored": lambda match, color: (
                 sum(
                     [
-                        match.score_breakdown[color]
+                        alliance_breakdown(match, color)
                         .get("teleopCommunity", {})
                         .get("B", [])
                         .count("Cone"),
-                        match.score_breakdown[color]
+                        alliance_breakdown(match, color)
                         .get("teleopCommunity", {})
                         .get("M", [])
                         .count("Cone"),
-                        match.score_breakdown[color]
+                        alliance_breakdown(match, color)
                         .get("teleopCommunity", {})
                         .get("T", [])
                         .count("Cone"),
@@ -369,15 +370,15 @@ class GameSpecifics2023(
             "Total Cubes Scored": lambda match, color: (
                 sum(
                     [
-                        match.score_breakdown[color]
+                        alliance_breakdown(match, color)
                         .get("teleopCommunity", {})
                         .get("B", [])
                         .count("Cube"),
-                        match.score_breakdown[color]
+                        alliance_breakdown(match, color)
                         .get("teleopCommunity", {})
                         .get("M", [])
                         .count("Cube"),
-                        match.score_breakdown[color]
+                        alliance_breakdown(match, color)
                         .get("teleopCommunity", {})
                         .get("T", [])
                         .count("Cube"),
