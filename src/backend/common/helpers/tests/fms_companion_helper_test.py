@@ -38,14 +38,6 @@ def test_read_newest_companion_db() -> None:
     assert mock_read.call_args[0][0] == "f.db"
 
 
-def test_read_newest_companion_db_text_content() -> None:
-    with (
-        patch.object(FMSCompanionHelper, "get_newest_file_path", return_value="f.db"),
-        patch(f"{MODULE}.storage_read", return_value="not bytes"),
-    ):
-        assert FMSCompanionHelper.read_newest_companion_db("2024test") is None
-
-
 def test_read_newest_companion_db_no_file() -> None:
     with patch.object(FMSCompanionHelper, "get_newest_file_path", return_value=None):
         assert FMSCompanionHelper.read_newest_companion_db("2024test") is None

@@ -559,6 +559,25 @@ def test_accept_webcast_invalid_type(ndb_stub, taskqueue_stub, event) -> None:
     assert not none_throws(Event.get_by_id(event.key_name)).webcast
 
 
+def test_accept_webcast_direct_link(ndb_stub, taskqueue_stub, event) -> None:
+    user = make_user([AccountPermission.REVIEW_MEDIA])
+    suggestion = _create_webcast_suggestion(event.key_name)
+
+    outcome = SuggestionReviewer.accept_suggestion(
+        str(none_throws(suggestion.key).id()),
+        user,
+        overrides={
+            "webcast_type": "direct_link",
+            "webcast_channel": "https://example.com/stream",
+        },
+    )
+
+    assert outcome.result == SuggestionReviewResult.ACCEPTED
+    assert none_throws(Event.get_by_id(event.key_name)).webcast == [
+        {"type": "direct_link", "channel": "https://example.com/stream"}
+    ]
+
+
 def test_accept_webcast_with_file_and_date(ndb_stub, taskqueue_stub, event) -> None:
     user = make_user([AccountPermission.REVIEW_MEDIA])
     suggestion = _create_webcast_suggestion(event.key_name)

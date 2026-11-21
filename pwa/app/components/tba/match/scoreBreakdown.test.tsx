@@ -1,5 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import {
   ScoreBreakdownAllianceCell,
@@ -7,14 +7,6 @@ import {
   ScoreBreakdownRow,
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
-
-vi.mock('~icons/mdi/arrow-left', () => ({
-  default: () => <img alt="Red leads" />,
-}));
-
-vi.mock('~icons/mdi/arrow-right', () => ({
-  default: () => <img alt="Blue leads" />,
-}));
 
 describe('ScoreBreakdownTable', () => {
   test('renders its rows inside a table', () => {

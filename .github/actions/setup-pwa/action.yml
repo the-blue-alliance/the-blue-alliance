@@ -26,4 +26,3 @@ runs:
       with:
         path: ${{ steps.pnpm-store.outputs.path }}
         key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pwa/pnpm-lock.yaml') }}
-        restore-keys: ${{ runner.os }}-pnpm-store-

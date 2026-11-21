@@ -34,7 +34,7 @@ class CloudStorageClient(StorageClient):
         ) as f:
             f.write(content)
 
-    def read(self, file_name: str) -> str | bytes | None:
+    def read(self, file_name: str) -> bytes | None:
         try:
             with gcs_open(f"/{self.bucket}/{file_name}", mode="rb") as f:
                 return f.read()

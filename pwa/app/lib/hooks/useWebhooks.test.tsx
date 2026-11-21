@@ -1,37 +1,23 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, renderHook, waitFor } from '@testing-library/react';
-import type { PropsWithChildren } from 'react';
+import { act, waitFor } from '@testing-library/react';
+import { HttpResponse } from 'msw';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import {
+  addWebhook,
+  deleteWebhook,
+  listWebhooks,
+  pingMobileClient,
+  sendWebhookTest,
+  sendWebhookVerification,
+  verifyWebhook,
+} from '~/api/tba/mobile/sdk.gen';
 import type { Webhook } from '~/api/tba/mobile/types.gen';
 import { useWebhooks } from '~/lib/hooks/useWebhooks';
+import { signIn, signOut } from '~/test/auth';
+import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
+import { renderHookWithClient } from '~/test/render';
 
-type SdkFn = (options: unknown) => Promise<{ data?: unknown }>;
-
-const mocks = vi.hoisted(() => ({
-  useAuth: vi.fn<() => { user: unknown }>(),
-  listWebhooks: vi.fn<SdkFn>(),
-  addWebhook: vi.fn<SdkFn>(),
-  verifyWebhook: vi.fn<SdkFn>(),
-  sendWebhookVerification: vi.fn<SdkFn>(),
-  deleteWebhook: vi.fn<SdkFn>(),
-  pingMobileClient: vi.fn<SdkFn>(),
-  sendWebhookTest: vi.fn<SdkFn>(),
-}));
-
-vi.mock('~/components/tba/auth/auth', () => ({ useAuth: mocks.useAuth }));
-
-vi.mock('~/api/tba/mobile/sdk.gen', () => ({
-  listWebhooks: mocks.listWebhooks,
-  addWebhook: mocks.addWebhook,
-  verifyWebhook: mocks.verifyWebhook,
-  sendWebhookVerification: mocks.sendWebhookVerification,
-  deleteWebhook: mocks.deleteWebhook,
-  pingMobileClient: mocks.pingMobileClient,
-  sendWebhookTest: mocks.sendWebhookTest,
-}));
-
-const USER = { uid: 'user-1', getIdToken: () => Promise.resolve('token-1') };
+vi.mock('~/components/tba/auth/auth', () => import('~/test/auth'));
 
 const HOOK_A: Webhook = {
   webhook_id: '1',
@@ -49,29 +35,19 @@ const HOOK_B: Webhook = {
 };
 
 async function renderLoaded() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  function Wrapper({ children }: PropsWithChildren) {
-    return (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    );
-  }
-  const hook = renderHook(() => useWebhooks(), { wrapper: Wrapper });
+  const hook = renderHookWithClient(() => useWebhooks());
   await waitFor(() => expect(hook.result.current.isLoading).toBe(false));
   return hook;
 }
 
 describe('useWebhooks', () => {
   beforeEach(() => {
-    mocks.useAuth.mockReturnValue({ user: USER });
-    mocks.listWebhooks.mockResolvedValue({
-      data: { code: 200, webhooks: [HOOK_A] },
-    });
+    signIn();
+    mockTbaApi(listWebhooks, {}, { code: 200, webhooks: [HOOK_A] });
   });
 
   test('does not load webhooks when signed out', async () => {
-    mocks.useAuth.mockReturnValue({ user: null });
+    signOut();
 
     const { result } = await renderLoaded();
 
@@ -85,7 +61,11 @@ describe('useWebhooks', () => {
   });
 
   test('returns no webhooks when loading fails', async () => {
-    mocks.listWebhooks.mockResolvedValue({ data: undefined });
+    mockTbaApiWith(
+      listWebhooks,
+      {},
+      () => new HttpResponse(null, { status: 500 }),
+    );
 
     const { result } = await renderLoaded();
 
@@ -93,25 +73,32 @@ describe('useWebhooks', () => {
   });
 
   test('sends the name and URL when adding', async () => {
-    mocks.addWebhook.mockResolvedValue({
-      data: { code: 200, webhook: HOOK_B },
-    });
+    const requests = mockTbaApi(addWebhook, {}, { code: 200, webhook: HOOK_B });
     const { result } = await renderLoaded();
 
     await act(() =>
       result.current.addWebhook({ name: 'Stats', url: HOOK_B.url }),
     );
 
-    expect(mocks.addWebhook).toHaveBeenCalledWith({
-      auth: 'token-1',
-      body: { name: 'Stats', url: HOOK_B.url },
+    expect(await requests[0].json()).toEqual({
+      name: 'Stats',
+      url: HOOK_B.url,
     });
   });
 
+  test('authenticates an add with the user token', async () => {
+    const requests = mockTbaApi(addWebhook, {}, { code: 200, webhook: HOOK_B });
+    const { result } = await renderLoaded();
+
+    await act(() =>
+      result.current.addWebhook({ name: 'Stats', url: HOOK_B.url }),
+    );
+
+    expect(requests[0].headers.get('Authorization')).toBe('Bearer token-1');
+  });
+
   test('lists an added webhook', async () => {
-    mocks.addWebhook.mockResolvedValue({
-      data: { code: 200, webhook: HOOK_B },
-    });
+    mockTbaApi(addWebhook, {}, { code: 200, webhook: HOOK_B });
     const { result } = await renderLoaded();
 
     await act(() =>
@@ -125,9 +112,7 @@ describe('useWebhooks', () => {
 
   test('replaces a webhook that was added again', async () => {
     const readded = { ...HOOK_A, secret: 'new-secret' };
-    mocks.addWebhook.mockResolvedValue({
-      data: { code: 200, webhook: readded },
-    });
+    mockTbaApi(addWebhook, {}, { code: 200, webhook: readded });
     const { result } = await renderLoaded();
 
     await act(() =>
@@ -138,9 +123,11 @@ describe('useWebhooks', () => {
   });
 
   test('rejects an add with the server message', async () => {
-    mocks.addWebhook.mockResolvedValue({
-      data: { code: 400, message: 'A name and URL are required' },
-    });
+    mockTbaApi(
+      addWebhook,
+      {},
+      { code: 400, message: 'A name and URL are required' },
+    );
     const { result } = await renderLoaded();
 
     await expect(
@@ -149,7 +136,7 @@ describe('useWebhooks', () => {
   });
 
   test('marks a verified webhook as verified', async () => {
-    mocks.verifyWebhook.mockResolvedValue({ data: { code: 200 } });
+    mockTbaApi(verifyWebhook, {}, { code: 200 });
     const { result } = await renderLoaded();
 
     await act(() =>
@@ -160,9 +147,11 @@ describe('useWebhooks', () => {
   });
 
   test('rejects a wrong verification code', async () => {
-    mocks.verifyWebhook.mockResolvedValue({
-      data: { code: 400, message: 'Incorrect verification code' },
-    });
+    mockTbaApi(
+      verifyWebhook,
+      {},
+      { code: 400, message: 'Incorrect verification code' },
+    );
     const { result } = await renderLoaded();
 
     await expect(
@@ -171,10 +160,8 @@ describe('useWebhooks', () => {
   });
 
   test('marks a webhook unverified after sending a new code', async () => {
-    mocks.listWebhooks.mockResolvedValue({
-      data: { code: 200, webhooks: [HOOK_B] },
-    });
-    mocks.sendWebhookVerification.mockResolvedValue({ data: { code: 200 } });
+    mockTbaApi(listWebhooks, {}, { code: 200, webhooks: [HOOK_B] });
+    mockTbaApi(sendWebhookVerification, {}, { code: 200 });
     const { result } = await renderLoaded();
 
     await act(() => result.current.resendVerification('2'));
@@ -185,7 +172,7 @@ describe('useWebhooks', () => {
   });
 
   test('removes a deleted webhook', async () => {
-    mocks.deleteWebhook.mockResolvedValue({ data: { code: 200 } });
+    mockTbaApi(deleteWebhook, {}, { code: 200 });
     const { result } = await renderLoaded();
 
     await act(() => result.current.deleteWebhook('1'));
@@ -194,7 +181,7 @@ describe('useWebhooks', () => {
   });
 
   test('keeps a webhook whose delete failed', async () => {
-    mocks.deleteWebhook.mockResolvedValue({ data: { code: 404 } });
+    mockTbaApi(deleteWebhook, {}, { code: 404 });
     const { result } = await renderLoaded();
 
     await expect(result.current.deleteWebhook('1')).rejects.toThrow(
@@ -204,19 +191,16 @@ describe('useWebhooks', () => {
   });
 
   test('pings a webhook by its URL', async () => {
-    mocks.pingMobileClient.mockResolvedValue({ data: { code: 200 } });
+    const requests = mockTbaApi(pingMobileClient, {}, { code: 200 });
     const { result } = await renderLoaded();
 
     await act(() => result.current.pingWebhook(HOOK_A.url));
 
-    expect(mocks.pingMobileClient).toHaveBeenCalledWith({
-      auth: 'token-1',
-      body: { mobile_id: HOOK_A.url },
-    });
+    expect(await requests[0].json()).toEqual({ mobile_id: HOOK_A.url });
   });
 
   test('rejects a failed ping', async () => {
-    mocks.pingMobileClient.mockResolvedValue({ data: { code: 500 } });
+    mockTbaApi(pingMobileClient, {}, { code: 500 });
     const { result } = await renderLoaded();
 
     await expect(result.current.pingWebhook(HOOK_A.url)).rejects.toThrow(
@@ -225,9 +209,11 @@ describe('useWebhooks', () => {
   });
 
   test('rejects a failed test notification with the server message', async () => {
-    mocks.sendWebhookTest.mockResolvedValue({
-      data: { code: 400, message: 'Webhook is not verified' },
-    });
+    mockTbaApi(
+      sendWebhookTest,
+      {},
+      { code: 400, message: 'Webhook is not verified' },
+    );
     const { result } = await renderLoaded();
 
     await expect(

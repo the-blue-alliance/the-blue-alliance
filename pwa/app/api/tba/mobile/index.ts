@@ -125,6 +125,7 @@ export type {
   UnregisterMobileClientData,
   UnregisterMobileClientResponse,
   UnregisterMobileClientResponses,
+  UnregistrationRequest,
   VerifyWebhookData,
   VerifyWebhookResponse,
   VerifyWebhookResponses,
@@ -132,4 +133,5 @@ export type {
   VideoPlaylistMessage,
   VideoPlaylistResponse,
   Webhook,
+  WebhookTestNotificationType,
 } from './types.gen';

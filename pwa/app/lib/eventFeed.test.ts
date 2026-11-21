@@ -4,16 +4,16 @@ import { describe, expect, test } from 'vitest';
 import type { Event, Match } from '~/api/tba/read';
 import { CompLevel } from '~/api/tba/read';
 import { buildEventFeed, formatRfc2822 } from '~/lib/eventFeed';
+import {
+  makeEvent as baseEvent,
+  makeMatch as baseMatch,
+  makeAlliance,
+} from '~/test/factories';
 
 const NOW = Temporal.Instant.from('2024-03-09T15:04:05Z');
 
 function makeEvent(name: string = 'Silicon Valley Regional'): Event {
-  return {
-    key: '2024casj',
-    name,
-    year: 2024,
-    playoff_type: null,
-  } as Event;
+  return baseEvent({ key: '2024casj', name, year: 2024 });
 }
 
 function makeMatch(
@@ -24,22 +24,16 @@ function makeMatch(
   redScore: number = 100,
   blueScore: number = 80,
 ): Match {
-  return {
+  return baseMatch({
     key,
     comp_level: compLevel,
     set_number: setNumber,
     match_number: matchNumber,
     alliances: {
-      red: {
-        score: redScore,
-        team_keys: ['frc254', 'frc1678', 'frc2056'],
-      },
-      blue: {
-        score: blueScore,
-        team_keys: ['frc604', 'frc1323', 'frc2910B'],
-      },
+      red: makeAlliance(redScore, ['frc254', 'frc1678', 'frc2056']),
+      blue: makeAlliance(blueScore, ['frc604', 'frc1323', 'frc2910B']),
     },
-  } as Match;
+  });
 }
 
 function itemTitles(feed: string): string[] {

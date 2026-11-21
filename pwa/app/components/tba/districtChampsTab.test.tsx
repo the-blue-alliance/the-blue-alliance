@@ -1,94 +1,39 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
   fireEvent,
-  render,
   screen,
   waitFor,
   within,
 } from '@testing-library/react';
-import { type ReactNode } from 'react';
+import { delay } from 'msw';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { type EventColors } from '~/api/colors';
+import { getEventColors } from '~/api/colors/sdk.gen';
 import {
-  AllianceColor,
   CompLevel,
   type Event,
   type EventRanking,
   EventType,
   type Match,
 } from '~/api/tba/read';
+import {
+  getDistrictTeamsKeys,
+  getEventMatches,
+  getEventRankings,
+  getEventsByYear,
+} from '~/api/tba/read/sdk.gen';
 import { DistrictChampsTab } from '~/components/tba/districtChampsTab';
+import {
+  makeEvent as baseEvent,
+  makeMatch as baseMatch,
+  makeAlliance,
+  winningAlliance,
+} from '~/test/factories';
+import { mockTbaApi, mockTbaApiWith } from '~/test/msw';
+import { renderWithClient } from '~/test/render';
 
-const { districtTeamsFn, eventsFn, matchesFn, rankingsFn, colorsFn } =
-  vi.hoisted(() => ({
-    districtTeamsFn: vi.fn<(districtKey: string) => Promise<string[]>>(),
-    eventsFn: vi.fn<(year: number) => Promise<Event[]>>(),
-    matchesFn: vi.fn<(eventKey: string) => Promise<Match[]>>(),
-    rankingsFn: vi.fn<(eventKey: string) => Promise<EventRanking | null>>(),
-    colorsFn: vi.fn<(eventKey: string) => Promise<EventColors>>(),
-  }));
-
-vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
-  getDistrictTeamsKeysOptions: ({
-    path,
-  }: {
-    path: { district_key: string };
-  }) => ({
-    queryKey: ['district-teams', path.district_key],
-    queryFn: () => districtTeamsFn(path.district_key),
-  }),
-  getEventsByYearOptions: ({ path }: { path: { year: number } }) => ({
-    queryKey: ['events', path.year],
-    queryFn: () => eventsFn(path.year),
-  }),
-  getEventMatchesOptions: ({ path }: { path: { event_key: string } }) => ({
-    queryKey: ['matches', path.event_key],
-    queryFn: () => matchesFn(path.event_key),
-  }),
-  getEventRankingsOptions: ({ path }: { path: { event_key: string } }) => ({
-    queryKey: ['rankings', path.event_key],
-    queryFn: () => rankingsFn(path.event_key),
-  }),
-}));
-
-vi.mock('~/api/colors/@tanstack/react-query.gen', () => ({
-  getEventColorsOptions: ({ path }: { path: { eventKey: string } }) => ({
-    queryKey: ['colors', path.eventKey],
-    queryFn: () => colorsFn(path.eventKey),
-  }),
-}));
-
-vi.mock('~/components/tba/links', () => ({
-  EventLink: ({
-    children,
-    eventOrKey,
-  }: {
-    children: ReactNode;
-    eventOrKey: string;
-  }) => <a href={`/event/${eventOrKey}`}>{children}</a>,
-  MatchLink: ({
-    children,
-    matchOrKey,
-  }: {
-    children: ReactNode;
-    matchOrKey: Match;
-  }) => <a href={`/match/${matchOrKey.key}`}>{children}</a>,
-  TeamLink: ({
-    children,
-    teamOrKey,
-    style,
-  }: {
-    children: ReactNode;
-    teamOrKey: string;
-    style?: React.CSSProperties;
-  }) => (
-    <a href={`/team/${teamOrKey.substring(3)}`} style={style}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('~/components/tba/links', () => import('~/test/linkMocks'));
 
 function makeEvent(
   key: string,
@@ -96,39 +41,19 @@ function makeEvent(
   short_name: string | null,
   event_type = EventType.CMP_DIVISION,
 ): Event {
-  return {
+  return baseEvent({
     key,
     name,
     short_name,
     event_type,
     event_code: key.substring(4),
-    district: null,
-    city: null,
-    state_prov: null,
-    country: null,
     start_date: '2026-04-15',
     end_date: '2026-04-18',
-    year: 2026,
     event_type_string: 'Championship Division',
     week: null,
-    address: null,
-    postal_code: null,
-    gmaps_place_id: null,
-    gmaps_url: null,
-    lat: null,
-    lng: null,
-    location_name: null,
     timezone: 'America/Chicago',
-    website: null,
-    first_event_id: null,
-    first_event_code: null,
-    webcasts: [],
-    division_keys: [],
     parent_event_key: '2026cmptx',
-    playoff_type: null,
-    playoff_type_string: null,
-    remap_teams: null,
-  };
+  });
 }
 
 function makeMatch(
@@ -141,44 +66,22 @@ function makeMatch(
   redScore: number,
   blueScore: number,
 ): Match {
-  const winning_alliance =
-    redScore > blueScore
-      ? AllianceColor.RED
-      : blueScore > redScore
-        ? AllianceColor.BLUE
-        : AllianceColor.NO_ALLIANCE;
   const suffix =
     compLevel === CompLevel.QM
       ? `qm${matchNumber}`
       : `${compLevel}${setNumber}m${matchNumber}`;
-  return {
+  return baseMatch({
     key: `${eventKey}_${suffix}`,
     comp_level: compLevel,
     set_number: setNumber,
     match_number: matchNumber,
     alliances: {
-      red: {
-        score: redScore,
-        team_keys: red,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: blueScore,
-        team_keys: blue,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
+      red: makeAlliance(redScore, red),
+      blue: makeAlliance(blueScore, blue),
     },
-    winning_alliance,
+    winning_alliance: winningAlliance(redScore, blueScore),
     event_key: eventKey,
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
-  };
+  });
 }
 
 function makeRanking(
@@ -310,6 +213,7 @@ const archimedesColors: EventColors = {
 };
 
 function setupQueries({
+  year = 2025,
   events = [archimedes, newton, regional],
   teams = DISTRICT_TEAMS,
   rankings = {
@@ -321,40 +225,49 @@ function setupQueries({
     '2026new': newtonMatches,
   } as Record<string, Match[]>,
 }: {
+  year?: number;
   events?: Event[];
   teams?: string[];
   rankings?: Record<string, EventRanking | null>;
   matches?: Record<string, Match[]>;
 } = {}) {
-  districtTeamsFn.mockResolvedValue(teams);
-  eventsFn.mockResolvedValue(events);
-  matchesFn.mockImplementation((key) => Promise.resolve(matches[key] ?? []));
-  rankingsFn.mockImplementation((key) =>
-    Promise.resolve(rankings[key] ?? null),
+  mockTbaApi(
+    getDistrictTeamsKeys,
+    { path: { district_key: `${year}fim` } },
+    teams,
   );
-  colorsFn.mockImplementation((key) =>
-    key === '2026arc'
-      ? Promise.resolve(archimedesColors)
-      : // Never resolves: exercises the "no colours yet" path.
-        new Promise(() => {}),
+  const eventsRequests = mockTbaApi(
+    getEventsByYear,
+    { path: { year } },
+    events,
   );
+  for (const key of ['2026arc', '2026new']) {
+    const path = { path: { event_key: key } };
+    mockTbaApi(getEventMatches, path, matches[key] ?? []);
+    mockTbaApi(getEventRankings, path, rankings[key] ?? null);
+  }
+  mockTbaApi(
+    getEventColors,
+    { path: { eventKey: '2026arc' } },
+    archimedesColors,
+  );
+  // Never resolves: exercises the "no colours yet" path.
+  mockTbaApiWith(getEventColors, { path: { eventKey: '2026new' } }, () =>
+    delay('infinite'),
+  );
+  return { eventsRequests };
 }
 
 function renderTab(
   props: Partial<Parameters<typeof DistrictChampsTab>[0]> = {},
 ) {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <DistrictChampsTab
-        abbreviation="fim"
-        currentSeason={2026}
-        year={2025}
-        {...props}
-      />
-    </QueryClientProvider>,
+  return renderWithClient(
+    <DistrictChampsTab
+      abbreviation="fim"
+      currentSeason={2026}
+      year={2025}
+      {...props}
+    />,
   );
 }
 
@@ -380,8 +293,6 @@ describe('DistrictChampsTab', () => {
     renderTab();
 
     expect(screen.getByText('Loading divisions…')).toBeTruthy();
-    expect(districtTeamsFn).toHaveBeenCalledWith('2025fim');
-    expect(eventsFn).toHaveBeenCalledWith(2025);
 
     await waitForDivisions();
     const tabs = screen.getAllByRole('tab').map((t) => t.textContent);
@@ -495,7 +406,7 @@ describe('DistrictChampsTab', () => {
       .closest('td');
     expect(team1?.style.backgroundColor).toBe('rgb(0, 0, 255)');
     expect(team1?.style.color).toBe('white');
-    expect(team1?.style.outline).toBe('2px solid #ffcc00');
+    expect(team1?.style.outline).toBe('2px solid rgb(255, 204, 0)');
     expect(team1?.querySelector('div')?.className).toBe('font-bold');
     // Unverified light primary: black text, no outline.
     const team2 = within(matchRows[1])
@@ -626,9 +537,9 @@ describe('DistrictChampsTab', () => {
     });
 
     test('counts down to the next refresh and resets once a fetch completes', async () => {
+      const { eventsRequests } = setupQueries({ year: 2026 });
       const { unmount } = renderTab({ year: 2026 });
 
-      expect(districtTeamsFn).toHaveBeenCalledWith('2026fim');
       expect(screen.getByText('Refreshing…')).toBeTruthy();
 
       await waitForDivisions();
@@ -649,7 +560,7 @@ describe('DistrictChampsTab', () => {
       // The final tick wraps the countdown and React Query's own 60s
       // refetch interval fires, so the badge reports the refresh in
       // progress and then resets once it settles.
-      expect(eventsFn).toHaveBeenCalledTimes(1);
+      expect(eventsRequests).toHaveLength(1);
       act(() => {
         vi.advanceTimersByTime(1000);
       });
@@ -657,7 +568,7 @@ describe('DistrictChampsTab', () => {
       await waitFor(() =>
         expect(screen.getByText('Auto-refresh in 60s')).toBeTruthy(),
       );
-      expect(eventsFn).toHaveBeenCalledTimes(2);
+      expect(eventsRequests).toHaveLength(2);
 
       unmount();
       expect(vi.getTimerCount()).toBe(0);
