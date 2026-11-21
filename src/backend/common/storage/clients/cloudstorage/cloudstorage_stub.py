@@ -7,9 +7,9 @@ from __future__ import print_function
 import calendar
 import datetime
 import hashlib
+import http.client
 
 import six
-import six.moves.http_client
 
 from google.appengine.api import datastore
 from google.appengine.api import namespace_manager
@@ -214,7 +214,7 @@ class CloudStorageStub(object):
             )
             gcs_file = _AE_GCSFileInfo_.get(key)
             if not gcs_file:
-                raise ValueError("Invalid token", six.moves.http_client.BAD_REQUEST)
+                raise ValueError("Invalid token", http.client.BAD_REQUEST)
             return gcs_file.next_offset - 1
         finally:
             namespace_manager.set_namespace(ns)
@@ -254,26 +254,26 @@ class CloudStorageStub(object):
             )
             gcs_file = _AE_GCSFileInfo_.get(key)
             if not gcs_file:
-                raise ValueError("Invalid token", six.moves.http_client.BAD_REQUEST)
+                raise ValueError("Invalid token", http.client.BAD_REQUEST)
             if gcs_file.next_offset == -1:
                 raise ValueError(
                     "Received more uploads after file %s "
                     "was finalized." % gcs_file.filename,
-                    six.moves.http_client.OK,
+                    http.client.OK,
                 )
             if content:
                 start, end = content_range
                 if len(content) != (end - start + 1):
                     raise ValueError(
                         "Invalid content range %d-%d" % content_range,
-                        six.moves.http_client.REQUESTED_RANGE_NOT_SATISFIABLE,
+                        http.client.REQUESTED_RANGE_NOT_SATISFIABLE,
                     )
                 # No hole in upload.
                 if start > gcs_file.next_offset:
                     raise ValueError(
                         "Expect start offset %s, got %s"
                         % (gcs_file.next_offset, start),
-                        six.moves.http_client.REQUESTED_RANGE_NOT_SATISFIABLE,
+                        http.client.REQUESTED_RANGE_NOT_SATISFIABLE,
                     )
                 # No overwrites of uploads.
                 elif end < gcs_file.next_offset:
@@ -300,7 +300,7 @@ class CloudStorageStub(object):
                 raise ValueError(
                     "Got finalization request with wrong file length. "
                     "Expecting %s, got %s" % (gcs_file.next_offset, length),
-                    six.moves.http_client.REQUESTED_RANGE_NOT_SATISFIABLE,
+                    http.client.REQUESTED_RANGE_NOT_SATISFIABLE,
                 )
             elif length is not None:
                 return self._end_creation(token, _upload_filename)

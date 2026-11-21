@@ -30,6 +30,7 @@ __all__ = [
 
 import collections
 import os
+import urllib.parse
 
 import six
 from google.appengine.api import urlfetch
@@ -771,7 +772,7 @@ class StreamingBuffer(object):
         loc = resp_headers.get("location")
         if not loc:
             raise IOError("No location header found in 201 response")
-        parsed = six.moves.urllib.parse.urlparse(loc)
+        parsed = urllib.parse.urlparse(loc)
         self._path_with_token = "%s?%s" % (self._path, parsed.query)
 
     def __getstate__(self):

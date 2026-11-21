@@ -38,7 +38,7 @@ __all__ = [
     "TransientError",
 ]
 
-from six.moves import http_client
+from http import client as http_client
 
 
 class Error(Exception):
