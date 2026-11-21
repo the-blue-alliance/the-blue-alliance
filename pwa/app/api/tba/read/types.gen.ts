@@ -1254,6 +1254,10 @@ export type EventDistrictPoints = {
        * Points awarded for qualification match performance.
        */
       qual_points: number;
+      /**
+       * Team age points awarded at this event under the Regional Championship pool rules, included in `total`. Present only for teams that earned them at a regional event.
+       */
+      rookie_bonus?: number;
     };
   };
   /**
@@ -3542,6 +3546,10 @@ export type RegionalRanking = {
      * Points awarded for qualification match performance.
      */
     qual_points: number;
+    /**
+     * Team age points awarded at this event under the Regional Championship pool rules, included in `total`. Present only for teams that earned them at a regional event.
+     */
+    rookie_bonus?: number;
   }>;
   /**
    * Any points adjustments applied to the team.
