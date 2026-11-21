@@ -459,6 +459,27 @@ def test_add_webcast_via_url_youtube(
     assert youtube_webcasts[0]["channel"] == "abc123defgh"
 
 
+def test_add_webcast_direct_link(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+    resp = web_client.post(
+        "/admin/event/add_webcast/2020nyny",
+        data={
+            "webcast_type": "direct_link",
+            "webcast_channel": "https://example.com/stream",
+            "webcast_date": "",
+            "csrf_token": "test",
+        },
+    )
+    assert resp.status_code == 302
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert {"type": "direct_link", "channel": "https://example.com/stream"} in (
+        event.webcast
+    )
+
+
 def test_add_webcast_via_url_twitch(
     web_client: Client, login_gae_admin, taskqueue_stub
 ) -> None:
