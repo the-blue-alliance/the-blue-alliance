@@ -40,7 +40,7 @@ def floatformat(num: float, num_decimals: int) -> str:
     return "%.{}f".format(num_decimals) % num
 
 
-def isoformat(dt: datetime) -> datetime:
+def isoformat(dt: datetime) -> str:
     return dt.isoformat()
 
 
