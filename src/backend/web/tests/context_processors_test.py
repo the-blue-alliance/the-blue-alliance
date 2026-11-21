@@ -6,7 +6,9 @@ from backend.web.context_processors import (
     platinum_sponsors_context_processor,
     pwa_url_context_processor,
     render_time_context_processor,
+    static_asset_url_context_processor,
 )
+from backend.web.static_assets import static_asset_url
 
 
 def test_render_time_context_processor() -> None:
@@ -38,3 +40,8 @@ def test_pwa_url_context_processor_local_dev(monkeypatch: pytest.MonkeyPatch) ->
 def test_platinum_sponsors_context_processor(ndb_stub) -> None:
     sponsors = platinum_sponsors_context_processor()["platinum_sponsors"]()
     assert [s["name"] for s in sponsors] == ["AndyMark"]
+
+
+def test_static_asset_url_context_processor() -> None:
+    context = static_asset_url_context_processor()
+    assert context["static_asset_url"] is static_asset_url
