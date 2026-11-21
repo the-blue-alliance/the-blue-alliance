@@ -1,6 +1,6 @@
 from flask import make_response, Response
 
-from backend.api.handlers.decorators import api_authenticated
+from backend.api.handlers.decorators import api_authenticated, validate_etag
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.decorators import cached_public
@@ -10,7 +10,8 @@ from backend.common.models.regional_champs_pool import RegionalChampsPool
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
+@validate_etag
 def regional_rankings(year: Year) -> Response:
     """
     Returns the regional advancement rankings
@@ -29,7 +30,8 @@ def regional_rankings(year: Year) -> Response:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
+@validate_etag
 def regional_advancement(year: Year) -> Response:
     """
     Returns the regional advancement qualification info

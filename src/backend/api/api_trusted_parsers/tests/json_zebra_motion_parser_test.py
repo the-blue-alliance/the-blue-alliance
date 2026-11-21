@@ -127,3 +127,43 @@ def test_mismatched_null_coords(zebra_data: List[Dict[str, Any]]) -> None:
     data[0]["alliances"]["red"][0]["xs"][1] = None
     with pytest.raises(ParserInputException):
         JSONZebraMotionWorksParser.parse(json.dumps(data))
+
+
+def test_invalid_json() -> None:
+    with pytest.raises(ParserInputException):
+        JSONZebraMotionWorksParser.parse("not json at all")
+
+
+def test_times_not_a_list(zebra_data: List[Dict[str, Any]]) -> None:
+    data = copy.deepcopy(zebra_data)
+    data[0]["times"] = {"0": 0.0}
+    with pytest.raises(ParserInputException, match="array of 'times'"):
+        JSONZebraMotionWorksParser.parse(json.dumps(data))
+
+
+def test_missing_alliances(zebra_data: List[Dict[str, Any]]) -> None:
+    data = copy.deepcopy(zebra_data)
+    del data[0]["alliances"]
+    with pytest.raises(ParserInputException, match="dictionary of 'alliances'"):
+        JSONZebraMotionWorksParser.parse(json.dumps(data))
+
+
+def test_alliances_not_a_dict(zebra_data: List[Dict[str, Any]]) -> None:
+    data = copy.deepcopy(zebra_data)
+    data[0]["alliances"] = [data[0]["alliances"]["red"]]
+    with pytest.raises(ParserInputException, match="dictionary of 'alliances'"):
+        JSONZebraMotionWorksParser.parse(json.dumps(data))
+
+
+def test_alliance_wrong_team_count(zebra_data: List[Dict[str, Any]]) -> None:
+    data = copy.deepcopy(zebra_data)
+    del data[0]["alliances"]["blue"][2]
+    with pytest.raises(ParserInputException, match="Must have 3 teams per alliance"):
+        JSONZebraMotionWorksParser.parse(json.dumps(data))
+
+
+def test_missing_alliance(zebra_data: List[Dict[str, Any]]) -> None:
+    data = copy.deepcopy(zebra_data)
+    del data[0]["alliances"]["red"]
+    with pytest.raises(ParserInputException, match="Must have 3 teams per alliance"):
+        JSONZebraMotionWorksParser.parse(json.dumps(data))

@@ -1,8 +1,8 @@
-from typing import Dict, List, Set
+from typing import Any, Dict, List, Set
 
-from firebase_admin import db as firebase_db
 from pyre_extensions import none_throws
 
+from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.nexus_match_status import NexusMatchStatus
 from backend.common.environment import Environment
 from backend.common.firebase import app as get_firebase_app
@@ -14,6 +14,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey
 from backend.common.models.match import Match
+from backend.common.models.match_suggestion import MatchSuggestions
 from backend.common.queries.dict_converters.event_converter import EventConverter
 from backend.common.queries.dict_converters.match_converter import (
     MatchConverter,
@@ -28,7 +29,9 @@ class FirebasePusher:
     DB_URL = "https://{project}.firebaseio.com/"
 
     @classmethod
-    def _get_reference(cls, key: str) -> firebase_db.Reference:
+    def _get_reference(cls, key: str) -> Any:
+        from firebase_admin import db as firebase_db
+
         url = cls.DB_URL.format(project=Environment.project())
         return firebase_db.reference(key, app=get_firebase_app(), url=url)
 
@@ -136,7 +139,7 @@ class FirebasePusher:
         """
         Updates a match in an event and event/team
         """
-        if match.year < 2017:
+        if match.year < 2017 or match.comp_level == CompLevel.PM:
             return
 
         if "predicted_time" in updated_attrs:
@@ -297,6 +300,20 @@ class FirebasePusher:
             _queue="firebase",
             _target="py3-tasks-io",
             _url="/_ah/queue/deferred_firebase_update_special_webcasts",
+        )
+
+    @classmethod
+    def update_match_suggestions(cls, suggestions: MatchSuggestions) -> None:
+        """
+        Replaces the GameDay match suggestion feed
+        """
+        defer_safe(
+            cls._put_data,
+            "match_suggestions",
+            suggestions.model_dump(mode="json", by_alias=True),
+            _queue="firebase",
+            _target="py3-tasks-io",
+            _url="/_ah/queue/deferred_firebase_update_match_suggestions",
         )
 
     @classmethod

@@ -7,9 +7,13 @@ import MailIcon from '~icons/lucide/mail';
 import UserIcon from '~icons/lucide/user';
 
 import { listFavorites, listSubscriptions } from '~/api/tba/mobile/sdk.gen';
+import ApiKeysSection from '~/components/tba/account/apiKeys';
+import { SuggestionReviewSection } from '~/components/tba/account/suggestionReviewSection';
+import WebhooksSection from '~/components/tba/account/webhooks';
 import { useAuth } from '~/components/tba/auth/auth';
 import LoginPage from '~/components/tba/auth/loginPage';
-import { Button } from '~/components/ui/button';
+import { LogoutConfirmDialog } from '~/components/tba/auth/logoutConfirmDialog';
+import { Button, buttonVariants } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -27,13 +31,17 @@ import {
   DialogTrigger,
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
+import { Spinner } from '~/components/ui/spinner';
+import { getDisplayName } from '~/lib/profileUtils';
 
 export const Route = createFileRoute('/account/')({
   component: Account,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function Account() {
   const { isInitialLoading, user, logout } = useAuth();
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   const { data: favorites } = useQuery({
     queryKey: ['favorites', user?.uid],
@@ -43,6 +51,9 @@ function Account() {
       const response = await listFavorites({
         auth: token,
       });
+      if (response.data === undefined) {
+        throw new Error('Failed to load favorites');
+      }
       return response.data;
     },
     enabled: !!user,
@@ -56,13 +67,20 @@ function Account() {
       const response = await listSubscriptions({
         auth: token,
       });
+      if (response.data === undefined) {
+        throw new Error('Failed to load subscriptions');
+      }
       return response.data;
     },
     enabled: !!user,
   });
 
   if (isInitialLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner className="size-8 text-muted-foreground" />
+      </div>
+    );
   }
 
   if (!user) {
@@ -73,9 +91,14 @@ function Account() {
     <div>
       <div className="flex flex-row items-center justify-between py-4">
         <h1 className="text-2xl font-bold">Account</h1>
-        <Button variant="default" onClick={() => void logout()}>
+        <Button variant="default" onClick={() => setLogoutConfirmOpen(true)}>
           Logout
         </Button>
+        <LogoutConfirmDialog
+          open={logoutConfirmOpen}
+          onOpenChange={setLogoutConfirmOpen}
+          onConfirm={() => void logout()}
+        />
       </div>
       <Card>
         <CardHeader>
@@ -87,7 +110,7 @@ function Account() {
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-foreground">
                 <UserIcon className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">{user.displayName}</span>
+                <span className="font-medium">{getDisplayName(user)}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <MailIcon className="h-4 w-4" />
@@ -120,7 +143,10 @@ function Account() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div
+            className="grid
+              grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-4"
+          >
             <div className="rounded-lg border bg-card p-4">
               <div className="text-2xl font-bold text-foreground">
                 {favorites?.favorites?.length}
@@ -134,11 +160,17 @@ function Account() {
               <div className="text-sm text-muted-foreground">Subscriptions</div>
             </div>
           </div>
-          <Button size="sm" asChild>
-            <Link to="/account/mytba">Manage myTBA</Link>
-          </Button>
+          <Link to="/account/mytba" className={buttonVariants({ size: 'sm' })}>
+            Manage myTBA
+          </Link>
         </CardContent>
       </Card>
+
+      <SuggestionReviewSection />
+
+      <ApiKeysSection />
+
+      <WebhooksSection />
     </div>
   );
 }
@@ -183,9 +215,7 @@ function EditProfileDialog({
         }
       }}
     >
-      <DialogTrigger asChild>
-        <Button size="sm">Edit Profile</Button>
-      </DialogTrigger>
+      <DialogTrigger render={<Button size="sm" />}>Edit Profile</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
@@ -251,10 +281,8 @@ function DeleteAccountDialog({
         }
       }}
     >
-      <DialogTrigger asChild>
-        <Button size="sm" variant="destructive">
-          Delete Account
-        </Button>
+      <DialogTrigger render={<Button size="sm" variant="destructive" />}>
+        Delete Account
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

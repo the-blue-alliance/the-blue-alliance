@@ -1,3 +1,5 @@
+from typing import Dict, Optional
+
 from flask import abort, Blueprint
 from google.appengine.api import users as gae_login
 
@@ -31,9 +33,7 @@ from backend.web.handlers.admin.cache import (
     cached_query_info,
     cached_query_key_lookup_post,
     cached_query_list,
-    cached_query_purge_class_global_version,
-    cached_query_purge_global_version,
-    cached_query_purge_version,
+    cached_query_purge_orphans,
     clear_model_cache,
 )
 from backend.web.handlers.admin.districts import (
@@ -61,6 +61,7 @@ from backend.web.handlers.admin.event import (
     event_edit_post,
     event_link_frc_api_post,
     event_list,
+    event_refresh_smugmug_albums_post,
     event_remap_teams_post,
     event_remove_webcast_post,
     event_update_all_webcast_dates_post,
@@ -103,6 +104,10 @@ from backend.web.handlers.admin.sitevars import (
     sitevar_edit_post,
     sitevars_list,
 )
+from backend.web.handlers.admin.suggestions_seed import (
+    suggestion_seed_get,
+    suggestion_seed_post,
+)
 from backend.web.handlers.admin.team import (
     team_detail,
     team_list,
@@ -141,6 +146,16 @@ def require_gae_admin() -> None:
     """
     if not gae_login.is_current_user_admin():
         abort(401)
+
+
+@admin_routes.context_processor
+def admin_identity() -> Dict[str, Optional[str]]:
+    """
+    The Google account App Engine admitted as an admin. It is separate from the
+    TBA account (`user`), which may be signed out or have no display name.
+    """
+    google_user = gae_login.get_current_user()
+    return {"admin_email": google_user.email() if google_user else None}
 
 
 @admin_routes.route("/")
@@ -232,6 +247,9 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule("/cache", view_func=cached_query_list)
 admin_routes.add_url_rule(
+    "/cache/purge_orphans", methods=["POST"], view_func=cached_query_purge_orphans
+)
+admin_routes.add_url_rule(
     "/cache/<query_class_name>", methods=["GET"], view_func=cached_query_detail
 )
 admin_routes.add_url_rule(
@@ -244,21 +262,6 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule(
     "/cache/<query_class_name>/<cache_key>/delete", view_func=cached_query_delete
-)
-admin_routes.add_url_rule(
-    "/cache/<query_class_name>/purge/<db_version>/<int:query_version>",
-    methods=["POST"],
-    view_func=cached_query_purge_version,
-)
-admin_routes.add_url_rule(
-    "/cache/<query_class_name>/purge_global/<int:db_version>",
-    methods=["POST"],
-    view_func=cached_query_purge_class_global_version,
-)
-admin_routes.add_url_rule(
-    "/cache/purge_global/<int:db_version>",
-    methods=["POST"],
-    view_func=cached_query_purge_global_version,
 )
 admin_routes.add_url_rule(
     "/cache/clear/<model_type>/<model_key>",
@@ -348,6 +351,11 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/event/cleanup_youtube_webcasts/<event_key>",
     view_func=event_cleanup_youtube_webcasts_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/event/refresh_smugmug_albums/<event_key>",
+    view_func=event_refresh_smugmug_albums_post,
     methods=["POST"],
 )
 admin_routes.add_url_rule(
@@ -490,6 +498,12 @@ admin_routes.add_url_rule(
     "/mobile_clients/dedupe",
     view_func=mobile_clients_dedupe_post,
     methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/suggestions/seed", view_func=suggestion_seed_get, methods=["GET"]
+)
+admin_routes.add_url_rule(
+    "/suggestions/seed", view_func=suggestion_seed_post, methods=["POST"]
 )
 admin_routes.add_url_rule("/user/<user_id>", view_func=user_detail)
 admin_routes.add_url_rule("/user/edit/<user_id>", methods=["GET"], view_func=user_edit)

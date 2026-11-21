@@ -1,3 +1,4 @@
+from typing import Callable, cast
 from unittest.mock import Mock, patch
 from urllib.parse import parse_qsl, urlparse
 
@@ -9,9 +10,10 @@ import backend.common.auth as backend_auth
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.models.account import Account
 from backend.web.decorators import (
+    _serialize_url_args,
+    audit_post_mutation,
     enforce_login,
     require_admin,
-    require_any_permission,
     require_login,
     require_login_only,
     require_permission,
@@ -255,100 +257,25 @@ def test_require_permission_admin(ndb_stub) -> None:
     func.assert_called_with(None, request)
 
 
-def test_require_any_permission_false(ndb_stub) -> None:
+def test_serialize_url_args_none() -> None:
+    assert _serialize_url_args(None) == {}
+
+
+def test_audit_post_mutation_with_kwargs_returns_decorator() -> None:
     from backend.web.main import app
 
-    a = Account(
-        email="zach@thebluealliance.com",
-    )
-    a.put()
-
-    func = Mock()
-    with (
-        patch.object(
-            backend_auth,
-            "_decoded_claims",
-            return_value={"email": "zach@thebluealliance.com"},
-        ),
-        app.test_request_context("/"),
-    ):
-        with pytest.raises(werkzeug.exceptions.Unauthorized):
-            decorated_func = require_permission(AccountPermission.REVIEW_MEDIA)(func)
-            decorated_func(None, request)
-    assert not func.called
+    decorator = audit_post_mutation(target_key_getter=lambda: None)
+    decorated = decorator(lambda: "ok")
+    with app.test_request_context("/"):
+        assert decorated() == "ok"
 
 
-def test_require_any_permission_wrong(ndb_stub) -> None:
+def test_audit_post_mutation_bare_decorator() -> None:
     from backend.web.main import app
 
-    a = Account(
-        email="zach@thebluealliance.com",
-        permissions=[AccountPermission.REVIEW_MEDIA],
-    )
-    a.put()
+    def view() -> str:
+        return "ok"
 
-    func = Mock()
-    with (
-        patch.object(
-            backend_auth,
-            "_decoded_claims",
-            return_value={"email": "zach@thebluealliance.com"},
-        ),
-        app.test_request_context("/"),
-    ):
-        with pytest.raises(werkzeug.exceptions.Unauthorized):
-            decorated_func = require_permission(AccountPermission.REVIEW_EVENT_MEDIA)(
-                func
-            )
-            decorated_func(None, request)
-    assert not func.called
-
-
-def test_require_any_permission(ndb_stub) -> None:
-    from backend.web.main import app
-
-    a = Account(
-        email="zach@thebluealliance.com",
-        permissions=[AccountPermission.REVIEW_MEDIA],
-    )
-    a.put()
-
-    func = Mock()
-    with (
-        patch.object(
-            backend_auth,
-            "_decoded_claims",
-            return_value={"email": "zach@thebluealliance.com"},
-        ),
-        app.test_request_context("/"),
-    ):
-        decorated_func = require_any_permission(
-            {AccountPermission.REVIEW_MEDIA, AccountPermission.REVIEW_EVENT_MEDIA}
-        )(func)
-        decorated_func(None, request)
-    func.assert_called_with(None, request)
-
-
-def test_require_any_permission_admin(ndb_stub) -> None:
-    from backend.web.main import app
-
-    a = Account(
-        email="zach@thebluealliance.com",
-        permissions=[],
-    )
-    a.put()
-
-    func = Mock()
-    with (
-        patch.object(
-            backend_auth,
-            "_decoded_claims",
-            return_value={"email": "zach@thebluealliance.com", "admin": True},
-        ),
-        app.test_request_context("/"),
-    ):
-        decorated_func = require_any_permission(
-            {AccountPermission.REVIEW_MEDIA, AccountPermission.REVIEW_EVENT_MEDIA}
-        )(func)
-        decorated_func(None, request)
-    func.assert_called_with(None, request)
+    decorated = cast(Callable[[], str], audit_post_mutation(view))
+    with app.test_request_context("/"):
+        assert decorated() == "ok"

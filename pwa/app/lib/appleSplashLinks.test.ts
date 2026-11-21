@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
 
-describe.concurrent('APPLE_SPLASH_STARTUP_LINKS', () => {
+describe('APPLE_SPLASH_STARTUP_LINKS', () => {
   test('contains one link per startup image variant', () => {
     expect(APPLE_SPLASH_STARTUP_LINKS).toHaveLength(30);
     expect(

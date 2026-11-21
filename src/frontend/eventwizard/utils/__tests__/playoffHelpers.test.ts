@@ -3,6 +3,7 @@ import {
   playoffTypeFromNumber,
   playoffMatchAndSet,
   computePlayoffMatchDetails,
+  computePlayoffMatchDetailsFromCounter,
 } from "../playoffHelpers";
 
 describe("playoffHelpers", () => {
@@ -204,6 +205,67 @@ describe("playoffHelpers", () => {
         matchNumber: 2,
         matchKey: "f1m2",
       });
+    });
+  });
+
+  describe("playoffMatchAndSet - octofinals semifinals and finals", () => {
+    it("maps matches 37-42 to semifinal sets", () => {
+      expect(playoffMatchAndSet(37, true)).toEqual([1, 1]);
+      expect(playoffMatchAndSet(40, true)).toEqual([2, 1]);
+      expect(playoffMatchAndSet(42, true)).toEqual([2, 3]);
+    });
+
+    it("maps matches after 42 to the finals set", () => {
+      expect(playoffMatchAndSet(43, true)).toEqual([1, 1]);
+      expect(playoffMatchAndSet(45, true)).toEqual([1, 3]);
+    });
+  });
+
+  describe("computePlayoffMatchDetails - Double Elimination fallback", () => {
+    it("falls back to the standard bracket for numbers outside the mapping", () => {
+      expect(computePlayoffMatchDetails(25, false, true)).toEqual({
+        compLevel: "f",
+        setNumber: 1,
+        matchNumber: 1,
+        matchKey: "f1m1",
+      });
+    });
+  });
+
+  describe("computePlayoffMatchDetailsFromCounter", () => {
+    it("uses the 4-alliance double elimination mapping for counters up to 11", () => {
+      expect(computePlayoffMatchDetailsFromCounter(11, false, true)).toEqual({
+        compLevel: "f",
+        setNumber: 1,
+        matchNumber: 6,
+        matchKey: "f1m6",
+      });
+    });
+
+    it("uses the 8-alliance double elimination mapping past 11", () => {
+      expect(computePlayoffMatchDetailsFromCounter(12, false, true)).toEqual({
+        compLevel: "sf",
+        setNumber: 12,
+        matchNumber: 1,
+        matchKey: "sf12m1",
+      });
+    });
+
+    it("uses the octofinals mapping when there are octofinals", () => {
+      expect(computePlayoffMatchDetailsFromCounter(1, true, false)?.matchKey).toBe(
+        "ef1m1"
+      );
+    });
+
+    it("uses the standard mapping otherwise", () => {
+      expect(computePlayoffMatchDetailsFromCounter(13, false, false)?.matchKey).toBe(
+        "sf1m1"
+      );
+    });
+
+    it("returns null for counters outside the mapping", () => {
+      expect(computePlayoffMatchDetailsFromCounter(999, false, false)).toBeNull();
+      expect(computePlayoffMatchDetailsFromCounter(999, false, true)).toBeNull();
     });
   });
 });

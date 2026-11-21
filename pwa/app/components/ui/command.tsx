@@ -1,4 +1,5 @@
 import { Command as CommandPrimitive } from 'cmdk';
+import { cn } from 'cn';
 
 import SearchIcon from '~icons/lucide/search';
 
@@ -9,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
-import { cn } from '~/lib/utils';
 
 function Command({
   className,
@@ -35,11 +35,12 @@ function CommandDialog({
   className,
   showCloseButton = true,
   ...props
-}: React.ComponentProps<typeof Dialog> & {
+}: Omit<React.ComponentProps<typeof Dialog>, 'children'> & {
   title?: string;
   description?: string;
   className?: string;
   showCloseButton?: boolean;
+  children?: React.ReactNode;
 }) {
   return (
     <Dialog {...props}>
@@ -99,7 +100,8 @@ function CommandList({
     <CommandPrimitive.List
       data-slot="command-list"
       className={cn(
-        'max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto',
+        `max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto
+        overscroll-contain`,
         className,
       )}
       {...props}

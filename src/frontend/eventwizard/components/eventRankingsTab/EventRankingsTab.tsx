@@ -53,11 +53,6 @@ function EventRankingsTab({ selectedEvent, makeTrustedRequest }: EventRankingsTa
       return;
     }
 
-    if (rankings.length === 0) {
-      alert("No rankings to upload");
-      return;
-    }
-
     setUploading(true);
     setStatusMessage("Uploading rankings...");
 
@@ -155,7 +150,9 @@ function EventRankingsTab({ selectedEvent, makeTrustedRequest }: EventRankingsTa
                             let value: string | number = "";
                             const headerLower = header.toLowerCase();
 
-                            if (headerLower.includes("rank")) {
+                            if (breakdowns.includes(header)) {
+                              value = ranking[header] ?? "";
+                            } else if (headerLower.includes("rank")) {
                               value = ranking.rank;
                             } else if (headerLower.includes("team")) {
                               value = ranking.team_key.replace("frc", "");

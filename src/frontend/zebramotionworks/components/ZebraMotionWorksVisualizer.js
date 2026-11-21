@@ -34,7 +34,7 @@ class ZebraMotionWorksVisualizer extends React.Component {
                 Trajectory
               </button>
               <button
-                type="buttons"
+                type="button"
                 className={`btn btn-secondary${
                   mode === "heat" ? " active" : ""
                 }`}

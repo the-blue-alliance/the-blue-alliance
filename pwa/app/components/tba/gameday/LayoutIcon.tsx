@@ -1,5 +1,6 @@
+import { cn } from 'cn';
+
 import { getLayoutById } from '~/lib/gameday/layouts';
-import { cn } from '~/lib/utils';
 
 export function LayoutIcon({
   layoutId,

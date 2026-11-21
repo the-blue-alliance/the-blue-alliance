@@ -11,6 +11,7 @@ import time
 import requests
 
 TIME_LIMIT = 10 * 60  # seconds
+POLL_INTERVAL = 1  # seconds
 HOMEPAGE_URL = "http://localhost:8080"
 MODULE_NAMES = {
     "default",
@@ -32,7 +33,7 @@ while time.time() - start_time < TIME_LIMIT:
     not_started = MODULE_NAMES.difference(started)
     if not_started:
         print(f"Not started modules: {not_started}")
-        time.sleep(5)
+        time.sleep(POLL_INTERVAL)
         continue
     print(f"Started modules: {started}")
 
@@ -45,7 +46,7 @@ while time.time() - start_time < TIME_LIMIT:
     )
     if not m:
         print("Webpack not compiled")
-        time.sleep(5)
+        time.sleep(POLL_INTERVAL)
         continue
     print(m.group(0))
 
@@ -58,7 +59,7 @@ while time.time() - start_time < TIME_LIMIT:
             sys.exit(0)
     except (requests.ConnectionError, requests.Timeout):
         print("Homepage not ready")
-        time.sleep(5)
+        time.sleep(POLL_INTERVAL)
         continue
 
 print("Fail: Didn't start up in time")

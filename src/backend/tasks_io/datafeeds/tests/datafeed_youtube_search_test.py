@@ -135,6 +135,35 @@ class TestYoutubeChannelListForHandleDatafeed:
             assert isinstance(datafeed.parser(), YoutubeChannelListParser)
 
 
+def test_search_parser_edge_cases() -> None:
+    results = YoutubeSearchParser().parse(
+        {
+            "items": [
+                {"id": {}, "snippet": {"title": "No ID"}},
+                {"id": {"kind": "youtube#video"}, "snippet": {"title": ""}},
+                {
+                    "id": {"kind": "youtube#video", "videoId": "v1"},
+                    "snippet": {"title": "Video", "channelId": "UC_snip"},
+                },
+                {
+                    "id": {"kind": "youtube#playlist", "playlistId": "PL_id"},
+                    "snippet": {"title": "Playlist"},
+                },
+            ]
+        }
+    )
+
+    assert results == [
+        {
+            "kind": "youtube#video",
+            "title": "Video",
+            "video_id": "v1",
+            "channel_id": "UC_snip",
+        },
+        {"kind": "youtube#playlist", "title": "Playlist", "playlist_id": "PL_id"},
+    ]
+
+
 class TestYoutubeUpcomingStreamsDatafeed:
     def test_datafeed_endpoint(self) -> None:
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
@@ -300,3 +329,54 @@ class TestYoutubeUpcomingStreamsDatafeed:
                     match="Unable to call YouTube API for search",
                 ):
                     datafeed.fetch_all_pages_async().get_result()
+
+    def test_fetch_all_pages_async_null_body(self, ndb_context) -> None:
+        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
+            datafeed = YoutubeUpcomingStreamsDatafeed(channel_id="UC_channel_id")
+
+            mock_result = URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/search", 200, "null"
+            )
+            with mock.patch.object(
+                YoutubeUpcomingStreamsDatafeed, "_fetch"
+            ) as mock_fetch:
+                mock_fetch.return_value = InstantFuture(mock_result)
+                results = datafeed.fetch_all_pages_async().get_result()
+
+            assert results == []
+
+    def test_fallback_parse_items_ids(self) -> None:
+        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
+            datafeed = YoutubeUpcomingStreamsDatafeed(channel_id="UC_channel_id")
+
+        results = datafeed._fallback_parse_items(
+            {
+                "items": [
+                    # Skipped: no title
+                    {"id": {"videoId": "untitled"}, "snippet": {}},
+                    {
+                        "id": {"kind": "youtube#channel", "channelId": "UC_id"},
+                        "snippet": {"title": "Channel", "description": "Desc"},
+                    },
+                    {
+                        "id": {"kind": "youtube#video"},
+                        "snippet": {"title": "Snippet", "channelId": "UC_snip"},
+                    },
+                    {
+                        "id": {"kind": "youtube#playlist", "playlistId": "PL_id"},
+                        "snippet": {"title": "Playlist"},
+                    },
+                ]
+            }
+        )
+
+        assert results == [
+            {
+                "kind": "youtube#channel",
+                "title": "Channel",
+                "channel_id": "UC_id",
+                "description": "Desc",
+            },
+            {"kind": "youtube#video", "title": "Snippet", "channel_id": "UC_snip"},
+            {"kind": "youtube#playlist", "title": "Playlist", "playlist_id": "PL_id"},
+        ]

@@ -110,3 +110,35 @@ def test_parse_5xx_error(
         result = df.fetch_async().get_result()
 
     assert result is None
+
+
+class PayloadDatafeed(DatafeedBase[Any, Any]):
+
+    def url(self):
+        return "https://example.com/post"
+
+    def payload(self):
+        return {"a": "b"}
+
+    def parser(self) -> DummyParser:
+        return DummyParser()
+
+
+def test_payload_and_default_headers(
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+) -> None:
+    df = PayloadDatafeed()
+    assert df.headers() == {}
+
+    with patch.object(urlfetch_stub, "_Dynamic_Fetch") as mock_fetch:
+
+        def fetch_fn(request, response):
+            response.StatusCode = 200
+            response.Content = b"null"
+
+        mock_fetch.side_effect = fetch_fn
+        result = df.fetch_async().get_result()
+
+    # A JSON null body parses to None
+    assert result is None
+    assert mock_fetch.call_count == 1

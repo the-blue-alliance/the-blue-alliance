@@ -1,22 +1,15 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { type Database, onValue, ref } from 'firebase/database';
+import { onValue, ref } from 'firebase/database';
 import { useEffect, useMemo } from 'react';
 
+import { getDatabaseInstance } from '~/firebase/firebaseConfig';
+import { firebaseOnlyQueryFn } from '~/lib/gameday/firebaseQuery';
 import {
   type FirebaseLiveEvent,
   type FirebaseSpecialWebcast,
   type WebcastWithMeta,
   getWebcastId,
 } from '~/lib/gameday/types';
-
-// Lazy load database to avoid SSR issues
-let cachedDatabase: Database | null = null;
-async function getDatabase(): Promise<Database> {
-  if (cachedDatabase) return cachedDatabase;
-  const { database } = await import('~/firebase/firebaseConfig');
-  cachedDatabase = database;
-  return database;
-}
 
 export const FIREBASE_LIVE_EVENTS_QUERY_KEY = [
   'firebase',
@@ -51,7 +44,7 @@ export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
     let unsubscribeSpecialWebcasts: (() => void) | null = null;
 
     // Initialize Firebase subscriptions
-    void getDatabase().then((database) => {
+    void getDatabaseInstance().then((database) => {
       // Subscribe to live_events
       const liveEventsRef = ref(database, 'live_events');
       unsubscribeLiveEvents = onValue(liveEventsRef, (snapshot) => {
@@ -82,11 +75,11 @@ export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
   // setQueryData is called for the first time (i.e. Firebase hasn't responded yet).
   // TanStack Query v5 requires a queryFn even when enabled: false. These queries
   // are never fetched — data is written exclusively via setQueryData in the
-  // Firebase subscription above. The queryFn placeholder satisfies the requirement.
+  // Firebase subscription above. firebaseOnlyQueryFn satisfies the requirement.
   const { data: liveEventsData, isPending: liveEventsPending } =
     useQuery<Record<string, FirebaseLiveEvent> | null>({
       queryKey: [...FIREBASE_LIVE_EVENTS_QUERY_KEY],
-      queryFn: () => null,
+      queryFn: firebaseOnlyQueryFn,
       enabled: false,
       staleTime: Infinity,
     });
@@ -94,7 +87,7 @@ export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
   const { data: specialWebcastsData, isPending: specialWebcastsPending } =
     useQuery<Record<string, FirebaseSpecialWebcast> | null>({
       queryKey: [...FIREBASE_SPECIAL_WEBCASTS_QUERY_KEY],
-      queryFn: () => null,
+      queryFn: firebaseOnlyQueryFn,
       enabled: false,
       staleTime: Infinity,
     });

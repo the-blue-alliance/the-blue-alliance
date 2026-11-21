@@ -25,17 +25,11 @@ const AddMultipleTeams: React.FC<AddMultipleTeamsProps> = ({
   };
 
   const handleAddTeams = (): void => {
-    if (!selectedEvent) {
-      // No valid event
-      showErrorMessage("Please select an event before adding teams");
-      return;
-    }
-
     const teams: string[] = [];
     const teamInput = inputTeams.split("\n");
     for (let i = 0; inputTeams && i < teamInput.length; i++) {
       const teamNum = parseInt(teamInput[i], 10);
-      if (!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999) {
+      if (!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 25599) {
         showErrorMessage(`Invalid team ${teamInput[i]}`);
         return;
       }
@@ -69,7 +63,7 @@ const AddMultipleTeams: React.FC<AddMultipleTeamsProps> = ({
       />
       <button
         className={`btn ${buttonClass}`}
-        onClick={handleAddTeams}
+        onClick={selectedEvent ? handleAddTeams : undefined}
         disabled={!selectedEvent}
       >
         Overwrite Teams

@@ -1,0 +1,1252 @@
+{
+  "Schedule": [
+    {
+      "description": "Practice 1",
+      "startTime": "2026-03-19T12:00:00",
+      "matchNumber": 1,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 6401,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10213,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2053,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3419,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 9636,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 333,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 2",
+      "startTime": "2026-03-19T12:10:00",
+      "matchNumber": 2,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 6911,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4122,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7748,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7589,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 369,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 5806,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 3",
+      "startTime": "2026-03-19T12:20:00",
+      "matchNumber": 3,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 6621,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6300,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3419,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10262,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 369,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 1796,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 4",
+      "startTime": "2026-03-19T12:30:00",
+      "matchNumber": 4,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 10213,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2053,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 11331,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6593,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 1796,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7504,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 5",
+      "startTime": "2026-03-19T12:40:00",
+      "matchNumber": 5,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 2601,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4122,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 369,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10452,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10922,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 5881,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 6",
+      "startTime": "2026-03-19T12:50:00",
+      "matchNumber": 6,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 7730,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10413,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3419,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 11339,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10152,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10262,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 7",
+      "startTime": "2026-03-19T13:00:00",
+      "matchNumber": 7,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 2601,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4091,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2265,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7611,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 639,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6593,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 8",
+      "startTime": "2026-03-19T13:10:00",
+      "matchNumber": 8,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 7589,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10213,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7759,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10262,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2791,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3419,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 9",
+      "startTime": "2026-03-19T13:20:00",
+      "matchNumber": 9,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 11331,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7504,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3204,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 9077,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6621,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2053,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 10",
+      "startTime": "2026-03-19T13:30:00",
+      "matchNumber": 10,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 3419,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6401,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7759,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4122,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10213,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10452,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 11",
+      "startTime": "2026-03-19T13:40:00",
+      "matchNumber": 11,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 369,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7611,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 1796,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4091,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7730,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2053,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 12",
+      "startTime": "2026-03-19T13:50:00",
+      "matchNumber": 12,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 11339,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2791,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10213,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6463,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 5298,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4122,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 13",
+      "startTime": "2026-03-19T14:00:00",
+      "matchNumber": 13,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 2791,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10922,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 1796,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4091,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6463,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4122,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 14",
+      "startTime": "2026-03-19T14:10:00",
+      "matchNumber": 14,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 1056,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3004,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2053,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 369,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3419,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10152,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 15",
+      "startTime": "2026-03-19T14:20:00",
+      "matchNumber": 15,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 5806,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 250,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10213,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10413,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7318,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 9077,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 16",
+      "startTime": "2026-03-19T14:30:00",
+      "matchNumber": 16,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 6300,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3419,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10262,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 639,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2601,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7718,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 17",
+      "startTime": "2026-03-19T14:40:00",
+      "matchNumber": 17,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 4122,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 11339,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6911,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7504,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10213,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2053,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 18",
+      "startTime": "2026-03-19T14:50:00",
+      "matchNumber": 18,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 3419,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7668,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4091,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4122,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 11331,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7748,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 19",
+      "startTime": "2026-03-19T15:00:00",
+      "matchNumber": 19,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 1056,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7759,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6621,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 369,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3004,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10229,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 20",
+      "startTime": "2026-03-19T15:10:00",
+      "matchNumber": 20,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 1155,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4122,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10213,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10922,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2053,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7589,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 21",
+      "startTime": "2026-03-19T15:20:00",
+      "matchNumber": 21,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 1796,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3419,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7730,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6300,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7748,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 369,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 22",
+      "startTime": "2026-03-19T15:30:00",
+      "matchNumber": 22,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 6593,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7318,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10452,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10152,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7718,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2265,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 23",
+      "startTime": "2026-03-19T15:40:00",
+      "matchNumber": 23,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 369,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 639,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10262,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10413,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 5881,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 1056,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 24",
+      "startTime": "2026-03-19T15:50:00",
+      "matchNumber": 24,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 7589,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6593,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4122,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 5123,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10213,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2601,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 25",
+      "startTime": "2026-03-19T16:00:00",
+      "matchNumber": 25,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 2053,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3419,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7611,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3004,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6621,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 11339,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 26",
+      "startTime": "2026-03-19T16:10:00",
+      "matchNumber": 26,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 7759,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 333,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6593,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4122,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 9077,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 6300,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 27",
+      "startTime": "2026-03-19T16:20:00",
+      "matchNumber": 27,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 369,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7718,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10229,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 5806,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2601,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10213,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 28",
+      "startTime": "2026-03-19T16:30:00",
+      "matchNumber": 28,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 1796,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7611,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10152,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 333,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3204,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 639,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 29",
+      "startTime": "2026-03-19T16:40:00",
+      "matchNumber": 29,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 5881,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 1155,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 5298,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10213,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 9077,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3419,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 30",
+      "startTime": "2026-03-19T16:50:00",
+      "matchNumber": 30,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 1056,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7730,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2601,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 11331,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10229,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7318,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 31",
+      "startTime": "2026-03-19T17:00:00",
+      "matchNumber": 31,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 2053,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 2265,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 9077,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 1796,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10262,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10413,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    },
+    {
+      "description": "Practice 32",
+      "startTime": "2026-03-19T17:10:00",
+      "matchNumber": 32,
+      "field": "Primary",
+      "tournamentLevel": "Practice",
+      "teams": [
+        {
+          "teamNumber": 5298,
+          "station": "Red1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 10452,
+          "station": "Red2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 5123,
+          "station": "Red3",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 7504,
+          "station": "Blue1",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 4091,
+          "station": "Blue2",
+          "surrogate": false
+        },
+        {
+          "teamNumber": 3419,
+          "station": "Blue3",
+          "surrogate": false
+        }
+      ]
+    }
+  ]
+}

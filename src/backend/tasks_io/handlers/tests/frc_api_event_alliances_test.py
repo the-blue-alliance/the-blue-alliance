@@ -193,6 +193,42 @@ def test_get_none_alliances_does_not_overwrite_existing(
 
 
 @mock.patch.object(DatafeedFMSAPI, "get_event_alliances")
+def test_get_empty_alliances_does_not_overwrite_existing(
+    fmsapi_event_alliances_mock, tasks_client: Client
+) -> None:
+    create_event(official=True)
+    existing_alliances = [EventAlliance(picks=["frc254", "frc971", "frc118"])]
+    EventDetails(id="2020nyny", alliance_selections=existing_alliances).put()
+
+    fmsapi_event_alliances_mock.return_value = InstantFuture([])
+
+    tasks_client.get("/tasks/get/fmsapi_event_alliances/2020nyny")
+
+    details = EventDetails.get_by_id("2020nyny")
+    assert details is not None
+    assert details.alliance_selections == existing_alliances
+
+
+@mock.patch.object(DatafeedFMSAPI, "get_event_alliances")
+def test_get_alliances_overwrites_existing(
+    fmsapi_event_alliances_mock, tasks_client: Client
+) -> None:
+    create_event(official=True)
+    EventDetails(
+        id="2020nyny", alliance_selections=[EventAlliance(picks=["frc254"])]
+    ).put()
+
+    new_alliances = [EventAlliance(picks=["frc1114"])]
+    fmsapi_event_alliances_mock.return_value = InstantFuture(new_alliances)
+
+    tasks_client.get("/tasks/get/fmsapi_event_alliances/2020nyny")
+
+    details = EventDetails.get_by_id("2020nyny")
+    assert details is not None
+    assert details.alliance_selections == new_alliances
+
+
+@mock.patch.object(DatafeedFMSAPI, "get_event_alliances")
 def test_get_no_events_no_output_in_taskqueue(
     fmsapi_event_alliances_mock, tasks_client: Client
 ) -> None:

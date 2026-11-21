@@ -14,7 +14,7 @@ interface EventManualAlliancesProps {
   selectedEvent: string | null;
   onAllianceSizeChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onAllianceChange: (index: number, field: keyof Alliance, value: string) => void;
-  onSubmit: () => void;
+  onSubmit: (eventKey: string) => void;
   statusMessage?: string;
 }
 
@@ -171,7 +171,7 @@ const EventManualAlliances: React.FC<EventManualAlliancesProps> = ({
 
               <button
                 className="btn btn-primary btn-lg"
-                onClick={onSubmit}
+                onClick={selectedEvent ? () => onSubmit(selectedEvent) : undefined}
                 disabled={uploading || !selectedEvent}
               >
                 {uploading ? "Uploading..." : "Upload Alliances to TBA"}

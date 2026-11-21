@@ -1,0 +1,4 @@
+# Labels applied automatically to pull requests by .github/workflows/labeler.yml.
+PWA:
+  - changed-files:
+      - any-glob-to-any-file: "pwa/**"

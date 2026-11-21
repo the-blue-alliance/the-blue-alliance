@@ -5,7 +5,7 @@ import json
 import re
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from typing import cast, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pytz
 from flask import abort, redirect, request
@@ -42,8 +42,13 @@ from backend.common.models.match import Match
 from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.models.team import Team
-from backend.common.nexus_api.types import PitMap
-from backend.common.queries import district_query, event_query, media_query, team_query
+from backend.common.queries import (
+    district_query,
+    event_query,
+    match_query,
+    media_query,
+    team_query,
+)
 from backend.web.profiled_render import render_template
 
 
@@ -101,7 +106,7 @@ def event_list(year: Optional[Year] = None) -> Response:
 
     districts = []  # a tuple of (district abbrev, district name)
     for district in districts_future.get_result():
-        districts.append((district.abbreviation, district.display_name))
+        districts.append((district.abbreviation, district.render_name))
     districts = sorted(districts, key=lambda d: d[1])
 
     # Special case to display a list of regionals
@@ -151,6 +156,9 @@ def event_detail(event_key: EventKey) -> Response:
     )
     event_medias_future = media_query.EventMediasQuery(event_key).fetch_async()
     event_eventteams_future = team_query.EventEventTeamsQuery(event_key).fetch_async()
+    practice_matches_future = match_query.EventPracticeMatchesQuery(
+        event_key
+    ).fetch_async()
     # status_sitevar_future = Sitevar.get_by_id_async('apistatus.down_events')
 
     event_divisions_future = None
@@ -438,13 +446,16 @@ def event_detail(event_key: EventKey) -> Response:
     template_values = {
         "event": event,
         "event_down": False,  # status_sitevar and event_key in status_sitevar.contents,
-        "district_name": district.display_name if district else None,
+        "district_name": district.render_name if district else None,
         "district_abbrev": district.abbreviation if district else None,
         "is_regional_cmp_eligible": is_regional_cmp_pool_eligible,
         "matches": matches,
         "match_count": match_count,
         "matches_recent": matches_recent,
         "matches_upcoming": matches_upcoming,
+        "practice_matches": MatchHelper.natural_sorted_matches(
+            practice_matches_future.get_result()
+        ),
         "has_time_predictions": has_time_predictions,
         "awards": awards,
         "teams_a": teams_a,
@@ -536,25 +547,24 @@ def event_pitmap(event_key: EventKey) -> Response:
 
     try:
         template_values = NexusEventDetailsSVGHelper.template_values(
-            cast(PitMap, nexus_event_details.pitmap_json),
+            nexus_event_details.pitmap_json,
             event.nexus_code_for_api,
             highlight_team_keys=highlight_team_keys,
             label_event_keys=_label_event_keys_for(event),
         )
     except ValueError:
         abort(404)
-        raise RuntimeError("unreachable")
-
-    response = make_cached_response(
-        render_template("event_pitmap.svg", template_values),
-        ttl=(
-            timedelta(seconds=61)
-            if event.should_use_short_cache
-            else timedelta(hours=6)
-        ),
-    )
-    response.headers["content-type"] = "image/svg+xml; charset=UTF-8"
-    return response
+    else:
+        response = make_cached_response(
+            render_template("event_pitmap.svg", template_values),
+            ttl=(
+                timedelta(seconds=61)
+                if event.should_use_short_cache
+                else timedelta(hours=6)
+            ),
+        )
+        response.headers["content-type"] = "image/svg+xml; charset=UTF-8"
+        return response
 
 
 @cached_public

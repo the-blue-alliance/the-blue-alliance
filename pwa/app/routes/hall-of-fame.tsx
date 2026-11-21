@@ -35,7 +35,8 @@ export const Route = createFileRoute('/hall-of-fame')({
     ],
   }),
   component: HallOfFamePage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function HallOfFamePage() {
   const { notables } = Route.useLoaderData();
@@ -50,7 +51,7 @@ function HallOfFamePage() {
 
   if (!hofNotable) {
     return (
-      <div className="py-8">
+      <div>
         <h1 className="mb-4 text-3xl font-medium">Hall of Fame</h1>
         <p className="text-muted-foreground">
           Hall of Fame data is not available.
@@ -70,7 +71,7 @@ function HallOfFamePage() {
   });
 
   return (
-    <div className="py-8">
+    <div>
       <h1 className="mb-2 text-3xl font-medium">Hall of Fame</h1>
       <p className="mb-6 text-muted-foreground">
         Teams inducted into the FIRST Robotics Competition Hall of Fame by
@@ -137,7 +138,6 @@ function HallOfFameTable({
                             title={getAwardName(year)}
                             description={eventKey}
                             year={year}
-                            className="h-48 w-28 text-xs"
                           />
                         </EventLink>
                       );
@@ -200,7 +200,6 @@ function WorldChampionsTable({
                             title="Winner"
                             description={eventKey}
                             year={year}
-                            className="h-48 w-28 text-xs"
                           />
                         </EventLink>
                       );

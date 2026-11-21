@@ -4,13 +4,12 @@ https://beta.thebluealliance.com/
 
 ## Development
 
-If you don't have `pnpm`, you can install it with
+You may optionally install [mise](https://mise.jdx.dev/), which provisions the exact node and pnpm versions
+this project pins in `pwa/mise.toml`:
 
 ```shellscript
-npm i -g pnpm
+mise install
 ```
-
-or any of their strategies here: https://pnpm.io/installation
 
 Install node deps:
 
@@ -115,16 +114,69 @@ With all that said... There are various levels of caching available when making 
    - This is best done by utilizing a combination of `cache-control`, `etag`, or other headers (like [`Expires`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Expires), [`Last-Modified`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Last-Modified), or [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Modified-Since)).
    - All major browsers will automatically & intelligently obey all of the caching-related headers I mentioned above (except the Cloudflare one, which is proprietary).
    - Most Node.js `fetch()` implementations don't automatically do this (some do, like [Undici](https://github.com/nodejs/undici))
-2. TanStack Query cache layer
+2. **SSR network LRU** (`app/lib/middleware/network-cache.ts`)
+   - Server-only transport cache under the hey-api TBA client (`client.setConfig` in `__root.tsx` installs it only when `typeof window === 'undefined'`).
+   - Reduces duplicate upstream API calls during SSR on a given Node process. TTL comes from the response `Cache-Control: max-age` (61s fallback).
+   - Shared across users on that process — safe because TBA read data is public and we use one shared `X-TBA-Auth-Key`. The browser must **not** get a second LRU underneath React Query.
+3. TanStack Query cache layer
    - This is a library that effectively wraps `fetch()` into a more state-management oriented philosophy
    - There are a [_lot_ of docs](https://tanstack.com/query/latest) on this
-3. TanStack Router cache layer
+   - Client freshness is owned here via `staleTime` (see below) — not by the SSR network LRU
+4. TanStack Router cache layer
    - Router caches `loader` data _per-route_ for us automatically
    - [Docs here](https://tanstack.com/router/v1/docs/framework/react/guide/data-loading)
    - Anything that is cached on the server is JSON-ified and sent to the client. So a larger server cache implies a slower first paint.
-4. Cache the entire html response
+   - Intent preloading is enabled in `app/router.tsx` (`defaultPreload: 'intent'`) so hovering/touching a `Link` warms the destination route's loader before click. `defaultPreloadStaleTime: 0` means Router always invokes loaders on preload and lets React Query's `staleTime` alone govern freshness — without the Query defaults above, preloaded data would go stale before the click lands.
+5. Cache the entire html response
    - This is what the prod site does
    - But TanStack Router / React don't support this extremely well out of the box
+
+### `staleTime` policy
+
+TanStack Query is the cache that matters most for perceived freshness on the client —
+the SSR network LRU above is a transport optimization for the Node process only. `staleTime` defaults to `0`
+in TanStack Query, which means data is considered stale the instant it arrives; left
+unset, this caused every `useSuspenseQuery` to refetch immediately on hydration, even
+though the server had just sent the same data moments earlier.
+
+The policy is centralized in `app/lib/queryClient.ts` and applied via `createQueryClient()`
+(wired into the router in `app/router.tsx`):
+
+- **Default: `staleTime: 60_000`** (~60s) on every query, anchored to the TBA API's own
+  `cache-control: max-age=61` header — this is the single default `defaultOptions.queries.staleTime`
+  set on the `QueryClient`.
+- **Historical data: `staleTimeForYear(year)`**, which returns a 1-hour `staleTime` for any past
+  calendar year (comparing against `Temporal.Now.plainDateISO().year`, deliberately not the
+  `/status` API's `current_season`, to avoid deepening that dependency) and falls back to the 60s
+  default for the current year. Applied today on the event page (`event.$eventKey.tsx`), the
+  team-year page (`team.$teamNumber.{-$year}.tsx`), and the districts list page
+  (`districts.{-$year}.tsx`); other year-scoped routes still inherit the 60s default.
+- **`/status`: `staleTime: STALE_TIME.STATUS`** (6h) — `/status` gates the default year/page-size
+  params for most of the site (`current_season`, `max_season`, `max_team_page`), so instead of
+  every route independently awaiting it, the root route's `beforeLoad` (`app/routes/__root.tsx`)
+  resolves it once per navigation and exposes `status`/`currentSeason` on router context for every
+  child loader to read. The long `staleTime` means this is a cache read after the first hit.
+- **Live data keeps its own `staleTime`/`refetchInterval`** and is unaffected by the above — e.g.
+  the district Champs tab (`districtChampsTab.tsx`) polls on a
+  `refetchInterval` independent of `staleTime`, the live Nexus queuing status on the event page
+  (`getEventNexusInfo`) overrides a short 30s `staleTime`, and Firebase-backed queries
+  (`app/lib/gameday/useFirebaseWebcasts.ts`) keep their own `Infinity` values.
+
+The generated `<name>Options()` helpers (from `hey-api`) return plain objects, so overrides
+compose by spreading:
+
+```ts
+useSuspenseQuery({
+  ...getEventOptions({ path: { event_key: eventKey } }),
+  staleTime: staleTimeForYear(year),
+});
+```
+
+A few routes still fetch data directly with the generated SDK functions instead of going through
+the `QueryClient` (e.g. `team.$teamNumber.stats.tsx`,
+`district.$districtAbbreviation.{-$year}.tsx`, `district.$districtAbbreviation.insights.tsx`,
+`teams.{-$pgNum}.tsx`). Those routes get no benefit from `staleTime` until they're converted to use
+`ensureQueryData`/`useSuspenseQuery`; that conversion is tracked separately.
 
 ## Styling
 
@@ -234,23 +286,13 @@ Unfortunately, Iconify wants you to get the icons from their API, but we'd rathe
 
 ## PR Screenshots
 
-PRs that touch `pwa/` files can get before/after screenshots posted as a PR comment (via the `PWA Screenshots` workflow). To request screenshots, add a `## Screenshot Pages` section to your PR description:
-
-```markdown
-## Screenshot Pages
-
-- /match/2024mil_f1m2
-- /team/254/2024 Team 254 Page
-- /gameday
-```
-
-Each line is `- /path` optionally followed by a display name. If no pages are listed, the workflow skips screenshot capture.
-
-> **Note:** Screenshots require the `TBA_API_READ_KEY` secret, which is only available for same-repo branches (not fork PRs). Fork PRs will gracefully skip screenshot capture.
+CI does not post screenshots. PRs that change what a user sees include a Before | After | Diff table the author captures; see [AGENTS.md](AGENTS.md#pr-screenshots) for the rule and the capture scripts.
 
 ## Playwright tests
 
-Playwright (end to end) tests are within `./tests`. Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports. Note that these are run on the production build, so if you make changes, you should re-build with `pnpm run build`.
+Playwright (end to end) tests are within `./tests` and cover route-level behavior. Keep assertions for a specific route in that route's spec file; `routes.spec.ts` is the exception and provides the exhaustive route smoke-test matrix. Component and unit tests live next to the source file they cover.
+
+Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports. Note that these are run on the production build, so if you make changes, you should re-build with `pnpm run build`.
 
 ```sh
 # Installs playwright binaries

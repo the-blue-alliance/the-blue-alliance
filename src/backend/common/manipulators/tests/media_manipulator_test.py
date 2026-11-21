@@ -2,9 +2,11 @@ import unittest
 
 import pytest
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.consts.media_type import MediaType
 from backend.common.manipulators.media_manipulator import MediaManipulator
+from backend.common.models.event import Event
 from backend.common.models.media import Media
 from backend.common.models.team import Team
 
@@ -52,3 +54,76 @@ class TestMediaManipulator(unittest.TestCase):
         self.assertMergedMedia(
             MediaManipulator.updateMerge(self.new_media, self.old_media)
         )
+
+
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
+class TestSmugmugReferenceKinds(unittest.TestCase):
+    def _media(self, media_type: MediaType, references) -> Media:
+        return Media(
+            id=Media.render_key_name(media_type, "asdf"),
+            media_type_enum=media_type,
+            foreign_key="asdf",
+            year=2026,
+            references=references,
+        )
+
+    def test_album_on_team_rejects_an_event(self) -> None:
+        media_id = Media.render_key_name(MediaType.SMUGMUG_ALBUM, "asdf")
+        MediaManipulator.createOrUpdate(
+            self._media(MediaType.SMUGMUG_ALBUM, [ndb.Key(Team, "frc177")])
+        )
+        MediaManipulator.createOrUpdate(
+            self._media(MediaType.SMUGMUG_ALBUM, [ndb.Key(Event, "2026necmp")])
+        )
+        assert none_throws(Media.get_by_id(media_id)).references == [
+            ndb.Key(Team, "frc177")
+        ]
+
+    def test_album_on_event_rejects_a_team(self) -> None:
+        media_id = Media.render_key_name(MediaType.SMUGMUG_ALBUM, "asdf")
+        MediaManipulator.createOrUpdate(
+            self._media(MediaType.SMUGMUG_ALBUM, [ndb.Key(Event, "2026necmp")])
+        )
+        MediaManipulator.createOrUpdate(
+            self._media(MediaType.SMUGMUG_ALBUM, [ndb.Key(Team, "frc177")])
+        )
+        assert none_throws(Media.get_by_id(media_id)).references == [
+            ndb.Key(Event, "2026necmp")
+        ]
+
+    def test_album_accepts_more_of_the_same_kind(self) -> None:
+        media_id = Media.render_key_name(MediaType.SMUGMUG_ALBUM, "asdf")
+        MediaManipulator.createOrUpdate(
+            self._media(MediaType.SMUGMUG_ALBUM, [ndb.Key(Team, "frc177")])
+        )
+        MediaManipulator.createOrUpdate(
+            self._media(MediaType.SMUGMUG_ALBUM, [ndb.Key(Team, "frc176")])
+        )
+        assert set(none_throws(Media.get_by_id(media_id)).references) == {
+            ndb.Key(Team, "frc177"),
+            ndb.Key(Team, "frc176"),
+        }
+
+    def test_photo_rejects_an_event(self) -> None:
+        media_id = Media.render_key_name(MediaType.SMUGMUG_PHOTO, "asdf")
+        MediaManipulator.createOrUpdate(
+            self._media(MediaType.SMUGMUG_PHOTO, [ndb.Key(Team, "frc177")])
+        )
+        MediaManipulator.createOrUpdate(
+            self._media(MediaType.SMUGMUG_PHOTO, [ndb.Key(Event, "2026necmp")])
+        )
+        assert none_throws(Media.get_by_id(media_id)).references == [
+            ndb.Key(Team, "frc177")
+        ]
+
+    def test_other_media_types_are_untouched(self) -> None:
+        MediaManipulator.createOrUpdate(
+            self._media(MediaType.YOUTUBE_VIDEO, [ndb.Key(Team, "frc177")])
+        )
+        MediaManipulator.createOrUpdate(
+            self._media(MediaType.YOUTUBE_VIDEO, [ndb.Key(Event, "2026necmp")])
+        )
+        assert set(none_throws(Media.get_by_id("youtube_asdf")).references) == {
+            ndb.Key(Team, "frc177"),
+            ndb.Key(Event, "2026necmp"),
+        }

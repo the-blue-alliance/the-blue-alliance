@@ -1,7 +1,9 @@
-import { expect, test } from '@playwright/test';
+import { Page, expect, test } from '@playwright/test';
+
+import { gotoHydrated, recordRequests } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/');
+  await gotoHydrated(page, '/');
 });
 
 // Navbar
@@ -31,6 +33,18 @@ test('navbar search button is visible', async ({ page }) => {
   ).toBeVisible();
 });
 
+[700, 960, 1165].forEach((width) => {
+  test.describe(`navbar at ${width}px wide`, () => {
+    test.use({ viewport: { width, height: 800 } });
+
+    test('keeps the account menu button fully on screen', async ({ page }) => {
+      await expect(
+        page.getByRole('button', { name: 'Account menu' }),
+      ).toBeInViewport({ ratio: 1 });
+    });
+  });
+});
+
 // (mobile) Navbar
 
 test('(mobile) navbar logo link is visible', async ({ page }) => {
@@ -49,6 +63,10 @@ test('(mobile) navbar shows a toggle menu button instead of nav links', async ({
   await expect(
     page.getByRole('link', { name: 'Events', exact: true }),
   ).not.toBeVisible();
+});
+
+test('(mobile) navbar search button is visible', async ({ page }) => {
+  await expect(page.getByRole('button', { name: 'Search' })).toBeVisible();
 });
 
 // This Week's Events
@@ -89,13 +107,247 @@ test('footer links are present', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('footer toggle theme button is visible', async ({ page }) => {
+test('navbar profile menu button is visible', async ({ page }) => {
   await expect(
-    page.getByRole('button', { name: 'Toggle Theme' }),
+    page.getByRole('button', { name: 'Account menu' }),
   ).toBeVisible();
 });
 
 test('footer displays platinum sponsor AndyMark', async ({ page }) => {
   await expect(page.getByText('Thanks to our platinum sponsor')).toBeVisible();
   await expect(page.getByRole('link', { name: 'AndyMark' })).toBeVisible();
+});
+
+test('nav popup portal is not mounted while the menu is closed', async ({
+  page,
+}) => {
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(
+    page.locator('[data-slot="navigation-menu-viewport"]'),
+  ).toHaveCount(0);
+});
+
+test.describe('hamburger menu (narrow viewport)', () => {
+  test.use({ viewport: { width: 500, height: 800 } });
+
+  test('does not open on hover', async ({ page }) => {
+    await gotoHydrated(page, '/');
+
+    const trigger = page.getByRole('button', { name: 'Toggle Menu' });
+    await trigger.hover();
+    await page.waitForTimeout(400);
+
+    await expect(
+      page.locator('[data-slot="navigation-menu-viewport"]'),
+    ).toHaveCount(0);
+  });
+
+  test('opens on click and fully unmounts on second click', async ({
+    page,
+  }) => {
+    await gotoHydrated(page, '/');
+
+    const trigger = page.getByRole('button', { name: 'Toggle Menu' });
+    await trigger.click();
+
+    const viewport = page.locator('[data-slot="navigation-menu-viewport"]');
+    await expect(viewport).toHaveCount(1);
+    await expect(viewport.getByRole('link').first()).toBeVisible();
+
+    await trigger.click();
+    await expect(
+      page.locator('[data-slot="navigation-menu-viewport"]'),
+    ).toHaveCount(0);
+  });
+});
+
+const MOCK_SEARCH_INDEX = {
+  teams: [{ key: 'frc254', nickname: 'The Cheesy Poofs' }],
+  events: [{ key: '2024casj', name: 'Silicon Valley Regional' }],
+};
+
+test('search dialog opens while search_index is still loading', async ({
+  page,
+}) => {
+  let releaseSearchIndex!: () => void;
+  const searchIndexGate = new Promise<void>((resolve) => {
+    releaseSearchIndex = resolve;
+  });
+
+  await page.route('**/api/v3/search_index**', async (route) => {
+    await searchIndexGate;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(MOCK_SEARCH_INDEX),
+    });
+  });
+
+  await gotoHydrated(page, '/');
+
+  const searchButton = page.getByRole('button', {
+    name: 'Search teams and events...',
+  });
+  await expect(searchButton).toBeVisible();
+  await expect(searchButton).toBeEnabled();
+  await searchButton.click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  const input = dialog.getByPlaceholder('Search teams and events...');
+  await expect(input).toBeEnabled();
+  await expect(dialog.getByTestId('search-index-loading')).toBeVisible();
+
+  releaseSearchIndex();
+
+  await expect(dialog.getByTestId('search-index-loading')).toBeHidden();
+  await input.fill('254');
+  await expect(dialog.getByText('254 - The Cheesy Poofs')).toBeVisible();
+});
+
+test('search trigger stays enabled while search_index is pending', async ({
+  page,
+}) => {
+  let releaseSearchIndex!: () => void;
+  const searchIndexGate = new Promise<void>((resolve) => {
+    releaseSearchIndex = resolve;
+  });
+
+  await page.route('**/api/v3/search_index**', async (route) => {
+    await searchIndexGate;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(MOCK_SEARCH_INDEX),
+    });
+  });
+
+  await gotoHydrated(page, '/');
+
+  const searchButton = page.getByRole('button', {
+    name: 'Search teams and events...',
+  });
+  await expect(searchButton).toBeEnabled();
+  releaseSearchIndex();
+});
+
+test('(mobile) loads the page without downloading the search index', async ({
+  page,
+}) => {
+  const requestUrls = recordRequests(page);
+
+  await page.reload();
+  await page.locator('body[data-hydrated]').waitFor();
+  await page.waitForLoadState('networkidle');
+
+  expect(
+    requestUrls.filter((url) => url.includes('/api/v3/search_index')),
+  ).toHaveLength(0);
+});
+
+test('requests the search index when the pointer reaches search', async ({
+  page,
+}) => {
+  // Keep the cursor off the search control so a remount under the pointer
+  // cannot intend search before this test does.
+  await page.mouse.move(0, 0);
+
+  const searchIndexUrls = recordRequests(page, 'search_index');
+
+  await gotoHydrated(page, '/');
+  expect(searchIndexUrls).toEqual([]);
+
+  await page.getByRole('button', { name: /Search teams and events/ }).hover();
+
+  await expect.poll(() => searchIndexUrls.length).toBe(1);
+  expect(searchIndexUrls[0]).toContain('search_index');
+});
+
+test('(mobile) opening search focuses the input', async ({ page }) => {
+  await page.route('**/api/v3/search_index**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(MOCK_SEARCH_INDEX),
+    });
+  });
+
+  await gotoHydrated(page, '/');
+
+  const searchButton = page.getByRole('button', { name: 'Search' });
+  await searchButton.click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  const input = dialog.getByPlaceholder('Search teams and events...');
+  await expect(input).toBeFocused();
+});
+
+// The theme selector lives in the navbar profile menu as a
+// light/dark/system radio group.
+async function selectTheme(page: Page, name: 'Light' | 'Dark' | 'System') {
+  await page.getByRole('button', { name: 'Account menu' }).click();
+  await page.getByRole('menuitemradio', { name }).click();
+  // Radio selection keeps the menu open; close it before interacting
+  // with the page underneath
+  await page.keyboard.press('Escape');
+}
+
+test.describe('Theme selection', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.removeItem('theme'));
+    await page.reload();
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  test('selecting Dark applies dark mode', async ({ page }) => {
+    const html = page.locator('html');
+    await selectTheme(page, 'Dark');
+    await expect(html).toHaveClass(/dark/);
+  });
+
+  test('selecting Light switches back from dark mode', async ({ page }) => {
+    const html = page.locator('html');
+    await selectTheme(page, 'Dark');
+    await expect(html).toHaveClass(/dark/);
+
+    await selectTheme(page, 'Light');
+    await expect(html).not.toHaveClass(/dark/);
+  });
+
+  test('theme persists across page reload', async ({ page }) => {
+    const html = page.locator('html');
+    await selectTheme(page, 'Dark');
+    await expect(html).toHaveClass(/dark/);
+
+    await page.reload();
+
+    await expect(html).toHaveClass(/dark/);
+  });
+
+  test('theme persists after navigation', async ({ page }) => {
+    const html = page.locator('html');
+    await selectTheme(page, 'Dark');
+    await expect(html).toHaveClass(/dark/);
+
+    await page
+      .locator('footer')
+      .getByRole('link', { name: 'About us' })
+      .click();
+    await page.waitForURL('/about');
+
+    await expect(html).toHaveClass(/dark/);
+  });
+});
+
+test('production build does not render TanStack devtools', async ({ page }) => {
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(page.locator('[class*="TanStackRouterDevtools"]')).toHaveCount(
+    0,
+  );
+  await expect(page.locator('.tsqd-open-btn-container')).toHaveCount(0);
 });

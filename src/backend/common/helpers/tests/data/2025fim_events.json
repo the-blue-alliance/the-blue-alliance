@@ -1,0 +1,1681 @@
+[
+  {
+    "address": "100 W Van Buren St",
+    "city": "Battle Creek",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-02",
+    "event_code": "mibat",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mibat",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mibat",
+    "lat": null,
+    "lng": null,
+    "location_name": "Battle Creek Central High",
+    "name": "FIM District Battle Creek Event presented by BlueOval Battery Park Michigan",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "49012",
+    "remap_teams": null,
+    "short_name": "Battle Creek",
+    "start_date": "2025-02-28",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires34",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 0,
+    "year": 2025
+  },
+  {
+    "address": "501 W Columbia",
+    "city": "Belleville",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-15",
+    "event_code": "mibel",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mibel",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mibel",
+    "lat": null,
+    "lng": null,
+    "location_name": "Belleville High School",
+    "name": "FIM District Belleville Event presented by Belleville Main LLC",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48111",
+    "remap_teams": null,
+    "short_name": "Belleville",
+    "start_date": "2025-03-13",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires32",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 2,
+    "year": 2025
+  },
+  {
+    "address": "201 Sylvester Ave",
+    "city": "Berrien Springs",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-16",
+    "event_code": "miber",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "miber",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025miber",
+    "lat": null,
+    "lng": null,
+    "location_name": "Berrien Springs High School",
+    "name": "FIM District Berrien Springs Event presented by Edgewater Automation",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "49103",
+    "remap_teams": null,
+    "short_name": "Berrien Springs",
+    "start_date": "2025-03-14",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires34",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 2,
+    "year": 2025
+  },
+  {
+    "address": "210 Sports Dr",
+    "city": "Big Rapids",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-29",
+    "event_code": "mibig",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mibig",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mibig",
+    "lat": null,
+    "lng": null,
+    "location_name": "Ferris State University",
+    "name": "FIM District Ferris State Event presented by Ferris State",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "49307",
+    "remap_teams": null,
+    "short_name": "Ferris State",
+    "start_date": "2025-03-27",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires35",
+        "type": "twitch"
+      },
+      {
+        "channel": "1_Z6HWHVMCs",
+        "date": "2025-03-27",
+        "type": "youtube"
+      },
+      {
+        "channel": "o3JopSXehdk",
+        "date": "2025-03-28",
+        "type": "youtube"
+      },
+      {
+        "channel": "B0MU0a-bT4M",
+        "date": "2025-03-29",
+        "type": "youtube"
+      },
+      {
+        "channel": "kXa7SS_EsgQ",
+        "date": "2025-03-29",
+        "type": "youtube"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 4,
+    "year": 2025
+  },
+  {
+    "address": "11775 Hewitt Rd",
+    "city": "Brooklyn",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-16",
+    "event_code": "mibkn",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mibkn",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mibkn",
+    "lat": null,
+    "lng": null,
+    "location_name": "Columbia Central High School",
+    "name": "FIM District Jackson at Columbia Event presented by Consumers Energy Foundation",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "49230",
+    "remap_teams": null,
+    "short_name": "Jackson at Columbia",
+    "start_date": "2025-03-14",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires31",
+        "type": "twitch"
+      },
+      {
+        "channel": "FjD-QIuhlpk",
+        "date": "2025-03-15",
+        "type": "youtube"
+      },
+      {
+        "channel": "Mlb7eHfzBvY",
+        "date": "2025-03-16",
+        "type": "youtube"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 2,
+    "year": 2025
+  },
+  {
+    "address": "24787 Van Horn Rd",
+    "city": "Brownstown Charter Twp",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-23",
+    "event_code": "mibro",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mibro",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mibro",
+    "lat": null,
+    "lng": null,
+    "location_name": "Woodhaven High School",
+    "name": "FIM District Woodhaven Event presented by Altair",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48134",
+    "remap_teams": null,
+    "short_name": "Woodhaven",
+    "start_date": "2025-03-21",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires32",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 3,
+    "year": 2025
+  },
+  {
+    "address": "Ryder Center 7400 Bay Road",
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [
+      "2025micmp1",
+      "2025micmp2",
+      "2025micmp3",
+      "2025micmp4"
+    ],
+    "end_date": "2025-04-05",
+    "event_code": "micmp",
+    "event_type": 2,
+    "event_type_string": "District Championship",
+    "first_event_code": "micmp",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025micmp",
+    "lat": null,
+    "lng": null,
+    "location_name": "Saginaw Valley State University",
+    "name": "FIRST in Michigan State Championship",
+    "parent_event_key": null,
+    "playoff_type": 11,
+    "playoff_type_string": "Double Elimination Bracket (4 Alliances)",
+    "postal_code": "48710",
+    "remap_teams": null,
+    "short_name": "Michigan",
+    "start_date": "2025-04-05",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires31",
+        "type": "twitch"
+      },
+      {
+        "channel": "firstinspires32",
+        "type": "twitch"
+      },
+      {
+        "channel": "firstinspires33",
+        "type": "twitch"
+      },
+      {
+        "channel": "firstinspires34",
+        "type": "twitch"
+      },
+      {
+        "channel": "0rtKHu_yzAA",
+        "date": "2025-04-05",
+        "type": "youtube"
+      },
+      {
+        "channel": "D7SH2MKpJQg",
+        "type": "youtube"
+      }
+    ],
+    "website": "https://www.firstinmichigan.org/",
+    "week": 5,
+    "year": 2025
+  },
+  {
+    "address": "Ryder Center 7400 Bay Road",
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-04-05",
+    "event_code": "micmp1",
+    "event_type": 5,
+    "event_type_string": "District Championship Division",
+    "first_event_code": "micmp1",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025micmp1",
+    "lat": null,
+    "lng": null,
+    "location_name": "Saginaw Valley State University",
+    "name": "FIRST in Michigan State Championship - DTE Energy Foundation Division",
+    "parent_event_key": "2025micmp",
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48710",
+    "remap_teams": null,
+    "short_name": "MSC - DTE Energy Foundation",
+    "start_date": "2025-04-03",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires31",
+        "type": "twitch"
+      },
+      {
+        "channel": "LVr-yEvWrFg",
+        "date": "2025-04-03",
+        "type": "youtube"
+      },
+      {
+        "channel": "DmTHThXLHVk",
+        "date": "2025-04-04",
+        "type": "youtube"
+      },
+      {
+        "channel": "0tWk6Jr_vDk",
+        "date": "2025-04-05",
+        "type": "youtube"
+      }
+    ],
+    "website": "https://www.firstinmichigan.org/",
+    "week": 5,
+    "year": 2025
+  },
+  {
+    "address": "Ryder Center 7400 Bay Road",
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-04-05",
+    "event_code": "micmp2",
+    "event_type": 5,
+    "event_type_string": "District Championship Division",
+    "first_event_code": "micmp2",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025micmp2",
+    "lat": null,
+    "lng": null,
+    "location_name": "Saginaw Valley State University",
+    "name": "FIRST in Michigan State Championship - Hemlock Semiconductor Division",
+    "parent_event_key": "2025micmp",
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48710",
+    "remap_teams": null,
+    "short_name": "MSC - Hemlock Semiconductor",
+    "start_date": "2025-04-03",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires33",
+        "type": "twitch"
+      },
+      {
+        "channel": "IV6_5LkA5aY",
+        "date": "2025-04-03",
+        "type": "youtube"
+      },
+      {
+        "channel": "iRVUARUDf64",
+        "date": "2025-04-04",
+        "type": "youtube"
+      },
+      {
+        "channel": "Ulg_ps8ktL4",
+        "date": "2025-04-05",
+        "type": "youtube"
+      }
+    ],
+    "website": "https://www.firstinmichigan.org/",
+    "week": 5,
+    "year": 2025
+  },
+  {
+    "address": "Ryder Center 7400 Bay Road",
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-04-05",
+    "event_code": "micmp3",
+    "event_type": 5,
+    "event_type_string": "District Championship Division",
+    "first_event_code": "micmp3",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025micmp3",
+    "lat": null,
+    "lng": null,
+    "location_name": "Saginaw Valley State University",
+    "name": "FIRST in Michigan State Championship - Consumers Energy Division",
+    "parent_event_key": "2025micmp",
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48710",
+    "remap_teams": null,
+    "short_name": "MSC - Consumers Energy",
+    "start_date": "2025-04-03",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires32",
+        "type": "twitch"
+      },
+      {
+        "channel": "bKKe0zFNcfY",
+        "date": "2025-04-03",
+        "type": "youtube"
+      },
+      {
+        "channel": "92_oAQ6D1cw",
+        "date": "2025-04-04",
+        "type": "youtube"
+      },
+      {
+        "channel": "Atc1XfxF-nE",
+        "date": "2025-04-05",
+        "type": "youtube"
+      }
+    ],
+    "website": "https://www.firstinmichigan.org/",
+    "week": 5,
+    "year": 2025
+  },
+  {
+    "address": "Ryder Center 7400 Bay Road",
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-04-05",
+    "event_code": "micmp4",
+    "event_type": 5,
+    "event_type_string": "District Championship Division",
+    "first_event_code": "micmp4",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025micmp4",
+    "lat": null,
+    "lng": null,
+    "location_name": "Saginaw Valley State University",
+    "name": "FIRST in Michigan State Championship - Aptiv Division",
+    "parent_event_key": "2025micmp",
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48710",
+    "remap_teams": null,
+    "short_name": "MSC - Aptiv",
+    "start_date": "2025-04-03",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires34",
+        "type": "twitch"
+      },
+      {
+        "channel": "2rXg2Mkd9Js",
+        "date": "2025-04-03",
+        "type": "youtube"
+      },
+      {
+        "channel": "U1SNeRZKro0",
+        "date": "2025-04-04",
+        "type": "youtube"
+      },
+      {
+        "channel": "m9myifILPe8",
+        "date": "2025-04-05",
+        "type": "youtube"
+      }
+    ],
+    "website": "https://www.firstinmichigan.org/",
+    "week": 5,
+    "year": 2025
+  },
+  {
+    "address": "6565 Outer Dr W",
+    "city": "Detroit",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-29",
+    "event_code": "midet",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "midet",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025midet",
+    "lat": null,
+    "lng": null,
+    "location_name": "Renaissance High School",
+    "name": "FIM District Renaissance Event presented by DTE Foundation",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48235",
+    "remap_teams": null,
+    "short_name": "Renaissance",
+    "start_date": "2025-03-27",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires32",
+        "type": "twitch"
+      },
+      {
+        "channel": "8tM8l1ex-n8",
+        "date": "2025-03-28",
+        "type": "youtube"
+      },
+      {
+        "channel": "TEPhnpXUeKs",
+        "date": "2025-03-29",
+        "type": "youtube"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 4,
+    "year": 2025
+  },
+  {
+    "address": "Matthai Center 5101 John C Lodge Freeway",
+    "city": "Detroit",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-15",
+    "event_code": "midtr",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "midtr",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025midtr",
+    "lat": null,
+    "lng": null,
+    "location_name": "Wayne State University",
+    "name": "FIM District Wayne State Event presented by Magna",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48202",
+    "remap_teams": null,
+    "short_name": "Wayne State",
+    "start_date": "2025-03-13",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires33",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 2,
+    "year": 2025
+  },
+  {
+    "address": "500 S. Lincoln Rd",
+    "city": "Escanaba",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-09",
+    "event_code": "miesc",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "miesc",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025miesc",
+    "lat": null,
+    "lng": null,
+    "location_name": "Escanaba Jr/Sr High School",
+    "name": "FIM District Escanaba Event presented by Highline Fast",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "49829",
+    "remap_teams": null,
+    "short_name": "Escanaba",
+    "start_date": "2025-03-07",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires36",
+        "type": "twitch"
+      }
+    ],
+    "website": "https://www.firstinmichigan.org/",
+    "week": 1,
+    "year": 2025
+  },
+  {
+    "address": "881 Pinecrest Dr",
+    "city": "Ferndale",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-02",
+    "event_code": "mifer",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mifer",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mifer",
+    "lat": null,
+    "lng": null,
+    "location_name": "Ferndale High School",
+    "name": "FIM District Ferndale Event presented by Magna",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48220",
+    "remap_teams": null,
+    "short_name": "Ferndale",
+    "start_date": "2025-02-28",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires33",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 0,
+    "year": 2025
+  },
+  {
+    "address": "1700 University Avenue Recreation Center",
+    "city": "Flint",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-08",
+    "event_code": "mike2",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mike2",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mike2",
+    "lat": null,
+    "lng": null,
+    "location_name": "Kettering University",
+    "name": "FIM District Kettering University Event #2 presented by Haas Foundation",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48504",
+    "remap_teams": null,
+    "short_name": "Kettering University #2",
+    "start_date": "2025-03-06",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires32",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 1,
+    "year": 2025
+  },
+  {
+    "address": "6230 Kalamazoo Avenue SE",
+    "city": "Kentwood",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-30",
+    "event_code": "miken",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "miken",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025miken",
+    "lat": null,
+    "lng": null,
+    "location_name": "East Kentwood High School",
+    "name": "FIM District Kentwood Event presented by Dematic",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "49508",
+    "remap_teams": null,
+    "short_name": "Kentwood",
+    "start_date": "2025-03-28",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires34",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 4,
+    "year": 2025
+  },
+  {
+    "address": "1700 University Avenue Recreation Center",
+    "city": "Flint",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-01",
+    "event_code": "miket",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "miket",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025miket",
+    "lat": null,
+    "lng": null,
+    "location_name": "Kettering University",
+    "name": "FIM District Kettering University Event #1 presented by Haas Foundation",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48504",
+    "remap_teams": null,
+    "short_name": "Kettering University #1",
+    "start_date": "2025-02-27",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires32",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 0,
+    "year": 2025
+  },
+  {
+    "address": "251 Russell Rd",
+    "city": "Lake City",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-02",
+    "event_code": "milac",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "milac",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025milac",
+    "lat": null,
+    "lng": null,
+    "location_name": "Lake City School",
+    "name": "FIM District Lake City Event",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "49651",
+    "remap_teams": null,
+    "short_name": "Lake City",
+    "start_date": "2025-02-28",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires35",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 0,
+    "year": 2025
+  },
+  {
+    "address": "8900 N Newburgh Road",
+    "city": "Livonia",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-29",
+    "event_code": "miliv",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "miliv",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025miliv",
+    "lat": null,
+    "lng": null,
+    "location_name": "Churchill High School",
+    "name": "FIM District Livonia Event presented by Aisin",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48150",
+    "remap_teams": null,
+    "short_name": "Livonia",
+    "start_date": "2025-03-27",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires31",
+        "type": "twitch"
+      },
+      {
+        "channel": "DPaO2MFzW2Y",
+        "date": "2025-03-27",
+        "type": "youtube"
+      },
+      {
+        "channel": "McWj1njVIcA",
+        "date": "2025-03-27",
+        "type": "youtube"
+      },
+      {
+        "channel": "ntAZ8ghJy60",
+        "date": "2025-03-28",
+        "type": "youtube"
+      },
+      {
+        "channel": "8RFqQxegodw",
+        "date": "2025-03-29",
+        "type": "youtube"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 4,
+    "year": 2025
+  },
+  {
+    "address": "650 W. Easterday Ave",
+    "city": "Sault Ste. Marie",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-22",
+    "event_code": "milsu",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "milsu",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025milsu",
+    "lat": null,
+    "lng": null,
+    "location_name": "Lake Superior State University",
+    "name": "FIM District LSSU Event presented by LSSU",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "49783",
+    "remap_teams": null,
+    "short_name": "LSSU",
+    "start_date": "2025-03-20",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires36",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 3,
+    "year": 2025
+  },
+  {
+    "address": "1001 S Barnes St",
+    "city": "Mason",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-23",
+    "event_code": "mimas",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mimas",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mimas",
+    "lat": null,
+    "lng": null,
+    "location_name": "Mason High School",
+    "name": "FIM District Mason Event presented by LIFT",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48854",
+    "remap_teams": null,
+    "short_name": "Mason",
+    "start_date": "2025-03-21",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires34",
+        "type": "twitch"
+      },
+      {
+        "channel": "bZ5kT1CKrzQ",
+        "date": "2025-03-22",
+        "type": "youtube"
+      },
+      {
+        "channel": "t0FFdb1uJLk",
+        "date": "2025-03-23",
+        "type": "youtube"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 3,
+    "year": 2025
+  },
+  {
+    "address": "14500 Twelve Mile Rd",
+    "city": "Warren",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-29",
+    "event_code": "mimcc",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mimcc",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mimcc",
+    "lat": null,
+    "lng": null,
+    "location_name": "Macomb CC Sports Expo Center",
+    "name": "FIM District Macomb Event presented by DTE",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48312",
+    "remap_teams": null,
+    "short_name": "Macomb",
+    "start_date": "2025-03-27",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires33",
+        "type": "twitch"
+      }
+    ],
+    "website": "https://www.firstinmichigan.org/",
+    "week": 4,
+    "year": 2025
+  },
+  {
+    "address": "3901 N. Saginaw Road",
+    "city": "Midland",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-29",
+    "event_code": "mimid",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mimid",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mimid",
+    "lat": null,
+    "lng": null,
+    "location_name": "H.H. Dow High School",
+    "name": "FIM District Midland Event presented by Dow",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48640",
+    "remap_teams": null,
+    "short_name": "Midland",
+    "start_date": "2025-03-27",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires36",
+        "type": "twitch"
+      },
+      {
+        "channel": "first_glbr",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 4,
+    "year": 2025
+  },
+  {
+    "address": "2380 S Milford Road",
+    "city": "Highland",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-01",
+    "event_code": "mimil",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mimil",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mimil",
+    "lat": null,
+    "lng": null,
+    "location_name": "Milford High School",
+    "name": "FIM District Milford Event presented by GM Milford Proving Grounds",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48381",
+    "remap_teams": null,
+    "short_name": "Milford",
+    "start_date": "2025-02-27",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires31",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 0,
+    "year": 2025
+  },
+  {
+    "address": "1155 S Elizabeth St",
+    "city": "Mt. Pleasant",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-09",
+    "event_code": "mimtp",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mimtp",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mimtp",
+    "lat": null,
+    "lng": null,
+    "location_name": "Mt. Pleasant High School",
+    "name": "FIM District Mt. Pleasant Event",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48858",
+    "remap_teams": null,
+    "short_name": "Mt. Pleasant",
+    "start_date": "2025-03-07",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires35",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 1,
+    "year": 2025
+  },
+  {
+    "address": "16 N Quarterline Road",
+    "city": "Muskegon",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-15",
+    "event_code": "mimus",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mimus",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mimus",
+    "lat": null,
+    "lng": null,
+    "location_name": "Orchard View High School",
+    "name": "FIM District Muskegon Event presented by RENK",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "49442",
+    "remap_teams": null,
+    "short_name": "Muskegon",
+    "start_date": "2025-03-13",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires35",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 2,
+    "year": 2025
+  },
+  {
+    "address": "1300 Campus Pkwy",
+    "city": "Saline",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-23",
+    "event_code": "misal",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "misal",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025misal",
+    "lat": null,
+    "lng": null,
+    "location_name": "Saline High School",
+    "name": "FIM District Saline Event presented by DTE",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48108",
+    "remap_teams": null,
+    "short_name": "Saline",
+    "start_date": "2025-03-21",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires31",
+        "type": "twitch"
+      },
+      {
+        "channel": "V-W_wyQn9Sw",
+        "date": "2025-03-22",
+        "type": "youtube"
+      },
+      {
+        "channel": "hYXLlpOYsoo",
+        "date": "2025-03-23",
+        "type": "youtube"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 3,
+    "year": 2025
+  },
+  {
+    "address": "2521 Stadium Drive",
+    "city": "St. Joseph",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-08",
+    "event_code": "misjo",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "misjo",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025misjo",
+    "lat": null,
+    "lng": null,
+    "location_name": "St. Joseph High School",
+    "name": "FIM District St. Joseph Event presented by Whirlpool",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "49085",
+    "remap_teams": null,
+    "short_name": "St. Joseph",
+    "start_date": "2025-03-06",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires34",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 1,
+    "year": 2025
+  },
+  {
+    "address": "4333 John R Road",
+    "city": "Troy",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-23",
+    "event_code": "mitry",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mitry",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mitry",
+    "lat": null,
+    "lng": null,
+    "location_name": "Troy Athens High School",
+    "name": "FIM District Troy Event presented by Aptiv Foundation",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "48085",
+    "remap_teams": null,
+    "short_name": "Troy",
+    "start_date": "2025-03-21",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires33",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 3,
+    "year": 2025
+  },
+  {
+    "address": "1150 Milliken Drive",
+    "city": "Traverse City",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-15",
+    "event_code": "mitvc",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mitvc",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025mitvc",
+    "lat": null,
+    "lng": null,
+    "location_name": "Traverse City Central High School",
+    "name": "FIM District Traverse City Event presented by Cone Drive",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "49685",
+    "remap_teams": null,
+    "short_name": "Traverse City",
+    "start_date": "2025-03-13",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires36",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 2,
+    "year": 2025
+  },
+  {
+    "address": "Field House 10915 S Campus Drive",
+    "city": "Allendale",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2025fim",
+      "official_advancement_counts": {
+        "cmp": 80,
+        "dcmp": 160
+      },
+      "year": 2025
+    },
+    "division_keys": [],
+    "end_date": "2025-03-22",
+    "event_code": "miwmi",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "miwmi",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2025miwmi",
+    "lat": null,
+    "lng": null,
+    "location_name": "Grand Valley State University",
+    "name": "FIM District West Michigan Event",
+    "parent_event_key": null,
+    "playoff_type": 10,
+    "playoff_type_string": "Double Elimination Bracket (8 Alliances)",
+    "postal_code": "49401",
+    "remap_teams": null,
+    "short_name": "West Michigan",
+    "start_date": "2025-03-20",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "firstinspires35",
+        "type": "twitch"
+      },
+      {
+        "channel": "z0qCQnor-y8",
+        "date": "2025-03-22",
+        "type": "youtube"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 3,
+    "year": 2025
+  }
+]

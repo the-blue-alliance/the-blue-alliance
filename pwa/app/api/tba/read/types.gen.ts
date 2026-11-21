@@ -27,6 +27,10 @@ export type ApiStatus = {
    * Maximum team page number for valid queries.
    */
   max_team_page: number;
+  /**
+   * ISO 8601 datetime (UTC) of FRC Kickoff for the upcoming season.
+   */
+  kickoff_datetime?: string;
 };
 
 export type ApiStatusAppVersion = {
@@ -38,6 +42,36 @@ export type ApiStatusAppVersion = {
    * Internal use - Latest application version available.
    */
   latest_app_version: number;
+};
+
+export type SponsorsList = {
+  /**
+   * Platinum sponsors in display order. Contains 0 to 3 entries.
+   */
+  sponsors: Array<Sponsor>;
+};
+
+export type Sponsor = {
+  /**
+   * Sponsor name. Use as the logo's alt text, or show it as text when there is no logo.
+   */
+  name: string;
+  /**
+   * Absolute https URL the sponsor credit links to.
+   */
+  url: string;
+  /**
+   * How to show the logo. `wordmark`: the logo already spells the sponsor's name, so show it alone. `mark`: a square logo, shown with the name beside it. Other values may be added later; clients must treat any value they do not recognize as `wordmark`.
+   */
+  logo_style: string;
+  /**
+   * Absolute https URL of a full-color PNG logo for light backgrounds, or null if there is none.
+   */
+  logo_url: string | null;
+  /**
+   * Absolute https URL of a white PNG logo for dark or brand-colored backgrounds, or null if there is none.
+   */
+  logo_url_dark: string | null;
 };
 
 /**
@@ -124,6 +158,7 @@ export enum BridgeState2023 {
  * The competition level the match was played at.
  */
 export enum CompLevel {
+  PM = 'pm',
   QM = 'qm',
   EF = 'ef',
   QF = 'qf',
@@ -583,6 +618,90 @@ export enum PlayoffType {
   CUSTOM = 8,
 }
 
+/**
+ * CmpQualificationMethod
+ *
+ * How a team earned its invitation to the FIRST Championship. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/cmp_qualification.py for full definitions.
+ */
+export enum CmpQualificationMethod {
+  /**
+   * DISTRICT_POINTS
+   */
+  DISTRICT_POINTS = 'district_points',
+  /**
+   * WAITLIST
+   */
+  WAITLIST = 'waitlist',
+  /**
+   * ORIGINAL_AND_SUSTAINING
+   */
+  ORIGINAL_AND_SUSTAINING = 'original_and_sustaining',
+  /**
+   * HALL_OF_FAME
+   */
+  HALL_OF_FAME = 'hall_of_fame',
+  /**
+   * PRIOR_YEAR_CMP_WINNER
+   */
+  PRIOR_YEAR_CMP_WINNER = 'prior_year_cmp_winner',
+  /**
+   * PRIOR_YEAR_CMP_IMPACT
+   */
+  PRIOR_YEAR_CMP_IMPACT = 'prior_year_cmp_impact',
+  /**
+   * PRIOR_YEAR_CMP_ENGINEERING_INSPIRATION
+   */
+  PRIOR_YEAR_CMP_ENGINEERING_INSPIRATION = 'prior_year_cmp_engineering_inspiration',
+  /**
+   * REGIONAL_WINNER
+   */
+  REGIONAL_WINNER = 'regional_winner',
+  /**
+   * REGIONAL_IMPACT
+   */
+  REGIONAL_IMPACT = 'regional_impact',
+  /**
+   * REGIONAL_ENGINEERING_INSPIRATION
+   */
+  REGIONAL_ENGINEERING_INSPIRATION = 'regional_engineering_inspiration',
+  /**
+   * REGIONAL_WILDCARD
+   */
+  REGIONAL_WILDCARD = 'regional_wildcard',
+  /**
+   * LATE_REGIONAL_WINNER
+   */
+  LATE_REGIONAL_WINNER = 'late_regional_winner',
+  /**
+   * LATE_REGIONAL_IMPACT
+   */
+  LATE_REGIONAL_IMPACT = 'late_regional_impact',
+  /**
+   * LATE_REGIONAL_ENGINEERING_INSPIRATION
+   */
+  LATE_REGIONAL_ENGINEERING_INSPIRATION = 'late_regional_engineering_inspiration',
+  /**
+   * LATE_REGIONAL_WILDCARD
+   */
+  LATE_REGIONAL_WILDCARD = 'late_regional_wildcard',
+  /**
+   * DCMP_WINNER
+   */
+  DCMP_WINNER = 'dcmp_winner',
+  /**
+   * DCMP_IMPACT
+   */
+  DCMP_IMPACT = 'dcmp_impact',
+  /**
+   * DCMP_ENGINEERING_INSPIRATION
+   */
+  DCMP_ENGINEERING_INSPIRATION = 'dcmp_engineering_inspiration',
+  /**
+   * DCMP_ROOKIE_ALL_STAR
+   */
+  DCMP_ROOKIE_ALL_STAR = 'dcmp_rookie_all_star',
+}
+
 export type District = {
   /**
    * The short identifier for the district.
@@ -654,6 +773,62 @@ export type DistrictAdvancement = {
    * Whether or not the team qualified for the FIRST Championship
    */
   cmp: boolean;
+  /**
+   * How the team qualified for the FIRST Championship, or `null` if the team did not qualify.
+   */
+  cmp_qualification?: CmpQualificationMethod | null;
+};
+
+/**
+ * Where the District Championship and FIRST Championship advancement cutoffs fell for a district, and how each qualifying team earned its Championship invitation.
+ */
+export type DistrictAdvancementCutoffs = {
+  /**
+   * The rank at which the District Championship cutoff would have fallen before any declines were applied.
+   */
+  dcmp_original: number;
+  /**
+   * The rank at which the District Championship cutoff actually fell, after declines were backfilled.
+   */
+  dcmp_effective: number;
+  /**
+   * TBA team keys for teams that declined their District Championship invitation.
+   */
+  dcmp_declines: Array<string>;
+  /**
+   * The rank at which the FIRST Championship cutoff would have fallen before any declines were applied.
+   */
+  cmp_original: number;
+  /**
+   * The rank at which the FIRST Championship cutoff actually fell, after declines were backfilled.
+   */
+  cmp_effective: number;
+  /**
+   * TBA team keys for teams that declined their FIRST Championship invitation.
+   */
+  cmp_declines: Array<string>;
+  /**
+   * A mapping of team key to how that team earned its FIRST Championship invitation. Populated independently of the per-team advancement data, so it is present even when `teams` is empty.
+   */
+  cmp_qualification: {
+    [key: string]: CmpQualificationMethod;
+  };
+};
+
+/**
+ * Per-team advancement status and the advancement cutoffs for a district.
+ */
+export type DistrictAdvancementResponse = {
+  /**
+   * A mapping of team key to District_Advancement. An empty object means advancement has been fetched but no teams are listed yet; `null` means it has never been fetched for this district.
+   */
+  teams: null | {
+    [key: string]: DistrictAdvancement;
+  };
+  /**
+   * Where the advancement cutoffs fell for the district, or `null` if they have not been calculated yet.
+   */
+  cutoffs: DistrictAdvancementCutoffs | null;
 };
 
 export type DistrictInsight = {
@@ -1662,7 +1837,7 @@ export type LeaderboardInsight = {
 
 export type Match = {
   /**
-   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set.
+   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (pm, qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set.
    */
   key: string;
   comp_level: CompLevel;
@@ -2321,7 +2496,7 @@ export type MatchScoreBreakdown2026Alliance = {
 
 export type MatchSimple = {
   /**
-   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set.
+   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (pm, qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set.
    */
   key: string;
   comp_level: CompLevel;
@@ -2539,7 +2714,13 @@ export type Media =
     } & MediaNoDetails)
   | ({
       type: 'onshape';
-    } & MediaOnshape);
+    } & MediaOnshape)
+  | ({
+      type: 'smugmug-album';
+    } & MediaSmugmugAlbum)
+  | ({
+      type: 'smugmug-photo';
+    } & MediaSmugmugPhoto);
 
 export type MediaAvatar = MediaBase & MediaAvatarExtras;
 
@@ -2570,7 +2751,9 @@ export type MediaBase = {
     | 'external-link'
     | 'avatar'
     | 'onshape'
-    | 'cd-thread';
+    | 'cd-thread'
+    | 'smugmug-photo'
+    | 'smugmug-album';
   /**
    * The key used to identify this media on the media site.
    */
@@ -2611,7 +2794,7 @@ export type MediaCdThread = MediaBase & {
 export type MediaGrabCad = MediaBase & {
   type?: 'grabcad';
   details?: {
-    model_created: string;
+    model_created: string | null;
     model_description: string | null;
     model_image: string;
     model_name: string;
@@ -2637,10 +2820,34 @@ export type MediaNoDetails = MediaBase & {
 export type MediaOnshape = MediaBase & {
   type?: 'onshape';
   details?: {
-    model_created: string;
+    model_created: string | null;
     model_description: string | null;
     model_image: string;
     model_name: string;
+  };
+};
+
+export type MediaSmugmugAlbum = MediaBase & {
+  type?: 'smugmug-album';
+  details?: {
+    cover_url: string;
+    cover_url_med: string;
+    cover_url_sm: string;
+    image_count: number;
+    title: string;
+    web_uri: string;
+  };
+};
+
+export type MediaSmugmugPhoto = MediaBase & {
+  type?: 'smugmug-photo';
+  details?: {
+    caption: string;
+    image_url: string;
+    image_url_med: string;
+    image_url_sm: string;
+    title: string;
+    web_uri: string;
   };
 };
 
@@ -2648,6 +2855,128 @@ export enum MobilityRobot2023 {
   NO = 'No',
   YES = 'Yes',
 }
+
+/**
+ * Estimated timing for a match, as reported by Nexus.
+ */
+export type NexusMatchTiming = {
+  /**
+   * Estimated Unix timestamp (in milliseconds) of when the match will be queued, or null if unknown.
+   */
+  estimated_queue_time_ms: number | null;
+  /**
+   * Estimated Unix timestamp (in milliseconds) of when the match will start, or null if unknown.
+   */
+  estimated_start_time_ms: number | null;
+};
+
+/**
+ * Live match-queuing info for a single match, as reported by Nexus.
+ */
+export type NexusMatchInfo = {
+  /**
+   * The match label as reported by Nexus, e.g. `Qualification 5`.
+   */
+  label: string;
+  /**
+   * The current queuing status of the match.
+   */
+  status: 'Queuing soon' | 'Now queuing' | 'On deck' | 'On field';
+  /**
+   * Whether the match has been played.
+   */
+  played: boolean;
+  times: NexusMatchTiming;
+};
+
+/**
+ * The match currently being queued, as reported by Nexus.
+ */
+export type NexusNowQueueing = {
+  /**
+   * TBA match key for the match currently being queued.
+   */
+  match_key: string;
+  /**
+   * The match name as reported by Nexus, e.g. `Qualification 5`.
+   */
+  match_name: string;
+};
+
+/**
+ * Live match-queuing info and the pit map for an event, sourced from Nexus (https://frc.nexus/) and cached by TBA.
+ */
+export type NexusEventInfo = {
+  /**
+   * Unix timestamp (in milliseconds) of when the queuing info was last fetched from Nexus, or null if no queuing info is available.
+   */
+  data_as_of_ms: number | null;
+  now_queueing: NexusNowQueueing | null;
+  /**
+   * Map of TBA match key to live queuing info for that match. Empty if no queuing info is available.
+   */
+  matches: {
+    [key: string]: NexusMatchInfo;
+  };
+  pit_map: NexusPitMap | null;
+};
+
+/**
+ * A pair of x and y values on a Nexus pit map, used for positions and sizes.
+ */
+export type NexusMapVector = {
+  x?: number;
+  y?: number;
+};
+
+/**
+ * A rectangle on a Nexus pit map.
+ */
+export type NexusMapElement = {
+  position?: NexusMapVector;
+  size?: NexusMapVector;
+  /**
+   * Rotation of the element, in degrees.
+   */
+  angle?: number | null;
+};
+
+export type NexusMapPit = NexusMapElement & {
+  /**
+   * TBA team key of the team in this pit, or null if the pit is unassigned.
+   */
+  team_key: string | null;
+};
+
+export type NexusMapLabel = NexusMapElement & {
+  label?: string;
+};
+
+export type NexusMapArrow = NexusMapElement & {
+  type?: 'single' | 'double';
+};
+
+/**
+ * The pit map for an event, as reported by Nexus. Each collection maps a Nexus element ID to that element.
+ */
+export type NexusPitMap = {
+  size: NexusMapVector;
+  pits: {
+    [key: string]: NexusMapPit;
+  };
+  areas: {
+    [key: string]: NexusMapLabel;
+  };
+  labels: {
+    [key: string]: NexusMapLabel;
+  };
+  arrows: {
+    [key: string]: NexusMapArrow;
+  };
+  walls: {
+    [key: string]: NexusMapElement;
+  };
+};
 
 export type NotablesInsight = {
   data: {
@@ -2664,7 +2993,7 @@ export type NotablesInsight = {
 };
 
 /**
- * A typed insight object. Use `category` to discriminate between leaderboard, streak, and timeseries shapes.
+ * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, game stats, and clubs shapes.
  */
 export type InsightV2 =
   | ({
@@ -2675,7 +3004,13 @@ export type InsightV2 =
     } & InsightV2Streak)
   | ({
       category: 'timeseries';
-    } & InsightV2Timeseries);
+    } & InsightV2Timeseries)
+  | ({
+      category: 'game_stats';
+    } & InsightV2GameStats)
+  | ({
+      category: 'clubs';
+    } & InsightV2Clubs);
 
 export type InsightV2Base = {
   /**
@@ -2693,11 +3028,11 @@ export type InsightV2Base = {
   /**
    * Insight category. Discriminates the shape of `data`.
    */
-  category: 'leaderboard' | 'streak' | 'timeseries';
+  category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats' | 'clubs';
   /**
    * District abbreviation if the insight is district-scoped, otherwise null.
    */
-  district_abbreviation: string;
+  district_abbreviation: string | null;
 };
 
 export type InsightV2Leaderboard = InsightV2Base & InsightV2LeaderboardExtras;
@@ -2719,6 +3054,74 @@ export type InsightV2Timeseries = InsightV2Base & InsightV2TimeseriesExtras;
 export type InsightV2TimeseriesExtras = {
   category?: 'timeseries';
   data: InsightV2TimeseriesData;
+};
+
+export type InsightV2GameStats = InsightV2Base & InsightV2GameStatsExtras;
+
+export type InsightV2GameStatsExtras = {
+  category?: 'game_stats';
+  data: InsightV2GameStatsData;
+};
+
+export type InsightV2Clubs = InsightV2Base & InsightV2ClubsExtras;
+
+export type InsightV2ClubsExtras = {
+  category?: 'clubs';
+  data: InsightV2ClubsData;
+};
+
+/**
+ * Data for a clubs-category InsightV2. A cumulative all-time membership of teams that reached a milestone.
+ */
+export type InsightV2ClubsData = {
+  /**
+   * Club members, sorted ascending by team number.
+   */
+  entries: Array<InsightV2ClubEntry>;
+  /**
+   * Discriminates the shape of each entry's `extra_context`. `none` means entries have no `extra_context`.
+   */
+  context_type: 'hall_of_fame' | 'none';
+};
+
+/**
+ * A single club member.
+ */
+export type InsightV2ClubEntry = {
+  /**
+   * Team key of the club member, e.g. `frc254`.
+   */
+  team_key: string;
+  /**
+   * Key of the event where the team first qualified for the club.
+   */
+  event_added_key: string;
+  /**
+   * Club-specific extra material for this member. Present when the club's `context_type` is `hall_of_fame`.
+   */
+  extra_context?: InsightV2HallOfFameContext;
+};
+
+/**
+ * Chairman's Award material for a Hall of Fame team, scraped from the FIRST resource library.
+ */
+export type InsightV2HallOfFameContext = {
+  /**
+   * Year the team was inducted (year of `event_added_key`).
+   */
+  year: number;
+  /**
+   * URL of the team's Chairman's video, or null.
+   */
+  video: string | null;
+  /**
+   * URL of the team's Chairman's presentation, or null.
+   */
+  presentation: string | null;
+  /**
+   * URL of the team's Chairman's essay, or null.
+   */
+  essay: string | null;
 };
 
 /**
@@ -2794,9 +3197,9 @@ export type InsightV2StreakData = {
  */
 export type InsightV2TimeseriesData = {
   /**
-   * What the x-axis represents.
+   * What the x-axis represents. For `date`, each point's `x` is a Unix timestamp (seconds) at UTC midnight of that day.
    */
-  x_type: 'week' | 'year' | 'event';
+  x_type: 'week' | 'year' | 'event' | 'date';
   /**
    * Human-readable label for the x-axis.
    */
@@ -2816,7 +3219,7 @@ export type InsightV2TimeseriesData = {
     label: string;
     points: Array<{
       /**
-       * X-axis value (week string, year integer, or event key).
+       * X-axis value (week string, year integer, event key, or Unix timestamp in seconds when x_type is date).
        */
       x: string | number | number;
       /**
@@ -2843,6 +3246,88 @@ export type InsightV2TimeseriesData = {
       };
     }>;
   }>;
+};
+
+/**
+ * Count/opportunities and average-value statistics for a year, broken out by scope: the season overall, each competition week, and each event.
+ */
+export type InsightV2GameStatsData = {
+  scopes: Array<InsightV2GameStatsScope>;
+};
+
+export type InsightV2GameStatsScope = {
+  /**
+   * What slice of the season this scope covers.
+   */
+  scope_type: 'overall' | 'week' | 'event';
+  /**
+   * Display name of the scope, e.g. `Overall`, `Week 3`, or an event's short name.
+   */
+  label: string;
+  /**
+   * Event key when `scope_type` is `event`, otherwise null.
+   */
+  key: string | null;
+  /**
+   * Zero-indexed competition week, or null for the overall and championship scopes.
+   */
+  week: number | null;
+  /**
+   * Count/opportunities statistics over qualification matches in this scope.
+   */
+  qual: Array<InsightV2GameStat>;
+  /**
+   * Count/opportunities statistics over playoff matches in this scope.
+   */
+  playoff: Array<InsightV2GameStat>;
+  /**
+   * Average-value statistics over qualification matches in this scope.
+   */
+  qual_averages: Array<InsightV2AverageStat>;
+  /**
+   * Average-value statistics over playoff matches in this scope.
+   */
+  playoff_averages: Array<InsightV2AverageStat>;
+};
+
+/**
+ * How many times an objective was achieved, out of how many chances there were to achieve it.
+ */
+export type InsightV2GameStat = {
+  /**
+   * Programmatic name of the statistic, e.g. `rp_1` or `auto_climb`.
+   */
+  name: string;
+  /**
+   * Human-readable name of the statistic, e.g. `Energized RP`.
+   */
+  label: string;
+  /**
+   * Times the objective was achieved.
+   */
+  count: number;
+  /**
+   * Chances there were to achieve the objective.
+   */
+  opportunities: number;
+};
+
+/**
+ * The average value of a numeric match statistic, e.g. average score or average win margin.
+ */
+export type InsightV2AverageStat = {
+  /**
+   * Programmatic name of the statistic, e.g. `average_score`.
+   */
+  name: string;
+  /**
+   * Human-readable name of the statistic, e.g. `Average Score`.
+   */
+  label: string;
+  /**
+   * The average value of the statistic over matches in this scope.
+   */
+  value: number;
 };
 
 export enum Position2016 {
@@ -2960,6 +3445,10 @@ export type RegionalRanking = {
      */
     qual_points: number;
   }>;
+  /**
+   * Any points adjustments applied to the team.
+   */
+  adjustments?: number;
 };
 
 export enum RobotAuto2016WithUnknown {
@@ -3039,7 +3528,7 @@ export type Team = {
    */
   country: string | null;
   /**
-   * Will be NULL, for future development.
+   * Always null. Teams are not geocoded, so there is no address or location name; use city, state_prov, country, and postal_code.
    */
   address: string | null;
   /**
@@ -3063,7 +3552,7 @@ export type Team = {
    */
   lng: number | null;
   /**
-   * Will be NULL, for future development.
+   * Always null. Teams are not geocoded, so there is no address or location name; use city, state_prov, country, and postal_code.
    */
   location_name: string | null;
   /**
@@ -3144,6 +3633,14 @@ export type TeamEventStatusAllianceBackup = null | {
  * Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun.
  */
 export type TeamEventStatusPlayoff = null | {
+  /**
+   * Playoff bracket format, or null if unavailable.
+   */
+  playoff_type?: PlayoffType | null;
+  /**
+   * Current double elimination round, if applicable.
+   */
+  double_elim_round?: DoubleElimRound;
   level?: CompLevel;
   current_level_record?: WltRecord | null;
   record?: WltRecord | null;
@@ -3267,6 +3764,92 @@ export enum TowerFace2016 {
   SCALED = 'Scaled',
   UNKNOWN = 'Unknown',
 }
+
+/**
+ * Describes one entry in an advancement level's `sort_orders` or `extra_stats` arrays.
+ */
+export type PlayoffAdvancementSortOrderInfo = {
+  /**
+   * Human-readable name of the sort order or extra stat.
+   */
+  name: string;
+  /**
+   * Data type of the corresponding value.
+   */
+  type: 'int' | 'bool';
+  /**
+   * Number of decimal places to display for the value.
+   */
+  precision: number;
+};
+
+/**
+ * One alliance's standing within a playoff advancement level.
+ */
+export type PlayoffAdvancementAllianceRank = {
+  /**
+   * Team keys (eg `frc254`) making up the alliance.
+   */
+  team_keys: Array<string>;
+  /**
+   * Name of the alliance (eg `Turing`, `Alliance 1`).
+   */
+  alliance_name: string;
+  /**
+   * For bracket levels, `red` or `blue`. Absent for round robin standings.
+   */
+  alliance_color?: string | null;
+  /**
+   * 1-indexed rank within the advancement level. Absent for bracket levels.
+   */
+  rank?: number | null;
+  /**
+   * Win-loss-tie record for the alliance at this level.
+   */
+  record?: WltRecord | null;
+  /**
+   * Number of matches the alliance played at this level.
+   */
+  matches_played: number;
+  /**
+   * Values used to rank alliances, described by the level's `sort_order_info`. For round robin: Champ Points followed by per-year tiebreakers.
+   */
+  sort_orders: Array<number>;
+  /**
+   * Additional per-alliance values, described by the level's `extra_stats_info`. For round robin: `1` if the alliance advances to the finals, else `0`.
+   */
+  extra_stats: Array<number>;
+};
+
+/**
+ * A single level of computed playoff advancement for an event.
+ */
+export type PlayoffAdvancement = {
+  /**
+   * Machine-readable level identifier (eg `sf`, `f1`).
+   */
+  level: string;
+  /**
+   * Human-readable level name (eg `Round Robin Semifinals`, `Finals`).
+   */
+  level_name: string;
+  /**
+   * Advancement level type (eg `round_robin`, `best_of_3`, `double_elim`, `average_score`).
+   */
+  type: string;
+  /**
+   * Ranked alliances for this level.
+   */
+  rankings?: Array<PlayoffAdvancementAllianceRank> | null;
+  /**
+   * Describes each element of every ranking's `sort_orders` array, in order.
+   */
+  sort_order_info: Array<PlayoffAdvancementSortOrderInfo>;
+  /**
+   * Describes each element of every ranking's `extra_stats` array, in order.
+   */
+  extra_stats_info: Array<PlayoffAdvancementSortOrderInfo>;
+};
 
 /**
  * A Win-Loss-Tie record for a team, or an alliance.
@@ -3426,12 +4009,14 @@ export type PageNum = number;
 export type TeamKey = string;
 
 /**
- * InsightV2 category. One of: leaderboard, streak, timeseries.
+ * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export enum InsightV2Category {
   LEADERBOARD = 'leaderboard',
   STREAK = 'streak',
   TIMESERIES = 'timeseries',
+  GAME_STATS = 'game_stats',
+  CLUBS = 'clubs',
 }
 
 /**
@@ -3622,11 +4207,9 @@ export type GetDistrictAdvancementError =
 
 export type GetDistrictAdvancementResponses = {
   /**
-   * A mapping of team key to District_Advancement
+   * Successful response
    */
-  200: null | {
-    [key: string]: DistrictAdvancement;
-  };
+  200: DistrictAdvancementResponse;
 };
 
 export type GetDistrictAdvancementResponse =
@@ -4522,6 +5105,147 @@ export type GetEventMatchesSimpleResponses = {
 export type GetEventMatchesSimpleResponse =
   GetEventMatchesSimpleResponses[keyof GetEventMatchesSimpleResponses];
 
+export type GetEventPracticeMatchesData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/matches/practice';
+};
+
+export type GetEventPracticeMatchesErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventPracticeMatchesError =
+  GetEventPracticeMatchesErrors[keyof GetEventPracticeMatchesErrors];
+
+export type GetEventPracticeMatchesResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Match>;
+};
+
+export type GetEventPracticeMatchesResponse =
+  GetEventPracticeMatchesResponses[keyof GetEventPracticeMatchesResponses];
+
+export type GetEventPracticeMatchesKeysData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/matches/practice/keys';
+};
+
+export type GetEventPracticeMatchesKeysErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventPracticeMatchesKeysError =
+  GetEventPracticeMatchesKeysErrors[keyof GetEventPracticeMatchesKeysErrors];
+
+export type GetEventPracticeMatchesKeysResponses = {
+  /**
+   * Array of Match Keys
+   */
+  200: Array<string>;
+};
+
+export type GetEventPracticeMatchesKeysResponse =
+  GetEventPracticeMatchesKeysResponses[keyof GetEventPracticeMatchesKeysResponses];
+
+export type GetEventPracticeMatchesSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/matches/practice/simple';
+};
+
+export type GetEventPracticeMatchesSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventPracticeMatchesSimpleError =
+  GetEventPracticeMatchesSimpleErrors[keyof GetEventPracticeMatchesSimpleErrors];
+
+export type GetEventPracticeMatchesSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<MatchSimple>;
+};
+
+export type GetEventPracticeMatchesSimpleResponse =
+  GetEventPracticeMatchesSimpleResponses[keyof GetEventPracticeMatchesSimpleResponses];
+
 export type GetEventMatchTimeseriesData = {
   body?: never;
   headers?: {
@@ -4569,6 +5293,99 @@ export type GetEventMatchTimeseriesResponses = {
 export type GetEventMatchTimeseriesResponse =
   GetEventMatchTimeseriesResponses[keyof GetEventMatchTimeseriesResponses];
 
+export type GetEventMediaData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/media';
+};
+
+export type GetEventMediaErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventMediaError = GetEventMediaErrors[keyof GetEventMediaErrors];
+
+export type GetEventMediaResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Media>;
+};
+
+export type GetEventMediaResponse =
+  GetEventMediaResponses[keyof GetEventMediaResponses];
+
+export type GetEventNexusInfoData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/nexus_info';
+};
+
+export type GetEventNexusInfoErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventNexusInfoError =
+  GetEventNexusInfoErrors[keyof GetEventNexusInfoErrors];
+
+export type GetEventNexusInfoResponses = {
+  /**
+   * Successful response
+   */
+  200: NexusEventInfo | null;
+};
+
+export type GetEventNexusInfoResponse =
+  GetEventNexusInfoResponses[keyof GetEventNexusInfoResponses];
+
 export type GetEventOprsData = {
   body?: never;
   headers?: {
@@ -4614,6 +5431,53 @@ export type GetEventOprsResponses = {
 
 export type GetEventOprsResponse =
   GetEventOprsResponses[keyof GetEventOprsResponses];
+
+export type GetEventPlayoffAdvancementData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/playoff_advancement';
+};
+
+export type GetEventPlayoffAdvancementErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventPlayoffAdvancementError =
+  GetEventPlayoffAdvancementErrors[keyof GetEventPlayoffAdvancementErrors];
+
+export type GetEventPlayoffAdvancementResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<PlayoffAdvancement>;
+};
+
+export type GetEventPlayoffAdvancementResponse =
+  GetEventPlayoffAdvancementResponses[keyof GetEventPlayoffAdvancementResponses];
 
 export type GetEventPredictionsData = {
   body?: never;
@@ -5335,9 +6199,9 @@ export type GetInsightsV2YearCategoryData = {
      */
     year: number;
     /**
-     * InsightV2 category. One of: leaderboard, streak, timeseries.
+     * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats, clubs.
      */
-    category: 'leaderboard' | 'streak' | 'timeseries';
+    category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats' | 'clubs';
   };
   query?: never;
   url: '/insights/{year}/{category}';
@@ -5437,9 +6301,9 @@ export type GetInsightsV2YearCategoryDistrictData = {
      */
     year: number;
     /**
-     * InsightV2 category. One of: leaderboard, streak, timeseries.
+     * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats, clubs.
      */
-    category: 'leaderboard' | 'streak' | 'timeseries';
+    category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats' | 'clubs';
     /**
      * District abbreviation, eg `ne` or `fim`
      */
@@ -5843,6 +6707,43 @@ export type GetStatusResponses = {
 
 export type GetStatusResponse = GetStatusResponses[keyof GetStatusResponses];
 
+export type GetSponsorsData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/sponsors';
+};
+
+export type GetSponsorsErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+};
+
+export type GetSponsorsError = GetSponsorsErrors[keyof GetSponsorsErrors];
+
+export type GetSponsorsResponses = {
+  /**
+   * Successful response
+   */
+  200: SponsorsList;
+};
+
+export type GetSponsorsResponse =
+  GetSponsorsResponses[keyof GetSponsorsResponses];
+
 export type GetTeamData = {
   body?: never;
   headers?: {
@@ -6230,7 +7131,7 @@ export type GetTeamEventMatchesSimpleResponses = {
   /**
    * Successful response
    */
-  200: Array<Match>;
+  200: Array<MatchSimple>;
 };
 
 export type GetTeamEventMatchesSimpleResponse =

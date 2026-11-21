@@ -103,4 +103,55 @@ describe("MainContent", () => {
     // — our mocked VideoCellContainer exposes this via data-has-webcast.
     expect(html).toContain('data-has-webcast="false"');
   });
+
+  it("renders the no-webcasts message when there are no webcasts", () => {
+    const theme = createTheme({
+      layout: {
+        appBarHeight: 36,
+        socialPanelWidth: 300,
+        chatPanelWidth: 300,
+      },
+    });
+
+    const html = renderToStaticMarkup(
+      <ThemeProvider theme={theme}>
+        <MainContent
+          webcasts={[]}
+          hashtagSidebarVisible={false}
+          chatSidebarVisible={false}
+          layoutSet={false}
+          setLayout={() => {}}
+        />
+      </ThemeProvider>
+    );
+
+    expect(html).toContain("No webcasts found");
+    expect(html).not.toContain("Select a layout");
+  });
+
+  it("offsets the content area for whichever sidebars are visible", () => {
+    const theme = createTheme({
+      layout: {
+        appBarHeight: 36,
+        socialPanelWidth: 300,
+        chatPanelWidth: 320,
+      },
+    });
+
+    const html = renderToStaticMarkup(
+      <ThemeProvider theme={theme}>
+        <MainContent
+          webcasts={[]}
+          hashtagSidebarVisible
+          chatSidebarVisible
+          layoutSet={false}
+          setLayout={() => {}}
+        />
+      </ThemeProvider>
+    );
+
+    expect(html).toContain("top:36px");
+    expect(html).toContain("margin-right:320px");
+    expect(html).toContain("margin-left:300px");
+  });
 });

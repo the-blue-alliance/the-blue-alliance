@@ -1,0 +1,882 @@
+[
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "1992cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc191"
+    ],
+    "year": 1992
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "1994cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc191"
+    ],
+    "year": 1994
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "1995cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc151"
+    ],
+    "year": 1995
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "1996cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc144"
+    ],
+    "year": 1996
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "1997cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc47"
+    ],
+    "year": 1997
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "1998cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc23"
+    ],
+    "year": 1998
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "1999cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc120"
+    ],
+    "year": 1999
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2000cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc16"
+    ],
+    "year": 2000
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2001cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc22"
+    ],
+    "year": 2001
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2002cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc175"
+    ],
+    "year": 2002
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2003cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc103"
+    ],
+    "year": 2003
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2004cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc254"
+    ],
+    "year": 2004
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2005cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc67"
+    ],
+    "year": 2005
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2006cmp",
+    "event_type": 4,
+    "name": "Chairman's Award Winner",
+    "team_keys": [
+      "frc111"
+    ],
+    "year": 2006
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2007cmp",
+    "event_type": 4,
+    "name": "Championship - Chairman's Award",
+    "team_keys": [
+      "frc365"
+    ],
+    "year": 2007
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2008cmp",
+    "event_type": 4,
+    "name": "Championship - Chairman's Award",
+    "team_keys": [
+      "frc842"
+    ],
+    "year": 2008
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2009cmp",
+    "event_type": 4,
+    "name": "Championship - Chairman's Award",
+    "team_keys": [
+      "frc236"
+    ],
+    "year": 2009
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2010cmp",
+    "event_type": 4,
+    "name": "Championship - Chairman's Award",
+    "team_keys": [
+      "frc341"
+    ],
+    "year": 2010
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2011cmp",
+    "event_type": 4,
+    "name": "Championship - Chairman's Award",
+    "team_keys": [
+      "frc359"
+    ],
+    "year": 2011
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2012cmp",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc1114"
+    ],
+    "year": 2012
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2013cmp",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc1538"
+    ],
+    "year": 2013
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2014cmp",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc27"
+    ],
+    "year": 2014
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2015cmp",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc597"
+    ],
+    "year": 2015
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmp",
+    "event_key": "2016cmp",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc987"
+    ],
+    "year": 2016
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmpmo",
+    "event_key": "2017cmpmo",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc2614"
+    ],
+    "year": 2017
+  },
+  {
+    "award_type": 1,
+    "event_code": "cmpmo",
+    "event_key": "2017cmpmo",
+    "event_type": 4,
+    "name": "Championship Winner",
+    "team_keys": [
+      "frc1676",
+      "frc254",
+      "frc2767",
+      "frc862"
+    ],
+    "year": 2017
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmptx",
+    "event_key": "2017cmptx",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc3132"
+    ],
+    "year": 2017
+  },
+  {
+    "award_type": 1,
+    "event_code": "cmptx",
+    "event_key": "2017cmptx",
+    "event_type": 4,
+    "name": "Championship Winner",
+    "team_keys": [
+      "frc1011",
+      "frc2928",
+      "frc5499",
+      "frc973"
+    ],
+    "year": 2017
+  },
+  {
+    "award_type": 9,
+    "event_code": "dal",
+    "event_key": "2017dal",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc27"
+    ],
+    "year": 2017
+  },
+  {
+    "award_type": 9,
+    "event_code": "dar",
+    "event_key": "2017dar",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc3324"
+    ],
+    "year": 2017
+  },
+  {
+    "award_type": 9,
+    "event_code": "gal",
+    "event_key": "2017gal",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc5437"
+    ],
+    "year": 2017
+  },
+  {
+    "award_type": 9,
+    "event_code": "new",
+    "event_key": "2017new",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc2096"
+    ],
+    "year": 2017
+  },
+  {
+    "award_type": 9,
+    "event_code": "tes",
+    "event_key": "2017tes",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc1023"
+    ],
+    "year": 2017
+  },
+  {
+    "award_type": 9,
+    "event_code": "tur",
+    "event_key": "2017tur",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc1540"
+    ],
+    "year": 2017
+  },
+  {
+    "award_type": 9,
+    "event_code": "cars",
+    "event_key": "2018cars",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc2137"
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_code": "carv",
+    "event_key": "2018carv",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc5987"
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmpmi",
+    "event_key": "2018cmpmi",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc2834"
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_code": "cmpmi",
+    "event_key": "2018cmpmi",
+    "event_type": 4,
+    "name": "Championship Winner",
+    "team_keys": [
+      "frc27",
+      "frc2708",
+      "frc2767",
+      "frc4027"
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmptx",
+    "event_key": "2018cmptx",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc1311"
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_code": "cmptx",
+    "event_key": "2018cmptx",
+    "event_type": 4,
+    "name": "Championship Winner",
+    "team_keys": [
+      "frc148",
+      "frc254",
+      "frc2976",
+      "frc3075"
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_code": "dal",
+    "event_key": "2018dal",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc4481"
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_code": "dar",
+    "event_key": "2018dar",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc772"
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_code": "roe",
+    "event_key": "2018roe",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc6348"
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_code": "tur",
+    "event_key": "2018tur",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc3847"
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmpmi",
+    "event_key": "2019cmpmi",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc1816"
+    ],
+    "year": 2019
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmptx",
+    "event_key": "2019cmptx",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc1902"
+    ],
+    "year": 2019
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmpaw",
+    "event_key": "2021cmpaw",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc4613",
+      "frc503"
+    ],
+    "year": 2021
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmptx",
+    "event_key": "2022cmptx",
+    "event_type": 4,
+    "name": "Chairman's Award",
+    "team_keys": [
+      "frc1629"
+    ],
+    "year": 2022
+  },
+  {
+    "award_type": 9,
+    "event_code": "arc",
+    "event_key": "2023arc",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc4"
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmptx",
+    "event_key": "2023cmptx",
+    "event_type": 4,
+    "name": "FIRST Impact Award",
+    "team_keys": [
+      "frc321"
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 1,
+    "event_code": "cmptx",
+    "event_key": "2023cmptx",
+    "event_type": 4,
+    "name": "Championship Winner",
+    "team_keys": [
+      "frc1323",
+      "frc2609",
+      "frc4096",
+      "frc4414"
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 9,
+    "event_code": "cur",
+    "event_key": "2023cur",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc7565"
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 9,
+    "event_code": "dal",
+    "event_key": "2023dal",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc2486"
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 9,
+    "event_code": "gal",
+    "event_key": "2023gal",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc5166"
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 9,
+    "event_code": "hop",
+    "event_key": "2023hop",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc2096"
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 9,
+    "event_code": "joh",
+    "event_key": "2023joh",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc1676"
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 9,
+    "event_code": "mil",
+    "event_key": "2023mil",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc3937"
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 9,
+    "event_code": "new",
+    "event_key": "2023new",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc1156"
+    ],
+    "year": 2023
+  },
+  {
+    "award_type": 9,
+    "event_code": "arc",
+    "event_key": "2024arc",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc4091"
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmptx",
+    "event_key": "2024cmptx",
+    "event_type": 4,
+    "name": "FIRST Impact Award",
+    "team_keys": [
+      "frc2486"
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 1,
+    "event_code": "cmptx",
+    "event_key": "2024cmptx",
+    "event_type": 4,
+    "name": "Championship Winner",
+    "team_keys": [
+      "frc1690",
+      "frc321",
+      "frc4522",
+      "frc9432"
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 9,
+    "event_code": "cur",
+    "event_key": "2024cur",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc9008"
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 9,
+    "event_code": "dal",
+    "event_key": "2024dal",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc4403"
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 9,
+    "event_code": "gal",
+    "event_key": "2024gal",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc2638"
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 9,
+    "event_code": "hop",
+    "event_key": "2024hop",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc8159"
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 9,
+    "event_code": "joh",
+    "event_key": "2024joh",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc2642"
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 9,
+    "event_code": "mil",
+    "event_key": "2024mil",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc6413"
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 9,
+    "event_code": "new",
+    "event_key": "2024new",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc3478"
+    ],
+    "year": 2024
+  },
+  {
+    "award_type": 9,
+    "event_code": "arc",
+    "event_key": "2025arc",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc5951"
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 0,
+    "event_code": "cmptx",
+    "event_key": "2025cmptx",
+    "event_type": 4,
+    "name": "FIRST Impact Award",
+    "team_keys": [
+      "frc5985"
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_code": "cmptx",
+    "event_key": "2025cmptx",
+    "event_type": 4,
+    "name": "Championship Winner",
+    "team_keys": [
+      "frc1323",
+      "frc2910",
+      "frc4272",
+      "frc5026"
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_code": "cur",
+    "event_key": "2025cur",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc359"
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_code": "dal",
+    "event_key": "2025dal",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc9199"
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_code": "gal",
+    "event_key": "2025gal",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc6429"
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_code": "hop",
+    "event_key": "2025hop",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc3794"
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_code": "joh",
+    "event_key": "2025joh",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc6024"
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_code": "mil",
+    "event_key": "2025mil",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc2486"
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_code": "new",
+    "event_key": "2025new",
+    "event_type": 3,
+    "name": "Engineering Inspiration Award",
+    "team_keys": [
+      "frc1880"
+    ],
+    "year": 2025
+  }
+]

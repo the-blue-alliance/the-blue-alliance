@@ -212,3 +212,11 @@ def test_submit_match_video(
     assert suggestion.review_state == SuggestionState.REVIEW_PENDING
     assert suggestion.target_key == "2016necmp_f1m1"
     assert suggestion.contents == SuggestionDict(youtube_videos=["bHGyTjxbLz8"])
+
+
+def test_invalid_match_key(login_user, web_client: Client) -> None:
+    response = web_client.get("/suggest/match/video?match_key=notamatch")
+    assert response.status_code == 404
+
+    response = web_client.get("/suggest/match/video")
+    assert response.status_code == 404

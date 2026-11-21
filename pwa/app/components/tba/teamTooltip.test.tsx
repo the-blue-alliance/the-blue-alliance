@@ -1,0 +1,146 @@
+import { screen } from '@testing-library/react';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+
+import type { SearchIndex } from '~/api/tba/read';
+import { getSearchIndexOptions } from '~/api/tba/read/@tanstack/react-query.gen';
+import { getSearchIndex, getTeamMediaByYear } from '~/api/tba/read/sdk.gen';
+import {
+  TeamLinkWithAvatarTooltip,
+  TeamLinkWithTooltip,
+  TeamTooltip,
+} from '~/components/tba/teamTooltip';
+import { mockTbaApi } from '~/test/msw';
+import { renderWithClient } from '~/test/render';
+
+vi.mock('~/components/tba/links', () => import('~/test/linkMocks'));
+
+const searchIndex: SearchIndex = {
+  teams: [{ key: 'frc254', nickname: 'The Cheesy Poofs' }],
+  events: [],
+};
+
+beforeEach(() => {
+  mockTbaApi(getSearchIndex, {}, searchIndex);
+  mockTbaApi(
+    getTeamMediaByYear,
+    { path: { team_key: 'frc254', year: 2026 } },
+    [],
+  );
+});
+
+function stubHoverCapability(canHover: boolean) {
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn<(query: string) => Pick<MediaQueryList, 'matches'>>(() => ({
+      matches: canHover,
+    })),
+  );
+}
+
+describe('TeamLinkWithTooltip', () => {
+  beforeEach(() => {
+    stubHoverCapability(true);
+  });
+
+  test('renders a plain link when the team is not in the search index', async () => {
+    const { container } = renderWithClient(
+      <TeamLinkWithTooltip teamKey="frc9999" year={2026} />,
+    );
+    await screen.findByRole('link', { name: '9999' });
+    expect(container.querySelector('a')?.getAttribute('href')).toBe(
+      '/team/9999/2026',
+    );
+  });
+
+  test('renders a winner captain label once the name loads', async () => {
+    renderWithClient(
+      <TeamLinkWithTooltip teamKey="frc254" year={2026} isWinner isCaptain />,
+    );
+    const link = await screen.findByRole('link', { name: '254C' });
+    expect(link.querySelector('svg')).toBeTruthy();
+    expect(link.querySelector('sup')?.textContent).toBe('C');
+  });
+
+  test.each([
+    [{ disqualified: true }],
+    [{ surrogate: true }],
+    [{ isWinner: true }],
+    [{ isCaptain: true }],
+    [{}],
+  ])('renders the tooltip trigger with %o', async (props) => {
+    const { queryClient } = renderWithClient(
+      <TeamLinkWithTooltip teamKey="frc254" year={2026} {...props} />,
+    );
+    await vi.waitFor(() =>
+      expect(
+        queryClient.getQueryData(getSearchIndexOptions({}).queryKey),
+      ).toEqual(searchIndex),
+    );
+    const link = await screen.findByRole('link', { name: /^254/ });
+    expect(link.getAttribute('href')).toBe('/team/254/2026');
+  });
+});
+
+describe('TeamTooltip', () => {
+  test('renders the nickname, avatar, and status flags', async () => {
+    mockTbaApi(
+      getTeamMediaByYear,
+      { path: { team_key: 'frc254', year: 2026 } },
+      [
+        {
+          type: 'avatar',
+          foreign_key: 'avatar_2026_frc254',
+          team_keys: ['frc254'],
+          details: { base64Image: 'AAAA' },
+        },
+      ],
+    );
+    renderWithClient(
+      <TeamTooltip teamKey="frc254" year={2026} disqualified surrogate />,
+    );
+    expect(await screen.findByText('The Cheesy Poofs')).toBeTruthy();
+    expect(screen.getByRole('img', { name: 'Team Avatar' })).toBeTruthy();
+    expect(screen.getByText('Disqualified')).toBeTruthy();
+    expect(screen.getByText('Surrogate')).toBeTruthy();
+  });
+
+  test('renders without flags', async () => {
+    renderWithClient(<TeamTooltip teamKey="frc254" year={2026} />);
+    expect(await screen.findByText('The Cheesy Poofs')).toBeTruthy();
+    expect(screen.queryByText('Disqualified')).toBeNull();
+  });
+
+  test('shows the default avatar for a team without one', async () => {
+    renderWithClient(<TeamTooltip teamKey="frc254" year={2026} />);
+    expect(
+      await screen.findByRole('img', { name: 'Default Team Avatar' }),
+    ).toBeTruthy();
+  });
+
+  test('renders nothing for an unknown team', async () => {
+    mockTbaApi(
+      getTeamMediaByYear,
+      { path: { team_key: 'frc9999', year: 2026 } },
+      [],
+    );
+    const { container } = renderWithClient(
+      <TeamTooltip teamKey="frc9999" year={2026} />,
+    );
+    await screen.findByText('loading');
+    await vi.waitFor(() => expect(container.textContent).toBe(''));
+  });
+});
+
+describe('TeamLinkWithAvatarTooltip', () => {
+  test.each([
+    [{ isWinner: true, isCaptain: true }, '254C'],
+    [{ isWinner: true }, '254'],
+    [{ isCaptain: true }, '254C'],
+    [{}, '254'],
+  ])('renders the label with %o', (props, name) => {
+    renderWithClient(
+      <TeamLinkWithAvatarTooltip teamKey="frc254" year={2026} {...props} />,
+    );
+    expect(screen.getByRole('link', { name })).toBeTruthy();
+  });
+});

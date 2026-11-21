@@ -1,11 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { InstagramEmbed } from 'react-social-media-embed';
 
+import SimpleIconsInstagram from '~icons/simple-icons/instagram';
+
 import { Media } from '~/api/tba/read';
+import { Skeleton } from '~/components/ui/skeleton';
+import onshapeLogoDark from '~/images/onshape/onshape-logo-dark.svg';
+import onshapeLogo from '~/images/onshape/onshape-logo.svg';
 import {
+  getCadModelName,
   getEmbedMedia,
-  getMediaImageUrl,
   getMediaLinkUrl,
+  getMediaThumbUrl,
 } from '~/lib/mediaUtils';
 
 export default function TeamMediaGallery({
@@ -13,7 +20,11 @@ export default function TeamMediaGallery({
 }: {
   media: Media[];
 }): React.JSX.Element | null {
-  const embedMedia = getEmbedMedia(media);
+  const embedMedia = getEmbedMedia(media).toSorted(
+    (a, b) =>
+      Number(b.type === 'instagram-image') -
+      Number(a.type === 'instagram-image'),
+  );
 
   if (embedMedia.length === 0) {
     return null;
@@ -21,66 +32,66 @@ export default function TeamMediaGallery({
 
   return (
     <div
-      className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      className="grid grid-flow-row-dense auto-rows-[16rem]
+        grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),1fr))] gap-4"
       data-testid="team-media-gallery"
     >
-      {embedMedia.map((m, index) => {
-        if (m.type === 'imgur') {
-          return <ImgurEmbed key={index} media={m} />;
+      {embedMedia.map((m): React.JSX.Element => {
+        const key = `${m.type}-${m.foreign_key}`;
+        switch (m.type) {
+          case 'imgur':
+            return <ImgurEmbed key={key} media={m} />;
+          case 'instagram-image':
+            return <InstagramImageEmbed key={key} media={m} />;
+          case 'cd-thread':
+            return (
+              <CaptionedEmbed
+                key={key}
+                media={m}
+                title={m.details?.thread_title}
+              />
+            );
+          case 'grabcad':
+            return (
+              <CaptionedEmbed key={key} media={m} title={getCadModelName(m)} />
+            );
+          case 'onshape':
+            return (
+              <CaptionedEmbed
+                key={key}
+                media={m}
+                title={getCadModelName(m)}
+                badge={
+                  <>
+                    <img
+                      src={onshapeLogo}
+                      alt="Onshape"
+                      className="-my-2.5 h-10 shrink-0 dark:hidden"
+                    />
+                    <img
+                      src={onshapeLogoDark}
+                      alt="Onshape"
+                      className="-my-2.5 hidden h-10 shrink-0 dark:block"
+                    />
+                  </>
+                }
+              />
+            );
         }
-        if (m.type === 'instagram-image') {
-          return <InstagramImageEmbed key={index} media={m} />;
-        }
-        if (m.type === 'cd-thread') {
-          return <CdThreadEmbed key={index} media={m} />;
-        }
-        return null;
       })}
     </div>
   );
 }
 
+function isImgurRemovedPlaceholder(img: HTMLImageElement): boolean {
+  return img.naturalWidth === 161 && img.naturalHeight === 81;
+}
+
 function ImgurEmbed({ media }: { media: Media }): React.JSX.Element | null {
-  // This component automatically hides imgur images that have been deleted or made unavailable
   const [failed, setFailed] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
-  const thumbnailUrl = getMediaImageUrl(media);
-
-  useEffect(() => {
-    const img = imgRef.current;
-    if (!img) return;
-
-    const check = () => {
-      // Imgur serves a 302 redirect to /removed.png for deleted images rather
-      // than a 404, so onError never fires. The removed placeholder is 161x81.
-      if (img.naturalWidth === 161 && img.naturalHeight === 81) {
-        setFailed(true);
-      } else {
-        setVisible(true);
-      }
-    };
-
-    // React's synthetic onLoad misses images that finish loading before
-    // hydration attaches the handler (common when the browser has the image
-    // cached). Using a ref lets us check img.complete synchronously and fall
-    // back to a native listener only when the load is still in flight.
-    if (img.complete) {
-      check();
-    } else {
-      img.addEventListener('load', check);
-      img.addEventListener('error', () => setFailed(true));
-      return () => img.removeEventListener('load', check);
-    }
-  }, []);
+  const thumbnailUrl = getMediaThumbUrl(media);
 
   if (!thumbnailUrl || failed) return null;
-
-  // While the check is in flight, render a hidden img that takes no space.
-  // Once confirmed valid, swap to the real card — same src hits browser cache.
-  if (!visible) {
-    return <img ref={imgRef} src={thumbnailUrl} alt="" className="hidden" />;
-  }
 
   return (
     <a
@@ -90,21 +101,34 @@ function ImgurEmbed({ media }: { media: Media }): React.JSX.Element | null {
       className="block overflow-hidden rounded-lg border-2 border-neutral-300
         hover:border-neutral-400"
     >
-      <img src={thumbnailUrl} alt="" className="h-64 w-full object-cover" />
+      <img
+        ref={(el) => {
+          if (el?.complete && isImgurRemovedPlaceholder(el)) setFailed(true);
+        }}
+        src={thumbnailUrl}
+        alt="Team media"
+        loading="lazy"
+        decoding="async"
+        onLoad={(e) => {
+          if (isImgurRemovedPlaceholder(e.currentTarget)) setFailed(true);
+        }}
+        onError={() => setFailed(true)}
+        className="h-full w-full object-cover"
+      />
     </a>
   );
 }
 
-type CdThreadMedia = Extract<Media, { type: 'cd-thread' }>;
-
-function CdThreadEmbed({
+function CaptionedEmbed({
   media,
+  title,
+  badge,
 }: {
-  media: CdThreadMedia;
+  media: Media;
+  title?: string | null;
+  badge?: React.ReactNode;
 }): React.JSX.Element | null {
-  const details = media.details;
-  const imageUrl = details?.image_url;
-  const threadTitle = details?.thread_title;
+  const imageUrl = getMediaThumbUrl(media);
   const linkUrl = getMediaLinkUrl(media);
 
   if (!imageUrl || !linkUrl) return null;
@@ -114,17 +138,20 @@ function CdThreadEmbed({
       href={linkUrl}
       target="_blank"
       rel="noreferrer"
-      className="block overflow-hidden rounded-lg border-2 border-neutral-300
-        hover:border-neutral-400"
+      className="flex flex-col overflow-hidden rounded-lg border-2
+        border-neutral-300 hover:border-neutral-400"
     >
       <img
         src={imageUrl}
-        alt={threadTitle ?? ''}
-        className="h-64 w-full object-cover"
+        alt={title ?? ''}
+        loading="lazy"
+        decoding="async"
+        className="min-h-0 w-full flex-1 object-cover"
       />
-      {threadTitle && (
-        <div className="truncate px-2 py-1 text-sm font-medium">
-          {threadTitle}
+      {title && (
+        <div className="flex items-center gap-1.5 px-2 py-1 text-sm font-medium">
+          <span className="truncate">{title}</span>
+          {badge && <span className="ml-auto flex">{badge}</span>}
         </div>
       )}
     </a>
@@ -137,6 +164,35 @@ function InstagramImageEmbed({
   media: Media;
 }): React.JSX.Element | null {
   const url = getMediaLinkUrl(media);
+  const { ref, inView } = useInView({ triggerOnce: true, rootMargin: '400px' });
   if (!url) return null;
-  return <InstagramEmbed url={url} width="100%" />;
+  const placeholder = (
+    <Skeleton
+      className="flex h-[512px] items-center justify-center rounded-none"
+    >
+      <SimpleIconsInstagram className="size-10 text-muted-foreground" />
+    </Skeleton>
+  );
+  return (
+    <div ref={ref} className="row-span-2">
+      {inView ? (
+        <InstagramEmbed
+          url={url}
+          width="100%"
+          className="h-full rounded-lg! border-2 border-neutral-300
+            hover:border-neutral-400 [&_iframe]:m-0! [&_iframe]:h-full!
+            [&_iframe]:w-full! [&_iframe]:min-w-0! [&_iframe]:rounded-none!
+            [&_iframe]:border-0!"
+          embedPlaceholder={placeholder}
+        />
+      ) : (
+        <div
+          className="h-full overflow-clip rounded-lg border-2
+            border-neutral-300"
+        >
+          {placeholder}
+        </div>
+      )}
+    </div>
+  );
 }

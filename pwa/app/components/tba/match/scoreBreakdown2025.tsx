@@ -6,9 +6,11 @@ import {
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 import { Badge } from '~/components/ui/badge';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
+import { getRobotPoints } from '~/lib/robotScoring';
 
 export default function ScoreBreakdown2025({
   scoreBreakdown,
@@ -53,9 +55,7 @@ export default function ScoreBreakdown2025({
             />
             (+{scoreBreakdown.red.autoMobilityPoints})
           </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Auto Leave
-          </TableCell>
+          <TableCell className="bg-breakdown-label">Auto Leave</TableCell>
           <TableCell
             colSpan={2}
             className="bg-alliance-blue-winner whitespace-nowrap *:align-middle"
@@ -88,7 +88,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-loser">
             {scoreBreakdown.red.autoReef?.tba_topRowCount}
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950" rowSpan={4}>
+          <TableCell className="bg-breakdown-cell" rowSpan={4}>
             Auto Coral Count
           </TableCell>
           <TableCell className="bg-alliance-blue-loser">
@@ -132,7 +132,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-winner" colSpan={2}>
             {scoreBreakdown.red.autoCoralPoints}
           </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
+          <TableCell className="bg-breakdown-label">
             Auto Coral Points
           </TableCell>
           <TableCell className="bg-alliance-blue-winner" colSpan={2}>
@@ -145,9 +145,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-winner" colSpan={2}>
             {scoreBreakdown.red.autoPoints}
           </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Total Auto
-          </TableCell>
+          <TableCell className="bg-breakdown-label">Total Auto</TableCell>
           <TableCell className="bg-alliance-blue-winner" colSpan={2}>
             {scoreBreakdown.blue.autoPoints}
           </TableCell>
@@ -159,7 +157,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-loser">
             {scoreBreakdown.red.teleopReef?.tba_topRowCount}
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950" rowSpan={4}>
+          <TableCell className="bg-breakdown-cell" rowSpan={4}>
             Teleop Coral Count
           </TableCell>
           <TableCell className="bg-alliance-blue-loser">
@@ -203,7 +201,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-winner" colSpan={2}>
             {scoreBreakdown.red.teleopCoralPoints}
           </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
+          <TableCell className="bg-breakdown-label">
             Teleop Coral Points
           </TableCell>
           <TableCell className="bg-alliance-blue-winner" colSpan={2}>
@@ -216,7 +214,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-loser" colSpan={2}>
             {scoreBreakdown.red.wallAlgaeCount}
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
+          <TableCell className="bg-breakdown-cell">
             Processor Algae Count
           </TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
@@ -229,9 +227,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-loser" colSpan={2}>
             {scoreBreakdown.red.netAlgaeCount}
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Net Algae Count
-          </TableCell>
+          <TableCell className="bg-breakdown-cell">Net Algae Count</TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
             {scoreBreakdown.blue.netAlgaeCount}
           </TableCell>
@@ -242,9 +238,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-winner" colSpan={2}>
             {scoreBreakdown.red.algaePoints}
           </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Algae Points
-          </TableCell>
+          <TableCell className="bg-breakdown-label">Algae Points</TableCell>
           <TableCell className="bg-alliance-blue-winner" colSpan={2}>
             {scoreBreakdown.blue.algaePoints}
           </TableCell>
@@ -255,15 +249,15 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-loser" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot1}
+              points={getRobotPoints(2025, scoreBreakdown.red, 1, 'endgame')}
               teamKey={match.alliances.red.team_keys[0]}
             />
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Robot 1 Endgame
-          </TableCell>
+          <TableCell className="bg-breakdown-cell">Robot 1 Endgame</TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot1}
+              points={getRobotPoints(2025, scoreBreakdown.blue, 1, 'endgame')}
               teamKey={match.alliances.blue.team_keys[0]}
             />
           </TableCell>
@@ -274,15 +268,15 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-loser" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot2}
+              points={getRobotPoints(2025, scoreBreakdown.red, 2, 'endgame')}
               teamKey={match.alliances.red.team_keys[1]}
             />
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Robot 2 Endgame
-          </TableCell>
+          <TableCell className="bg-breakdown-cell">Robot 2 Endgame</TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot2}
+              points={getRobotPoints(2025, scoreBreakdown.blue, 2, 'endgame')}
               teamKey={match.alliances.blue.team_keys[1]}
             />
           </TableCell>
@@ -293,15 +287,15 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-loser" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot3}
+              points={getRobotPoints(2025, scoreBreakdown.red, 3, 'endgame')}
               teamKey={match.alliances.red.team_keys[2]}
             />
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Robot 3 Endgame
-          </TableCell>
+          <TableCell className="bg-breakdown-cell">Robot 3 Endgame</TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot3}
+              points={getRobotPoints(2025, scoreBreakdown.blue, 3, 'endgame')}
               teamKey={match.alliances.blue.team_keys[2]}
             />
           </TableCell>
@@ -312,9 +306,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-winner" colSpan={2}>
             {scoreBreakdown.red.endGameBargePoints}
           </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Barge Points
-          </TableCell>
+          <TableCell className="bg-breakdown-label">Barge Points</TableCell>
           <TableCell className="bg-alliance-blue-winner" colSpan={2}>
             {scoreBreakdown.blue.endGameBargePoints}
           </TableCell>
@@ -325,9 +317,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-winner" colSpan={2}>
             {scoreBreakdown.red.teleopPoints}
           </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Total Teleop
-          </TableCell>
+          <TableCell className="bg-breakdown-label">Total Teleop</TableCell>
           <TableCell className="bg-alliance-blue-winner" colSpan={2}>
             {scoreBreakdown.blue.teleopPoints}
           </TableCell>
@@ -340,7 +330,7 @@ export default function ScoreBreakdown2025({
               condition={scoreBreakdown.red.coopertitionCriteriaMet ?? false}
             />
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
+          <TableCell className="bg-breakdown-cell">
             Coopertition Criteria Met
           </TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
@@ -357,9 +347,7 @@ export default function ScoreBreakdown2025({
               condition={scoreBreakdown.red.autoBonusAchieved ?? false}
             />
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Auto Bonus
-          </TableCell>
+          <TableCell className="bg-breakdown-cell">Auto Bonus</TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
             <ConditionalRpAchieved
               condition={scoreBreakdown.blue.autoBonusAchieved ?? false}
@@ -374,9 +362,7 @@ export default function ScoreBreakdown2025({
               condition={scoreBreakdown.red.coralBonusAchieved ?? false}
             />
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Coral Bonus
-          </TableCell>
+          <TableCell className="bg-breakdown-cell">Coral Bonus</TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
             <ConditionalRpAchieved
               condition={scoreBreakdown.blue.coralBonusAchieved ?? false}
@@ -391,9 +377,7 @@ export default function ScoreBreakdown2025({
               condition={scoreBreakdown.red.bargeBonusAchieved ?? false}
             />
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Barge Bonus
-          </TableCell>
+          <TableCell className="bg-breakdown-cell">Barge Bonus</TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
             <ConditionalRpAchieved
               condition={scoreBreakdown.blue.bargeBonusAchieved ?? false}
@@ -401,27 +385,32 @@ export default function ScoreBreakdown2025({
           </TableCell>
         </TableRow>
 
-        {/* Fouls / Major Fouls */}
+        {/* Fouls committed by each alliance */}
         <TableRow>
           <TableCell className="bg-alliance-red-loser" colSpan={2}>
-            {scoreBreakdown.red.foulCount} / {scoreBreakdown.red.techFoulCount}
+            {fmtFoulsCommitted({
+              fouls: scoreBreakdown.red.foulCount,
+              techFouls: scoreBreakdown.red.techFoulCount,
+            })}
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Fouls / Major Fouls
+          <TableCell className="bg-breakdown-cell">
+            Fouls / Major Fouls Committed
           </TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
-            {scoreBreakdown.blue.foulCount} /{' '}
-            {scoreBreakdown.blue.techFoulCount}
+            {fmtFoulsCommitted({
+              fouls: scoreBreakdown.blue.foulCount,
+              techFouls: scoreBreakdown.blue.techFoulCount,
+            })}
           </TableCell>
         </TableRow>
 
-        {/* Foul Points */}
+        {/* Foul Points: points each alliance received from the other's fouls */}
         <TableRow>
           <TableCell className="bg-alliance-red-winner" colSpan={2}>
             {scoreBreakdown.red.foulPoints}
           </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Foul Points
+          <TableCell className="bg-breakdown-label">
+            Foul Points Received
           </TableCell>
           <TableCell className="bg-alliance-blue-winner" colSpan={2}>
             {scoreBreakdown.blue.foulPoints}
@@ -433,9 +422,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-loser" colSpan={2}>
             {scoreBreakdown.red.adjustPoints}
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Adjustments
-          </TableCell>
+          <TableCell className="bg-breakdown-cell">Adjustments</TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
             {scoreBreakdown.blue.adjustPoints}
           </TableCell>
@@ -446,9 +433,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-winner" colSpan={2}>
             {scoreBreakdown.red.totalPoints}
           </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Total Score
-          </TableCell>
+          <TableCell className="bg-breakdown-label">Total Score</TableCell>
           <TableCell className="bg-alliance-blue-winner" colSpan={2}>
             {scoreBreakdown.blue.totalPoints}
           </TableCell>
@@ -459,9 +444,7 @@ export default function ScoreBreakdown2025({
           <TableCell className="bg-alliance-red-loser" colSpan={2}>
             +{scoreBreakdown.red.rp} RP
           </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            RP
-          </TableCell>
+          <TableCell className="bg-breakdown-cell">RP</TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
             +{scoreBreakdown.blue.rp} RP
           </TableCell>
@@ -473,21 +456,13 @@ export default function ScoreBreakdown2025({
 
 function EndgameRobotCell({
   endgame,
+  points,
   teamKey,
 }: {
   endgame: MatchScoreBreakdown2025['red']['endGameRobot1'];
+  points: number;
   teamKey: string;
 }) {
-  const pointMap: Record<
-    NonNullable<MatchScoreBreakdown2025['red']['endGameRobot1']>,
-    number
-  > = {
-    DeepCage: 12,
-    ShallowCage: 6,
-    Parked: 2,
-    None: 0,
-  };
-
   const displayMap: Record<
     NonNullable<MatchScoreBreakdown2025['red']['endGameRobot1']>,
     string
@@ -501,7 +476,7 @@ function EndgameRobotCell({
   return (
     <div className="flex flex-col items-center gap-1">
       <Badge variant={'outline'}>{teamKey.substring(3)}</Badge>
-      {displayMap[endgame ?? 'None']} (+{pointMap[endgame ?? 'None']})
+      {displayMap[endgame ?? 'None']} (+{points})
     </div>
   );
 }

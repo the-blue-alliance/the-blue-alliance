@@ -22,6 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
+import { Spinner } from '~/components/ui/spinner';
 import {
   Table,
   TableBody,
@@ -36,6 +37,7 @@ import {
   SUBSCRIPTION_TYPES,
   SUBSCRIPTION_TYPE_DISPLAY_NAMES,
 } from '~/lib/myTBAConstants';
+import { useHashTab } from '~/lib/useHashTab';
 import { MODEL_TYPE, pluralize } from '~/lib/utils';
 
 export const Route = createFileRoute('/account/mytba')({
@@ -43,6 +45,10 @@ export const Route = createFileRoute('/account/mytba')({
 });
 
 function MyTBA() {
+  const tabs = useHashTab({
+    values: ['teams', 'events'] as const,
+    defaultValue: 'teams',
+  });
   const { isInitialLoading, user } = useAuth();
 
   const { data: favorites } = useQuery({
@@ -53,6 +59,9 @@ function MyTBA() {
       const response = await listFavorites({
         auth: token,
       });
+      if (response.data === undefined) {
+        throw new Error('Failed to load favorites');
+      }
       return response.data;
     },
     enabled: !!user,
@@ -66,13 +75,20 @@ function MyTBA() {
       const response = await listSubscriptions({
         auth: token,
       });
+      if (response.data === undefined) {
+        throw new Error('Failed to load subscriptions');
+      }
       return response.data;
     },
     enabled: !!user,
   });
 
   if (isInitialLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner className="size-8 text-muted-foreground" />
+      </div>
+    );
   }
 
   if (!user) {
@@ -101,7 +117,11 @@ function MyTBA() {
       <div className="py-4">
         <h1 className="text-2xl font-bold">myTBA</h1>
       </div>
-      <Tabs defaultValue="teams" className="mt-4">
+      <Tabs
+        value={tabs.value}
+        onValueChange={(value) => tabs.onValueChange(String(value))}
+        className="mt-4"
+      >
         <TabsList>
           <TabsTrigger value="teams">My Teams</TabsTrigger>
           <TabsTrigger value="events">My Events</TabsTrigger>
@@ -128,7 +148,8 @@ function MyTBA() {
 interface ModelListProps {
   favorites: FavoriteMessage[];
   subscriptions: SubscriptionMessage[];
-}
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function buildCombinedItems(
   favorites: FavoriteMessage[],

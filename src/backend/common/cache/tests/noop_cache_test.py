@@ -25,3 +25,11 @@ def test_noop_cache() -> None:
     stats = cache.get_stats()
     assert stats is not None
     assert stats["misses"] == 4
+
+
+def test_noop_cache_async() -> None:
+    cache = NoopCache()
+
+    assert cache.set_async(b"key", "value").get_result() is True
+    assert cache.get_async(b"key").get_result() is None
+    assert cache.miss_count == 1

@@ -8,8 +8,8 @@ const EmbedIframe = (props) => {
   };
 
   let iframeMarkup = props.webcast.channel;
-  iframeMarkup = iframeMarkup.replace(/&lt;/, "<");
-  iframeMarkup = iframeMarkup.replace(/&gt;/, ">");
+  iframeMarkup = iframeMarkup.replace(/&lt;/g, "<");
+  iframeMarkup = iframeMarkup.replace(/&gt;/g, ">");
   const markup = {
     __html: iframeMarkup,
   };

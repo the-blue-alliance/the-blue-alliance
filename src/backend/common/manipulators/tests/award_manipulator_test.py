@@ -369,3 +369,33 @@ class TestAwardManipulator(unittest.TestCase):
 
         # Event is not configured to be within a day - skip it
         mock_awards.assert_not_called()
+
+    def test_postUpdateHook_notifications_deferThrows(self) -> None:
+        """A failure enqueuing the awards notification is swallowed."""
+        import datetime
+
+        self.event.start_date = datetime.datetime.now()
+        self.event.end_date = self.event.start_date + datetime.timedelta(days=1)
+
+        AwardManipulator.createOrUpdate(self.new_award)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+
+        with patch(
+            "backend.common.manipulators.award_manipulator.defer_safe",
+            side_effect=Exception,
+        ) as mock_defer:
+            for task in tasks:
+                run_from_task(task)
+
+        mock_defer.assert_called_once()
+        assert mock_defer.call_args[0][0] == TBANSHelper.awards
+        assert (
+            none_throws(self.taskqueue_stub).get_filtered_tasks(
+                queue_names="push-notifications"
+            )
+            == []
+        )

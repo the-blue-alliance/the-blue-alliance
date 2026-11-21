@@ -1,10 +1,11 @@
 import { Link } from '@tanstack/react-router';
+import { cn } from 'cn';
 
 import MdiVideo from '~icons/mdi/video';
 
 import { Event } from '~/api/tba/read';
 import InlineIcon from '~/components/tba/inlineIcon';
-import { Button } from '~/components/ui/button';
+import { Button, buttonVariants } from '~/components/ui/button';
 import {
   Table,
   TableBody,
@@ -13,52 +14,22 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
+import { getDistrictColorBorderClass } from '~/lib/districtUtils';
 import {
-  getEventDateString,
+  getEventCompactDateString,
   groupEventsByParent,
   isEventActive,
   stripParentPrefix,
 } from '~/lib/eventUtils';
 import { useOnlineEventWebcasts } from '~/lib/gameday/useOnlineEventWebcasts';
-import { cn } from '~/lib/utils';
 
-const DISTRICT_COLORS: Record<string, string> = {
-  ca: 'border-l-district-ca',
-  chs: 'border-l-district-chs',
-  fch: 'border-l-district-chs',
-  fin: 'border-l-district-fin',
-  in: 'border-l-district-fin',
-  isr: 'border-l-district-isr',
-  fim: 'border-l-district-fim',
-  fma: 'border-l-district-fma',
-  mar: 'border-l-district-fma',
-  ne: 'border-l-district-ne',
-  fnc: 'border-l-district-fnc',
-  ont: 'border-l-district-ont',
-  pnw: 'border-l-district-pnw',
-  pch: 'border-l-district-pch',
-  fsc: 'border-l-district-fsc',
-  fit: 'border-l-district-fit',
-  tx: 'border-l-district-fit',
-  win: 'border-l-district-win',
-};
+// Swap the space in "Apr 2" for a non-breaking one so ranges only wrap at the dash.
+const keepMonthDayTogether = (dates: string) =>
+  dates.replace(/(\p{L}+) (\d)/gu, '$1 $2');
 
-function getDistrictColorClass(
-  districtAbbreviation: string | undefined,
-): string {
-  if (!districtAbbreviation) return '';
-  return DISTRICT_COLORS[districtAbbreviation.toLowerCase()] || '';
-}
-
-export default function EventListTable({
-  events,
-  enableGrouping = false,
-}: {
-  events: Event[];
-  enableGrouping?: boolean;
-}) {
+export default function EventListTable({ events }: { events: Event[] }) {
   const isEventOnline = useOnlineEventWebcasts();
-  const items = enableGrouping ? groupEventsByParent(events) : events;
+  const items = groupEventsByParent(events);
   // Build a set of all division keys so we can identify division rows on the fly.
   const allDivisionKeys = new Set(items.flatMap((e) => e.division_keys));
   // Map each division key to its parent event name for display trimming.
@@ -67,12 +38,13 @@ export default function EventListTable({
   );
 
   return (
-    <Table className="w-full">
+    <Table className="w-full table-fixed">
       <TableHeader>
         <TableRow>
-          <TableHead>Event</TableHead>
-          <TableHead>Webcast</TableHead>
-          <TableHead>Dates</TableHead>
+          <TableHead className="h-9">Event</TableHead>
+          <TableHead className="hidden h-9 md:table-cell md:w-40">
+            Webcast
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -83,8 +55,17 @@ export default function EventListTable({
             isDivision && !allDivisionKeys.has(items[idx + 1]?.key);
           const withinADay = isEventActive(event);
           const isOnline = isEventOnline(event);
-          const districtColor = getDistrictColorClass(
+          const districtColor = getDistrictColorBorderClass(
             event.district?.abbreviation,
+          );
+          const dates = keepMonthDayTogether(getEventCompactDateString(event));
+          const watchButtonContent = (
+            <InlineIcon iconSize="large">
+              <MdiVideo />
+              <span className="hidden md:contents">
+                {isOnline ? 'Watch Now' : 'Offline'}
+              </span>
+            </InlineIcon>
           );
           return (
             <TableRow
@@ -100,7 +81,9 @@ export default function EventListTable({
               )}
             >
               <TableCell
-                className={cn('w-8/12', { 'relative pl-[26px]': isDivision })}
+                className={cn('py-2 md:w-8/12 md:py-1.5', {
+                  'relative pl-[26px]': isDivision,
+                })}
               >
                 {isDivision && districtColor && (
                   <div
@@ -122,47 +105,36 @@ export default function EventListTable({
                       )
                     : event.name}
                 </Link>
-                {!isDivision && (
-                  <div className="text-sm text-neutral-600">
+                {isDivision ? (
+                  <div className="text-sm text-foreground/50">{dates}</div>
+                ) : (
+                  <div className="text-sm text-foreground/50">
                     {event.city}, {event.state_prov}, {event.country}
+                    {' · '}
+                    {dates}
                   </div>
                 )}
               </TableCell>
-              <TableCell>
-                {event.webcasts.length > 0 && (
-                  <Button
-                    asChild={isOnline || withinADay}
-                    variant={isOnline ? 'success' : 'secondary'}
-                    disabled={!isOnline && !withinADay}
-                    className={cn({
-                      'pointer-events-none opacity-50':
-                        !isOnline && !withinADay,
-                    })}
-                  >
-                    {isOnline || withinADay ? (
-                      <a
-                        href={`/gameday/${event.key}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:no-underline"
-                      >
-                        <InlineIcon iconSize="large">
-                          <MdiVideo />
-                          <span className="hidden md:contents">
-                            {isOnline ? 'Watch Now' : 'Offline'}
-                          </span>
-                        </InlineIcon>
-                      </a>
-                    ) : (
-                      <InlineIcon iconSize="large">
-                        <MdiVideo />
-                        <span className="hidden md:contents">Offline</span>
-                      </InlineIcon>
-                    )}
-                  </Button>
-                )}
+              <TableCell className="hidden md:table-cell">
+                {event.webcasts.length > 0 &&
+                  (isOnline || withinADay ? (
+                    <a
+                      href={`/gameday/${event.key}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={buttonVariants({
+                        variant: isOnline ? 'success' : 'secondary',
+                        className: 'hover:no-underline',
+                      })}
+                    >
+                      {watchButtonContent}
+                    </a>
+                  ) : (
+                    <Button variant="secondary" disabled>
+                      {watchButtonContent}
+                    </Button>
+                  ))}
               </TableCell>
-              <TableCell>{getEventDateString(event, 'short')}</TableCell>
             </TableRow>
           );
         })}

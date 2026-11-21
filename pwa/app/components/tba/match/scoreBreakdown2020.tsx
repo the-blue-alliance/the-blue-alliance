@@ -7,7 +7,7 @@ import {
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
-  FoulDisplay,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 import {
   ScoreBreakdownAllianceCell,
@@ -16,13 +16,7 @@ import {
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
 import { Badge } from '~/components/ui/badge';
-import { POINTS_PER_FOUL, POINTS_PER_TECH_FOUL } from '~/lib/pointValues';
-
-const ENDGAME_2020_POINTS: Record<string, number> = {
-  Hang: 25,
-  Park: 5,
-  None: 0,
-};
+import { getRobotPoints } from '~/lib/robotScoring';
 
 export default function ScoreBreakdown2020({
   scoreBreakdown,
@@ -268,6 +262,7 @@ export default function ScoreBreakdown2020({
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.red.endgameRobot1}
+            points={getRobotPoints(2020, scoreBreakdown.red, 1, 'endgame')}
             teamKey={match.alliances.red.team_keys[0]}
           />
         </ScoreBreakdownAllianceCell>
@@ -277,6 +272,7 @@ export default function ScoreBreakdown2020({
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.blue.endgameRobot1}
+            points={getRobotPoints(2020, scoreBreakdown.blue, 1, 'endgame')}
             teamKey={match.alliances.blue.team_keys[0]}
           />
         </ScoreBreakdownAllianceCell>
@@ -287,6 +283,7 @@ export default function ScoreBreakdown2020({
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.red.endgameRobot2}
+            points={getRobotPoints(2020, scoreBreakdown.red, 2, 'endgame')}
             teamKey={match.alliances.red.team_keys[1]}
           />
         </ScoreBreakdownAllianceCell>
@@ -296,6 +293,7 @@ export default function ScoreBreakdown2020({
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.blue.endgameRobot2}
+            points={getRobotPoints(2020, scoreBreakdown.blue, 2, 'endgame')}
             teamKey={match.alliances.blue.team_keys[1]}
           />
         </ScoreBreakdownAllianceCell>
@@ -306,6 +304,7 @@ export default function ScoreBreakdown2020({
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.red.endgameRobot3}
+            points={getRobotPoints(2020, scoreBreakdown.red, 3, 'endgame')}
             teamKey={match.alliances.red.team_keys[2]}
           />
         </ScoreBreakdownAllianceCell>
@@ -315,6 +314,7 @@ export default function ScoreBreakdown2020({
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.blue.endgameRobot3}
+            points={getRobotPoints(2020, scoreBreakdown.blue, 3, 'endgame')}
             teamKey={match.alliances.blue.team_keys[2]}
           />
         </ScoreBreakdownAllianceCell>
@@ -409,31 +409,38 @@ export default function ScoreBreakdown2020({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Fouls / Tech Fouls */}
+      {/* Fouls committed by each alliance */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.red.foulCount,
+            techFouls: scoreBreakdown.red.techFoulCount,
+          })}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Fouls / Tech Fouls Committed
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.blue.foulCount,
+            techFouls: scoreBreakdown.blue.techFoulCount,
+          })}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Foul Points: points each alliance received from the other's fouls */}
       <ScoreBreakdownRow
         redValue={scoreBreakdown.red.foulPoints}
         blueValue={scoreBreakdown.blue.foulPoints}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          <FoulDisplay
-            foulsReceived={scoreBreakdown.blue.foulCount}
-            pointsPerFoul={POINTS_PER_FOUL[2020]}
-            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
-            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2020]}
-            techOrMajor="tech"
-          />
+          {scoreBreakdown.red.foulPoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
-          Fouls / Tech Fouls
+          Foul Points Received
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          <FoulDisplay
-            foulsReceived={scoreBreakdown.red.foulCount}
-            pointsPerFoul={POINTS_PER_FOUL[2020]}
-            techFoulsReceived={scoreBreakdown.red.techFoulCount}
-            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2020]}
-            techOrMajor="tech"
-          />
+          {scoreBreakdown.blue.foulPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
@@ -510,12 +517,11 @@ function ControlPanelCell({
 
 interface EndgameRobotCellProps {
   endgame: MatchScoreBreakdown2020['red']['endgameRobot1'];
+  points: number;
   teamKey: string;
 }
 
-function EndgameRobotCell({ endgame, teamKey }: EndgameRobotCellProps) {
-  const points = ENDGAME_2020_POINTS[endgame] ?? 0;
-
+function EndgameRobotCell({ endgame, points, teamKey }: EndgameRobotCellProps) {
   return (
     <div className="flex flex-col items-center gap-1">
       <Badge variant={'outline'}>{teamKey.substring(3)}</Badge>

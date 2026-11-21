@@ -126,3 +126,35 @@ describe("AddMultipleTeams", () => {
     expect(button).toBeDisabled();
   });
 });
+
+describe("AddMultipleTeams failure reporting", () => {
+  test("forwards update errors to showErrorMessage and keeps the pending class", () => {
+    const updateTeamList = jest.fn((_teams, _onSuccess, onError) =>
+      onError("Upload failed")
+    );
+    const showErrorMessage = jest.fn();
+    const clearTeams = jest.fn();
+    render(
+      <AddMultipleTeams
+        selectedEvent="event1"
+        updateTeamList={updateTeamList}
+        clearTeams={clearTeams}
+        showErrorMessage={showErrorMessage}
+      />
+    );
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "254" } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Overwrite Teams" }));
+
+    expect(updateTeamList).toHaveBeenCalledWith(
+      ["frc254"],
+      expect.any(Function),
+      expect.any(Function)
+    );
+    expect(showErrorMessage).toHaveBeenCalledWith("Upload failed");
+    expect(clearTeams).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Overwrite Teams" })).toHaveClass(
+      "btn-warning"
+    );
+  });
+});

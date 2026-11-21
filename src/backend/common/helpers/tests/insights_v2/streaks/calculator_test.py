@@ -6,6 +6,7 @@ from backend.common.helpers.insights_v2.streaks.calculator import (
     STREAK_TOP_N,
     StreakV2Calculator,
 )
+from backend.common.helpers.tests.insights_v2.fakes import fake_match
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
@@ -222,3 +223,12 @@ def test_renamed_district_normalized_to_latest_code(ndb_stub) -> None:
     assert len(district_insights) == 1
     assert district_insights[0].district_abbreviation == "fch"
     assert {e["key"] for e in district_insights[0].data["entries"]} == {"frc1", "frc2"}
+
+
+def test_effective_winning_alliance_2015_uses_scores() -> None:
+    def match(red: int, blue: int):
+        return fake_match(red, blue, year=2015)
+
+    assert StreakV2Calculator._effective_winning_alliance(match(10, 5)) == "red"
+    assert StreakV2Calculator._effective_winning_alliance(match(5, 10)) == "blue"
+    assert StreakV2Calculator._effective_winning_alliance(match(5, 5)) == ""

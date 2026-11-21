@@ -18,7 +18,11 @@ class RobotTrajectory extends React.PureComponent {
   generatePath = (teamData, startTime, endTime) => {
     let path = "";
     let first = true;
-    for (let i = startTime; i < Math.min(teamData.xs.length, endTime); i++) {
+    for (
+      let i = startTime;
+      i <= Math.min(teamData.xs.length - 1, endTime);
+      i++
+    ) {
       if (teamData.xs[i] !== null && teamData.ys[i] !== null) {
         if (first) {
           first = false;
@@ -74,7 +78,7 @@ class RobotTrajectory extends React.PureComponent {
           stroke={color}
           strokeWidth={0.2}
         />
-        {x && (
+        {Number.isFinite(x) && (
           <circle
             cx={x}
             cy={27 - y}
@@ -84,7 +88,7 @@ class RobotTrajectory extends React.PureComponent {
             strokeWidth={0.2}
           />
         )}
-        {x && (
+        {Number.isFinite(x) && (
           <text
             x={x}
             y={27 - y}

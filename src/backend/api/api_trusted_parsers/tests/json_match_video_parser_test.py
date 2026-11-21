@@ -154,3 +154,33 @@ def test_parse_valid_video_id_with_hyphens_and_underscores() -> None:
     data = {"qm1": "abc-def_123"}
     parsed = JSONMatchVideoParser.parse("2024casj", json.dumps(data))
     assert parsed == {"2024casj_qm1": "abc-def_123"}
+
+
+def test_parse_valid_video_id_with_start_time() -> None:
+    data = {
+        "qm1": "dQw4w9WgXcw?t=90",
+        "qm2": "oHg5SJYRHA0?t=0",
+        "qm3": "abc12345678?t=11850",
+    }
+    parsed = JSONMatchVideoParser.parse("2024casj", json.dumps(data))
+    assert parsed == {
+        "2024casj_qm1": "dQw4w9WgXcw?t=90",
+        "2024casj_qm2": "oHg5SJYRHA0?t=0",
+        "2024casj_qm3": "abc12345678?t=11850",
+    }
+
+
+def test_parse_invalid_video_id_bad_timestamp_format_raises_exception() -> None:
+    bad_timestamps = [
+        "dQw4w9WgXcw?t=1m30s",
+        "dQw4w9WgXcw?t=-10",
+        "dQw4w9WgXcw?t=abc",
+        "dQw4w9WgXcw?time=90",
+        "https://youtu.be/dQw4w9WgXcw?t=90",
+    ]
+    for bad_id in bad_timestamps:
+        data = {"qm1": bad_id}
+        with pytest.raises(
+            ParserInputException, match="Invalid YouTube video IDs provided"
+        ):
+            JSONMatchVideoParser.parse("2024casj", json.dumps(data))

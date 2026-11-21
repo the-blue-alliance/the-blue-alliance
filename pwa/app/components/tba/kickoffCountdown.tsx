@@ -85,8 +85,8 @@ export function KickoffCountdown({
 
   return (
     <div
-      className="mx-auto max-w-[600px] rounded-xl border border-border bg-card
-        p-6 text-card-foreground shadow-lg"
+      className="mx-auto mb-4 max-w-[600px] rounded-xl border border-border
+        bg-card p-6 text-card-foreground shadow-lg"
     >
       <h2
         className="mb-4 text-center text-2xl font-bold text-foreground
@@ -139,7 +139,9 @@ export function KickoffCountdown({
 
       <div className="mt-4 flex justify-center">
         <a
-          href="/watch/kickoff"
+          href="https://www.thebluealliance.com/watch/kickoff"
+          target="_blank"
+          rel="noopener noreferrer"
           className={`inline-flex items-center gap-2 rounded-lg px-6 py-3
             text-lg font-semibold transition-colors hover:no-underline ${
               isWithin24Hours

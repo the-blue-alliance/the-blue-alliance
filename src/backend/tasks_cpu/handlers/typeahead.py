@@ -91,7 +91,7 @@ def do_typeahead() -> Response:
 
     for district in districts:
         data = "%s District [%s]" % (
-            district.display_name,
+            district.render_name,
             district.abbreviation.upper(),
         )
         # all districts

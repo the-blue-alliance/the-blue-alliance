@@ -1,5 +1,21 @@
 [run]
 relative_files = True
+# Vendored Google Cloud Storage client (Apache-2.0, see its LICENSE/README).
+# It is not ours to test; keep it out of the coverage denominator.
+omit =
+    src/backend/common/storage/clients/cloudstorage/*
+    # Tests are not the code under test. Skipped live-API tests and unused
+    # helper branches in test files would otherwise count as "uncovered".
+    */tests/*
+    */conftest.py
 
 [report]
 ignore_errors = True
+# Lines that exist for the type checker or as deliberate dead ends, not for
+# runtime behaviour. Anything else that can't run under test needs an
+# explicit `# pragma: no cover` with a reason.
+exclude_also =
+    if TYPE_CHECKING:
+    @overload
+    raise NotImplementedError
+    if __name__ == .__main__.:

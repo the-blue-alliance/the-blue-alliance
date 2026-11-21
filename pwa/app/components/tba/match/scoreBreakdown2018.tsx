@@ -1,5 +1,8 @@
 import { AutoRobot2018, Match, MatchScoreBreakdown2018 } from '~/api/tba/read';
-import { ConditionalBadge, FoulDisplay } from '~/components/tba/match/common';
+import {
+  ConditionalBadge,
+  fmtFoulsCommitted,
+} from '~/components/tba/match/common';
 import {
   ScoreBreakdownAllianceCell,
   ScoreBreakdownLabelCell,
@@ -7,11 +10,7 @@ import {
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
 import { Badge } from '~/components/ui/badge';
-import {
-  ENDGAME_2018_POINTS,
-  POINTS_PER_FOUL,
-  POINTS_PER_TECH_FOUL,
-} from '~/lib/pointValues';
+import { getRobotPoints } from '~/lib/robotScoring';
 
 export default function ScoreBreakdown2018({
   scoreBreakdown,
@@ -301,8 +300,7 @@ export default function ScoreBreakdown2018({
           </Badge>
           <span>
             {scoreBreakdown.red.endgameRobot1} (+
-            {ENDGAME_2018_POINTS[scoreBreakdown.red.endgameRobot1 ?? 'Unknown']}
-            )
+            {getRobotPoints(2018, scoreBreakdown.red, 1, 'endgame')})
           </span>
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
@@ -319,12 +317,7 @@ export default function ScoreBreakdown2018({
           </Badge>
           <span>
             {scoreBreakdown.blue.endgameRobot1} (+
-            {
-              ENDGAME_2018_POINTS[
-                scoreBreakdown.blue.endgameRobot1 ?? 'Unknown'
-              ]
-            }
-            )
+            {getRobotPoints(2018, scoreBreakdown.blue, 1, 'endgame')})
           </span>
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
@@ -341,8 +334,7 @@ export default function ScoreBreakdown2018({
           </Badge>
           <span>
             {scoreBreakdown.red.endgameRobot2} (+
-            {ENDGAME_2018_POINTS[scoreBreakdown.red.endgameRobot2 ?? 'Unknown']}
-            )
+            {getRobotPoints(2018, scoreBreakdown.red, 2, 'endgame')})
           </span>
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
@@ -359,12 +351,7 @@ export default function ScoreBreakdown2018({
           </Badge>
           <span>
             {scoreBreakdown.blue.endgameRobot2} (+
-            {
-              ENDGAME_2018_POINTS[
-                scoreBreakdown.blue.endgameRobot2 ?? 'Unknown'
-              ]
-            }
-            )
+            {getRobotPoints(2018, scoreBreakdown.blue, 2, 'endgame')})
           </span>
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
@@ -381,8 +368,7 @@ export default function ScoreBreakdown2018({
           </Badge>
           <span>
             {scoreBreakdown.red.endgameRobot3} (+
-            {ENDGAME_2018_POINTS[scoreBreakdown.red.endgameRobot3 ?? 'Unknown']}
-            )
+            {getRobotPoints(2018, scoreBreakdown.red, 3, 'endgame')})
           </span>
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
@@ -399,12 +385,7 @@ export default function ScoreBreakdown2018({
           </Badge>
           <span>
             {scoreBreakdown.blue.endgameRobot3} (+
-            {
-              ENDGAME_2018_POINTS[
-                scoreBreakdown.blue.endgameRobot3 ?? 'Unknown'
-              ]
-            }
-            )
+            {getRobotPoints(2018, scoreBreakdown.blue, 3, 'endgame')})
           </span>
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
@@ -441,52 +422,59 @@ export default function ScoreBreakdown2018({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Fouls */}
-      <ScoreBreakdownRow
-        blueValue={scoreBreakdown.blue.foulPoints}
-        redValue={scoreBreakdown.red.foulPoints}
-      >
+      {/* Fouls committed by each alliance */}
+      <ScoreBreakdownRow>
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          <FoulDisplay
-            foulsReceived={scoreBreakdown.red.foulCount}
-            pointsPerFoul={POINTS_PER_FOUL[2018]}
-            techFoulsReceived={scoreBreakdown.red.techFoulCount}
-            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2018]}
-            techOrMajor="tech"
-          />
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.red.foulCount,
+            techFouls: scoreBreakdown.red.techFoulCount,
+          })}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
-          Fouls Received
+          Fouls / Tech Fouls Committed
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          <FoulDisplay
-            foulsReceived={scoreBreakdown.blue.foulCount}
-            pointsPerFoul={POINTS_PER_FOUL[2018]}
-            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
-            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2018]}
-            techOrMajor="tech"
-          />
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.blue.foulCount,
+            techFouls: scoreBreakdown.blue.techFoulCount,
+          })}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Foul Points: points each alliance received from the other's fouls */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.foulPoints}
+        blueValue={scoreBreakdown.blue.foulPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {scoreBreakdown.red.foulPoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Foul Points Received
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {scoreBreakdown.blue.foulPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
       {/* Adjustments */}
-      {(scoreBreakdown.blue.adjustPoints ?? 0) !== 0 &&
-        (scoreBreakdown.red.adjustPoints ?? 0) !== 0 && (
-          <ScoreBreakdownRow
-            blueValue={scoreBreakdown.blue.adjustPoints}
-            redValue={scoreBreakdown.red.adjustPoints}
-          >
-            <ScoreBreakdownAllianceCell color="red" shade="light">
-              {scoreBreakdown.red.adjustPoints}
-            </ScoreBreakdownAllianceCell>
-            <ScoreBreakdownLabelCell shade="light">
-              Adjustments
-            </ScoreBreakdownLabelCell>
-            <ScoreBreakdownAllianceCell color="blue" shade="light">
-              {scoreBreakdown.blue.adjustPoints}
-            </ScoreBreakdownAllianceCell>
-          </ScoreBreakdownRow>
-        )}
+      {((scoreBreakdown.blue.adjustPoints ?? 0) !== 0 ||
+        (scoreBreakdown.red.adjustPoints ?? 0) !== 0) && (
+        <ScoreBreakdownRow
+          blueValue={scoreBreakdown.blue.adjustPoints}
+          redValue={scoreBreakdown.red.adjustPoints}
+        >
+          <ScoreBreakdownAllianceCell color="red" shade="light">
+            {scoreBreakdown.red.adjustPoints}
+          </ScoreBreakdownAllianceCell>
+          <ScoreBreakdownLabelCell shade="light">
+            Adjustments
+          </ScoreBreakdownLabelCell>
+          <ScoreBreakdownAllianceCell color="blue" shade="light">
+            {scoreBreakdown.blue.adjustPoints}
+          </ScoreBreakdownAllianceCell>
+        </ScoreBreakdownRow>
+      )}
 
       {/* Total Score */}
       <ScoreBreakdownRow

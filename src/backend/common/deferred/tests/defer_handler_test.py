@@ -80,3 +80,17 @@ def test_handle_defer_decodes_body():
     mock_calls = mock_post.call_args_list
     assert len(mock_calls) == 1
     assert mock_calls[0].args[0]["wsgi.input"].read() == b"foo"
+
+
+def test_decode_deferred_payload_bad_content_length():
+    import io
+
+    from backend.common.deferred.defer_handler import _decode_deferred_payload
+
+    body = base64.b64encode(b"payload")
+    environ = {"CONTENT_LENGTH": "not-a-number", "wsgi.input": io.BytesIO(body)}
+    decoded = _decode_deferred_payload(environ)
+
+    # An unparseable length reads nothing
+    assert decoded["CONTENT_LENGTH"] == 0
+    assert decoded["wsgi.input"].read() == b""

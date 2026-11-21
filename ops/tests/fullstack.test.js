@@ -1,23 +1,13 @@
 import { setDefaultOptions } from "expect-puppeteer";
-import puppeteer from "puppeteer";
 import "regenerator-runtime/runtime";
 
 jest.setTimeout(120000);
 setDefaultOptions({ timeout: 120000 });
 
-// Shared browser instance for all tests
-let sharedBrowser;
-
-beforeAll(async () => {
-  sharedBrowser = await puppeteer.launch({
-    headless: "new",
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
-});
-
-afterAll(async () => {
-  if (sharedBrowser) await sharedBrowser.close();
-});
+// puppeteer 25 is ESM-only, which Jest's CommonJS runtime cannot require, so
+// use the browser the jest-puppeteer preset launches (see
+// jest-puppeteer.config.cjs) instead of launching our own.
+const sharedBrowser = browser;
 
 describe("Homepage", () => {
   let page;

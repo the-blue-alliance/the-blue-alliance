@@ -4,7 +4,6 @@ import { Temporal } from 'temporal-polyfill';
 
 import { Badge } from '~/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { getCacheEntries, getCacheStats } from '~/lib/middleware/network-cache';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 interface CacheInfo {
@@ -12,6 +11,7 @@ interface CacheInfo {
   method: string;
   url: string;
   dataPreview: string;
+  etag: string;
   remainingTTL: number;
   expiresAt: string;
 }
@@ -19,14 +19,16 @@ interface CacheInfo {
 const PREVIEW_JSON_LENGTH = 50;
 
 export const Route = createFileRoute('/local/debug')({
-  loader: () => {
+  loader: async () => {
+    const { getCacheEntries, getCacheStats } =
+      await import('~/lib/middleware/network-cache');
     const stats = getCacheStats();
     const entries = getCacheEntries();
     const now = Temporal.Now.instant().epochMilliseconds;
 
     // Parse cache entries to extract useful information
     const cacheEntries: CacheInfo[] = entries.map(
-      ({ key, data, remainingTTL }) => {
+      ({ key, data, etag, remainingTTL }) => {
         // Format: METHOD:URL
         const parts = key.split(':');
         const method = parts[0] || 'UNKNOWN';
@@ -48,6 +50,7 @@ export const Route = createFileRoute('/local/debug')({
           method,
           url,
           dataPreview: preview,
+          etag: etag ?? '—',
           remainingTTL,
           expiresAt,
         };
@@ -75,7 +78,8 @@ export const Route = createFileRoute('/local/debug')({
       ],
     };
   },
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function formatTimeRemaining(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -132,6 +136,7 @@ function CacheEntryRow({
       <td className="px-4 py-2 font-mono text-xs break-all">
         {entry.dataPreview}
       </td>
+      <td className="px-4 py-2 font-mono text-xs break-all">{entry.etag}</td>
       <td className="px-4 py-2 font-mono text-xs">
         <div>{formatTimeRemaining(timeRemaining)}</div>
         <div className="text-muted-foreground">
@@ -148,7 +153,7 @@ function LocalDebug(): React.JSX.Element {
   const loadTime = Temporal.Instant.from(timestamp).epochMilliseconds;
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="mx-auto max-w-6xl px-4">
       <h1 className="mb-4 text-3xl font-medium">Network Cache Debug</h1>
 
       <Card>
@@ -156,7 +161,10 @@ function LocalDebug(): React.JSX.Element {
           <CardTitle>Cache Statistics</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div
+            className="grid
+              grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-4"
+          >
             <div className="rounded-lg border p-4">
               <div className="text-sm text-muted-foreground">Cache Size</div>
               <div className="text-3xl font-bold">{stats.size}</div>
@@ -176,6 +184,52 @@ function LocalDebug(): React.JSX.Element {
                 %
               </div>
               <div className="text-sm text-muted-foreground">capacity</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Cache Hits</div>
+              <div className="text-3xl font-bold">{stats.hits}</div>
+              <div className="text-sm text-muted-foreground">hits</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Cache Misses</div>
+              <div className="text-3xl font-bold">{stats.misses}</div>
+              <div className="text-sm text-muted-foreground">misses</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Hit Rate</div>
+              <div className="text-3xl font-bold">
+                {Math.round(stats.hitRate * 100)}%
+              </div>
+              <div className="text-sm text-muted-foreground">all-time</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">
+                Revalidations: Not Modified
+              </div>
+              <div className="text-3xl font-bold">
+                {stats.revalidatedNotModified}
+              </div>
+              <div className="text-sm text-muted-foreground">304 responses</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">
+                Revalidations: Modified
+              </div>
+              <div className="text-3xl font-bold">
+                {stats.revalidatedModified}
+              </div>
+              <div className="text-sm text-muted-foreground">200 responses</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">
+                Not Modified Rate
+              </div>
+              <div className="text-3xl font-bold">
+                {Math.round(stats.notModifiedRate * 100)}%
+              </div>
+              <div className="text-sm text-muted-foreground">
+                of revalidations
+              </div>
             </div>
           </div>
           <div className="mt-4 text-sm text-muted-foreground">
@@ -198,7 +252,7 @@ function LocalDebug(): React.JSX.Element {
             <div className="overflow-x-auto">
               <table className="w-full table-auto border-collapse">
                 <thead>
-                  <tr className="border-b bg-neutral-50">
+                  <tr className="border-b bg-muted">
                     <th className="px-4 py-2 text-left text-sm font-medium">
                       Method
                     </th>
@@ -207,6 +261,9 @@ function LocalDebug(): React.JSX.Element {
                     </th>
                     <th className="px-4 py-2 text-left text-sm font-medium">
                       Data Preview
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium">
+                      ETag
                     </th>
                     <th className="px-4 py-2 text-left text-sm font-medium">
                       TTL

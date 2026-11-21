@@ -1,17 +1,25 @@
 from __future__ import annotations
 
+import json
+import logging
+
 from typing import cast
 
 import pytest
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
-from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
+from backend.common.consts.event_type import EventType
 from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2022
 from backend.common.game_specific.seasons.game_specifics_2022 import GameSpecifics2022
 from backend.common.game_specific.seasons.tests.conftest import (
+    assert_partial_breakdowns_split_counters,
+    assert_score_stats_without_breakdowns,
+    build_match,
     HELPERS_TESTS,
+    put_event,
     tiebreak_winner,
 )
 from backend.common.models.event import Event
@@ -80,3 +88,91 @@ def test_round_robin_tiebreaker_names() -> None:
         "Hangar Points",
         "Auto Taxi/Cargo Points",
     ]
+
+
+def test_tiebreak_criteria_without_breakdown_data() -> None:
+    empty = cast(ScoreDetailModelAlliance2022, {})
+    criteria = GameSpecifics2022().tiebreak_criteria(empty, empty)
+    assert criteria == [None] * 3
+    assert tiebreak_winner(criteria) == ""
+
+
+# A played match whose breakdown lacks every scoring field FIRST publishes.
+_BROKEN_BREAKDOWN = {"red": {}, "blue": {}}
+
+
+def test_calculate_event_insights_ignores_unplayed_matches() -> None:
+    matches = [build_match("2022test", "qm", 1, -1, -1, None)]
+    assert GameSpecifics2022().calculate_event_insights(matches) == {
+        "qual": None,
+        "playoff": None,
+    }
+
+
+@pytest.mark.parametrize(
+    "event_type, level",
+    [(EventType.REGIONAL, logging.WARNING), (EventType.OFFSEASON, logging.INFO)],
+)
+def test_calculate_event_insights_logs_failed_matches(
+    event_type: EventType, level: int, caplog: pytest.LogCaptureFixture
+) -> None:
+    put_event("2022test", event_type)
+    broken = build_match("2022test", "qm", 1, 30, 10, _BROKEN_BREAKDOWN)
+    with caplog.at_level(logging.INFO):
+        insights = GameSpecifics2022().calculate_event_insights([broken])
+    assert insights is not None and insights["qual"] is not None
+    failures = [
+        record
+        for record in caplog.records
+        if record.getMessage().startswith("Event insights failed for 2022test_qm1")
+    ]
+    assert failures
+    assert all(record.levelno == level for record in failures)
+
+
+def test_calculate_event_insights_counts_low_climbs_in_quals(
+    test_data_importer,
+) -> None:
+    source = test_data_importer.parse_match_list(
+        HELPERS_TESTS, "data/2022cmptx_matches.json"
+    )[0]
+    red_score = source.alliances[AllianceColor.RED]["score"]
+    blue_score = source.alliances[AllianceColor.BLUE]["score"]
+    breakdown = json.loads(none_throws(source.score_breakdown_json))
+    for color in ALLIANCE_COLORS:
+        for i in range(1, 4):
+            breakdown[color][f"endgameRobot{i}"] = "None"
+
+    no_climbs = build_match("2022cmptx", "qm", 1, red_score, blue_score, breakdown)
+    insights = none_throws(GameSpecifics2022().calculate_event_insights([no_climbs]))
+    assert insights["playoff"] is None
+    assert none_throws(insights["qual"])["low_climb_count"] == [0, 6, 0.0]
+
+    breakdown["red"]["endgameRobot1"] = "Low"
+    one_low = build_match("2022cmptx", "qm", 1, red_score, blue_score, breakdown)
+    insights = none_throws(GameSpecifics2022().calculate_event_insights([one_low]))
+    assert none_throws(insights["qual"])["low_climb_count"] == [1, 6, 100.0 / 6]
+
+
+def test_insights_without_any_breakdowns() -> None:
+    assert_score_stats_without_breakdowns(GameSpecifics2022(), "2022test")
+
+
+def test_insights_with_some_breakdowns(test_data_importer) -> None:
+    test_data_importer.import_match_list(HELPERS_TESTS, "data/2022cmptx_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, "2022cmptx")).fetch()
+    assert_partial_breakdowns_split_counters(GameSpecifics2022(), matches)
+
+
+def test_get_per_robot_coprs() -> None:
+    coprs = GameSpecifics2022().get_per_robot_coprs()
+    breakdown = {
+        "taxiRobot1": "Yes",
+        "taxiRobot2": "No",
+        "taxiRobot3": "Yes",
+        "endgameRobot1": "Traversal",
+        "endgameRobot2": "Mid",
+        "endgameRobot3": "None",
+    }
+    assert coprs["autoTaxiPoints"](breakdown) == [2, 0, 2]
+    assert coprs["endgamePoints"](breakdown) == [15, 6, 0]

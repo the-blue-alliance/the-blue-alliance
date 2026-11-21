@@ -362,3 +362,44 @@ def test_apidocs_webhooks_notification_with_team_key(
     call_args = mock_send.call_args
     assert call_args[1]["event_key"] == "2019nyny"
     assert call_args[1]["team_key"] == "frc1"
+
+
+def test_apidocs_webhooks_notification_with_non_webhook_client(
+    login_user, apidocs_match, web_client: Client
+) -> None:
+    client = MobileClient(
+        parent=ndb.Key(Account, login_user.uid),
+        user_id=str(login_user.uid),
+        messaging_id="android_token",
+        client_type=ClientType.OS_ANDROID,
+        verified=True,
+    )
+    client.put()
+    response = web_client.post(
+        f"/apidocs/webhooks/test/{NotificationType.MATCH_SCORE.value}",
+        data={"match_key": "2019nyny_qm1", "webhook_client_id": str(client.key.id())},
+    )
+    assert response.status_code == 400
+    assert b"Client is not a webhook" in response.data
+
+
+def test_apidocs_webhooks_notification_with_other_users_webhook(
+    login_user, apidocs_match, web_client: Client
+) -> None:
+    webhook = MobileClient(
+        parent=ndb.Key(Account, login_user.uid),
+        user_id="someone_else",
+        messaging_id="https://example.com/webhook",
+        client_type=ClientType.WEBHOOK,
+        verified=True,
+    )
+    webhook.put()
+    response = web_client.post(
+        f"/apidocs/webhooks/test/{NotificationType.MATCH_SCORE.value}",
+        data={
+            "match_key": "2019nyny_qm1",
+            "webhook_client_id": str(webhook.key.id()),
+        },
+    )
+    assert response.status_code == 400
+    assert b"Webhook does not belong to current user" in response.data

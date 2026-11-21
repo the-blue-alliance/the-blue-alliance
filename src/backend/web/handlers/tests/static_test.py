@@ -34,3 +34,18 @@ def test_privacy(web_client: Client) -> None:
 def test_swag(web_client: Client) -> None:
     resp = web_client.get("/swag")
     assert resp.status_code == 302
+
+
+def test_faq(web_client: Client) -> None:
+    resp = web_client.get("/faq")
+    assert resp.status_code == 200
+
+
+def test_thanks(web_client: Client) -> None:
+    resp = web_client.get("/thanks")
+    assert resp.status_code == 200
+
+
+def test_donate(web_client: Client) -> None:
+    resp = web_client.get("/donate")
+    assert resp.status_code == 200

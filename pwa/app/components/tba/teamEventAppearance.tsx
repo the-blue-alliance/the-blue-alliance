@@ -11,11 +11,14 @@ import {
   RegionalAdvancement,
   Team,
   TeamEventStatus,
+  WltRecord,
 } from '~/api/tba/read';
 import AddToCalendarLinks from '~/components/tba/addToCalendarLinks';
 import { AwardBanner } from '~/components/tba/banner';
 import DetailEntity from '~/components/tba/detailEntity';
+import EventRankTooltip from '~/components/tba/eventRankTooltip';
 import { EventLink, EventLocationLink, TeamLink } from '~/components/tba/links';
+import LoadingSkeleton from '~/components/tba/loadingSkeleton';
 import {
   CHANGE_IN_COMP_LEVEL_BREAKER,
   END_OF_DAY_BREAKER,
@@ -24,10 +27,19 @@ import {
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import { Badge } from '~/components/ui/badge';
 import { Separator } from '~/components/ui/separator';
+import { Skeleton } from '~/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
-import { getEventDateString } from '~/lib/eventUtils';
-import { sortMatchComparator } from '~/lib/matchUtils';
+import { getEventDateString, getEventWeekString } from '~/lib/eventUtils';
+import {
+  type TeamAvgScore,
+  calculateTeamAvgScore,
+  calculateTeamRecordsFromMatches,
+  formatAvgScore,
+  sortMatchComparator,
+} from '~/lib/matchUtils';
+import { addRecords, hasAnyMatches } from '~/lib/utils';
 
 function StatChip({
   label,
@@ -47,6 +59,77 @@ function StatChip({
       {sub && <div className="mt-1 text-xs text-muted-foreground">{sub}</div>}
     </div>
   );
+}
+
+function StatChipSkeleton({ label }: { label: string }) {
+  return <LoadingSkeleton label={label} className="h-17 rounded-lg" />;
+}
+
+function SectionSkeleton({ label }: { label: string }) {
+  return (
+    <output aria-label={label} className="block space-y-2">
+      <Skeleton className="h-4 w-24" />
+      <Skeleton className="h-4 w-full" />
+    </output>
+  );
+}
+
+export function getTotalRankingPoints(
+  event: Event,
+  status: TeamEventStatus | null,
+): number | undefined {
+  const ranking = status?.qual?.ranking;
+  const rankingScore = ranking?.sort_orders?.[0];
+  const rankingScoreInfo = status?.qual?.sort_order_info?.[0];
+
+  if (
+    event.year < 2016 ||
+    rankingScoreInfo?.name !== 'Ranking Score' ||
+    rankingScore === undefined ||
+    rankingScore === null
+  ) {
+    return undefined;
+  }
+
+  if (rankingScoreInfo.precision === 0) {
+    return Math.round(rankingScore);
+  }
+
+  if (ranking?.matches_played === undefined) {
+    return undefined;
+  }
+
+  return Math.round(rankingScore * ranking.matches_played);
+}
+
+export function getTeamEventRecord(
+  event: Event,
+  teamKey: string,
+  matches: Match[],
+): WltRecord | undefined {
+  if (event.year === 2015) {
+    return undefined;
+  }
+  const { quals, playoff } = calculateTeamRecordsFromMatches(teamKey, matches);
+  const record = addRecords(quals, playoff);
+  return hasAnyMatches(record) ? record : undefined;
+}
+
+export function getTeamEventAvgScore(
+  event: Event,
+  teamKey: string,
+  matches: Match[],
+): TeamAvgScore | undefined {
+  if (event.year !== 2015) {
+    return undefined;
+  }
+  const avg = calculateTeamAvgScore(teamKey, matches);
+  // Event appearance only surfaces qual averages; playoff averages stay on the
+  // season summary so the compact stats row does not grow for 2015.
+  if (avg.qualAvg === null) {
+    return undefined;
+  }
+  return { qualAvg: avg.qualAvg, playoffAvg: null };
 }
 
 function Section({
@@ -69,6 +152,20 @@ function Section({
   );
 }
 
+export interface RobotAppearance {
+  robotKey: string;
+  sourceTeamKey?: string;
+  status: TeamEventStatus | null | undefined;
+  matches: Match[] | undefined;
+  awards: Award[] | undefined;
+}
+
+interface RobotTab {
+  value: string;
+  label: string;
+  robots: RobotAppearance[];
+}
+
 export default function TeamEventAppearance({
   event,
   matches,
@@ -79,26 +176,62 @@ export default function TeamEventAppearance({
   maybeRegionalPoolPoints,
   maybeAlliances,
   teamRegionalAdvancement,
+  remappedRobots = [],
 }: {
   event: Event;
   matches: Match[];
-  status: TeamEventStatus | null;
+  status: TeamEventStatus | null | undefined;
   team: Team;
   awards: Award[];
-  maybeDistrictPoints: EventDistrictPoints | null;
-  maybeRegionalPoolPoints: EventDistrictPoints | null;
-  maybeAlliances: EliminationAlliance[] | null;
+  maybeDistrictPoints: EventDistrictPoints | null | undefined;
+  maybeRegionalPoolPoints: EventDistrictPoints | null | undefined;
+  maybeAlliances: EliminationAlliance[] | null | undefined;
   teamRegionalAdvancement?: RegionalAdvancement;
+  remappedRobots?: RobotAppearance[];
 }): React.JSX.Element {
   const bannerAwards = awards.filter((a) =>
     BLUE_BANNER_AWARDS.has(a.award_type),
   );
 
-  matches.sort(sortMatchComparator);
+  const robots = [
+    { robotKey: team.key, status, matches, awards },
+    ...remappedRobots,
+  ];
+  const tabs: RobotTab[] = [
+    ...robots.map((r) => ({
+      value: r.robotKey,
+      label: r.robotKey.substring(3),
+      robots: [r],
+    })),
+    { value: 'combined', label: 'Combined', robots },
+  ];
+
+  const matchList = (tab: RobotTab) =>
+    tab.robots.some((r) => r.matches === undefined) ? (
+      <LoadingSkeleton label="Loading matches" className="h-48 w-full" />
+    ) : (
+      <SimpleMatchRowsWithBreaks
+        matches={[
+          ...new Map(
+            tab.robots.flatMap((r) => r.matches ?? []).map((m) => [m.key, m]),
+          ).values(),
+        ].sort(sortMatchComparator)}
+        event={event}
+        breakers={[
+          START_OF_QUALS_BREAKER,
+          END_OF_DAY_BREAKER,
+          CHANGE_IN_COMP_LEVEL_BREAKER,
+        ]}
+        focusTeamKeys={tab.robots.map((r) => r.robotKey)}
+      />
+    );
 
   return (
-    <div className="relative" id={event.key}>
-      <div className="flex flex-wrap gap-x-8">
+    <div className="relative min-[1550px]:grid" id={event.key}>
+      <div
+        className="flex flex-wrap gap-x-8 min-[1550px]:col-start-1
+          min-[1550px]:row-start-1"
+      >
         <div className="w-full md:w-[32%]">
           <h2 className="mb-1 text-2xl font-medium">
             <EventLink eventOrKey={event.key}>{event.name}</EventLink>
@@ -108,8 +241,8 @@ export default function TeamEventAppearance({
             <DetailEntity icon={<DateIcon />}>
               {getEventDateString(event, 'long')}
               <AddToCalendarLinks event={event} />{' '}
-              {event.week !== null && (
-                <Badge variant={'secondary'}>Week {event.week + 1}</Badge>
+              {getEventWeekString(event) && (
+                <Badge variant={'secondary'}>{getEventWeekString(event)}</Badge>
               )}
             </DetailEntity>
             <DetailEntity icon={<LocationIcon />}>
@@ -120,36 +253,59 @@ export default function TeamEventAppearance({
               />
             </DetailEntity>
           </div>
-          <TeamStatus
-            event={event}
-            status={status}
-            team={team}
-            awards={awards}
-            maybeDistrictPoints={maybeDistrictPoints}
-            maybeRegionalPoolPoints={maybeRegionalPoolPoints}
-            maybeAlliances={maybeAlliances}
-            teamRegionalAdvancement={teamRegionalAdvancement}
-          />
+          <div className="space-y-4">
+            {robots.map((r, index) => (
+              <div key={r.robotKey}>
+                {index > 0 && <Separator className="mb-4" />}
+                {robots.length > 1 && (
+                  <h3 className="mb-2 text-lg font-medium">
+                    {r.robotKey.substring(3)}
+                    {r.sourceTeamKey && ` (${r.sourceTeamKey.substring(3)})`}
+                  </h3>
+                )}
+                <TeamStatus
+                  event={event}
+                  matches={r.matches}
+                  status={r.status}
+                  teamKey={r.robotKey}
+                  awards={r.awards}
+                  maybeDistrictPoints={maybeDistrictPoints}
+                  maybeRegionalPoolPoints={maybeRegionalPoolPoints}
+                  maybeAlliances={maybeAlliances}
+                  teamRegionalAdvancement={teamRegionalAdvancement}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="grow">
-          <SimpleMatchRowsWithBreaks
-            matches={matches}
-            event={event}
-            breakers={[
-              START_OF_QUALS_BREAKER,
-              END_OF_DAY_BREAKER,
-              CHANGE_IN_COMP_LEVEL_BREAKER,
-            ]}
-            focusTeamKey={team.key}
-          />
+          {remappedRobots.length > 0 ? (
+            <Tabs defaultValue={team.key} className="mt-4 md:mt-0">
+              <TabsList>
+                {tabs.map((t) => (
+                  <TabsTrigger key={t.value} value={t.value}>
+                    {t.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              {tabs.map((t) => (
+                <TabsContent key={t.value} value={t.value}>
+                  {matchList(t)}
+                </TabsContent>
+              ))}
+            </Tabs>
+          ) : (
+            <div className="mt-2 md:mt-0">{matchList(tabs[0])}</div>
+          )}
         </div>
       </div>
 
       {SEASON_EVENT_TYPES.has(event.event_type) && bannerAwards.length > 0 && (
         <div
-          className="absolute top-0 right-0 -mr-46 hidden min-[1550px]:flex
-            min-[1550px]:flex-col min-[1550px]:gap-2"
+          className="hidden min-[1550px]:col-start-1 min-[1550px]:row-start-1
+            min-[1550px]:flex min-[1550px]:translate-x-46 min-[1550px]:flex-col
+            min-[1550px]:gap-2 min-[1550px]:justify-self-end"
         >
           {bannerAwards.map((a) => (
             <AwardBanner key={a.award_type} award={a} event={event} />
@@ -160,10 +316,59 @@ export default function TeamEventAppearance({
   );
 }
 
-function TeamStatus({
+export function TeamEventRecord({
   event,
+  teamKey,
   status,
-  team,
+  record,
+  avgScore,
+  recordLoading = false,
+}: {
+  event: Event;
+  teamKey: string;
+  status: TeamEventStatus | null | undefined;
+  record: WltRecord | undefined;
+  avgScore?: TeamAvgScore;
+  recordLoading?: boolean;
+}) {
+  const rank = status?.qual?.ranking?.rank;
+  const rankLoading = status === undefined;
+  if (!rank && !record && !avgScore && !rankLoading && !recordLoading) {
+    return null;
+  }
+  const rankingPoints = getTotalRankingPoints(event, status ?? null);
+
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {rankLoading && <StatChipSkeleton label="Loading rank" />}
+      {recordLoading && <StatChipSkeleton label="Loading record" />}
+      {rank && (
+        <EventRankTooltip
+          eventKey={event.key}
+          teamKey={teamKey}
+          rank={rank}
+          numTeams={status?.qual?.num_teams}
+        />
+      )}
+      {record && (
+        <StatChip
+          label="Record"
+          value={`${record.wins}-${record.losses}-${record.ties}`}
+          sub={rankingPoints === undefined ? undefined : `${rankingPoints} RP`}
+        />
+      )}
+      {avgScore?.qualAvg != null && (
+        <StatChip label="Avg Qual" value={formatAvgScore(avgScore.qualAvg)} />
+      )}
+    </div>
+  );
+}
+
+export function TeamStatus({
+  event,
+  matches,
+  status,
+  teamKey,
   awards,
   maybeDistrictPoints,
   maybeRegionalPoolPoints,
@@ -171,73 +376,96 @@ function TeamStatus({
   teamRegionalAdvancement,
 }: {
   event: Event;
-  status: TeamEventStatus | null;
-  team: Team;
-  awards: Award[];
-  maybeDistrictPoints: EventDistrictPoints | null;
-  maybeRegionalPoolPoints: EventDistrictPoints | null;
-  maybeAlliances: EliminationAlliance[] | null;
+  matches: Match[] | undefined;
+  status: TeamEventStatus | null | undefined;
+  teamKey: string;
+  awards: Award[] | undefined;
+  maybeDistrictPoints: EventDistrictPoints | null | undefined;
+  maybeRegionalPoolPoints: EventDistrictPoints | null | undefined;
+  maybeAlliances: EliminationAlliance[] | null | undefined;
   teamRegionalAdvancement?: RegionalAdvancement;
 }) {
   const hasRank = status?.qual?.ranking?.rank;
-  const hasRecord = status?.qual?.ranking?.record;
+  const record = matches && getTeamEventRecord(event, teamKey, matches);
+  const avgScore = matches && getTeamEventAvgScore(event, teamKey, matches);
   const hasAlliance =
     status?.alliance && maybeAlliances && maybeAlliances.length > 0;
-  const hasAwards = awards.length > 0;
+  const allianceRuledOut =
+    status === null ||
+    status?.alliance === null ||
+    maybeAlliances === null ||
+    (maybeAlliances !== undefined &&
+      !maybeAlliances.some((a) => a.picks.includes(teamKey)));
+  const allianceLoading =
+    (status === undefined || maybeAlliances === undefined) && !allianceRuledOut;
+  const hasAwards = awards !== undefined && awards.length > 0;
+  const isDistrictEvent = DISTRICT_EVENT_TYPES.has(event.event_type);
+  const isRegionalEvent = event.event_type === EventType.REGIONAL;
   const hasDistrictPoints =
-    DISTRICT_EVENT_TYPES.has(event.event_type) &&
-    maybeDistrictPoints?.points[team.key];
+    isDistrictEvent && maybeDistrictPoints?.points[teamKey];
   const hasRegionalPoolPoints =
-    event.event_type === EventType.REGIONAL &&
-    maybeRegionalPoolPoints?.points[team.key];
+    isRegionalEvent && maybeRegionalPoolPoints?.points[teamKey];
 
   const sections = [];
 
-  // Stats row (rank + record)
-  if (hasRank || hasRecord) {
+  // Stats row (rank + record, or 2015 average scores)
+  if (
+    hasRank ||
+    record ||
+    avgScore ||
+    status === undefined ||
+    matches === undefined
+  ) {
     sections.push(
-      <div key="stats" className="grid grid-cols-2 gap-2">
-        {hasRank && status?.qual?.ranking?.rank && (
-          <StatChip
-            label="Rank"
-            value={status.qual.ranking.rank.toString()}
-            sub={`of ${status.qual.num_teams}`}
-          />
-        )}
-        {hasRecord && status?.qual?.ranking?.record && (
-          <StatChip
-            label="Record"
-            value={`${
-              status.qual.ranking.record.wins +
-              (status.playoff?.record?.wins ?? 0)
-            }-${
-              status.qual.ranking.record.losses +
-              (status.playoff?.record?.losses ?? 0)
-            }-${
-              status.qual.ranking.record.ties +
-              (status.playoff?.record?.ties ?? 0)
-            }`}
-          />
-        )}
-      </div>,
+      <TeamEventRecord
+        key="stats"
+        event={event}
+        teamKey={teamKey}
+        status={status}
+        record={record}
+        avgScore={avgScore}
+        recordLoading={matches === undefined}
+      />,
     );
   }
 
   // Alliance section
   if (hasAlliance) {
     sections.push(
-      <Section key="alliance" title={status.alliance?.name ?? 'Alliance'}>
-        <div className="flex flex-wrap gap-1">
+      <div
+        key="alliance"
+        className="flex flex-wrap items-center justify-between gap-2"
+      >
+        <h3
+          className="text-sm font-medium tracking-wide text-muted-foreground
+            uppercase"
+        >
+          {status.alliance?.name ?? 'Alliance'}
+        </h3>
+        <div className="flex flex-wrap justify-end gap-1">
           {maybeAlliances
-            .find((a) => a.picks.includes(team.key))
+            .find((a) => a.picks.includes(teamKey))
             ?.picks.map((k) => (
-              <TeamLink key={k} teamOrKey={k} year={event.year}>
-                <Badge variant={'outline'}>{k.substring(3)}</Badge>
+              <TeamLink
+                key={k}
+                teamOrKey={k}
+                year={event.year}
+                aria-current={k === teamKey ? 'page' : undefined}
+              >
+                <Badge
+                  variant={k === teamKey ? 'default' : 'secondary'}
+                  className="px-2 tabular-nums shadow-xs transition-all
+                    hover:-translate-y-px hover:shadow-sm"
+                >
+                  {k.substring(3)}
+                </Badge>
               </TeamLink>
             ))}
         </div>
-      </Section>,
+      </div>,
     );
+  } else if (allianceLoading) {
+    sections.push(<SectionSkeleton key="alliance" label="Loading alliance" />);
   }
 
   // Awards section
@@ -251,7 +479,7 @@ function TeamStatus({
                 (r) =>
                   r.awardee !== null &&
                   r.awardee !== '' &&
-                  r.team_key === team.key,
+                  r.team_key === teamKey,
               );
 
               return (
@@ -270,6 +498,8 @@ function TeamStatus({
         </div>
       </Section>,
     );
+  } else if (awards === undefined) {
+    sections.push(<SectionSkeleton key="awards" label="Loading awards" />);
   }
 
   // District Points section
@@ -277,9 +507,13 @@ function TeamStatus({
     sections.push(
       <Section key="district" title="District Points">
         <DistrictPointsTable
-          districtPoints={maybeDistrictPoints.points[team.key]}
+          districtPoints={maybeDistrictPoints.points[teamKey]}
         />
       </Section>,
+    );
+  } else if (isDistrictEvent && maybeDistrictPoints === undefined) {
+    sections.push(
+      <SectionSkeleton key="district" label="Loading district points" />,
     );
   }
 
@@ -315,9 +549,16 @@ function TeamStatus({
         }
       >
         <DistrictPointsTable
-          districtPoints={maybeRegionalPoolPoints.points[team.key]}
+          districtPoints={maybeRegionalPoolPoints.points[teamKey]}
         />
       </Section>,
+    );
+  } else if (isRegionalEvent && maybeRegionalPoolPoints === undefined) {
+    sections.push(
+      <SectionSkeleton
+        key="regional-pool"
+        label="Loading regional pool points"
+      />,
     );
   }
 

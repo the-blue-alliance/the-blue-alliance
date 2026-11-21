@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
-from pyre_extensions import none_throws
-
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.frc_api.types import ScoreDetailModelAlliance2024
 from backend.common.game_specific.base import (
+    per_robot_points,
     PredictionStatConfig,
+    RobotPointsAccessor,
+    safe_div,
     StatAccessor,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
@@ -24,6 +25,10 @@ class GameSpecifics2024(
     SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2024
     BONUS_RP_BREAKDOWN_FIELDS = ("melodyBonusAchieved", "ensembleBonusAchieved")
     BONUS_RP_PREDICTION_FIELDS = ("prob_melody_bonus", "prob_ensemble_bonus")
+    BONUS_RP_LABELS = (
+        "Melody",
+        "Ensemble",
+    )
     EXTRA_SCORE_BREAKDOWN_KEYS = frozenset(
         [
             "tba_extraRp1",
@@ -105,13 +110,14 @@ class GameSpecifics2024(
 
         high_score: Tuple[int, str, str] = (0, "", "")
 
-        finished_matches = 0
+        scored_matches = 0  # played matches, for alliance-score stats
+        breakdown_matches = 0  # played matches with a score breakdown
 
         for match in matches:
             if not match.has_been_played:
                 continue
 
-            finished_matches += 1
+            scored_matches += 1
 
             red_score = match.alliances[AllianceColor.RED]["score"]
             blue_score = match.alliances[AllianceColor.BLUE]["score"]
@@ -120,11 +126,17 @@ class GameSpecifics2024(
             if win_score > high_score[0]:
                 high_score = (win_score, match.key_name, match.short_name)
 
-            if match.score_breakdown is None:
-                continue
+            total_scores += red_score + blue_score
+            total_win_margins += win_score - min(red_score, blue_score)
+            total_winning_scores += win_score
 
-            red_sb = none_throws(match.score_breakdown)[AllianceColor.RED]
-            blue_sb = none_throws(match.score_breakdown)[AllianceColor.BLUE]
+            score_breakdown = match.score_breakdown
+            if not score_breakdown:
+                continue
+            breakdown_matches += 1
+
+            red_sb = score_breakdown[AllianceColor.RED]
+            blue_sb = score_breakdown[AllianceColor.BLUE]
 
             if red_sb.get("melodyBonusAchieved", False):
                 melody_rp_count += 1
@@ -142,10 +154,10 @@ class GameSpecifics2024(
                 coopertition_count += 1
 
             red_all_rp = red_sb.get("melodyBonusAchieved", False) and red_sb.get(
-                "melodyBonusAchieved", False
+                "ensembleBonusAchieved", False
             )
             blue_all_rp = blue_sb.get("melodyBonusAchieved", False) and blue_sb.get(
-                "melodyBonusAchieved", False
+                "ensembleBonusAchieved", False
             )
 
             if (red_score > blue_score and red_all_rp) or (
@@ -155,42 +167,38 @@ class GameSpecifics2024(
                 if red_all_rp and blue_all_rp:
                     six_rp_count += 1
 
-            total_scores += red_score + blue_score
-            total_win_margins += win_score - min(red_score, blue_score)
-            total_winning_scores += win_score
-
-        if finished_matches == 0:
+        if scored_matches == 0:
             return None
 
         return {
             "melody_rp_count": [
                 melody_rp_count,
-                finished_matches * 2,
-                100.0 * melody_rp_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * melody_rp_count, breakdown_matches * 2),
             ],
             "ensemble_rp_count": [
                 ensemble_rp_count,
-                finished_matches * 2,
-                100.0 * ensemble_rp_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * ensemble_rp_count, breakdown_matches * 2),
             ],
             "coopertition_count": [
                 coopertition_count,
-                finished_matches * 2,
-                100.0 * coopertition_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * coopertition_count, breakdown_matches * 2),
             ],
             "four_rp_count": [
                 four_rp_count,
-                finished_matches,
-                100.0 * four_rp_count / finished_matches,
+                breakdown_matches,
+                safe_div(100.0 * four_rp_count, breakdown_matches),
             ],
             "six_rp_count": [
                 six_rp_count,
-                finished_matches,
-                100.0 * six_rp_count / finished_matches,
+                breakdown_matches,
+                safe_div(100.0 * six_rp_count, breakdown_matches),
             ],
-            "average_score": total_scores / (finished_matches * 2),
-            "average_win_margin": total_win_margins / finished_matches,
-            "average_winning_score": total_winning_scores / finished_matches,
+            "average_score": total_scores / (scored_matches * 2),
+            "average_win_margin": total_win_margins / scored_matches,
+            "average_winning_score": total_winning_scores / scored_matches,
             "high_score": high_score,
         }
 
@@ -248,11 +256,22 @@ class GameSpecifics2024(
             ),
         }
 
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
+        return {
+            "autoLeavePoints": per_robot_points("autoLineRobot{}", {"Yes": 2}),
+            "endGameParkPoints": per_robot_points("endGameRobot{}", {"Parked": 1}),
+            "endGameOnStagePoints": per_robot_points(
+                "endGameRobot{}", {"StageLeft": 3, "StageRight": 3, "CenterStage": 3}
+            ),
+        }
+
     def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return [
             PredictionStatConfig("score", 0, 20**2),
             PredictionStatConfig("note_scored", 0, 10**2),
             PredictionStatConfig("stage_points", 0, 10**2),
+            PredictionStatConfig("coopertition_criteria", 0, 1),
+            PredictionStatConfig("robot_on_stage", 0, 1),
         ]
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:

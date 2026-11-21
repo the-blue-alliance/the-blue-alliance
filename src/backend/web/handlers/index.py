@@ -241,12 +241,11 @@ def avatar_list(year: Optional[Year] = None) -> Response:
 
     NUM_SHARDS = 20
     avatars = []
-    shards = memcache.get_multi(
-        [f"{year}avatars_{i}".encode("utf-8") for i in range(NUM_SHARDS)]
-    )
+    shard_keys = [f"{year}avatars_{i}".encode("utf-8") for i in range(NUM_SHARDS)]
+    shards = memcache.get_multi(shard_keys)
     if len(shards) == NUM_SHARDS:  # If missing a shard, must refetch all
-        for _, shard in sorted(shards.items(), key=lambda kv: kv[0]):
-            avatars += shard
+        for shard_key in shard_keys:
+            avatars += shards[shard_key]
 
     if not avatars:
         avatars_future = Media.query(

@@ -56,7 +56,7 @@ from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
 from backend.common.tasklets import typed_tasklet
 from backend.common.urlfetch import TypedURLFetchResult
 
-TCompLevel = Literal["qual", "playoff"]
+TCompLevel = Literal["Practice", "qual", "playoff"]
 
 T = TypeVar("T", bound=JSON)
 
@@ -293,7 +293,7 @@ class FRCAPI:
 
             return response
 
-    def _maybe_save_response(self, url: str, content: str) -> None:
+    def _maybe_save_response(self, url: str, content: bytes) -> None:
         if not Environment.save_frc_api_response() or not self._save_response:
             return
 
@@ -325,6 +325,16 @@ class FRCAPI:
             logging.exception("Error saving API response for: {}".format(url))
 
     @staticmethod
+    def _gcs_cache_path(relative_path: str) -> str:
+        base = os.path.realpath(
+            os.path.join(os.path.dirname(__file__), "gcs_test_data_cache")
+        )
+        path = os.path.realpath(os.path.join(base, relative_path))
+        if not path.startswith(base + os.sep):
+            raise ValueError(f"GCS cache path escapes cache dir: {relative_path}")
+        return path
+
+    @staticmethod
     def get_cached_gcs_files(gcs_dir_name: str):
         """
         Get the locally cached files or from GCS if not cached.
@@ -332,9 +342,7 @@ class FRCAPI:
         To avoid issues with Windows, `:` are replaced with `_` and `?` are replaced with `@` in the filenames.
         """
         safe_dir_name = gcs_dir_name.replace(":", "_").replace("?", "@")
-        path = os.path.join(
-            os.path.dirname(__file__), f"gcs_test_data_cache/{safe_dir_name}"
-        )
+        path = FRCAPI._gcs_cache_path(safe_dir_name)
         if os.path.exists(path):
             files = [f"{safe_dir_name}{p}" for p in os.listdir(path)]
         else:
@@ -346,17 +354,13 @@ class FRCAPI:
                 safe_file_name = (
                     gcs_file.split("/")[-1].replace(":", "_").replace("?", "@")
                 )
-                filename = os.path.join(path, safe_file_name)
+                filename = FRCAPI._gcs_cache_path(f"{safe_dir_name}{safe_file_name}")
                 os.makedirs(os.path.dirname(filename), exist_ok=True)
                 content = read(gcs_file)
                 if content is not None:
-                    if isinstance(content, str):
-                        with open(filename, "w") as f:
-                            f.write(content)
-                    else:
-                        with open(filename, "wb") as f:
-                            f.write(content)
-                    files.append(f"{safe_dir_name}/{safe_file_name}")
+                    with open(filename, "wb") as f:
+                        f.write(content)
+                    files.append(f"{safe_dir_name}{safe_file_name}")
         return sorted(files)
 
     def _get_simulated(
@@ -434,13 +438,7 @@ class FRCAPI:
             # Fetch response
             content: Optional[str] = None
             if last_file_name:
-                with open(
-                    os.path.join(
-                        os.path.dirname(__file__),
-                        f"gcs_test_data_cache/{last_file_name}",
-                    ),
-                    "r",
-                ) as f:
+                with open(self._gcs_cache_path(last_file_name), "r") as f:
                     content = f.read()
 
             if content is None:
@@ -468,35 +466,41 @@ class FRCAPI:
 
     @classmethod
     def _merge_match(cls, scheduled: Dict, result: Dict) -> Dict:
-        # Over the years, both "Teams" and "teams" have been used in FRC API responses...
-        teams_key = "Teams" if "Teams" in scheduled else "teams"
+        # Over the years, both "Teams" and "teams" have been used in FRC API
+        # responses, and a schedule and its results don't always agree.
+        # Normalize both to "teams" so their teams always merge.
+        cls._normalize_teams_key(scheduled)
+        cls._normalize_teams_key(result)
 
         # 2024, Week 4: As part of attempting to restore sync,
         # schedules sync with teams [1, 2, 3] in to-be-played playoff matches
         # In a case where the only teams for a match are those three, overwrite
         # the team numbers in each station to None
-        schedule_team_numbers = [t["teamNumber"] for t in scheduled.get(teams_key)]
-        if set(schedule_team_numbers) == {1, 2, 3}:
-            scheduled["teams"] = [
-                {**t, "teamNumber": None} for t in scheduled.get(teams_key)
-            ]
+        scheduled_teams = scheduled.get("teams") or []
+        if {t["teamNumber"] for t in scheduled_teams} == {1, 2, 3}:
+            scheduled["teams"] = [{**t, "teamNumber": None} for t in scheduled_teams]
 
         for field, value in result.items():
-            if field == teams_key:
-                for team in value:
-                    schedule_idx, schedule_team = next(
-                        filter(
-                            lambda t: t[1]["teamNumber"] == team["teamNumber"],
-                            enumerate(scheduled["teams"]),
-                        ),
-                        (None, None),
-                    )
-                    if schedule_team is None:
-                        # 2024, Week 3: Upstream FMS sync issues leading to schedules returned with no teams
-                        # Some match results have been sync'd, so patch around this where we can
-                        scheduled["teams"].append(team)
-                    else:
-                        scheduled["teams"][schedule_idx].update(team)
-            else:
+            if field != "teams":
                 scheduled[field] = value
+                continue
+            teams = scheduled.setdefault("teams", [])
+            for team in value:
+                schedule_team = next(
+                    (t for t in teams if t["teamNumber"] == team["teamNumber"]),
+                    None,
+                )
+                if schedule_team is None:
+                    # 2024, Week 3: Upstream FMS sync issues leading to schedules returned with no teams
+                    # Some match results have been sync'd, so patch around this where we can
+                    teams.append(team)
+                else:
+                    schedule_team.update(team)
         return scheduled
+
+    @staticmethod
+    def _normalize_teams_key(data: Dict) -> None:
+        """Rename a "Teams" key to "teams" in place. If both exist, "teams" wins."""
+        if "Teams" in data:
+            teams = data.pop("Teams")
+            data.setdefault("teams", teams)

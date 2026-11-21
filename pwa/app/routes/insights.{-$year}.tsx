@@ -1,28 +1,23 @@
+import { useSuspenseQueries } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
-import { ReactNode } from 'react';
 
+import { type Event, type InsightV2Leaderboard } from '~/api/tba/read';
 import {
-  LeaderboardInsight,
-  NotablesInsight,
-  getInsightsLeaderboardsYear,
-  getInsightsNotablesYear,
-} from '~/api/tba/read';
-import { TitledCard } from '~/components/tba/cards';
-import { Leaderboard } from '~/components/tba/leaderboard';
-import { EventLink, TeamLink } from '~/components/tba/links';
+  getEventsByYearOptions,
+  getInsightsV2YearOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
+import { InsightSections } from '~/components/tba/insightSections';
 import { YearSelector } from '~/components/tba/yearSelector';
 import {
-  NOTABLE_NAME_TO_DISPLAY_NAME,
-  leaderboardFromNotable,
+  type GroupedInsights,
+  groupInsightsByCategory,
 } from '~/lib/insightUtils';
-import {
-  joinComponents,
-  publicCacheControlHeaders,
-  useValidYears,
-} from '~/lib/utils';
+import { parseMatchKey } from '~/lib/matchUtils';
+import { STALE_TIME, staleTimeForYear } from '~/lib/queryClient';
+import { publicCacheControlHeaders, useValidYears } from '~/lib/utils';
 
 export const Route = createFileRoute('/insights/{-$year}')({
-  loader: async ({ params }) => {
+  loader: async ({ params, context: { queryClient } }) => {
     let numericYear = -1;
     if (params.year === undefined || params.year === '') {
       numericYear = 0;
@@ -37,23 +32,37 @@ export const Route = createFileRoute('/insights/{-$year}')({
       throw notFound();
     }
 
-    const [leaderboards, notables] = await Promise.all([
-      getInsightsLeaderboardsYear({ path: { year: numericYear } }),
-      getInsightsNotablesYear({ path: { year: numericYear } }),
-    ]);
+    const insights = await queryClient.ensureQueryData({
+      ...getInsightsV2YearOptions({ path: { year: numericYear } }),
+      staleTime:
+        numericYear === 0 ? STALE_TIME.DEFAULT : staleTimeForYear(numericYear),
+    });
 
-    if (leaderboards.data === undefined || notables.data === undefined) {
-      throw new Error('Failed to load insights');
-    }
-
-    if (leaderboards.data.length === 0 || notables.data.length === 0) {
+    if (insights.length === 0) {
       throw notFound();
     }
 
+    const { leaderboards, streaks, timeseries, successRates } =
+      groupInsightsByCategory(insights);
+
+    // Event and match leaderboards render names, not keys, which needs the
+    // events behind those keys. Overall (year 0) boards can span seasons.
+    const eventYears = leaderboardEventYears(leaderboards);
+    await Promise.all(
+      eventYears.map((eventYear) =>
+        queryClient.ensureQueryData({
+          ...getEventsByYearOptions({ path: { year: eventYear } }),
+          staleTime: staleTimeForYear(eventYear),
+        }),
+      ),
+    );
     return {
       year: numericYear,
-      leaderboards: leaderboards.data,
-      notables: notables.data,
+      eventYears,
+      leaderboards,
+      streaks,
+      timeseries,
+      successRates,
     };
   },
   headers: publicCacheControlHeaders(),
@@ -85,15 +94,57 @@ export const Route = createFileRoute('/insights/{-$year}')({
   component: InsightsPage,
 });
 
+/** Seasons whose events are referenced by event or match keys in the boards. */
+function leaderboardEventYears(leaderboards: InsightV2Leaderboard[]): number[] {
+  const years = new Set<number>();
+  for (const board of leaderboards) {
+    const keyType = board.data.key_type;
+    if (keyType !== 'event' && keyType !== 'match') {
+      continue;
+    }
+    for (const ranking of board.data.rankings) {
+      for (const key of ranking.keys) {
+        if (typeof key !== 'string') {
+          continue;
+        }
+        const eventKey =
+          keyType === 'match' ? parseMatchKey(key)?.eventKey : key;
+        const year = Number(eventKey?.slice(0, 4));
+        if (year > 0) {
+          years.add(year);
+        }
+      }
+    }
+  }
+  return [...years].sort((a, b) => a - b);
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
+
 function InsightsPage() {
-  const { leaderboards, year, notables } = Route.useLoaderData();
+  const { leaderboards, streaks, timeseries, successRates, year, eventYears } =
+    Route.useLoaderData();
+  const eventQueries = useSuspenseQueries({
+    queries: eventYears.map((eventYear) => ({
+      ...getEventsByYearOptions({ path: { year: eventYear } }),
+      staleTime: staleTimeForYear(eventYear),
+    })),
+  });
+  const eventsByKey = new Map<string, Event>();
+  for (const query of eventQueries) {
+    for (const event of query.data) {
+      eventsByKey.set(event.key, event);
+    }
+  }
 
   return (
     <div>
       <SingleYearInsights
+        eventsByKey={eventsByKey}
         leaderboards={leaderboards}
+        streaks={streaks}
+        timeseries={timeseries}
+        successRates={successRates}
         year={year}
-        notables={notables}
       />
     </div>
   );
@@ -101,31 +152,20 @@ function InsightsPage() {
 
 function SingleYearInsights({
   year,
-  leaderboards,
-  notables,
-}: {
+  eventsByKey,
+  ...insights
+}: GroupedInsights & {
   year: number;
-  leaderboards: LeaderboardInsight[];
-  notables: NotablesInsight[];
+  eventsByKey: ReadonlyMap<string, Event>;
 }) {
   const validYears = useValidYears();
 
-  const notableDiv =
-    year !== 0 ? (
-      <NotablesYearSpecific notables={notables} />
-    ) : (
-      <NotablesOverall
-        notables={notables.filter((n) => n.name !== 'notables_hall_of_fame')}
-        year={0}
-      />
-    );
-
   return (
-    <div className="py-8">
+    <div>
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1
-            className="bg-gradient-to-r from-foreground to-foreground/70
+            className="bg-linear-to-r from-foreground to-foreground/70
               bg-clip-text text-4xl font-bold tracking-tight text-transparent"
           >
             Insights
@@ -153,128 +193,7 @@ function SingleYearInsights({
         />
       </div>
 
-      <div className="mb-8">
-        <h2 className="mb-4 flex items-center gap-2 text-2xl font-semibold">
-          <span
-            className="inline-block h-1 w-8 rounded-full bg-gradient-to-r
-              from-primary to-primary/50"
-          />
-          Notables
-        </h2>
-        {notableDiv}
-      </div>
-
-      <div>
-        <h2 className="mb-4 flex items-center gap-2 text-2xl font-semibold">
-          <span
-            className="inline-block h-1 w-8 rounded-full bg-gradient-to-r
-              from-primary to-primary/50"
-          />
-          Leaderboards
-        </h2>
-        <div className="grid gap-6 lg:grid-cols-2">
-          {leaderboards.map((l, i) => (
-            <Leaderboard
-              subtitle={l.year > 0 ? `${l.year}` : 'Overall'}
-              leaderboard={l}
-              key={i}
-              year={year}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function NotablesYearSpecific({ notables }: { notables: NotablesInsight[] }) {
-  const hof = notables.find((n) => n.name === 'notables_hall_of_fame');
-  const worldChamps = notables.find(
-    (n) => n.name === 'notables_world_champions',
-  );
-
-  return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      {hof && (
-        <TitledCard
-          cardTitle={joinComponents(
-            hof.data.entries.map((e) => (
-              <TeamLink key={e.team_key} teamOrKey={e.team_key} year={hof.year}>
-                {e.team_key.substring(3)}
-              </TeamLink>
-            )),
-            <span className="font-medium">, </span>,
-          )}
-          cardSubtitle={
-            <>
-              {NOTABLE_NAME_TO_DISPLAY_NAME[hof.name] || hof.name} {hof.year}
-            </>
-          }
-        />
-      )}
-      {worldChamps && (
-        <TitledCard
-          cardTitle={joinComponents(
-            worldChamps.data.entries.map((e) => (
-              <TeamLink
-                key={e.team_key}
-                teamOrKey={e.team_key}
-                year={worldChamps.year}
-              >
-                {e.team_key.substring(3)}
-              </TeamLink>
-            )),
-            <span className="font-medium">, </span>,
-          )}
-          cardSubtitle={
-            <>
-              {NOTABLE_NAME_TO_DISPLAY_NAME[worldChamps.name] ||
-                worldChamps.name}{' '}
-              {worldChamps.year}
-            </>
-          }
-        />
-      )}
-    </div>
-  );
-}
-
-function NotablesOverall({
-  notables,
-  year,
-}: {
-  notables: NotablesInsight[];
-  year: number;
-}) {
-  return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      {notables.map((n, i) => {
-        const leaderboard = leaderboardFromNotable(n);
-        const context = n.data.entries.reduce<Record<string, ReactNode>>(
-          (acc, entry) => {
-            acc[entry.team_key] = joinComponents(
-              entry.context.map((c, i) => (
-                <EventLink eventOrKey={c} key={i}>
-                  {c}
-                </EventLink>
-              )),
-              ', ',
-            );
-            return acc;
-          },
-          {},
-        );
-
-        return (
-          <Leaderboard
-            subtitle={leaderboard.year > 0 ? `${leaderboard.year}` : 'Overall'}
-            leaderboard={leaderboard}
-            key={i}
-            contextTooltipMap={context}
-            year={year}
-          />
-        );
-      })}
+      <InsightSections year={year} eventsByKey={eventsByKey} {...insights} />
     </div>
   );
 }

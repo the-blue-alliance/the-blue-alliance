@@ -1,0 +1,436 @@
+[
+  {
+    "end_date": "2024-04-06",
+    "event_code": "alhu",
+    "key": "2024alhu",
+    "start_date": "2024-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2024-03-09",
+    "event_code": "arli",
+    "key": "2024arli",
+    "start_date": "2024-03-06",
+    "week": 1
+  },
+  {
+    "end_date": "2024-03-17",
+    "event_code": "ausc",
+    "key": "2024ausc",
+    "start_date": "2024-03-15",
+    "week": 2
+  },
+  {
+    "end_date": "2024-03-23",
+    "event_code": "azgl",
+    "key": "2024azgl",
+    "start_date": "2024-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2024-03-16",
+    "event_code": "azva",
+    "key": "2024azva",
+    "start_date": "2024-03-13",
+    "week": 2
+  },
+  {
+    "end_date": "2024-03-02",
+    "event_code": "bcvi",
+    "key": "2024bcvi",
+    "start_date": "2024-02-28",
+    "week": 0
+  },
+  {
+    "end_date": "2024-03-02",
+    "event_code": "brbr",
+    "key": "2024brbr",
+    "start_date": "2024-02-28",
+    "week": 0
+  },
+  {
+    "end_date": "2024-04-06",
+    "event_code": "caav",
+    "key": "2024caav",
+    "start_date": "2024-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2024-04-07",
+    "event_code": "cabe",
+    "key": "2024cabe",
+    "start_date": "2024-04-04",
+    "week": 5
+  },
+  {
+    "end_date": "2024-03-16",
+    "event_code": "cada",
+    "key": "2024cada",
+    "start_date": "2024-03-13",
+    "week": 2
+  },
+  {
+    "end_date": "2024-03-24",
+    "event_code": "cafr",
+    "key": "2024cafr",
+    "start_date": "2024-03-21",
+    "week": 3
+  },
+  {
+    "end_date": "2024-03-17",
+    "event_code": "cala",
+    "key": "2024cala",
+    "start_date": "2024-03-14",
+    "week": 2
+  },
+  {
+    "end_date": "2024-03-30",
+    "event_code": "camb",
+    "key": "2024camb",
+    "start_date": "2024-03-27",
+    "week": 4
+  },
+  {
+    "end_date": "2024-03-30",
+    "event_code": "caoc",
+    "key": "2024caoc",
+    "start_date": "2024-03-27",
+    "week": 4
+  },
+  {
+    "end_date": "2024-03-03",
+    "event_code": "caph",
+    "key": "2024caph",
+    "start_date": "2024-02-29",
+    "week": 0
+  },
+  {
+    "end_date": "2024-03-24",
+    "event_code": "casd",
+    "key": "2024casd",
+    "start_date": "2024-03-21",
+    "week": 3
+  },
+  {
+    "end_date": "2024-03-10",
+    "event_code": "casf",
+    "key": "2024casf",
+    "start_date": "2024-03-07",
+    "week": 1
+  },
+  {
+    "end_date": "2024-03-03",
+    "event_code": "casj",
+    "key": "2024casj",
+    "start_date": "2024-02-29",
+    "week": 0
+  },
+  {
+    "end_date": "2024-03-10",
+    "event_code": "cave",
+    "key": "2024cave",
+    "start_date": "2024-03-07",
+    "week": 1
+  },
+  {
+    "end_date": "2024-03-23",
+    "event_code": "code",
+    "key": "2024code",
+    "start_date": "2024-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2024-03-23",
+    "event_code": "flor",
+    "key": "2024flor",
+    "start_date": "2024-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2024-03-16",
+    "event_code": "flta",
+    "key": "2024flta",
+    "start_date": "2024-03-13",
+    "week": 2
+  },
+  {
+    "end_date": "2024-03-02",
+    "event_code": "flwp",
+    "key": "2024flwp",
+    "start_date": "2024-02-28",
+    "week": 0
+  },
+  {
+    "end_date": "2024-04-06",
+    "event_code": "hiho",
+    "key": "2024hiho",
+    "start_date": "2024-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2024-03-23",
+    "event_code": "iacf",
+    "key": "2024iacf",
+    "start_date": "2024-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2024-03-23",
+    "event_code": "idbo",
+    "key": "2024idbo",
+    "start_date": "2024-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2024-03-30",
+    "event_code": "ilch",
+    "key": "2024ilch",
+    "start_date": "2024-03-27",
+    "week": 4
+  },
+  {
+    "end_date": "2024-03-16",
+    "event_code": "ilpe",
+    "key": "2024ilpe",
+    "start_date": "2024-03-13",
+    "week": 2
+  },
+  {
+    "end_date": "2024-03-16",
+    "event_code": "ksla",
+    "key": "2024ksla",
+    "start_date": "2024-03-13",
+    "week": 2
+  },
+  {
+    "end_date": "2024-04-06",
+    "event_code": "lake",
+    "key": "2024lake",
+    "start_date": "2024-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2024-03-02",
+    "event_code": "mndu",
+    "key": "2024mndu",
+    "start_date": "2024-02-28",
+    "week": 0
+  },
+  {
+    "end_date": "2024-03-02",
+    "event_code": "mndu2",
+    "key": "2024mndu2",
+    "start_date": "2024-02-28",
+    "week": 0
+  },
+  {
+    "end_date": "2024-04-06",
+    "event_code": "mnmi",
+    "key": "2024mnmi",
+    "start_date": "2024-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2024-04-07",
+    "event_code": "mnmi2",
+    "key": "2024mnmi2",
+    "start_date": "2024-04-04",
+    "week": 5
+  },
+  {
+    "end_date": "2024-04-06",
+    "event_code": "mokc",
+    "key": "2024mokc",
+    "start_date": "2024-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2024-03-09",
+    "event_code": "mose",
+    "key": "2024mose",
+    "start_date": "2024-03-06",
+    "week": 1
+  },
+  {
+    "end_date": "2024-03-23",
+    "event_code": "mosl",
+    "key": "2024mosl",
+    "start_date": "2024-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2024-03-16",
+    "event_code": "mslr",
+    "key": "2024mslr",
+    "start_date": "2024-03-13",
+    "week": 2
+  },
+  {
+    "end_date": "2024-03-02",
+    "event_code": "mxmo",
+    "key": "2024mxmo",
+    "start_date": "2024-02-28",
+    "week": 0
+  },
+  {
+    "end_date": "2024-03-16",
+    "event_code": "mxpu",
+    "key": "2024mxpu",
+    "start_date": "2024-03-13",
+    "week": 2
+  },
+  {
+    "end_date": "2024-03-23",
+    "event_code": "mxto",
+    "key": "2024mxto",
+    "start_date": "2024-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2024-03-09",
+    "event_code": "ndgf",
+    "key": "2024ndgf",
+    "start_date": "2024-03-06",
+    "week": 1
+  },
+  {
+    "end_date": "2024-03-30",
+    "event_code": "nvlv",
+    "key": "2024nvlv",
+    "start_date": "2024-03-27",
+    "week": 4
+  },
+  {
+    "end_date": "2024-03-23",
+    "event_code": "nyli2",
+    "key": "2024nyli2",
+    "start_date": "2024-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2024-04-07",
+    "event_code": "nyny",
+    "key": "2024nyny",
+    "start_date": "2024-04-04",
+    "week": 5
+  },
+  {
+    "end_date": "2024-03-16",
+    "event_code": "nyro",
+    "key": "2024nyro",
+    "start_date": "2024-03-13",
+    "week": 2
+  },
+  {
+    "end_date": "2024-03-09",
+    "event_code": "nysu",
+    "key": "2024nysu",
+    "start_date": "2024-03-06",
+    "week": 1
+  },
+  {
+    "end_date": "2024-03-23",
+    "event_code": "nytr",
+    "key": "2024nytr",
+    "start_date": "2024-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2024-03-23",
+    "event_code": "ohcl",
+    "key": "2024ohcl",
+    "start_date": "2024-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2024-04-06",
+    "event_code": "ohmv",
+    "key": "2024ohmv",
+    "start_date": "2024-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2024-04-06",
+    "event_code": "okok",
+    "key": "2024okok",
+    "start_date": "2024-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2024-03-09",
+    "event_code": "oktu",
+    "key": "2024oktu",
+    "start_date": "2024-03-06",
+    "week": 1
+  },
+  {
+    "end_date": "2024-03-02",
+    "event_code": "paca",
+    "key": "2024paca",
+    "start_date": "2024-02-28",
+    "week": 0
+  },
+  {
+    "end_date": "2024-03-03",
+    "event_code": "qcmo",
+    "key": "2024qcmo",
+    "start_date": "2024-03-01",
+    "week": 0
+  },
+  {
+    "end_date": "2024-03-06",
+    "event_code": "tnkn",
+    "key": "2024tnkn",
+    "start_date": "2024-03-03",
+    "week": 0
+  },
+  {
+    "end_date": "2024-03-21",
+    "event_code": "tuhc",
+    "key": "2024tuhc",
+    "start_date": "2024-03-19",
+    "week": 3
+  },
+  {
+    "end_date": "2024-03-07",
+    "event_code": "tuis",
+    "key": "2024tuis",
+    "start_date": "2024-03-05",
+    "week": 1
+  },
+  {
+    "end_date": "2024-03-10",
+    "event_code": "tuis2",
+    "key": "2024tuis2",
+    "start_date": "2024-03-08",
+    "week": 1
+  },
+  {
+    "end_date": "2024-03-24",
+    "event_code": "tuis3",
+    "key": "2024tuis3",
+    "start_date": "2024-03-22",
+    "week": 3
+  },
+  {
+    "end_date": "2024-03-02",
+    "event_code": "utwv",
+    "key": "2024utwv",
+    "start_date": "2024-02-28",
+    "week": 0
+  },
+  {
+    "end_date": "2024-04-06",
+    "event_code": "wila",
+    "key": "2024wila",
+    "start_date": "2024-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2024-03-17",
+    "event_code": "wimi",
+    "key": "2024wimi",
+    "start_date": "2024-03-14",
+    "week": 2
+  }
+]

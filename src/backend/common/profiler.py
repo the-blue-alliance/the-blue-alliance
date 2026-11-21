@@ -2,26 +2,32 @@
 
 import logging
 import random
+import time
+from contextvars import ContextVar, Token
 from datetime import datetime
+from typing import Any, cast, Dict, Optional
 
-from googleapiclient import discovery
-from oauth2client.client import GoogleCredentials
 from werkzeug.local import Local
 
 from backend.common.environment import Environment
+from backend.common.tasklets import enable_tasklet_context_propagation
+
+enable_tasklet_context_propagation()
 
 # create a request-local global context
 trace_context = Local()
+_active_span_var: ContextVar[Optional["Span"]] = ContextVar(
+    "active_span", default=cast(Optional["Span"], None)
+)
 
 PROJECT_ID = Environment.project()
 
 
-def send_traces():
+def send_traces() -> None:
     try:
-        if (
-            not hasattr(trace_context.request, "spans")
-            or len(trace_context.request.spans) == 0
-        ):
+        request = getattr(trace_context, "request", None)
+        spans = getattr(request, "spans", None)
+        if not spans:
             return
 
         _make_tracing_call(
@@ -29,8 +35,8 @@ def send_traces():
                 "traces": [
                     {
                         "projectId": PROJECT_ID,
-                        "traceId": trace_context.request.trace_id,
-                        "spans": trace_context.request.spans,
+                        "traceId": request.trace_id,
+                        "spans": spans,
                     }
                 ]
             }
@@ -40,9 +46,12 @@ def send_traces():
         logging.exception(e)
 
 
-def _make_tracing_call(body):
+def _make_tracing_call(body: Dict[str, Any]) -> None:
     if PROJECT_ID is None:
         return
+
+    from googleapiclient import discovery
+    from oauth2client.client import GoogleCredentials
 
     # Authentication is provided by the 'gcloud' tool when running locally
     # and by built-in service accounts when running on GAE, GCE, or GKE.
@@ -61,15 +70,22 @@ def _make_tracing_call(body):
     request.execute()
 
 
-class Span(object):
-    def __init__(self, name: str):
+class Span:
+    def __init__(self, name: str) -> None:
         """
         Start a Span
         Spans are saved in trace_context.request.spans on exit
         Spans are sent by send_traces() which is called when the request context ends
         """
         self._name = name
-        self._labels = {}  # Cloud Trace spans support labels
+        self._labels: Dict[str, str] = {}  # Cloud Trace spans support labels
+        self._span_id = str(random.getrandbits(64))
+        self._root_span_id: Optional[str] = None
+        self._parent_span_id: Optional[str] = None
+        self._token: Optional[Token[Optional["Span"]]] = None
+        self._startTime: Optional[datetime] = None
+        self._endTime: Optional[datetime] = None
+        self._start_cpu: Optional[float] = None
 
         if hasattr(trace_context, "request") and trace_context.request:
             tcontext = trace_context.request.headers.get(
@@ -87,6 +103,17 @@ class Span(object):
         else:
             self._do_trace = False
 
+        parent = _active_span_var.get()
+        self._parent_span_id = parent._span_id if parent else self._root_span_id
+
+    @property
+    def span_id(self) -> str:
+        return self._span_id
+
+    @property
+    def parent_span_id(self) -> Optional[str]:
+        return self._parent_span_id
+
     def set_label(self, key: str, value: str) -> None:
         """
         Add a label to this span. Labels are key-value pairs that appear in Cloud Trace.
@@ -98,29 +125,60 @@ class Span(object):
         """
         self._labels[key] = str(value)
 
-    def __enter__(self):
+    def __enter__(self) -> "Span":
         if self._do_trace:
             logging.debug("CREATED SPAN: {}".format(self._name))
+        parent = _active_span_var.get()
+        self._parent_span_id = parent._span_id if parent else self._root_span_id
+        self._token = _active_span_var.set(self)
         self._startTime = datetime.now()
+        if self._do_trace:
+            self._start_cpu = time.thread_time()
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
         self._endTime = datetime.now()
-        if self._do_trace:
-            if not hasattr(trace_context.request, "spans"):
-                trace_context.request.spans = []
-            trace_context.request.spans.append(self.dict())
+        if self._token is not None:
+            try:
+                _active_span_var.reset(self._token)
+            except ValueError:
+                pass
+            self._token = None
 
-    def dict(self):
+        if self._do_trace and exc_type is not GeneratorExit:
+            start_cpu = self._start_cpu
+            start_time = self._startTime
+            end_time = self._endTime
+            if (
+                start_cpu is not None
+                and start_time is not None
+                and end_time is not None
+            ):
+                cpu_duration_ms = (time.thread_time() - start_cpu) * 1000.0
+                self.set_label("cpu_time_ms", f"{cpu_duration_ms:.2f}")
+
+                wall_duration_ms = (end_time - start_time).total_seconds() * 1000.0
+                self.set_label("wall_time_ms", f"{wall_duration_ms:.2f}")
+                if wall_duration_ms > 0:
+                    cpu_ratio = min(1.0, cpu_duration_ms / wall_duration_ms)
+                    self.set_label("cpu_ratio", f"{cpu_ratio:.2f}")
+
+            request = getattr(trace_context, "request", None)
+            if request is not None:
+                if not hasattr(request, "spans"):
+                    request.spans = []
+                request.spans.append(self.dict())
+
+    def dict(self) -> Dict[str, Any]:
         """Format as a dictionary of the correct shape for sending to the Cloud
         Trace REST API as a JSON object"""
         span_dict = {
             "kind": "SPAN_KIND_UNSPECIFIED",
             "name": self._name,
-            "parentSpanId": self._root_span_id,
-            "spanId": str(random.getrandbits(64)),
-            "startTime": self._startTime.isoformat() + "Z",
-            "endTime": self._endTime.isoformat() + "Z",
+            "parentSpanId": self._parent_span_id,
+            "spanId": self._span_id,
+            "startTime": (self._startTime.isoformat() + "Z") if self._startTime else "",
+            "endTime": (self._endTime.isoformat() + "Z") if self._endTime else "",
         }
 
         # Add labels if any were set

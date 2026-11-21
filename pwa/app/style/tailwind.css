@@ -7,6 +7,7 @@
 @import './colors/alliances.css';
 @import './colors/districts.css';
 @import './colors/frc.css';
+@import './typeset.css';
 
 @layer base {
   a {
@@ -14,6 +15,48 @@
   }
 }
 
+/* Keep TBA's site-wide link color inside typeset prose; typeset's own
+   `.typeset a { color: inherit }` lives in the components layer, which
+   would otherwise beat the rule above. Elements marked `.not-typeset`
+   (e.g. Button-rendered links) are excluded, matching typeset's own
+   opt-out convention. */
+@layer utilities {
+  .typeset
+    :where(a):not(
+      :where(
+        .not-typeset,
+        [data-not-typeset],
+        .not-typeset *,
+        [data-not-typeset] *
+      )
+    ) {
+    @apply text-blue-800 dark:text-blue-400;
+  }
+}
+
 :root {
   --footer-inset-top: 4rem;
+  --header-height: 3.5rem;
+  --toc-bar-height: 2.5rem;
+}
+
+html {
+  scroll-padding-block-start: calc(var(--header-height) + 1rem);
+}
+
+/* Reserve the mobile TOC bar's height in the server HTML, only on pages with a TOC, so the bar mounting later doesn't shift the layout. */
+[data-toc-placeholder] {
+  display: none;
+}
+
+@media (width < 64rem) {
+  html:has([data-toc-marker]) [data-toc-placeholder] {
+    display: flex;
+  }
+
+  html:has([data-toc-bar]) {
+    scroll-padding-block-start: calc(
+      var(--header-height) + var(--toc-bar-height) + 1rem
+    );
+  }
 }

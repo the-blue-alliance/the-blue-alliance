@@ -475,6 +475,50 @@ def test_parse_invalid_breakdown_value_defaults_to_zero() -> None:
     assert parsed[0]["sort_orders"] == [0.0]
 
 
+def test_parse_missing_breakdown_value_raises_exception() -> None:
+    data = {
+        "breakdowns": ["QS", "Auto Fuel"],
+        "rankings": [
+            {
+                "rank": 1,
+                "team_key": "frc254",
+                "played": 10,
+                "dqs": 0,
+                "QS": 24.0,
+                # Missing 'Auto Fuel' key
+            }
+        ],
+    }
+    with pytest.raises(ParserInputException, match="frc254.*Auto Fuel"):
+        JSONRankingsParser.parse(2026, json.dumps(data))
+
+
+def test_parse_missing_breakdown_value_for_one_of_many_rankings_raises_exception() -> (
+    None
+):
+    data = {
+        "breakdowns": ["QS"],
+        "rankings": [
+            {
+                "rank": 1,
+                "team_key": "frc254",
+                "played": 10,
+                "dqs": 0,
+                "QS": 24.0,
+            },
+            {
+                "rank": 2,
+                "team_key": "frc971",
+                "played": 10,
+                "dqs": 0,
+                # Missing 'QS' key
+            },
+        ],
+    }
+    with pytest.raises(ParserInputException, match="frc971"):
+        JSONRankingsParser.parse(2024, json.dumps(data))
+
+
 def test_parse_with_breakdowns_dict() -> None:
     data = {
         "breakdowns": ["QS", "Auton"],

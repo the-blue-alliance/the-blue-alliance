@@ -4,6 +4,10 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
+# The GCP project the real site runs in; every other App Engine deploy is a
+# contributor's own
+PROD_PROJECT_ID = "tbatv-prod-hrd"
+
 
 @enum.unique
 class EnvironmentMode(enum.Enum):
@@ -34,6 +38,15 @@ class Environment:
     def is_prod() -> bool:
         env = os.environ.get("GAE_ENV")
         return env is not None and env.startswith("standard")
+
+    @classmethod
+    def is_prod_project(cls) -> bool:
+        """
+        Running on App Engine *in the production project*, as opposed to a
+        contributor's own GAE project. Gate side effects that reach real
+        people (email) on this rather than is_prod().
+        """
+        return cls.is_prod() and cls.project() == PROD_PROJECT_ID
 
     @staticmethod
     def service() -> Optional[str]:

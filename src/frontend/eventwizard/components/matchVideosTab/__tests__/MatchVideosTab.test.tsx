@@ -526,3 +526,325 @@ describe("MatchVideosTab", () => {
     });
   });
 });
+
+describe("MatchVideosTab playlist parsing, sorting and failure handling", () => {
+  const mockMakeTrustedRequest = jest.fn();
+  const mockMakeApiV3Request = jest.fn();
+  const selectedEvent = "2024nytr";
+
+  const jsonResponse = (payload: unknown): Response =>
+    ({ ok: true, json: async () => payload }) as Response;
+
+  const makeMatch = (
+    partial: string,
+    comp_level: string,
+    set_number: number,
+    match_number: number,
+    videos: Array<{ type: string; key: string }> = []
+  ) => ({
+    key: `${selectedEvent}_${partial}`,
+    comp_level,
+    set_number,
+    match_number,
+    videos,
+  });
+
+  const qm1 = makeMatch("qm1", "qm", 1, 1, [{ type: "youtube", key: "vid-qm1" }]);
+  const qm2 = makeMatch("qm2", "qm", 1, 2, [{ type: "tba", key: "not-youtube" }]);
+  const sf1m1 = makeMatch("sf1m1", "sf", 1, 1);
+  const sf2m1 = makeMatch("sf2m1", "sf", 2, 1);
+
+  const renderAndFetch = async (matches: unknown[]): Promise<void> => {
+    mockMakeApiV3Request.mockResolvedValue(jsonResponse(matches));
+    render(
+      <MatchVideosTab
+        selectedEvent={selectedEvent}
+        makeTrustedRequest={mockMakeTrustedRequest}
+        makeApiV3Request={mockMakeApiV3Request}
+      />
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Fetch Matches/i }));
+    await screen.findByText(`Loaded ${matches.length} matches`);
+  };
+
+  const rowFor = (matchName: string): HTMLElement =>
+    screen.getByText(matchName).closest("tr") as HTMLElement;
+
+  const videoIdInput = (matchName: string): HTMLInputElement =>
+    rowFor(matchName).querySelector('input[placeholder="YouTube ID"]') as HTMLInputElement;
+
+  const loadPlaylist = async (input: string): Promise<void> => {
+    fireEvent.change(screen.getByPlaceholderText("YouTube playlist URL or ID"), {
+      target: { value: input },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Load Playlist/i }));
+  };
+
+  const status = () => screen.getByText(/Autofilled|Error|Please|Success|Loaded|No new/);
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("orders playoff matches by set then match number and hides non-YouTube videos", async () => {
+    await renderAndFetch([sf2m1, qm2, sf1m1, qm1]);
+
+    const names = screen
+      .getAllByRole("row")
+      .slice(1)
+      .map((row) => row.querySelector("strong")?.textContent);
+    expect(names).toEqual([
+      "Qualification 1",
+      "Qualification 2",
+      "Semifinal 1-1",
+      "Semifinal 2-1",
+    ]);
+    expect(screen.getByText("vid-qm1")).toHaveAttribute(
+      "href",
+      "https://www.youtube.com/watch?v=vid-qm1"
+    );
+    expect(screen.queryByText("not-youtube")).not.toBeInTheDocument();
+    expect(rowFor("Qualification 2").querySelectorAll("li")).toHaveLength(0);
+    expect(rowFor("Semifinal 1-1")).toHaveTextContent("No videos");
+  });
+
+  describe("playlist input parsing", () => {
+    it("rejects an empty playlist field", async () => {
+      await renderAndFetch([sf1m1]);
+
+      await loadPlaylist("   ");
+
+      expect(
+        screen.getByText("Please enter a valid YouTube playlist URL or ID")
+      ).toBeInTheDocument();
+      expect(mockMakeTrustedRequest).not.toHaveBeenCalled();
+    });
+
+    it("accepts a bare playlist ID", async () => {
+      mockMakeTrustedRequest.mockResolvedValue(jsonResponse([]));
+      await renderAndFetch([sf1m1]);
+
+      await loadPlaylist("PLabc_123-XYZ");
+
+      await waitFor(() => {
+        expect(mockMakeTrustedRequest).toHaveBeenCalledWith(
+          "/api/_eventwizard/_playlist/2024nytr/PLabc_123-XYZ",
+          ""
+        );
+      });
+    });
+
+    it("falls back to regex parsing for inputs that are not valid URLs", async () => {
+      mockMakeTrustedRequest.mockResolvedValue(jsonResponse([]));
+      await renderAndFetch([sf1m1]);
+
+      await loadPlaylist("watch?v=abc&list=PLfromregex&index=2");
+
+      await waitFor(() => {
+        expect(mockMakeTrustedRequest).toHaveBeenCalledWith(
+          "/api/_eventwizard/_playlist/2024nytr/PLfromregex",
+          ""
+        );
+      });
+    });
+
+    it("rejects a URL that has no list parameter", async () => {
+      await renderAndFetch([sf1m1]);
+
+      await loadPlaylist("https://www.youtube.com/watch?v=abc");
+
+      expect(
+        screen.getByText("Please enter a valid YouTube playlist URL or ID")
+      ).toBeInTheDocument();
+      expect(mockMakeTrustedRequest).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("playlist responses", () => {
+    it("reports an unexpected response shape", async () => {
+      mockMakeTrustedRequest.mockResolvedValue(jsonResponse({ nope: true }));
+      await renderAndFetch([sf1m1]);
+
+      await loadPlaylist("PLabc");
+
+      expect(
+        await screen.findByText(
+          "Error loading playlist: Error: Unexpected playlist response format"
+        )
+      ).toBeInTheDocument();
+    });
+
+    it("reports request failures", async () => {
+      mockMakeTrustedRequest.mockRejectedValue(new Error("boom"));
+      await renderAndFetch([sf1m1]);
+
+      await loadPlaylist("PLabc");
+
+      expect(
+        await screen.findByText("Error loading playlist: Error: boom")
+      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Load Playlist/i })).toBeEnabled();
+    });
+
+    it("skips unusable entries, existing videos, typed IDs and duplicates", async () => {
+      mockMakeTrustedRequest.mockResolvedValue(
+        jsonResponse([
+          { video_title: "no partial", video_id: "v0" },
+          { guessed_match_partial: "qm1", video_title: "no id" },
+          { guessed_match_partial: "qm99", video_id: "v-unknown" },
+          { guessed_match_partial: "qm1", video_id: "vid-qm1" },
+          { guessed_match_partial: "SF2M1", video_id: "v-typed" },
+          { guessed_match_partial: "sf1m1", video_id: "v-first", video_title: "SF 1-1 video" },
+          { guessed_match_partial: "sf1m1", video_id: "v-second" },
+          { guessed_match_partial: "qm2", video_id: "v-untitled" },
+        ])
+      );
+      await renderAndFetch([qm1, qm2, sf1m1, sf2m1]);
+      fireEvent.change(videoIdInput("Semifinal 2-1"), {
+        target: { value: "already-typed" },
+      });
+
+      await loadPlaylist("PLabc");
+
+      expect(
+        await screen.findByText(
+          "Autofilled 2 match videos from playlist (1 already on matches)"
+        )
+      ).toBeInTheDocument();
+      expect(videoIdInput("Qualification 1")).toHaveValue("");
+      expect(videoIdInput("Qualification 2")).toHaveValue("v-untitled");
+      expect(videoIdInput("Semifinal 1-1")).toHaveValue("v-first");
+      expect(videoIdInput("Semifinal 2-1")).toHaveValue("already-typed");
+      expect(screen.getByText("SF 1-1 video")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Add All (3)" })).toBeEnabled();
+    });
+  });
+
+  describe("playlist titles", () => {
+    const autofillWithTitle = async (): Promise<void> => {
+      mockMakeTrustedRequest.mockResolvedValueOnce(
+        jsonResponse([
+          { guessed_match_partial: "sf1m1", video_id: "v-first", video_title: "SF 1-1 video" },
+        ])
+      );
+      await renderAndFetch([sf1m1, sf2m1]);
+      await loadPlaylist("PLabc");
+      await screen.findByText("SF 1-1 video");
+    };
+
+    it("clears the suggested title when the video ID is edited by hand", async () => {
+      await autofillWithTitle();
+
+      fireEvent.change(videoIdInput("Semifinal 1-1"), {
+        target: { value: "manual" },
+      });
+
+      expect(screen.queryByText("SF 1-1 video")).not.toBeInTheDocument();
+      expect(videoIdInput("Semifinal 1-1")).toHaveValue("manual");
+    });
+
+    it("clears the suggested title once the video has been added", async () => {
+      await autofillWithTitle();
+      mockMakeTrustedRequest.mockResolvedValueOnce(jsonResponse({}));
+
+      fireEvent.click(
+        rowFor("Semifinal 1-1").querySelector("button.btn-primary") as HTMLElement
+      );
+
+      expect(
+        await screen.findByText("Successfully added video to Semifinal 1-1!")
+      ).toBeInTheDocument();
+      expect(screen.queryByText("SF 1-1 video")).not.toBeInTheDocument();
+      expect(screen.getByText("v-first")).toBeInTheDocument();
+      expect(rowFor("Semifinal 2-1")).toHaveTextContent("No videos");
+    });
+  });
+
+  describe("failed mutations", () => {
+    it("reports a failed single add and re-enables the row", async () => {
+      mockMakeTrustedRequest.mockRejectedValue(new Error("boom"));
+      await renderAndFetch([sf1m1]);
+      fireEvent.change(videoIdInput("Semifinal 1-1"), {
+        target: { value: "new-vid" },
+      });
+
+      fireEvent.click(
+        rowFor("Semifinal 1-1").querySelector("button.btn-primary") as HTMLElement
+      );
+
+      expect(
+        await screen.findByText("Error adding video: Error: boom")
+      ).toBeInTheDocument();
+      expect(rowFor("Semifinal 1-1").querySelector("button.btn-primary")).toBeEnabled();
+      expect(videoIdInput("Semifinal 1-1")).toHaveValue("new-vid");
+    });
+
+    it("reports a failed Add All and keeps the pending IDs", async () => {
+      mockMakeTrustedRequest.mockRejectedValue(new Error("boom"));
+      await renderAndFetch([sf1m1, sf2m1]);
+      fireEvent.change(videoIdInput("Semifinal 1-1"), {
+        target: { value: "new-vid" },
+      });
+
+      fireEvent.click(screen.getByRole("button", { name: "Add All (1)" }));
+
+      expect(
+        await screen.findByText("Error adding videos: Error: boom")
+      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Add All (1)" })).toBeEnabled();
+      expect(videoIdInput("Semifinal 1-1")).toHaveValue("new-vid");
+    });
+
+    it("reports a failed delete and keeps the video", async () => {
+      mockMakeTrustedRequest.mockRejectedValue(new Error("boom"));
+      await renderAndFetch([qm1, sf1m1]);
+
+      fireEvent.click(screen.getByRole("button", { name: "Delete video vid-qm1" }));
+
+      expect(
+        await screen.findByText("Error deleting video: Error: boom")
+      ).toBeInTheDocument();
+      expect(screen.getByText("vid-qm1")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Delete video vid-qm1" })).toBeEnabled();
+    });
+  });
+
+  it("adds all pending videos while leaving other matches untouched", async () => {
+    mockMakeTrustedRequest.mockResolvedValue(jsonResponse({}));
+    await renderAndFetch([qm1, sf1m1, sf2m1]);
+    fireEvent.change(videoIdInput("Semifinal 1-1"), {
+      target: { value: "  new-vid  " },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Add All (1)" }));
+
+    expect(
+      await screen.findByText("Successfully added 1 videos!")
+    ).toBeInTheDocument();
+    expect(mockMakeTrustedRequest).toHaveBeenCalledWith(
+      "/api/trusted/v1/event/2024nytr/match_videos/add",
+      JSON.stringify({ sf1m1: "new-vid" })
+    );
+    expect(screen.getByText("new-vid")).toBeInTheDocument();
+    expect(videoIdInput("Semifinal 1-1")).toHaveValue("");
+    expect(rowFor("Semifinal 2-1")).toHaveTextContent("No videos");
+    expect(screen.getByText("vid-qm1")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add All" })).toBeDisabled();
+  });
+
+  it("deletes a video from one match without touching the others", async () => {
+    mockMakeTrustedRequest.mockResolvedValue(jsonResponse({}));
+    await renderAndFetch([
+      qm1,
+      makeMatch("qm3", "qm", 1, 3, [{ type: "youtube", key: "vid-qm3" }]),
+    ]);
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete video vid-qm1" }));
+
+    expect(
+      await screen.findByText("Successfully deleted video from Qualification 1!")
+    ).toBeInTheDocument();
+    expect(screen.queryByText("vid-qm1")).not.toBeInTheDocument();
+    expect(screen.getByText("vid-qm3")).toBeInTheDocument();
+  });
+});

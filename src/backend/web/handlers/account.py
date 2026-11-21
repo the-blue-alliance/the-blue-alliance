@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from flask import (
@@ -11,6 +12,7 @@ from flask import (
     session,
     url_for,
 )
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
@@ -21,9 +23,7 @@ from backend.common.auth import (
     revoke_session_cookie,
     SESSION_COOKIE_LIFETIME,
 )
-from backend.common.consts.auth_type import (
-    WRITE_TYPE_NAMES as AUTH_TYPE_WRITE_TYPE_NAMES,
-)
+from backend.common.consts.auth_type import AuthType
 from backend.common.consts.model_type import ModelType
 from backend.common.consts.notification_type import (
     ENABLED_EVENT_NOTIFICATIONS,
@@ -36,6 +36,7 @@ from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.mytba_helper import MyTBAHelper
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
 from backend.common.models.keys import EventKey, TeamNumber
@@ -48,10 +49,70 @@ from backend.web.redirect import is_safe_url, safe_next_redirect
 
 blueprint = Blueprint("account", __name__, url_prefix="/account")
 
+# Labels for write key permissions on the account page only. Every key already
+# belongs to an event, so these drop the "event" prefix that WRITE_TYPE_NAMES
+# (shared with the APIs and notifications) carries.
+ACCOUNT_WRITE_TYPE_LABELS: dict[AuthType, str] = {
+    AuthType.EVENT_INFO: "Event details",
+    AuthType.EVENT_TEAMS: "Teams",
+    AuthType.EVENT_MATCHES: "Matches",
+    AuthType.EVENT_RANKINGS: "Rankings",
+    AuthType.EVENT_ALLIANCES: "Alliances",
+    AuthType.EVENT_AWARDS: "Awards",
+    AuthType.MATCH_VIDEO: "Match videos",
+    AuthType.ZEBRA_MOTIONWORKS: "Zebra MotionWorks",
+}
+
+
+def _api_write_key_sort_key(api_key: ApiAuthAccess) -> tuple[bool, str, str]:
+    event_keys = sorted(str(event_key.id()) for event_key in api_key.event_list)
+    return (
+        not event_keys,
+        event_keys[0] if event_keys else "",
+        str(api_key.key.id()),
+    )
+
+
+def _sorted_api_write_keys(
+    api_write_keys: list[ApiAuthAccess], descending: bool
+) -> list[ApiAuthAccess]:
+    keys_with_events = [key for key in api_write_keys if key.event_list]
+    keys_without_events = [key for key in api_write_keys if not key.event_list]
+    return sorted(
+        keys_with_events,
+        key=_api_write_key_sort_key,
+        reverse=descending,
+    ) + sorted(keys_without_events, key=_api_write_key_sort_key)
+
+
+def _event_names(api_write_keys: list[ApiAuthAccess]) -> dict[str, str]:
+    event_keys = {
+        str(event_key.id()) for key in api_write_keys for event_key in key.event_list
+    }
+    events = ndb.get_multi([ndb.Key(Event, event_key) for event_key in event_keys])
+    return {
+        event.key_name: f"{event.year} {event.display_name}"
+        for event in events
+        if event
+    }
+
 
 @blueprint.route("")
 @require_login
 def overview() -> str:
+    user = none_throws(current_user())
+    # Newest events first by default: the key someone just requested for this
+    # season is the one they're looking for. Clicking the "Event" header sets
+    # ?api_write_keys_sort explicitly, which also reveals the direction caret.
+    requested_sort = request.args.get("api_write_keys_sort")
+    api_write_keys_sort_explicit = requested_sort in {"asc", "desc"}
+    api_write_keys_sort_direction = (
+        requested_sort if api_write_keys_sort_explicit else "desc"
+    )
+    api_write_keys_next_sort = (
+        "asc" if api_write_keys_sort_direction == "desc" else "desc"
+    )
+
     template_values = {
         "status": session.pop("account_status", None),
         "webhook_verification_success": request.args.get(
@@ -59,7 +120,16 @@ def overview() -> str:
         ),
         "ping_sent": session.pop("ping_sent", None),
         "ping_enabled": NotificationsEnable.notifications_enabled(),
-        "auth_write_type_names": AUTH_TYPE_WRITE_TYPE_NAMES,
+        "auth_write_type_labels": ACCOUNT_WRITE_TYPE_LABELS,
+        "api_write_keys": _sorted_api_write_keys(
+            user.api_write_keys,
+            descending=api_write_keys_sort_direction == "desc",
+        ),
+        "api_write_key_event_names": _event_names(user.api_write_keys),
+        "now": datetime.datetime.now(),
+        "api_write_keys_sort_direction": api_write_keys_sort_direction,
+        "api_write_keys_sort_explicit": api_write_keys_sort_explicit,
+        "api_write_keys_next_sort": api_write_keys_next_sort,
     }
     return render_template("account_overview.html", **template_values)
 
@@ -482,13 +552,18 @@ def mytba_eventteam_get(team_number: TeamNumber) -> str:
 
     team_events = TeamEventsQuery(none_throws(team.key.string_id())).fetch()
 
-    favorites = Favorite.query(
-        Favorite.model_type == ModelType.EVENT_TEAM,
-        Favorite.model_key.IN(  # pyre-ignore[16]
-            [f"{event.key.string_id()}_{team.key.string_id()}" for event in team_events]
-        ),
-        ancestor=none_throws(user.account_key),
-    ).fetch(1000)
+    eventteam_keys = [
+        f"{event.key.string_id()}_{team.key.string_id()}" for event in team_events
+    ]
+    favorites = (
+        Favorite.query(
+            Favorite.model_type == ModelType.EVENT_TEAM,
+            Favorite.model_key.IN(eventteam_keys),  # pyre-ignore[16]
+            ancestor=none_throws(user.account_key),
+        ).fetch(1000)
+        if eventteam_keys
+        else []
+    )
 
     already_favorited = set()
     if favorites:

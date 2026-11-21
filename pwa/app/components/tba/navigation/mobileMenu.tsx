@@ -12,18 +12,15 @@ import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
 
 export function MobileMenu() {
   return (
-    <NavigationMenuItem className="md:hidden">
-      <NavigationMenuTrigger
-        aria-label="Toggle Menu"
-        // Disable hover to open
-        onPointerMove={(e) => e.preventDefault()}
-      >
-        <MenuIcon className="size-5 group-data-[state=open]:hidden" />
-        <XIcon className="hidden size-5 group-data-[state=open]:block" />
+    <NavigationMenuItem className="min-[60rem]:hidden">
+      <NavigationMenuTrigger aria-label="Toggle Menu">
+        <MenuIcon className="size-5 group-data-popup-open:hidden" />
+        <XIcon className="hidden size-5 group-data-popup-open:block" />
       </NavigationMenuTrigger>
       <NavigationMenuContent
         className="absolute inset-x-0 top-0 z-12 mt-0 flex max-h-[80svh]
-          flex-col overflow-auto px-4"
+          flex-col overflow-auto overscroll-contain rounded-b-xl bg-brand px-4
+          text-white"
       >
         <ul className="grid divide-y divide-white/10">
           {NAV_ITEMS_LIST.map(({ title, to, icon: Icon }, index) => (
@@ -31,11 +28,12 @@ export function MobileMenu() {
               key={title}
               to={to}
               className="flex w-full animate-navigation-item-fade-in
-                items-center gap-3 py-4 opacity-0 hover:no-underline"
+                items-center gap-3 py-4 opacity-0 hover:no-underline
+                motion-safe:[--nav-item-shift:-8px]"
               activeProps={{ className: 'bg-white/15 rounded-md' }}
               style={{ animationDelay: `${index * 50}ms` }}
             >
-              <Icon className="size-5 text-white/50" />
+              <Icon className="size-5 text-white" />
               <p className="font-medium text-white">{title}</p>
             </Link>
           ))}

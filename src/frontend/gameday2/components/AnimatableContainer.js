@@ -7,6 +7,8 @@ export default class AnimatableContainer extends React.Component {
     endStyle: PropTypes.object.isRequired,
     style: PropTypes.object,
     children: PropTypes.node,
+    in: PropTypes.bool,
+    onExited: PropTypes.func,
   };
 
   constructor(props) {
@@ -15,6 +17,22 @@ export default class AnimatableContainer extends React.Component {
     this.state = {
       style: props.beginStyle,
     };
+  }
+
+  // react-transition-group v4 drives children through `in` and `onExited`.
+  componentDidMount() {
+    if (this.props.in) {
+      this.componentWillAppear(() => {});
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.in && this.props.in) {
+      clearTimeout(this.leaveTimeout);
+      this.componentWillEnter(() => {});
+    } else if (prevProps.in && !this.props.in) {
+      this.componentWillLeave(() => this.props.onExited?.());
+    }
   }
 
   componentWillUnmount() {
@@ -49,9 +67,19 @@ export default class AnimatableContainer extends React.Component {
   }
 
   render() {
-    // beginStyle and endStyle are unused, but we exclude them from ...other so
-    // they don't get passed as props to our div
-    const { style, children, beginStyle, endStyle, ...other } = this.props;
+    // Exclude animation and transition-group props so they don't reach the div
+    const {
+      style,
+      children,
+      beginStyle,
+      endStyle,
+      in: inProp,
+      onExited,
+      appear,
+      enter,
+      exit,
+      ...other
+    } = this.props;
 
     return (
       <div {...other} style={Object.assign({}, style, this.state.style)}>

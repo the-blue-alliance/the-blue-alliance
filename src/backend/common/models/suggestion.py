@@ -76,6 +76,19 @@ class Suggestion(ndb.Model):
             return self.contents["youtube_videos"][0]
 
     @classmethod
+    def get_by_key_string(cls, suggestion_key: str) -> Optional["Suggestion"]:
+        """
+        Look up a suggestion by the string form of its id. Most suggestions
+        have string ids (media key names); offseason events and API key
+        requests have auto-allocated integer ids that arrive as digit strings
+        over HTTP and task payloads.
+        """
+        suggestion = cls.get_by_id(suggestion_key)
+        if suggestion is None and suggestion_key.isdigit():
+            suggestion = cls.get_by_id(int(suggestion_key))
+        return suggestion
+
+    @classmethod
     def render_media_key_name(
         cls,
         year: Optional[Year],

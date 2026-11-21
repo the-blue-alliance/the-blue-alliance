@@ -2,6 +2,7 @@ from backend.common.helpers.insights_v2.leaderboards.most_matches_played_togethe
     MostMatchesPlayedTogetherV2Calculator,
 )
 from backend.common.helpers.insights_v2.registry import compute_insights_for_year
+from backend.common.helpers.tests.insights_v2.fakes import fake_event, fake_match
 
 
 def test_most_matches_played_together_year(ndb_stub, test_data_importer) -> None:
@@ -67,3 +68,13 @@ def test_no_unplayed_matches_counted(ndb_stub, test_data_importer) -> None:
         2024, [MostMatchesPlayedTogetherV2Calculator()]
     )
     assert insights == []
+
+
+def test_most_matches_played_together_team_keys_and_unplayed() -> None:
+    calc = MostMatchesPlayedTogetherV2Calculator()
+    calc.on_event(fake_event([fake_match(-1, -1)]))
+    assert calc.counts == {}
+
+    calc._increment("frc1|frc2")
+    calc._increment("frc2|frc3")
+    assert calc.team_keys == {"frc1", "frc2", "frc3"}

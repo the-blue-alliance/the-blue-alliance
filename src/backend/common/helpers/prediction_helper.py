@@ -2,6 +2,7 @@ import copy
 import math
 from collections import defaultdict
 from typing import (
+    Any,
     cast,
     Dict,
     List,
@@ -125,6 +126,10 @@ class ContributionCalculator:
 
         no_priors_team_list = team_list
 
+        # Only the current year is searched today. TODO: if this looks back
+        # further (year_diff != 0), scale prior-year stats based on actual
+        # data. The old placeholder kept means as-is (x1) and replaced
+        # variances with self._default_var * 3.
         for year_diff in range(1):
             team_events_futures = []
             for team in no_priors_team_list:
@@ -160,10 +165,6 @@ class ContributionCalculator:
                                 "qual"
                             ][self._stat]["mean"].get(team)
                             if team_mean is not None:
-                                if year_diff != 0:
-                                    team_mean *= (
-                                        1  # TODO: Hacky; scale based on actual data
-                                    )
                                 past_stats_mean[team].append(team_mean)
                                 no_past_mean = False
 
@@ -171,10 +172,6 @@ class ContributionCalculator:
                                 "qual"
                             ][self._stat]["var"].get(team)
                             if team_var is not None:
-                                if year_diff != 0:
-                                    team_var = (
-                                        self._default_var * 3
-                                    )  # TODO: Hacky; scale based on actual data
                                 past_stats_var[team].append(team_var)
                 if no_past_mean:
                     no_priors_team_list.append(team)
@@ -279,7 +276,7 @@ class ContributionCalculator:
                     score -= score_breakdown[color].get("rotorBonusPoints", 0)
                     means[color] = score
                 elif self._stat == "auto_points":
-                    means[color] = score_breakdown[color]["autoPoints"]
+                    means[color] = score_breakdown[color].get("autoPoints", 0)
                 elif self._stat == "boulders":
                     means[color] = (
                         score_breakdown[color].get("autoBouldersLow", 0)
@@ -320,57 +317,61 @@ class ContributionCalculator:
                         num_gears = -1  # Failed to place reserve gear
                     means[color] = num_gears
                 elif self._stat == "endgame_points":
-                    means[color] = score_breakdown[color]["endgamePoints"]
+                    means[color] = score_breakdown[color].get("endgamePoints", 0)
                 elif self._stat == "rocket_pieces_scored":
                     count = 0
                     for side1 in ["Far", "Near"]:
                         for side2 in ["Left", "Right"]:
                             for level in ["low", "mid", "top"]:
-                                position = score_breakdown[color][
-                                    "{}{}Rocket{}".format(level, side2, side1)
-                                ]
+                                position = score_breakdown[color].get(
+                                    "{}{}Rocket{}".format(level, side2, side1), ""
+                                )
                                 if "Cargo" in position:
                                     count += 2
                                 elif "Panel" in position:
                                     count += 1
                     means[color] = count
                 elif self._stat == "hab_climb_points":
-                    means[color] = score_breakdown[color]["habClimbPoints"]
+                    means[color] = score_breakdown[color].get("habClimbPoints", 0)
                 elif self._stat == "power_cells_scored":
                     count = 0
                     for mode in ["auto", "teleop"]:
                         for goal in ["Bottom", "Outer", "Inner"]:
-                            count += score_breakdown[color][
-                                "{}Cells{}".format(mode, goal)
-                            ]
+                            count += score_breakdown[color].get(
+                                "{}Cells{}".format(mode, goal), 0
+                            )
                     means[color] = count
                 elif self._stat == "cargo_scored":
                     auto_count = 0
                     for goal in ["Lower", "Upper"]:
                         for exit in ["Near", "Far", "Red", "Blue"]:
-                            auto_count += score_breakdown[color][
-                                "autoCargo{}{}".format(goal, exit)
-                            ]
+                            auto_count += score_breakdown[color].get(
+                                "autoCargo{}{}".format(goal, exit), 0
+                            )
                     # Approximate Quintet by adding 2 to count
                     count = auto_count + 2 if auto_count >= 5 else auto_count
                     for goal in ["Lower", "Upper"]:
                         for exit in ["Near", "Far", "Red", "Blue"]:
-                            count += score_breakdown[color][
-                                "teleopCargo{}{}".format(goal, exit)
-                            ]
+                            count += score_breakdown[color].get(
+                                "teleopCargo{}{}".format(goal, exit), 0
+                            )
                     means[color] = count
                 elif self._stat == "game_piece_scored":
                     count = 0
                     for mode in ["auto", "teleop"]:
-                        count += score_breakdown[color]["{}GamePieceCount".format(mode)]
+                        count += score_breakdown[color].get(
+                            "{}GamePieceCount".format(mode), 0
+                        )
                     means[color] = count
                 elif self._stat == "links":
                     count = 0
-                    count = math.floor((score_breakdown[color]["linkPoints"]) / 5)
+                    count = math.floor(
+                        (score_breakdown[color].get("linkPoints", 0)) / 5
+                    )
                     means[color] = count
                 elif self._stat == "charge_station_points":
                     count = 0
-                    count = score_breakdown[color]["totalChargeStationPoints"]
+                    count = score_breakdown[color].get("totalChargeStationPoints", 0)
                     means[color] = count
                 elif self._stat == "note_scored":
                     count = 0
@@ -378,48 +379,63 @@ class ContributionCalculator:
                         for position in ["Amp", "Speaker"]:
                             if position == "Speaker" and mode == "teleop":
                                 for type in ["NoteCount", "NoteAmplifiedCount"]:
-                                    count += score_breakdown[color][
-                                        "{}{}{}".format(mode, position, type)
-                                    ]
+                                    count += score_breakdown[color].get(
+                                        "{}{}{}".format(mode, position, type), 0
+                                    )
                             else:
-                                count += score_breakdown[color][
-                                    "{}{}NoteCount".format(mode, position)
-                                ]
+                                count += score_breakdown[color].get(
+                                    "{}{}NoteCount".format(mode, position), 0
+                                )
                     means[color] = count
                 elif self._stat == "stage_points":
                     count = 0
-                    count = score_breakdown[color]["endGameTotalStagePoints"]
+                    count = score_breakdown[color].get("endGameTotalStagePoints", 0)
                     means[color] = count
                 elif self._stat == "robot_on_stage":
                     count = 0
-                    for i in range(1, 4):
+                    for robot in range(1, 4):
                         if (
-                            score_breakdown[color]["endGameRobot{}".format(i)]
+                            score_breakdown[color].get(
+                                "endGameRobot{}".format(robot), ""
+                            )
                             == "StageLeft"
-                            or score_breakdown[color]["endGameRobot{}".format(i)]
+                            or score_breakdown[color].get(
+                                "endGameRobot{}".format(robot), ""
+                            )
                             == "StageRight"
-                            or score_breakdown[color]["endGameRobot{}".format(i)]
+                            or score_breakdown[color].get(
+                                "endGameRobot{}".format(robot), ""
+                            )
                             == "CenterStage"
                         ):
                             count += 1
                     means[color] = count
                 elif self._stat == "coopertition_criteria":
-                    count = 0
-                    if score_breakdown[color]["coopertitionCriteriaMet"]:
-                        count = 1
-                    means[color] = count
+                    # This ALLIANCE's half of the Coopertition Bonus, which
+                    # needs both ALLIANCES to meet it.
+                    if "wallAlgaeCount" in score_breakdown[color]:
+                        # 2025 Game Manual 6.5.3: "at least 2 ALGAE are scored
+                        # in each ALLIANCE'S PROCESSOR"
+                        met = score_breakdown[color].get("wallAlgaeCount", 0) >= 2
+                    else:
+                        # 2024: FMS sets this when the ALLIANCE uses a NOTE for
+                        # Coopertition within the first 45 seconds of TELEOP
+                        met = score_breakdown[color].get(
+                            "coopertitionCriteriaMet", False
+                        )
+                    means[color] = 1 if met else 0
                 elif self._stat == "auto_coral_scored":
-                    means[color] = score_breakdown[color]["autoCoralCount"]
+                    means[color] = score_breakdown[color].get("autoCoralCount", 0)
                 elif self._stat == "coral_scored":
-                    means[color] = score_breakdown[color]["teleopCoralCount"]
+                    means[color] = score_breakdown[color].get("teleopCoralCount", 0)
                 elif self._stat == "barge_points":
-                    means[color] = score_breakdown[color]["endGameBargePoints"]
+                    means[color] = score_breakdown[color].get("endGameBargePoints", 0)
                 elif self._stat == "totalAutoPoints":
-                    means[color] = score_breakdown[color]["totalAutoPoints"]
+                    means[color] = score_breakdown[color].get("totalAutoPoints", 0)
                 elif self._stat == "totalTeleopPoints":
-                    means[color] = score_breakdown[color]["totalTeleopPoints"]
+                    means[color] = score_breakdown[color].get("totalTeleopPoints", 0)
                 elif self._stat == "endGameTowerPoints":
-                    means[color] = score_breakdown[color]["endGameTowerPoints"]
+                    means[color] = score_breakdown[color].get("endGameTowerPoints", 0)
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -498,6 +514,23 @@ class PredictionHelper:
     @classmethod
     def _normcdf(cls, x: float) -> float:
         return (1.0 + math.erf(x / np.sqrt(2.0))) / 2.0
+
+    @classmethod
+    def _prob_coopertition_bonus(cls, mean_vars: Dict[str, Any]) -> float:
+        """
+        Probability that both ALLIANCES meet the Coopertition criteria, from
+        each ALLIANCE's 0/1 "coopertition_criteria" stat (thresholded at 0.5).
+        2024 Game Manual 6.5.5: "If both ALLIANCES use a NOTE scored in their
+        AMP to engage in Coopertition ... all teams earn a Coopertition Bonus".
+        2025 Game Manual 6.5.3: "if at least 2 ALGAE are scored in each
+        ALLIANCE'S PROCESSOR, all teams earn 1 Coopertition Point".
+        """
+        prob = 1.0
+        for color in ALLIANCE_COLORS:
+            mean_var = mean_vars[color]["coopertition_criteria"]
+            mu = mean_var["mean"] - 0.5
+            prob *= 1 - cls._normcdf(-mu / np.sqrt(mean_var["var"]))
+        return prob
 
     @classmethod
     def _predict_match(
@@ -712,17 +745,16 @@ class PredictionHelper:
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    mu2 = mean_vars[color]["coopertition_criteria"]["mean"] - 1
-                    prob2 = 1 - cls._normcdf(
-                        -mu2 / np.sqrt(mean_vars[color]["coopertition_criteria"]["var"])
-                    )
+                    prob_coop = cls._prob_coopertition_bonus(mean_vars)
 
                     mu3 = mean_vars[color][stat]["mean"] - 15
                     prob3 = 1 - cls._normcdf(
                         -mu3 / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    prediction[color]["prob_melody_bonus"] = prob + prob2 * prob3
+                    prediction[color]["prob_melody_bonus"] = (
+                        prob_coop * prob3 + (1 - prob_coop) * prob
+                    )
                 if stat == "stage_points":
                     required_points = 10
 
@@ -754,17 +786,16 @@ class PredictionHelper:
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    mu2 = mean_vars[color]["coopertition_criteria"]["mean"] - 1
-                    prob2 = 1 - cls._normcdf(
-                        -mu2 / np.sqrt(mean_vars[color]["coopertition_criteria"]["var"])
-                    )
+                    prob_coop = cls._prob_coopertition_bonus(mean_vars)
 
                     mu3 = mean_vars[color][stat]["mean"] - 15
                     prob3 = 1 - cls._normcdf(
                         -mu3 / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    prediction[color]["prob_coral_bonus"] = prob + prob2 * prob3
+                    prediction[color]["prob_coral_bonus"] = (
+                        prob_coop * prob3 + (1 - prob_coop) * prob
+                    )
                 if stat == "barge_points":
                     required_points = 14
 

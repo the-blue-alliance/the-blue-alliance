@@ -14,11 +14,11 @@ from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.frc_api import TScoreDetailReturn, TScoreDetailUnion
 from backend.common.frc_api.types import (
     EventScheduleHybridModelV2,
+    ScheduleListModelV31,
+    ScheduleTeamModelV2,
     ScoreDetailModel2018,
     ScoreDetailModel2024,
 )
-from backend.common.helpers.match_helper import MatchHelper
-from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
 from backend.common.models.event import Event
 from backend.common.models.keys import MatchKey, TeamKey, Year
@@ -26,18 +26,36 @@ from backend.common.models.match import Match
 from backend.common.models.match_score_breakdown import MatchScoreBreakdown
 from backend.common.suggestions.media_parser import MediaParser
 
-QF_SF_MAP = {
-    1: (1, 3),  # in sf1, qf seeds 2 and 4 play. 0-indexed becomes 1, 3
-    2: (0, 2),
-    3: (1, 2),
-    4: (0, 3),
-    5: (2, 3),
-    6: (0, 1),
-}
-
-LAST_LEVEL = {CompLevel.SF: CompLevel.QF, CompLevel.F: CompLevel.SF}
-
 TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
+
+# FRC API returns camelCase alliance keys for 2015; TBA historically stores snake_case.
+# Remap on ingest so regrabs restore the documented APIv3 / Jinja / PWA shape.
+_SCORE_BREAKDOWN_2015_KEY_MAP = {
+    "robotSet": "robot_set",
+    "containerSet": "container_set",
+    "toteSet": "tote_set",
+    "toteStack": "tote_stack",
+    "toteCountFar": "tote_count_far",
+    "toteCountNear": "tote_count_near",
+    "containerCountLevel1": "container_count_level1",
+    "containerCountLevel2": "container_count_level2",
+    "containerCountLevel3": "container_count_level3",
+    "containerCountLevel4": "container_count_level4",
+    "containerCountLevel5": "container_count_level5",
+    "containerCountLevel6": "container_count_level6",
+    "litterCountLandfill": "litter_count_landfill",
+    "litterCountContainer": "litter_count_container",
+    "litterCountUnprocessed": "litter_count_unprocessed",
+    "foulCount": "foul_count",
+    "autoPoints": "auto_points",
+    "totePoints": "tote_points",
+    "containerPoints": "container_points",
+    "litterPoints": "litter_points",
+    "teleopPoints": "teleop_points",
+    "adjustPoints": "adjust_points",
+    "foulPoints": "foul_points",
+    "totalPoints": "total_points",
+}
 
 
 class FMSAPIHybridScheduleParser(
@@ -130,7 +148,7 @@ class FMSAPIHybridScheduleParser(
             sorted_teams = list(
                 sorted(
                     teams_data,
-                    key=lambda team: team["station"],
+                    key=lambda team: team["station"] or "",
                 )
             )
 
@@ -179,19 +197,15 @@ class FMSAPIHybridScheduleParser(
                 },
             }
 
-            if not match[
-                "startTime"
-            ]:  # no startTime means it's an unneeded rubber match
+            api_start_time = match["startTime"]
+            if not api_start_time:  # no startTime means it's an unneeded rubber match
                 continue
 
-            if api_start_time := match["startTime"]:
-                time = datetime.datetime.strptime(
-                    api_start_time.split(".")[0], TIME_PATTERN
-                )
-                if event_tz is not None:
-                    time = time - event_tz.utcoffset(time)
-            else:
-                time = None
+            time = datetime.datetime.strptime(
+                api_start_time.split(".")[0], TIME_PATTERN
+            )
+            if event_tz is not None:
+                time = time - event_tz.utcoffset(time)
 
             actual_time_raw = (
                 match["actualStartTime"] if "actualStartTime" in match else None
@@ -301,6 +315,31 @@ class FMSAPIHybridScheduleParser(
                 key_name = existing_match.key.id()
                 match_number = existing_match.match_number
 
+            if null_team and existing_match:
+                # The FRC API sometimes drops teams from played matches (2015mitry
+                # finals). Keep the teams we already know rather than erase them.
+                for color, teams, surrogates, dqs in [
+                    (AllianceColor.RED, red_teams, red_surrogates, red_dqs),
+                    (AllianceColor.BLUE, blue_teams, blue_surrogates, blue_dqs),
+                ]:
+                    if not any(
+                        t["teamNumber"] is None
+                        and color in (t["station"] or "").lower()
+                        for t in sorted_teams
+                    ):
+                        continue
+                    known = existing_match.alliances[color]
+                    if not known["teams"]:
+                        continue
+                    logging.warning(
+                        f"FRC API returned a null team for {key_name} {color}; "
+                        f"keeping known teams {known['teams']}"
+                    )
+                    teams[:] = known["teams"]
+                    surrogates[:] = known.get("surrogates", [])
+                    dqs[:] = known.get("dqs", [])
+                team_key_names = red_teams + blue_teams
+
             parsed_matches.append(
                 Match(
                     id=key_name,
@@ -318,52 +357,76 @@ class FMSAPIHybridScheduleParser(
                 )
             )
 
-        if self.year == 2015:
-            # Fix null teams in elims (due to FMS API failure, some info not complete)
-            # Should only happen for sf and f matches
-            _, organized_matches = MatchHelper.organized_matches(parsed_matches)
-            for level in [CompLevel.SF, CompLevel.F]:
-                playoff_advancement = (
-                    PlayoffAdvancementHelper.generate_playoff_advancement_2015(
-                        organized_matches
-                    )
-                )
-                if playoff_advancement[LAST_LEVEL[level]] != []:
-                    for match in organized_matches[level]:
-                        if "frcNone" in match.team_key_names:
-                            if level == "sf":
-                                red_seed, blue_seed = QF_SF_MAP[match.match_number]
-                            else:
-                                red_seed = 0
-                                blue_seed = 1
-                            red_teams = [
-                                "frc{}".format(t)
-                                for t in playoff_advancement[LAST_LEVEL[level]][
-                                    red_seed
-                                ][0]
-                            ]
-                            blue_teams = [
-                                "frc{}".format(t)
-                                for t in playoff_advancement[LAST_LEVEL[level]][
-                                    blue_seed
-                                ][0]
-                            ]
-
-                            alliances = match.alliances
-                            alliances[AllianceColor.RED]["teams"] = red_teams
-                            alliances[AllianceColor.BLUE]["teams"] = blue_teams
-                            match.alliances_json = json.dumps(alliances)
-                            match.team_key_names = red_teams + blue_teams
-
-            fixed_matches = []
-            for key, matches in organized_matches.items():
-                if key != "num":
-                    for match in matches:
-                        if "frcNone" not in match.team_key_names:
-                            fixed_matches.append(match)
-            parsed_matches = fixed_matches
-
         return parsed_matches, remapped_matches
+
+
+class FMSAPIPracticeScheduleParser(ParserBase[ScheduleListModelV31, List[Match]]):
+    def __init__(self, year: Year, event_short: str):
+        self.year = year
+        self.event_short = event_short
+
+    @staticmethod
+    def _alliance_teams(
+        teams: List[ScheduleTeamModelV2], color_prefix: str
+    ) -> List[TeamKey]:
+        return [
+            f"frc{team['teamNumber']}"
+            for team in sorted(teams, key=lambda team: team["station"] or "")
+            if team["teamNumber"] and (team["station"] or "").startswith(color_prefix)
+        ]
+
+    def parse(self, response: ScheduleListModelV31) -> List[Match]:
+        import pytz
+
+        event_key = f"{self.year}{self.event_short}"
+        event = none_throws(Event.get_by_id(event_key))
+        event_tz = pytz.timezone(event.timezone_id) if event.timezone_id else None
+
+        matches: List[Match] = []
+        for scheduled in response.get("Schedule") or []:
+            start_time = scheduled["startTime"]
+            if not start_time:
+                continue
+
+            time = datetime.datetime.strptime(start_time.split(".")[0], TIME_PATTERN)
+            if event_tz is not None:
+                time = time - event_tz.utcoffset(time)
+
+            teams = scheduled["teams"] or []
+            red_teams = self._alliance_teams(teams, "Red")
+            blue_teams = self._alliance_teams(teams, "Blue")
+            matches.append(
+                Match(
+                    id=Match.render_key_name(
+                        event_key, CompLevel.PM, 1, scheduled["matchNumber"]
+                    ),
+                    event=event.key,
+                    year=event.year,
+                    set_number=1,
+                    match_number=scheduled["matchNumber"],
+                    comp_level=CompLevel.PM,
+                    team_key_names=red_teams + blue_teams,
+                    time=time,
+                    alliances_json=json.dumps(
+                        {
+                            "red": {
+                                "teams": red_teams,
+                                "surrogates": [],
+                                "dqs": [],
+                                "score": None,
+                            },
+                            "blue": {
+                                "teams": blue_teams,
+                                "surrogates": [],
+                                "dqs": [],
+                                "score": None,
+                            },
+                        }
+                    ),
+                )
+            )
+
+        return matches
 
 
 class FMSAPIMatchDetailsParser(
@@ -439,8 +502,11 @@ class FMSAPIMatchDetailsParser(
             for alliance in api_alliances:
                 color = alliance["alliance"].lower()
                 for key, value in alliance.items():
-                    if key != "alliance":
-                        breakdown[color][key] = value
+                    if key == "alliance":
+                        continue
+                    if self.year == 2015:
+                        key = _SCORE_BREAKDOWN_2015_KEY_MAP.get(key, key)
+                    breakdown[color][key] = value
 
                 if game_data is not None:
                     breakdown[color]["tba_gameData"] = game_data
@@ -452,9 +518,9 @@ class FMSAPIMatchDetailsParser(
                         for side2 in ["Left", "Right"]:
                             for level in ["low", "mid", "top"]:
                                 if (
-                                    breakdown[color][
+                                    breakdown[color].get(
                                         "{}{}Rocket{}".format(level, side2, side1)
-                                    ]
+                                    )
                                     != "PanelAndCargo"
                                 ):
                                     completedRocket = False

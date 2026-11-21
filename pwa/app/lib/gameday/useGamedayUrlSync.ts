@@ -1,5 +1,5 @@
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { MAX_VIEWS } from '~/lib/gameday/layouts';
 import type { GamedaySearchParams } from '~/routes/gameday';
@@ -9,7 +9,7 @@ import type { GamedaySearchParams } from '~/routes/gameday';
  */
 export interface GamedayUrlState {
   layoutId: number | null;
-  positionToWebcast: (string | null)[];
+  positionToContent: (string | null)[];
   chatSidebarVisible: boolean;
   currentChat: string;
 }
@@ -20,7 +20,7 @@ export interface GamedayUrlState {
 export function hasUrlStateToRestore(urlState: GamedayUrlState): boolean {
   return (
     urlState.layoutId !== null ||
-    urlState.positionToWebcast.some((id) => id !== null) ||
+    urlState.positionToContent.some((id) => id !== null) ||
     urlState.currentChat !== '' ||
     !urlState.chatSidebarVisible
   );
@@ -36,16 +36,15 @@ export function parseSearchParams(
   const layoutId = searchParams.layout ?? null;
 
   // Webcast positions: view_0, view_1, ... view_N
-  const positionToWebcast: (string | null)[] = Array.from(
+  const positionToContent: (string | null)[] = Array.from(
     { length: MAX_VIEWS },
     () => null,
   );
   for (let i = 0; i < MAX_VIEWS; i++) {
     const viewParam = searchParams[`view_${i}` as keyof GamedaySearchParams] as
-      | string
-      | undefined;
+      string | undefined;
     if (viewParam) {
-      positionToWebcast[i] = viewParam;
+      positionToContent[i] = viewParam;
     }
   }
 
@@ -56,7 +55,7 @@ export function parseSearchParams(
 
   return {
     layoutId,
-    positionToWebcast,
+    positionToContent,
     chatSidebarVisible,
     currentChat,
   };
@@ -76,10 +75,10 @@ export function serializeToSearchParams(
   }
 
   // Webcast positions
-  for (let i = 0; i < state.positionToWebcast.length; i++) {
-    const webcastId = state.positionToWebcast[i];
-    if (webcastId) {
-      (params as Record<string, unknown>)[`view_${i}`] = webcastId;
+  for (let i = 0; i < state.positionToContent.length; i++) {
+    const contentId = state.positionToContent[i];
+    if (contentId) {
+      (params as Record<string, unknown>)[`view_${i}`] = contentId;
     }
   }
 
@@ -102,7 +101,7 @@ export function serializeToSearchParams(
  */
 export function useGamedayUrlSync(state: {
   layoutId: number | null;
-  positionToWebcast: (string | null)[];
+  positionToContent: (string | null)[];
   chatSidebarVisible: boolean;
   currentChat: string;
 }) {
@@ -112,10 +111,7 @@ export function useGamedayUrlSync(state: {
   const lastSerializedRef = useRef<string>('');
 
   // Parse URL params once on first render
-  const initialUrlStateRef = useRef<GamedayUrlState | null>(null);
-  if (initialUrlStateRef.current === null) {
-    initialUrlStateRef.current = parseSearchParams(searchParams);
-  }
+  const [initialUrlState] = useState(() => parseSearchParams(searchParams));
 
   // Sync state to URL on changes
   useEffect(() => {
@@ -128,7 +124,7 @@ export function useGamedayUrlSync(state: {
 
     const urlState: GamedayUrlState = {
       layoutId: state.layoutId,
-      positionToWebcast: state.positionToWebcast,
+      positionToContent: state.positionToContent,
       chatSidebarVisible: state.chatSidebarVisible,
       currentChat: state.currentChat,
     };
@@ -147,11 +143,11 @@ export function useGamedayUrlSync(state: {
     }
   }, [
     state.layoutId,
-    state.positionToWebcast,
+    state.positionToContent,
     state.chatSidebarVisible,
     state.currentChat,
     navigate,
   ]);
 
-  return { initialUrlState: initialUrlStateRef.current };
+  return { initialUrlState };
 }

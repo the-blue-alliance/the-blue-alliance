@@ -1,19 +1,22 @@
 /// <reference types="vite/client" />
 import type { QueryClient } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
   HeadContent,
   Outlet,
+  ScriptOnce,
   Scripts,
   createRootRouteWithContext,
   useLocation,
 } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { useEffect } from 'react';
+import { cn } from 'cn';
+import { Suspense, lazy, useEffect } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { z } from 'zod';
 
+import { client as colorsClient } from '~/api/colors/client.gen';
 import { client as mobileClient } from '~/api/tba/mobile/client.gen';
+import { client as moderationClient } from '~/api/tba/moderation/client.gen';
+import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { client } from '~/api/tba/read/client.gen';
 import { AuthContextProvider } from '~/components/tba/auth/auth';
 import { MatchModal } from '~/components/tba/match/matchModal';
@@ -23,20 +26,47 @@ import { TOCRendererProvider } from '~/components/tba/tableOfContents';
 import { Toaster } from '~/components/ui/sonner';
 import { TooltipProvider } from '~/components/ui/tooltip';
 import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?url&no-inline';
-import { ApiError } from '~/lib/apiError';
+import { mapClientError } from '~/lib/apiError';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
-import { createCachedFetch } from '~/lib/middleware/network-cache';
-import { ThemeProvider } from '~/lib/theme';
-import { cn, createLogger } from '~/lib/utils';
+import {
+  LOCAL_API_AUTH_KEY,
+  LOCAL_API_BASE_URL,
+  isLocalDataSource,
+} from '~/lib/dataSource';
+import { STALE_TIME } from '~/lib/queryClient';
+import { THEME_INIT_SCRIPT, ThemeProvider } from '~/lib/theme';
+import { createLogger } from '~/lib/utils';
 import appCss from '~/style/tailwind.css?url';
 
 const logger = createLogger('root');
 
+// Devtools are dev-only and must never ship to production. Lazy-loading them
+// (instead of a static import) keeps both packages out of the production
+// bundle entirely, rather than just tree-shaking an unused render.
+const TanStackRouterDevtools = import.meta.env.PROD
+  ? null
+  : lazy(() =>
+      import('@tanstack/react-router-devtools').then((m) => ({
+        default: m.TanStackRouterDevtools,
+      })),
+    );
+const ReactQueryDevtools = import.meta.env.PROD
+  ? null
+  : lazy(() =>
+      import('@tanstack/react-query-devtools').then((m) => ({
+        default: m.ReactQueryDevtools,
+      })),
+    );
+
 // Configure request interceptor for auth
 client.interceptors.request.use((request) => {
-  request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);
+  // The prod read key isn't valid against the local dev datastore, which
+  // has its own well-known dev key (seeded by /local/bootstrap)
+  const authKey = isLocalDataSource()
+    ? LOCAL_API_AUTH_KEY
+    : import.meta.env.VITE_TBA_API_READ_KEY;
 
-  logger.info(
+  logger.debug(
     {
       method: request.method,
       url: request.url,
@@ -44,31 +74,66 @@ client.interceptors.request.use((request) => {
     'Sending request to TBA API',
   );
 
-  return request;
+  if (import.meta.env.SSR) {
+    request.headers.set('X-TBA-Auth-Key', authKey);
+    return request;
+  }
+  return asSimpleCorsRequest(request, authKey);
 });
+
+function asSimpleCorsRequest(request: Request, authKey: string): Request {
+  const url = new URL(request.url);
+  url.searchParams.set('X-TBA-Auth-Key', authKey);
+  return new Request(url, request);
+}
 
 // Attach the HTTP status code to thrown errors so the QueryClient's retry
 // function can distinguish 4xx "client error" failures from transient ones.
-client.interceptors.error.use((_error, response) => {
-  return new ApiError(
-    response?.statusText || String(response?.status ?? 0),
-    response?.status ?? 0,
-  );
+client.interceptors.error.use((error, response) => {
+  return mapClientError(error, response);
 });
 
-// Configure network cache middleware
-// Caches API responses in memory across sessions to reduce external API calls
-// Cache is a global singleton with 500 max entries and 3 hour TTL
-client.setConfig({
-  fetch: createCachedFetch({
-    cacheableMethods: ['GET'],
-  }),
+// Same ApiError mapping for the colors client — consumers rely on 404s being
+// skipped and 4xx not being retried (see queryClient.ts).
+colorsClient.interceptors.error.use((error, response) => {
+  return mapClientError(error, response);
 });
+
+// And for the moderation client, so a failed queue probe throws a real
+// ApiError (with status) rather than a bare object.
+moderationClient.interceptors.error.use((error, response) => {
+  return mapClientError(error, response);
+});
+
+// SSR-only network LRU under the API client. Client freshness is owned by
+// React Query staleTime — do not install a second TTL in the browser.
+if (import.meta.env.SSR && !globalThis.__TBA_E2E_MOCKS__) {
+  const { createCachedFetch } = await import('~/lib/middleware/network-cache');
+  client.setConfig({
+    fetch: createCachedFetch({
+      cacheableMethods: ['GET'],
+    }),
+  });
+}
+
+// Dev-only: read from the local dev stack instead of prod when toggled via the
+// profile menu. isLocalDataSource() is false without a browser, so server
+// rendering always reads prod.
+if (isLocalDataSource()) {
+  client.setConfig({ baseUrl: LOCAL_API_BASE_URL });
+}
 
 // Point mobile API client at local backend when configured
 if (import.meta.env.VITE_TBA_MOBILE_API_BASE_URL) {
   mobileClient.setConfig({
     baseUrl: import.meta.env.VITE_TBA_MOBILE_API_BASE_URL,
+  });
+}
+
+// Point moderation API client at local backend when configured
+if (import.meta.env.VITE_TBA_MODERATION_API_BASE_URL) {
+  moderationClient.setConfig({
+    baseUrl: import.meta.env.VITE_TBA_MODERATION_API_BASE_URL,
   });
 }
 
@@ -83,16 +148,20 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
   validateSearch: rootSearchSchema,
-  loader: () => ({
-    renderTime: Temporal.Now.zonedDateTimeISO().toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true,
-    }),
-  }),
+  // `/status` gates the default year/page-size params for most of the site
+  // (see app/lib/queryClient.ts's STALE_TIME.STATUS doc comment), so it's
+  // resolved once here rather than independently by every route loader. With
+  // STALE_TIME.STATUS this is a cache read after the first navigation.
+  beforeLoad: async ({ context: { queryClient } }) => {
+    const status = await queryClient.ensureQueryData({
+      ...getStatusOptions({}),
+      staleTime: STALE_TIME.STATUS,
+    });
+    return {
+      status,
+      currentSeason: status.current_season ?? Temporal.Now.plainDateISO().year,
+    };
+  },
   head: ({ matches }) => ({
     meta: [
       {
@@ -120,18 +189,17 @@ export const Route = createRootRouteWithContext<{
     ],
     links: [
       {
+        rel: 'preconnect',
+        href: 'https://www.thebluealliance.com',
+        crossOrigin: 'anonymous',
+      },
+      {
         rel: 'canonical',
         href: `https://www.thebluealliance.com${matches[matches.length - 1].pathname}`,
       },
       {
         rel: 'stylesheet',
         href: appCss,
-      },
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-      {
-        rel: 'preconnect',
-        href: 'https://fonts.gstatic.com',
-        crossOrigin: 'anonymous',
       },
       { rel: 'manifest', href: '/manifest.webmanifest' },
       { rel: 'apple-touch-icon', href: appleTouchIcon180 },
@@ -145,7 +213,6 @@ const FULLSCREEN_ROUTES = ['/gameday'];
 const FULLWIDTH_ROUTES = ['/match_suggestion'];
 
 function RootComponent() {
-  const { renderTime } = Route.useLoaderData();
   const { pathname } = useLocation();
 
   // Set data-hydrated on <body> after React mounts so Playwright tests can
@@ -163,39 +230,24 @@ function RootComponent() {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          // This render-blocking script is necessary to ensure the correct theme is applied when the page is loaded.
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('theme');
-                  var isDark = theme === 'dark' || 
-                    (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                  if (isDark) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
+        {/* This render-blocking script is necessary to ensure the correct theme is applied when the page is loaded. */}
+        <ScriptOnce>{THEME_INIT_SCRIPT}</ScriptOnce>
         <HeadContent />
       </head>
       <body>
         <ThemeProvider>
-          <TooltipProvider delayDuration={300} skipDelayDuration={0}>
+          <TooltipProvider delay={300} timeout={0}>
             <AuthContextProvider>
               {isFullscreen ? (
                 <Outlet />
               ) : (
-                <div className="flex min-h-screen flex-col">
+                <div className="flex min-h-svh flex-col">
                   <Navbar />
                   <TOCRendererProvider>
                     <div
                       className={cn(
-                        !isFullwidth && 'container mx-auto',
-                        'flex-1 px-4 text-sm',
+                        !isFullwidth && 'container',
+                        'flex-1 px-2 py-2 text-sm md:px-4 md:py-4',
                       )}
                     >
                       <div vaul-drawer-wrapper="" className="bg-background">
@@ -204,17 +256,26 @@ function RootComponent() {
                       </div>
                     </div>
                   </TOCRendererProvider>
-                  <Footer renderTime={renderTime} />
+                  <Footer />
                 </div>
               )}
             </AuthContextProvider>
           </TooltipProvider>
           <Toaster />
         </ThemeProvider>
-        <TanStackRouterDevtools position="bottom-right" />
-        <ReactQueryDevtools buttonPosition="bottom-left" />
+        {!import.meta.env.PROD && (
+          <Suspense fallback={null}>
+            {TanStackRouterDevtools && (
+              <TanStackRouterDevtools position="bottom-right" />
+            )}
+            {ReactQueryDevtools && (
+              <ReactQueryDevtools buttonPosition="bottom-left" />
+            )}
+          </Suspense>
+        )}
         <Scripts />
       </body>
     </html>
   );
-}
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop

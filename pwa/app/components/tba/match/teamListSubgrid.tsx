@@ -1,7 +1,7 @@
 import { VariantProps, cva } from 'class-variance-authority';
+import { cn } from 'cn';
 
 import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
-import { cn } from '~/lib/utils';
 
 const teamListSubgridVariants = cva('flex items-center justify-center', {
   variants: {
@@ -41,7 +41,8 @@ interface TeamListSubgridProps
   dq: string[];
   surrogate: string[];
   year: number;
-  focusTeamKey?: string;
+  focusTeamKeys?: string[];
+  favoriteTeamKeys?: string[];
   teamCellClassName?: string;
 }
 
@@ -53,7 +54,8 @@ export default function TeamListSubgrid({
   dq,
   surrogate,
   year,
-  focusTeamKey,
+  focusTeamKeys,
+  favoriteTeamKeys,
   teamCellClassName,
   ...props
 }: TeamListSubgridProps) {
@@ -66,7 +68,8 @@ export default function TeamListSubgrid({
           year={year}
           dq={dq.includes(teamKey)}
           surrogate={surrogate.includes(teamKey)}
-          focus={focusTeamKey === teamKey}
+          focus={focusTeamKeys?.includes(teamKey) ?? false}
+          favorite={favoriteTeamKeys?.includes(teamKey) ?? false}
           className={cn(
             teamListSubgridVariants({
               allianceColor,
@@ -97,6 +100,13 @@ const teamCellVariants = cva(
         false: '',
       },
     },
+    compoundVariants: [
+      {
+        dq: true,
+        focus: true,
+        className: '[text-decoration-line:underline_line-through]!',
+      },
+    ],
     defaultVariants: {
       dq: false,
       surrogate: false,
@@ -111,6 +121,7 @@ interface TeamCellProps
     VariantProps<typeof teamCellVariants> {
   teamKey: string;
   year: number;
+  favorite: boolean;
 }
 
 function TeamCell({
@@ -119,17 +130,28 @@ function TeamCell({
   dq,
   surrogate,
   focus,
+  favorite,
   ...props
 }: TeamCellProps) {
   return (
     <div {...props}>
-      <TeamLinkWithTooltip
-        teamKey={teamKey}
-        year={year}
-        disqualified={dq ?? false}
-        surrogate={surrogate ?? false}
-        className={cn(teamCellVariants({ dq, surrogate, focus }))}
-      />
+      <span className="relative">
+        <TeamLinkWithTooltip
+          teamKey={teamKey}
+          year={year}
+          disqualified={dq ?? false}
+          surrogate={surrogate ?? false}
+          className={cn(teamCellVariants({ dq, surrogate, focus }))}
+        />
+        {favorite && (
+          <span
+            className="absolute -top-0.5 -right-1.5 size-1.5 rounded-full
+              bg-yellow-500"
+          >
+            <span className="sr-only">Favorite team</span>
+          </span>
+        )}
+      </span>
     </div>
   );
 }

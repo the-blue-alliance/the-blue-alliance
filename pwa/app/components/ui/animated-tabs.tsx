@@ -1,79 +1,106 @@
-import * as TabsPrimitive from '@radix-ui/react-tabs';
-import { LayoutGroup, motion } from 'motion/react';
+import { cn } from 'cn';
 import {
-  type ComponentPropsWithoutRef,
-  type ElementRef,
+  type ComponentProps,
+  Suspense,
   createContext,
-  forwardRef,
+  lazy,
   useContext,
   useState,
 } from 'react';
 
 import { Tabs, TabsTrigger } from '~/components/ui/tabs';
-import { cn } from '~/lib/utils';
 
-const AnimatedTabsContext = createContext<{ activeValue: string | undefined }>({
+const AnimatedTabIndicator = lazy(
+  () => import('~/components/ui/animatedTabIndicator'),
+);
+
+const AnimatedTabsContext = createContext<{
+  activeValue: string | undefined;
+  motionReady: boolean;
+}>({
   activeValue: undefined,
+  motionReady: false,
 });
 
-const AnimatedTabs = forwardRef<
-  ElementRef<typeof TabsPrimitive.Root>,
-  ComponentPropsWithoutRef<typeof TabsPrimitive.Root>
->(({ defaultValue, value, onValueChange, ...props }, ref) => {
+type TabsChangeEventDetails = Parameters<
+  NonNullable<ComponentProps<typeof Tabs>['onValueChange']>
+>[1];
+
+function AnimatedTabs({
+  defaultValue,
+  value,
+  onValueChange,
+  ...props
+}: Omit<
+  ComponentProps<typeof Tabs>,
+  'defaultValue' | 'value' | 'onValueChange'
+> & {
+  defaultValue?: string;
+  value?: string;
+  onValueChange?: (value: string, eventDetails: TabsChangeEventDetails) => void;
+}) {
   const [internalValue, setInternalValue] = useState<string | undefined>(
     value ?? defaultValue,
   );
   const activeValue = value ?? internalValue;
+  // The framer-motion indicator (~60 KB) is only requested once the user
+  // shows intent to switch tabs: a pointer entering the tab bar or focus
+  // landing in it. That keeps it off the hydration critical path
+  // deterministically, and it has usually arrived by the first click.
+  const [motionReady, setMotionReady] = useState(false);
+  const warmUp = () => setMotionReady(true);
 
   return (
-    <AnimatedTabsContext.Provider value={{ activeValue }}>
-      <LayoutGroup>
-        <Tabs
-          ref={ref}
-          defaultValue={defaultValue}
-          value={value}
-          onValueChange={(v) => {
-            setInternalValue(v);
-            onValueChange?.(v);
-          }}
-          {...props}
-        />
-      </LayoutGroup>
+    <AnimatedTabsContext.Provider value={{ activeValue, motionReady }}>
+      <Tabs
+        defaultValue={defaultValue}
+        value={value}
+        onValueChange={(v, eventDetails) => {
+          const stringValue = String(v);
+          setInternalValue(stringValue);
+          warmUp();
+          onValueChange?.(stringValue, eventDetails);
+        }}
+        onPointerEnter={warmUp}
+        onFocusCapture={warmUp}
+        {...props}
+      />
     </AnimatedTabsContext.Provider>
   );
-});
-AnimatedTabs.displayName = 'AnimatedTabs';
+}
 
-const AnimatedTabsTrigger = forwardRef<
-  ElementRef<typeof TabsPrimitive.Trigger>,
-  ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, children, value, ...props }, ref) => {
-  const { activeValue } = useContext(AnimatedTabsContext);
+function AnimatedTabsTrigger({
+  className,
+  children,
+  value,
+  ...props
+}: Omit<ComponentProps<typeof TabsTrigger>, 'value'> & { value: string }) {
+  const { activeValue, motionReady } = useContext(AnimatedTabsContext);
   const isActive = value !== undefined && activeValue === value;
+  const staticIndicator = (
+    <span className="absolute inset-0 rounded-sm bg-background shadow-xs" />
+  );
 
   return (
     <TabsTrigger
-      ref={ref}
       value={value}
       className={cn(
-        `relative data-[state=active]:bg-transparent
-        data-[state=active]:shadow-none`,
+        'relative data-active:bg-transparent data-active:shadow-none',
         className,
       )}
       {...props}
     >
-      {isActive && (
-        <motion.span
-          layoutId="tab-indicator"
-          initial={false}
-          className="absolute inset-0 rounded-sm bg-background shadow-xs"
-          transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
-        />
-      )}
+      {isActive &&
+        (motionReady ? (
+          <Suspense fallback={staticIndicator}>
+            <AnimatedTabIndicator />
+          </Suspense>
+        ) : (
+          staticIndicator
+        ))}
       <span className="relative z-10">{children}</span>
     </TabsTrigger>
   );
-});
-AnimatedTabsTrigger.displayName = 'AnimatedTabsTrigger';
+}
 
 export { AnimatedTabs, AnimatedTabsTrigger };

@@ -1,11 +1,13 @@
-import type { ColumnDef } from '@tanstack/react-table';
+import { cn } from 'cn';
+
+import BiTrophy from '~icons/bi/trophy';
 
 import { EventRanking } from '~/api/tba/read';
-import { DataTable } from '~/components/tba/dataTable';
+import { DataTable, type TbaColumnDef } from '~/components/tba/dataTable';
+import InlineIcon from '~/components/tba/inlineIcon';
 import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
-import { cn } from '~/lib/utils';
 
-type RankingColumnType = ColumnDef<EventRanking['rankings'][number]>[];
+type RankingColumnType = TbaColumnDef<EventRanking['rankings'][number]>[];
 
 export default function RankingsTable({
   rankings,
@@ -58,7 +60,7 @@ export default function RankingsTable({
               row.record &&
               `${row.record.wins}-${row.record.losses}-${row.record.ties}`,
             sortDescFirst: true,
-            sortingFn: (a, b) => {
+            sortFn: (a, b) => {
               if (a.original.record === null || b.original.record === null) {
                 return 0;
               }
@@ -92,20 +94,41 @@ export default function RankingsTable({
   );
 
   return (
-    <DataTable
-      columns={standardCols
-        .concat(sortOrderCols)
-        .concat(summaryCols)
-        .concat(generatedCols)}
-      data={rankings.rankings}
-      conditionalRowStyling={(row) =>
-        cn({
-          [`bg-yellow-100! font-bold shadow-inner shadow-yellow-200
-          dark:bg-yellow-500/15! dark:shadow-yellow-500/10`]: winners.includes(
-            row.original.team_key,
-          ),
-        })
-      }
-    />
+    <>
+      {(winners.length > 0 || captains.length > 0) && (
+        <ul
+          aria-label="Key"
+          className="mb-2 flex flex-wrap gap-x-4 text-sm text-muted-foreground"
+        >
+          {winners.length > 0 && (
+            <li>
+              <InlineIcon>
+                <BiTrophy />
+                Event winner
+              </InlineIcon>
+            </li>
+          )}
+          {captains.length > 0 && (
+            <li>
+              <span className="font-medium">C</span> Alliance captain
+            </li>
+          )}
+        </ul>
+      )}
+      <DataTable
+        columns={standardCols
+          .concat(sortOrderCols)
+          .concat(summaryCols)
+          .concat(generatedCols)}
+        data={rankings.rankings}
+        conditionalRowStyling={(row) =>
+          cn({
+            [`bg-yellow-100! font-bold shadow-inner shadow-yellow-200
+            dark:bg-yellow-500/15! dark:shadow-yellow-500/10`]:
+              winners.includes(row.original.team_key),
+          })
+        }
+      />
+    </>
   );
 }

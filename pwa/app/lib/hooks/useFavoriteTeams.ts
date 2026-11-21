@@ -11,15 +11,23 @@ interface UseFavoriteTeamsResult {
   isLoading: boolean;
 }
 
-export function useFavoriteTeams(): UseFavoriteTeamsResult {
+interface UseFavoriteTeamKeysResult {
+  teamKeys: string[];
+  isLoading: boolean;
+}
+
+export function useFavoriteTeamKeys(): UseFavoriteTeamKeysResult {
   const { user } = useAuth();
 
-  const { data: favorites, isLoading: isFavoritesLoading } = useQuery({
+  const { data: favorites, isLoading } = useQuery({
     queryKey: ['favorites', user?.uid],
     queryFn: async () => {
       if (!user) throw new Error('User not authenticated');
       const token = await user.getIdToken();
       const response = await listFavorites({ auth: token });
+      if (response.data === undefined) {
+        throw new Error('Failed to load favorites');
+      }
       return response.data;
     },
     enabled: !!user,
@@ -28,6 +36,12 @@ export function useFavoriteTeams(): UseFavoriteTeamsResult {
   const teamKeys = (favorites?.favorites ?? [])
     .filter((f) => f.model_type === MODEL_TYPE.TEAM)
     .map((f) => f.model_key);
+
+  return { teamKeys, isLoading };
+}
+
+export function useFavoriteTeams(): UseFavoriteTeamsResult {
+  const { teamKeys, isLoading: isFavoritesLoading } = useFavoriteTeamKeys();
 
   const favoriteTeams = useQueries({
     queries: teamKeys.map((key) =>

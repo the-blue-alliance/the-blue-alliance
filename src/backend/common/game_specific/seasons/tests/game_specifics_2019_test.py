@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 
 from typing import cast
 
@@ -9,11 +10,16 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.event_type import EventType
 from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2019
 from backend.common.game_specific.seasons.game_specifics_2019 import GameSpecifics2019
 from backend.common.game_specific.seasons.tests.conftest import (
+    assert_partial_breakdowns_split_counters,
+    assert_score_stats_without_breakdowns,
+    build_match,
     HELPERS_TESTS,
+    put_event,
     tiebreak_winner,
 )
 from backend.common.models.event import Event
@@ -91,3 +97,66 @@ def test_round_robin_tiebreaker_names() -> None:
         "Cargo Points",
         "Hatch Panel Points",
     ]
+
+
+def test_tiebreak_criteria_without_breakdown_data() -> None:
+    empty = cast(ScoreDetailModelAlliance2019, {})
+    criteria = GameSpecifics2019().tiebreak_criteria(empty, empty)
+    assert criteria == [None] * 5
+    assert tiebreak_winner(criteria) == ""
+
+
+# A played match whose breakdown lacks every scoring field FIRST publishes.
+_BROKEN_BREAKDOWN = {"red": {}, "blue": {}}
+
+
+def test_calculate_event_insights_ignores_unplayed_matches() -> None:
+    matches = [build_match("2019test", "qm", 1, -1, -1, None)]
+    assert GameSpecifics2019().calculate_event_insights(matches) == {
+        "qual": None,
+        "playoff": None,
+    }
+
+
+@pytest.mark.parametrize(
+    "event_type, level",
+    [(EventType.REGIONAL, logging.WARNING), (EventType.OFFSEASON, logging.INFO)],
+)
+def test_calculate_event_insights_logs_failed_matches(
+    event_type: EventType, level: int, caplog: pytest.LogCaptureFixture
+) -> None:
+    put_event("2019test", event_type)
+    broken = build_match("2019test", "qm", 1, 30, 10, _BROKEN_BREAKDOWN)
+    with caplog.at_level(logging.INFO):
+        insights = GameSpecifics2019().calculate_event_insights([broken])
+    assert insights is not None and insights["qual"] is not None
+    failures = [
+        record
+        for record in caplog.records
+        if record.getMessage().startswith("Event insights failed for 2019test_qm1")
+    ]
+    assert failures
+    assert all(record.levelno == level for record in failures)
+
+
+def test_insights_without_any_breakdowns() -> None:
+    assert_score_stats_without_breakdowns(GameSpecifics2019(), "2019test")
+
+
+def test_insights_with_some_breakdowns(test_data_importer) -> None:
+    test_data_importer.import_match_list(HELPERS_TESTS, "data/2019nyny_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, "2019nyny")).fetch()
+    assert_partial_breakdowns_split_counters(GameSpecifics2019(), matches)
+
+
+def test_get_per_robot_coprs() -> None:
+    coprs = GameSpecifics2019().get_per_robot_coprs()
+    breakdown = {
+        "preMatchLevelRobot1": "HabLevel2",
+        "preMatchLevelRobot2": "HabLevel1",
+        "preMatchLevelRobot3": "HabLevel2",
+        "habLineRobot1": "CrossedHabLineInSandstorm",
+        "habLineRobot2": "CrossedHabLineInSandstorm",
+        "habLineRobot3": "CrossedHabLineInTeleop",
+    }
+    assert coprs["sandStormBonusPoints"](breakdown) == [6, 3, 0]

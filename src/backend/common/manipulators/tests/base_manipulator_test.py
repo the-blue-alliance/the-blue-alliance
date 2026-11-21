@@ -632,3 +632,78 @@ def test_no_update_always_manual_attrs(monkeypatch) -> None:
     merged = DummyManipulator.updateMerge(new, old, True, False)
     expected = ManipulatorDummyModel(id="test", int_prop=42)
     assert merged == expected
+
+
+def test_clear_cache_without_write(ndb_context, taskqueue_stub) -> None:
+    model = ManipulatorDummyModel(id="test", int_prop=1337)
+    model.put()
+
+    # Do a query to populate CachedQueryResult
+    query = DummyCachedQuery(model_key="test")
+    query.fetch()
+    assert CachedQueryResult.get_by_id(query.cache_key) is not None
+
+    DummyManipulator.clearCache(model)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="cache-clearing")
+    assert len(tasks) == 1
+    run_from_task(tasks[0])
+
+    assert CachedQueryResult.get_by_id(query.cache_key) is None
+    # Nothing was written to the datastore
+    assert none_throws(ManipulatorDummyModel.get_by_id("test")).int_prop == 1337
+
+
+def test_no_update_manual_json_list_and_union_attrs() -> None:
+    """update_manual_attrs=False leaves manually-set json, list and
+    auto-union attrs alone, not just plain mutable attrs."""
+    old = ManipulatorDummyModel(
+        id="test",
+        prop_json=json.dumps({"a": 1}),
+        repeated_prop=[1],
+        union_prop=[1],
+        manual_attrs=["prop_json", "repeated_prop", "union_prop"],
+    )
+    new = ManipulatorDummyModel(
+        id="test",
+        prop_json=json.dumps({"a": 2}),
+        repeated_prop=[2],
+        union_prop=[2],
+    )
+
+    merged = DummyManipulator.updateMerge(new, old, True, False)
+    expected = ManipulatorDummyModel(
+        id="test",
+        prop_json=json.dumps({"a": 1}),
+        repeated_prop=[1],
+        union_prop=[1],
+        manual_attrs=["prop_json", "repeated_prop", "union_prop"],
+    )
+    assert merged == expected
+    assert merged._updated_attrs == set()
+
+
+def test_update_required_prop_model(ndb_context, taskqueue_stub) -> None:
+    """A valid existing model goes through updateMerge, and its cache clearing
+    task runs cleanly with no queries to clear."""
+    DummyRequiredManipulator.createOrUpdate(
+        ManipulatorDummyModelWithRequiredProp(id="test", required_prop="old")
+    )
+    assert DummyRequiredManipulator.update_merge_calls == 0
+
+    result = DummyRequiredManipulator.createOrUpdate(
+        ManipulatorDummyModelWithRequiredProp(id="test", required_prop="new")
+    )
+    assert DummyRequiredManipulator.update_merge_calls == 1
+    assert result.required_prop == "new"
+    assert (
+        none_throws(
+            ManipulatorDummyModelWithRequiredProp.get_by_id("test")
+        ).required_prop
+        == "new"
+    )
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="cache-clearing")
+    assert len(tasks) == 2
+    for task in tasks:
+        run_from_task(task)

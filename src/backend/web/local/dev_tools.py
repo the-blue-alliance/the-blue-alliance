@@ -13,6 +13,8 @@ from werkzeug import Response
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
+from backend.common.consts.suggestion_type import SuggestionType
+from backend.common.helpers.pwa_url_helper import PwaUrlHelper
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
@@ -364,7 +366,8 @@ def seed_media_suggestions() -> Response:
             logging.info(f"Suggestion not created for {url}: {status}")
 
     logging.info(f"Created {created}/{len(media_urls)} media suggestions")
-    return redirect("/suggest/team/media/review")
+    # Review them in the local PWA dev server; never bounce local dev to prod
+    return redirect(PwaUrlHelper.suggestion_review_url(SuggestionType.MEDIA))
 
 
 def _teams_for_match(teams: List[Team], match_number: int) -> tuple:

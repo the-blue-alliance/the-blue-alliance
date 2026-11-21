@@ -1,4 +1,5 @@
 import { type VariantProps, cva } from 'class-variance-authority';
+import { cn } from 'cn';
 import {
   Children,
   type ComponentPropsWithoutRef,
@@ -12,7 +13,6 @@ import MdiArrowLeft from '~icons/mdi/arrow-left';
 import MdiArrowRight from '~icons/mdi/arrow-right';
 
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import { cn } from '~/lib/utils';
 
 export function ScoreBreakdownTable({
   children,
@@ -40,8 +40,8 @@ export function ScoreBreakdownTable({
 
 export function ScoreBreakdownRow({
   children,
-  blueValue = undefined,
-  redValue = undefined,
+  blueValue,
+  redValue,
 }: {
   children: ReactNode;
   blueValue?: number;
@@ -60,7 +60,7 @@ export function ScoreBreakdownRow({
       })}
     >
       {Children.map(children, (child) => {
-        if (isValidElement(child)) {
+        if (isValidElement(child) && child.type === ScoreBreakdownLabelCell) {
           return cloneElement(
             child as ReactElement<{
               redWon?: boolean;
@@ -118,12 +118,12 @@ const cellVariants = cva('', {
     {
       color: 'neutral',
       shade: 'light',
-      class: 'bg-neutral-50 dark:bg-neutral-900',
+      class: 'bg-surface-subtle',
     },
     {
       color: 'neutral',
       shade: 'dark',
-      class: 'bg-neutral-200 dark:bg-neutral-800',
+      class: 'bg-breakdown-label',
     },
   ],
   defaultVariants: {
@@ -181,11 +181,11 @@ export function ScoreBreakdownLabelCell({
     >
       <div className="flex items-center justify-between">
         <div className="flex w-6 items-center justify-center">
-          {redWon && <MdiArrowLeft />}
+          {redWon && <MdiArrowLeft role="img" aria-label="Red leads" />}
         </div>
         <div className="w-[80%] text-center">{children}</div>
         <div className="flex w-6 items-center justify-center">
-          {blueWon && <MdiArrowRight />}
+          {blueWon && <MdiArrowRight role="img" aria-label="Blue leads" />}
         </div>
       </div>
     </TableCell>

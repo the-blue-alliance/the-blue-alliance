@@ -1,7 +1,13 @@
+from unittest.mock import patch
+
 import pytest
+from google.appengine.ext import ndb
 
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.district import District
+from backend.common.models.event import Event
 
 
 def test_read_type_put() -> None:
@@ -94,3 +100,64 @@ def test_is_write_key() -> None:
     assert auth.is_write_key
     auth.auth_types_enum = [AuthType.ZEBRA_MOTIONWORKS]
     assert auth.is_write_key
+
+
+def test_generate_auth_id() -> None:
+    auth_id = ApiAuthAccess.generate_auth_id()
+    assert len(auth_id) == 16
+    assert all(c in ApiAuthAccess.TOKEN_ALPHABET for c in auth_id)
+
+
+def test_generate_read_key() -> None:
+    key = ApiAuthAccess.generate_read_key()
+    assert len(key) == 64
+    assert all(c in ApiAuthAccess.TOKEN_ALPHABET for c in key)
+
+
+def test_generate_secret() -> None:
+    secret = ApiAuthAccess.generate_secret()
+    assert len(secret) == 64
+    assert all(c in ApiAuthAccess.TOKEN_ALPHABET for c in secret)
+
+
+def test_generated_tokens_are_unique() -> None:
+    assert len({ApiAuthAccess.generate_secret() for _ in range(100)}) == 100
+    assert len({ApiAuthAccess.generate_auth_id() for _ in range(100)}) == 100
+
+
+def test_tokens_come_from_secrets_module() -> None:
+    # `random` is a Mersenne Twister whose state can be recovered from its
+    # output; bearer credentials must be drawn from `secrets` instead.
+    with patch(
+        "backend.common.models.api_auth_access.secrets.choice", return_value="x"
+    ) as mock_choice:
+        assert ApiAuthAccess.generate_auth_id() == "x" * 16
+        assert ApiAuthAccess.generate_secret() == "x" * 64
+        assert ApiAuthAccess.generate_read_key() == "x" * 64
+    assert mock_choice.call_count == 16 + 64 + 64
+
+
+def test_list_strs() -> None:
+    auth = ApiAuthAccess(
+        auth_types_enum=[AuthType.EVENT_INFO],
+        event_list=[ndb.Key(Event, "2020nyny"), ndb.Key(Event, "2020casj")],
+        district_list=[ndb.Key(District, "2020ne"), ndb.Key(District, "2020fim")],
+        offseason_webcast_channels=["twitch:tba", "youtube:abc"],
+    )
+    assert auth.event_list_str == "2020nyny,2020casj"
+    assert auth.district_list_str == "2020ne,2020fim"
+    assert auth.webcast_list_str == "twitch:tba,youtube:abc"
+
+
+def test_list_strs_empty() -> None:
+    auth = ApiAuthAccess(auth_types_enum=[AuthType.EVENT_INFO])
+    assert auth.event_list_str == ""
+    assert auth.district_list_str == ""
+    assert auth.webcast_list_str == ""
+
+
+def test_webcast_key() -> None:
+    assert (
+        ApiAuthAccess.webcast_key({"type": WebcastType.TWITCH, "channel": "abc"})
+        == "twitch:abc"
+    )

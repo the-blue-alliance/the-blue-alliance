@@ -303,3 +303,24 @@ def test_api_history_has_tabs(web_client: Client, login_gae_admin) -> None:
     assert "FMS Reports" in content
     assert "Companion DB" in content
     assert "Trusted API" in content
+
+
+@patch("backend.web.handlers.admin.api_history.get_files")
+def test_api_history_unparseable_timestamps(
+    mock_get_files: Mock,
+    web_client: Client,
+    login_gae_admin,
+) -> None:
+    """Filenames whose timestamps can't be parsed fall back to the raw text"""
+    helpers.preseed_event("2020nyny")
+    mock_get_files.return_value = [
+        "some/path/team_list.not-a-date.xlsx",
+        "some/path/garbage.json",
+    ]
+
+    resp = web_client.get("/admin/api_history/2020nyny")
+    assert resp.status_code == 200
+
+    content = resp.data.decode("utf-8")
+    assert "not-a-date" in content
+    assert "garbage" in content

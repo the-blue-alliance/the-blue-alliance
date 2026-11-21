@@ -79,3 +79,23 @@ def test_get_team_avatar_parser_failed() -> None:
         assert df.get_team_avatar(2020, "frc254").get_result() == ([], set())
 
     mock_api.assert_called_once_with(2020, 254)
+
+
+def test_get_team_details_fetch_failed() -> None:
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2020/teams?teamNumber=254",
+        500,
+        "",
+    )
+
+    df = DatafeedFMSAPI()
+    with (
+        patch.object(
+            FRCAPI, "team_details", return_value=InstantFuture(response)
+        ) as mock_api,
+        patch.object(FMSAPITeamDetailsParser, "parse") as mock_parse,
+    ):
+        assert df.get_team_details(2020, "frc254").get_result() is None
+
+    mock_api.assert_called_once_with(2020, 254)
+    mock_parse.assert_not_called()

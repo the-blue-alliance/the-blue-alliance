@@ -1,17 +1,28 @@
-import json
+import datetime
 import logging
+from dataclasses import dataclass
 from functools import wraps
-from typing import Callable, Type, TypeVar
+from typing import Any, Callable, Optional, Type, TypeVar
 
-from flask import g, jsonify, request, Response
+import orjson
+from flask import g, jsonify, make_response, request, Response
 
 from backend.api.client_api_types import VoidRequest
-from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
-from backend.common.auth import current_user
+from backend.api.handlers.helpers.etag_helper import (
+    etag_deps_persisted_cache,
+    get_incoming_etags,
+    get_request_path,
+    is_etag_valid,
+    normalize_etag,
+    save_etag_dependencies,
+)
+from backend.common.cache.instance_cache import InstanceCache
+from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_code_exceptions import EventCodeExceptions
 from backend.common.consts.fms_report_type import FMSReportType
 from backend.common.consts.renamed_districts import RenamedDistricts
+from backend.common.environment import Environment
 from backend.common.logging import set_logging_context
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
@@ -19,6 +30,20 @@ from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 from backend.common.profiler import Span
+from backend.common.queries.database_query import track_accessed_query_cache_keys
+
+
+@dataclass(frozen=True)
+class CachedAuth:
+    owner_id: Optional[str]
+    description: Optional[str]
+
+
+AUTH_KEY_CACHE_TTL: float = 600.0  # 10 minutes
+AUTH_KEY_CACHE_MAX_SIZE: int = 1000
+auth_key_cache: InstanceCache[str, CachedAuth] = InstanceCache(
+    ttl_seconds=AUTH_KEY_CACHE_TTL, max_size=AUTH_KEY_CACHE_MAX_SIZE
+)
 
 
 def api_authenticated(func):
@@ -32,28 +57,35 @@ def api_authenticated(func):
             auth_owner_id = None
 
             if auth_key:
-                auth = ApiAuthAccess.get_by_id(auth_key)
-                if auth:
-                    auth_owner_id = auth.owner.id() if auth.owner else None
-                    # Set for our GA event tracking in `track_call_after_response`
-                    g.auth_description = auth.description
-                    # Add API key to logging context for searchability in logs
-                    set_logging_context("api_auth_key", auth_key)
-                    # Add to trace span for visibility in Cloud Trace
-                    span.set_label("api_auth_key", auth_key)
-                    span.set_label("auth_owner_id", str(auth_owner_id))
-                    # Log API key usage for visibility in GCP Console
-                    logging.info(
-                        f"API request authenticated with key: {auth_key[:16]}... (owner: {auth_owner_id})"
+                cached_auth = auth_key_cache.get(auth_key)
+                if cached_auth is None:
+                    auth = ApiAuthAccess.get_by_id(auth_key)
+                    if not auth:
+                        return (
+                            {
+                                "Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."
+                            },
+                            401,
+                        )
+                    cached_auth = CachedAuth(
+                        owner_id=auth.owner.id() if auth.owner else None,
+                        description=auth.description,
                     )
+                    auth_key_cache.set(auth_key, cached_auth)
                 else:
-                    return (
-                        {
-                            "Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."
-                        },
-                        401,
-                    )
+                    span.set_label("auth_cached", "true")
+
+                auth_owner_id = cached_auth.owner_id
+                # Set for our GA event tracking in `track_call_after_response`
+                g.auth_description = cached_auth.description
+                # Add API key to logging context for searchability in logs
+                set_logging_context("api_auth_key", auth_key)
+                # Add to trace span for visibility in Cloud Trace
+                span.set_label("api_auth_key", auth_key)
+                span.set_label("auth_owner_id", str(auth_owner_id))
             else:
+                from backend.common.auth import current_user
+
                 user = current_user()
                 if user:
                     auth_owner_id = user.account_key.id()
@@ -85,12 +117,77 @@ def require_write_auth(auth_types: set[AuthType] | None, file_param: str | None 
                     try:
                         FMSReportType(fms_report_type)
                     except ValueError:
-                        fms_report_type = None
+                        return make_response(
+                            jsonify(
+                                {"Error": f"Unknown FMS report type {fms_report_type}"}
+                            ),
+                            400,
+                        )
 
                 # This will abort the request on failure
+                from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
+
                 TrustedApiAuthHelper.do_trusted_api_auth(
                     event_key, fms_report_type, auth_types, file_param
                 )
+            return func(*args, **kwargs)
+
+        return decorated_function
+
+    return decorator
+
+
+def require_moderation_permission(permissions: set[AccountPermission]):
+    """
+    Authenticate the request via a Firebase ID token in the Authorization
+    header (the same mechanism as the client API) and require the resolved
+    account to hold any of the given AccountPermissions. Admins always pass.
+    The resolved User is stored on flask.g.moderation_user.
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def decorated_function(*args, **kwargs):
+            with Span("require_moderation_permission"):
+                from backend.api.client_api_auth_helper import ClientApiAuthHelper
+
+                user = ClientApiAuthHelper.get_current_user()
+                if user is None:
+                    return make_response(
+                        jsonify(
+                            {
+                                "Error": "Authorization required. Pass a Firebase ID token "
+                                "as 'Authorization: Bearer <token>'."
+                            }
+                        ),
+                        401,
+                    )
+                # Accounts are linked to tokens by email claim, so an
+                # unverified email must never confer the linked account's
+                # permissions
+                if not user.email_verified:
+                    return make_response(
+                        jsonify(
+                            {
+                                "Error": "Moderation requires a verified email on your "
+                                "sign-in provider."
+                            }
+                        ),
+                        403,
+                    )
+                if not user.is_admin and not permissions.intersection(
+                    user.permissions or []
+                ):
+                    return make_response(
+                        jsonify(
+                            {
+                                "Error": "You do not have permission to moderate suggestions. "
+                                "If this is incorrect, please contact TBA admins."
+                            }
+                        ),
+                        403,
+                    )
+                g.moderation_user = user
             return func(*args, **kwargs)
 
         return decorated_function
@@ -115,74 +212,250 @@ def client_api_method(
         def decorated_function(*args, **kwargs) -> Response:
             data = request.get_data()
             if data:
-                req = json.loads(data)
+                req = orjson.loads(data)
             else:
                 req = VoidRequest()
 
             resp = func(req)
-            return jsonify(resp)
+            return Response(orjson.dumps(resp), mimetype="application/json")
 
         return decorated_function
 
     return decorator
 
 
+KEY_EXISTS_CACHE_TTL_DEFAULT: float = (
+    86400.0  # 24 hours (teams, past season events/matches, districts)
+)
+KEY_EXISTS_CACHE_TTL_CURRENT_YEAR: float = (
+    3600.0  # 1 hour (events/matches in the current year)
+)
+KEY_EXISTS_CACHE_MAX_SIZE: int = 25000
+key_exists_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
+    ttl_seconds=KEY_EXISTS_CACHE_TTL_DEFAULT, max_size=KEY_EXISTS_CACHE_MAX_SIZE
+)
+
+KEY_DOES_NOT_EXIST_CACHE_TTL: float = 60.0  # 1 minute (aligned with 61s 404 cache)
+KEY_DOES_NOT_EXIST_CACHE_MAX_SIZE: int = 2000
+key_does_not_exist_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
+    ttl_seconds=KEY_DOES_NOT_EXIST_CACHE_TTL, max_size=KEY_DOES_NOT_EXIST_CACHE_MAX_SIZE
+)
+
+
+def _get_key_exists_ttl(entity_name: str, key: str) -> float:
+    if entity_name in ("Event", "Match"):
+        current_year = datetime.date.today().year
+        year_prefix = key[:4]
+        if year_prefix.isdigit() and int(year_prefix) == current_year:
+            return KEY_EXISTS_CACHE_TTL_CURRENT_YEAR
+    return KEY_EXISTS_CACHE_TTL_DEFAULT
+
+
+@dataclass(frozen=True)
+class _KeyValidator:
+    param_name: str
+    key_type: str
+    entity_name: str
+    validate_format: Callable[[str], bool]
+    fetch_async: Callable[[str], Any]
+    resolve_key: Optional[Callable[[str], str]] = None
+
+
+_KEY_VALIDATORS: tuple[_KeyValidator, ...] = (
+    _KeyValidator(
+        param_name="team_key",
+        key_type="team",
+        entity_name="Team",
+        validate_format=Team.validate_key_name,
+        fetch_async=Team.get_by_id_async,
+    ),
+    _KeyValidator(
+        param_name="event_key",
+        key_type="event",
+        entity_name="Event",
+        validate_format=Event.validate_key_name,
+        fetch_async=Event.get_by_id_async,
+        resolve_key=EventCodeExceptions.resolve,
+    ),
+    _KeyValidator(
+        param_name="match_key",
+        key_type="match",
+        entity_name="Match",
+        validate_format=Match.validate_key_name,
+        fetch_async=Match.get_by_id_async,
+    ),
+    _KeyValidator(
+        param_name="district_key",
+        key_type="district",
+        entity_name="District",
+        validate_format=District.validate_key_name,
+        fetch_async=RenamedDistricts.district_exists_async,
+    ),
+)
+
+
 def validate_keys(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         with Span("validate_keys"):
-            # Check key format
-            team_key = kwargs.get("team_key")
-            if team_key and not Team.validate_key_name(team_key):
-                return {"Error": f"{team_key} is not a valid team key"}, 404
+            # 1. Format validation for all provided keys
+            for validator in _KEY_VALIDATORS:
+                key = kwargs.get(validator.param_name)
+                if key and not validator.validate_format(key):
+                    return {
+                        "Error": f"{key} is not a valid {validator.key_type} key"
+                    }, 404
 
-            event_key = kwargs.get("event_key")
-            if event_key and not Event.validate_key_name(event_key):
-                return {"Error": f"{event_key} is not a valid event key"}, 404
+            # 2. Check existence in positive/negative cache or queue for async fetch
+            pending_checks: list[tuple[_KeyValidator, str, Optional[str], Any]] = []
+            for validator in _KEY_VALIDATORS:
+                key = kwargs.get(validator.param_name)
+                if not key:
+                    continue
 
-            match_key = kwargs.get("match_key")
-            if match_key and not Match.validate_key_name(match_key):
-                return {"Error": f"{match_key} is not a valid match key"}, 404
+                # Hot path: Fast positive cache check (skips negative cache lock)
+                if (validator.entity_name, key) in key_exists_cache:
+                    continue
 
-            district_key = kwargs.get("district_key")
-            if district_key and not District.validate_key_name(district_key):
-                return {"Error": f"{district_key} is not a valid district key"}, 404
+                # Fast negative cache check
+                if (validator.entity_name, key) in key_does_not_exist_cache:
+                    return {
+                        "Error": f"{validator.key_type} key: {key} does not exist"
+                    }, 404
 
-            # Check key existence
-            team_future = None
-            if team_key:
-                team_future = Team.get_by_id_async(team_key)
+                # Check alias / resolved key
+                lookup_key = (
+                    validator.resolve_key(key) if validator.resolve_key else key
+                )
+                if lookup_key != key:
+                    if (validator.entity_name, lookup_key) in key_exists_cache:
+                        ttl = _get_key_exists_ttl(validator.entity_name, key)
+                        key_exists_cache.set(
+                            (validator.entity_name, key), True, ttl_seconds=ttl
+                        )
+                        continue
+                    if (validator.entity_name, lookup_key) in key_does_not_exist_cache:
+                        key_does_not_exist_cache.set((validator.entity_name, key), True)
+                        return {
+                            "Error": f"{validator.key_type} key: {key} does not exist"
+                        }, 404
 
-            event_future = None
-            if event_key:
-                event_key = EventCodeExceptions.resolve(event_key)
-                event_future = Event.get_by_id_async(event_key)
-
-            match_future = None
-            if match_key:
-                match_future = Match.get_by_id_async(match_key)
-
-            district_exists_future = None
-            if district_key:
-                district_exists_future = RenamedDistricts.district_exists_async(
-                    district_key
+                future = validator.fetch_async(lookup_key)
+                pending_checks.append(
+                    (validator, key, lookup_key if lookup_key != key else None, future)
                 )
 
-            if team_future is not None and not team_future.get_result():
-                return {"Error": f"team key: {team_key} does not exist"}, 404
+            # 3. Resolve futures and populate positive / negative caches
+            for validator, key, resolved_key, future in pending_checks:
+                with Span(f"validate_keys.resolve:{validator.entity_name}") as span:
+                    span.set_label("lookup_key", key)
+                    entity_result = future.get_result()
+                    span.set_label("exists", str(bool(entity_result)))
+                    if not entity_result:
+                        key_does_not_exist_cache.set((validator.entity_name, key), True)
+                        if resolved_key:
+                            key_does_not_exist_cache.set(
+                                (validator.entity_name, resolved_key), True
+                            )
+                        return {
+                            "Error": f"{validator.key_type} key: {key} does not exist"
+                        }, 404
 
-            if event_future is not None and not event_future.get_result():
-                return {"Error": f"event key: {event_key} does not exist"}, 404
-
-            if match_future is not None and not match_future.get_result():
-                return {"Error": f"match key: {match_key} does not exist"}, 404
-
-            if (
-                district_exists_future is not None
-                and not district_exists_future.get_result()
-            ):
-                return {"Error": f"district key: {district_key} does not exist"}, 404
+                    ttl = _get_key_exists_ttl(validator.entity_name, key)
+                    key_exists_cache.set(
+                        (validator.entity_name, key), True, ttl_seconds=ttl
+                    )
+                    if resolved_key:
+                        resolved_ttl = _get_key_exists_ttl(
+                            validator.entity_name, resolved_key
+                        )
+                        key_exists_cache.set(
+                            (validator.entity_name, resolved_key),
+                            True,
+                            ttl_seconds=resolved_ttl,
+                        )
 
         return func(*args, **kwargs)
+
+    return decorated_function
+
+
+ETAG_304_CACHE_TTL: float = 61.0  # 61 seconds (aligned with Cache-Control: max-age=61)
+ETAG_304_CACHE_MAX_SIZE: int = 5000
+etag_304_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
+    ttl_seconds=ETAG_304_CACHE_TTL, max_size=ETAG_304_CACHE_MAX_SIZE
+)
+
+
+def _make_304_response(etag: str) -> Response:
+    response = Response(status=304)
+    response.headers["ETag"] = f'"{etag}"'
+    if Environment.cache_control_header_enabled():
+        response.headers["Cache-Control"] = "public, max-age=61, s-maxage=61"
+    return response
+
+
+def validate_etag(func: Callable) -> Callable:
+    """
+    Decorator for APIv3 endpoints to short-circuit 304 responses when query dependencies haven't changed.
+    """
+
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        with Span("validate_etag") as span:
+            if_none_match = request.headers.get("If-None-Match")
+            if if_none_match:
+                try:
+                    request_path = get_request_path()
+                    incoming_etags = get_incoming_etags()
+                    for etag in incoming_etags:
+                        if not etag:
+                            continue
+
+                        hit_source: Optional[str] = None
+                        if etag_304_cache.get((request_path, etag)):
+                            hit_source = "memory"
+                        elif is_etag_valid(etag, path=request_path):
+                            etag_304_cache.set((request_path, etag), True)
+                            hit_source = "memcache"
+
+                        if hit_source:
+                            span.set_label("etag_cache_hit", hit_source)
+                            return _make_304_response(etag)
+                except Exception as e:
+                    logging.warning(f"Error during validate_etag fast-path: {e}")
+
+        with track_accessed_query_cache_keys() as accessed_keys:
+            resp = make_response(func(*args, **kwargs))
+
+            if resp.status_code == 200:
+                try:
+                    if not resp.headers.get("ETag"):
+                        with Span("etag.compute_md5") as span:
+                            resp.add_etag()
+                            data = resp.get_data()
+                            if data:
+                                span.set_label("response_size_bytes", str(len(data)))
+                    etag_header = resp.headers.get("ETag")
+                    if etag_header and accessed_keys:
+                        normalized = normalize_etag(etag_header)
+                        if normalized:
+                            request_path = get_request_path()
+                            if not etag_deps_persisted_cache.get(
+                                (request_path, normalized)
+                            ):
+                                with Span("etag.save_dependencies") as span:
+                                    span.set_label(
+                                        "num_query_keys", str(len(accessed_keys))
+                                    )
+                                    save_etag_dependencies(
+                                        normalized,
+                                        accessed_keys,
+                                        path=request_path,
+                                    )
+                except Exception as e:
+                    logging.warning(f"Error saving validate_etag dependencies: {e}")
+
+            return resp
 
     return decorated_function

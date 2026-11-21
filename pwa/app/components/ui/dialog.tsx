@@ -1,8 +1,8 @@
-import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
+import { cn } from 'cn';
+import { useRef } from 'react';
 
 import XIcon from '~icons/lucide/x';
-
-import { cn } from '~/lib/utils';
 
 function Dialog({
   ...props
@@ -31,14 +31,14 @@ function DialogClose({
 function DialogOverlay({
   className,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+}: React.ComponentProps<typeof DialogPrimitive.Backdrop>) {
   return (
-    <DialogPrimitive.Overlay
+    <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        `fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-out
-        data-[state=closed]:fade-out-0 data-[state=open]:animate-in
-        data-[state=open]:fade-in-0 dark:bg-black/75`,
+        `fixed inset-0 z-50 bg-black/50 dark:bg-black/75 data-open:animate-in
+        data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0
+        data-closed:fill-mode-forwards`,
         className,
       )}
       {...props}
@@ -50,22 +50,45 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  focusContentOnOpen = false,
+  initialFocus,
+  ref,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & {
+}: React.ComponentProps<typeof DialogPrimitive.Popup> & {
   showCloseButton?: boolean;
+  /**
+   * Focus the popup container itself when the dialog opens instead of Base
+   * UI's default (the first tabbable element inside the popup). Ignored
+   * when an explicit `initialFocus` is passed.
+   */
+  focusContentOnOpen?: boolean;
 }) {
+  const popupRef = useRef<HTMLDivElement | null>(null);
+
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
-      <DialogPrimitive.Content
+      <DialogPrimitive.Popup
         data-slot="dialog-content"
+        ref={(node) => {
+          popupRef.current = node;
+          if (typeof ref === 'function') {
+            ref(node);
+          } else if (ref) {
+            ref.current = node;
+          }
+        }}
+        initialFocus={
+          initialFocus ?? (focusContentOnOpen ? popupRef : undefined)
+        }
         className={cn(
           `fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)]
           translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border
-          bg-background p-6 shadow-lg duration-200
-          data-[state=closed]:animate-out data-[state=closed]:fade-out-0
-          data-[state=closed]:zoom-out-95 data-[state=open]:animate-in
-          data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg`,
+          bg-background p-6 shadow-lg duration-200 sm:max-w-lg
+          data-open:animate-in data-open:fade-in-0
+          motion-safe:data-open:zoom-in-95 data-closed:animate-out
+          data-closed:fade-out-0 data-closed:fill-mode-forwards
+          motion-safe:data-closed:zoom-out-95`,
           className,
         )}
         {...props}
@@ -76,18 +99,20 @@ function DialogContent({
             data-slot="dialog-close"
             className="absolute top-4 right-4 cursor-pointer rounded-xs
               opacity-70 ring-offset-background transition-opacity
-              hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2
-              focus:outline-hidden disabled:pointer-events-none
-              data-[state=open]:bg-accent
+              after:absolute after:inset-[min(0px,(100%-44px)/2)]
+              after:content-[''] hover:opacity-100 focus-visible:ring-2
+              focus-visible:ring-ring focus-visible:ring-offset-2
+              focus-visible:outline-hidden active:scale-97
+              disabled:pointer-events-none data-[state=open]:bg-accent
               data-[state=open]:text-muted-foreground
-              [&_svg]:pointer-events-none [&_svg]:shrink-0
-              [&_svg:not([class*='size-'])]:size-4"
+              motion-safe:transition-[opacity,scale] [&_svg]:pointer-events-none
+              [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
           >
             <XIcon />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
         )}
-      </DialogPrimitive.Content>
+      </DialogPrimitive.Popup>
     </DialogPortal>
   );
 }

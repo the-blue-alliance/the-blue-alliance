@@ -289,3 +289,225 @@ describe("FMSMatchResults", () => {
     });
   });
 });
+
+describe("FMSMatchResults re-parsing and upload edge cases", () => {
+  const mockParseResultsFile = parseResultsFile as jest.Mock;
+  const mockMakeTrustedRequest = jest.fn();
+  const selectedEvent = "2024nytr";
+  const file = new File(["dummy content"], "results.xlsx");
+  // jsdom's File has no arrayBuffer(), which the report archival digest needs.
+  Object.defineProperty(file, "arrayBuffer", {
+    value: async () => new ArrayBuffer(8),
+  });
+
+  const makeMatch = (overrides: Record<string, unknown> = {}) => ({
+    comp_level: "qm",
+    set_number: 1,
+    match_number: 1,
+    alliances: {
+      red: { teams: ["frc254", "frc971", "frc1678"], score: 100 },
+      blue: { teams: ["frc1323", "frc2056", "frc5499"], score: 90 },
+    },
+    time_string: "9:00 AM",
+    description: "Qualification 1",
+    tbaMatchKey: "2024nytr_qm1",
+    timeString: "9:00 AM",
+    rawRedTeams: ["254", "971", "1678"],
+    rawBlueTeams: ["1323", "2056", "5499"],
+    ...overrides,
+  });
+
+  const renderComponent = () =>
+    render(
+      <FMSMatchResults
+        selectedEvent={selectedEvent}
+        makeTrustedRequest={mockMakeTrustedRequest}
+      />
+    );
+
+  const fileInput = () => screen.getByLabelText("FMS Results Excel File");
+
+  const loadFile = async (): Promise<void> => {
+    fireEvent.change(fileInput(), { target: { files: [file] } });
+    await screen.findByText("Loaded 1 matches");
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockParseResultsFile.mockResolvedValue([makeMatch()]);
+    mockMakeTrustedRequest.mockResolvedValue({ ok: true } as Response);
+  });
+
+  it("ignores a change event that carries no file", () => {
+    renderComponent();
+
+    fireEvent.change(fileInput(), { target: { files: [] } });
+
+    expect(mockParseResultsFile).not.toHaveBeenCalled();
+    expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
+  });
+
+  it("reports when the file contains no matches", async () => {
+    mockParseResultsFile.mockResolvedValue([]);
+    renderComponent();
+
+    fireEvent.change(fileInput(), { target: { files: [file] } });
+
+    expect(
+      await screen.findByText("No matches found in the file.")
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Confirm Match Results Upload")
+    ).not.toBeInTheDocument();
+  });
+
+  describe("re-parsing when settings change", () => {
+    const triggers: Array<{
+      name: string;
+      prepare?: () => Promise<void>;
+      trigger: () => void;
+      expectedArgs: [boolean, boolean];
+    }> = [
+      {
+        name: "alliance count",
+        trigger: () => fireEvent.click(screen.getByLabelText("16 Alliances")),
+        expectedArgs: [true, false],
+      },
+      {
+        name: "double elimination playoff format",
+        trigger: () =>
+          fireEvent.click(screen.getByLabelText("Double Elimination")),
+        expectedArgs: [false, true],
+      },
+      {
+        name: "standard bracket playoff format",
+        prepare: async () => {
+          fireEvent.click(screen.getByLabelText("Double Elimination"));
+          await waitFor(() => {
+            expect(mockParseResultsFile).toHaveBeenCalledTimes(2);
+          });
+        },
+        trigger: () => fireEvent.click(screen.getByLabelText("Standard Bracket")),
+        expectedArgs: [false, false],
+      },
+    ];
+
+    it("does not re-parse before a file has been chosen", () => {
+      renderComponent();
+
+      fireEvent.click(screen.getByLabelText("16 Alliances"));
+      fireEvent.click(screen.getByLabelText("Double Elimination"));
+      fireEvent.click(screen.getByLabelText("Standard Bracket"));
+
+      expect(mockParseResultsFile).not.toHaveBeenCalled();
+    });
+
+    describe.each(triggers)("$name", ({ prepare, trigger, expectedArgs }) => {
+      it("re-parses the loaded file with the new setting", async () => {
+        renderComponent();
+        await loadFile();
+        if (prepare) await prepare();
+        const match = makeMatch({ tbaMatchKey: "2024nytr_reparsed" });
+        mockParseResultsFile.mockResolvedValueOnce([match, match]);
+
+        trigger();
+
+        expect(await screen.findByText("Loaded 2 matches")).toBeInTheDocument();
+        expect(mockParseResultsFile).toHaveBeenLastCalledWith(
+          file,
+          selectedEvent,
+          ...expectedArgs
+        );
+        expect(screen.getAllByText("2024nytr_reparsed")).toHaveLength(2);
+        expect(screen.getByText("Confirm Match Results Upload")).toBeInTheDocument();
+      });
+
+      it("reports when the new setting yields no matches", async () => {
+        renderComponent();
+        await loadFile();
+        if (prepare) await prepare();
+        mockParseResultsFile.mockResolvedValueOnce([]);
+
+        trigger();
+
+        expect(
+          await screen.findByText("No matches found in the file.")
+        ).toBeInTheDocument();
+        expect(
+          screen.queryByText("Confirm Match Results Upload")
+        ).not.toBeInTheDocument();
+      });
+
+      it("surfaces parser errors from the re-parse", async () => {
+        renderComponent();
+        await loadFile();
+        if (prepare) await prepare();
+        mockParseResultsFile.mockRejectedValueOnce(new Error("re-parse failed"));
+
+        trigger();
+
+        expect(
+          await screen.findByText("Error parsing file: re-parse failed")
+        ).toBeInTheDocument();
+        expect(
+          screen.queryByText("Confirm Match Results Upload")
+        ).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("uploading", () => {
+    it("archives the report as playoff results when any playoff match is present", async () => {
+      mockParseResultsFile.mockResolvedValue([
+        makeMatch(),
+        makeMatch({
+          comp_level: "sf",
+          set_number: 2,
+          tbaMatchKey: "2024nytr_sf2m1",
+          description: "Playoff 2",
+        }),
+      ]);
+      renderComponent();
+      fireEvent.change(fileInput(), { target: { files: [file] } });
+      await screen.findByText("Loaded 2 matches");
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "Confirm and Upload to TBA" })
+      );
+
+      expect(
+        await screen.findByText("Successfully uploaded 2 matches!")
+      ).toBeInTheDocument();
+      expect(mockMakeTrustedRequest).toHaveBeenCalledTimes(2);
+      expect(mockMakeTrustedRequest.mock.calls[1][0]).toBe(
+        "/api/_eventwizard/event/2024nytr/fms_reports/playoff_results"
+      );
+    });
+
+    it("shows the upload error and leaves the parsed matches in place", async () => {
+      mockMakeTrustedRequest.mockRejectedValueOnce(new Error("boom"));
+      renderComponent();
+      await loadFile();
+
+      fireEvent.click(
+        screen.getByRole("button", { name: "Confirm and Upload to TBA" })
+      );
+
+      expect(
+        await screen.findByText("Error uploading matches: Error: boom")
+      ).toBeInTheDocument();
+      expect(mockMakeTrustedRequest).toHaveBeenCalledTimes(1);
+      // A later settings change still re-parses the retained file.
+      mockParseResultsFile.mockResolvedValueOnce([makeMatch()]);
+      fireEvent.click(screen.getByLabelText("16 Alliances"));
+      await waitFor(() => {
+        expect(mockParseResultsFile).toHaveBeenLastCalledWith(
+          file,
+          selectedEvent,
+          true,
+          false
+        );
+      });
+    });
+  });
+});

@@ -28,7 +28,13 @@ import {
   getEventMatches,
   getEventMatchesKeys,
   getEventMatchesSimple,
+  getEventMedia,
+  getEventNexusInfo,
   getEventOprs,
+  getEventPlayoffAdvancement,
+  getEventPracticeMatches,
+  getEventPracticeMatchesKeys,
+  getEventPracticeMatchesSimple,
   getEventPredictions,
   getEventRankings,
   getEventSimple,
@@ -54,6 +60,7 @@ import {
   getRegionalChampsPoolPoints,
   getRegionalRankings,
   getSearchIndex,
+  getSponsors,
   getStatus,
   getTeam,
   getTeamAwards,
@@ -161,9 +168,27 @@ import type {
   GetEventMatchesSimpleData,
   GetEventMatchesSimpleError,
   GetEventMatchesSimpleResponse,
+  GetEventMediaData,
+  GetEventMediaError,
+  GetEventMediaResponse,
+  GetEventNexusInfoData,
+  GetEventNexusInfoError,
+  GetEventNexusInfoResponse,
   GetEventOprsData,
   GetEventOprsError,
   GetEventOprsResponse,
+  GetEventPlayoffAdvancementData,
+  GetEventPlayoffAdvancementError,
+  GetEventPlayoffAdvancementResponse,
+  GetEventPracticeMatchesData,
+  GetEventPracticeMatchesError,
+  GetEventPracticeMatchesKeysData,
+  GetEventPracticeMatchesKeysError,
+  GetEventPracticeMatchesKeysResponse,
+  GetEventPracticeMatchesResponse,
+  GetEventPracticeMatchesSimpleData,
+  GetEventPracticeMatchesSimpleError,
+  GetEventPracticeMatchesSimpleResponse,
   GetEventPredictionsData,
   GetEventPredictionsError,
   GetEventPredictionsResponse,
@@ -240,6 +265,9 @@ import type {
   GetSearchIndexData,
   GetSearchIndexError,
   GetSearchIndexResponse,
+  GetSponsorsData,
+  GetSponsorsError,
+  GetSponsorsResponse,
   GetStatusData,
   GetStatusError,
   GetStatusResponse,
@@ -473,7 +501,7 @@ export const getDistrictAdvancementQueryKey = (
 ) => createQueryKey('getDistrictAdvancement', options);
 
 /**
- * Gets a list of advancement information per team in a district.
+ * Gets per-team advancement information and the advancement cutoffs for a district.
  */
 export const getDistrictAdvancementOptions = (
   options: Options<GetDistrictAdvancementData>,
@@ -1017,6 +1045,90 @@ export const getEventMatchesSimpleOptions = (
     queryKey: getEventMatchesSimpleQueryKey(options),
   });
 
+export const getEventPracticeMatchesQueryKey = (
+  options: Options<GetEventPracticeMatchesData>,
+) => createQueryKey('getEventPracticeMatches', options);
+
+/**
+ * Gets a list of practice matches for the given event.
+ */
+export const getEventPracticeMatchesOptions = (
+  options: Options<GetEventPracticeMatchesData>,
+) =>
+  queryOptions<
+    GetEventPracticeMatchesResponse,
+    GetEventPracticeMatchesError,
+    GetEventPracticeMatchesResponse,
+    ReturnType<typeof getEventPracticeMatchesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventPracticeMatches({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventPracticeMatchesQueryKey(options),
+  });
+
+export const getEventPracticeMatchesKeysQueryKey = (
+  options: Options<GetEventPracticeMatchesKeysData>,
+) => createQueryKey('getEventPracticeMatchesKeys', options);
+
+/**
+ * Gets a list of practice match keys for the given event.
+ */
+export const getEventPracticeMatchesKeysOptions = (
+  options: Options<GetEventPracticeMatchesKeysData>,
+) =>
+  queryOptions<
+    GetEventPracticeMatchesKeysResponse,
+    GetEventPracticeMatchesKeysError,
+    GetEventPracticeMatchesKeysResponse,
+    ReturnType<typeof getEventPracticeMatchesKeysQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventPracticeMatchesKeys({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventPracticeMatchesKeysQueryKey(options),
+  });
+
+export const getEventPracticeMatchesSimpleQueryKey = (
+  options: Options<GetEventPracticeMatchesSimpleData>,
+) => createQueryKey('getEventPracticeMatchesSimple', options);
+
+/**
+ * Gets a short-form list of practice matches for the given event.
+ */
+export const getEventPracticeMatchesSimpleOptions = (
+  options: Options<GetEventPracticeMatchesSimpleData>,
+) =>
+  queryOptions<
+    GetEventPracticeMatchesSimpleResponse,
+    GetEventPracticeMatchesSimpleError,
+    GetEventPracticeMatchesSimpleResponse,
+    ReturnType<typeof getEventPracticeMatchesSimpleQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventPracticeMatchesSimple({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventPracticeMatchesSimpleQueryKey(options),
+  });
+
 export const getEventMatchTimeseriesQueryKey = (
   options: Options<GetEventMatchTimeseriesData>,
 ) => createQueryKey('getEventMatchTimeseries', options);
@@ -1047,6 +1159,59 @@ export const getEventMatchTimeseriesOptions = (
     queryKey: getEventMatchTimeseriesQueryKey(options),
   });
 
+export const getEventMediaQueryKey = (options: Options<GetEventMediaData>) =>
+  createQueryKey('getEventMedia', options);
+
+/**
+ * Gets a list of media objects associated with this event itself (e.g. SmugMug photo galleries and event videos), as opposed to media belonging to the event's teams.
+ */
+export const getEventMediaOptions = (options: Options<GetEventMediaData>) =>
+  queryOptions<
+    GetEventMediaResponse,
+    GetEventMediaError,
+    GetEventMediaResponse,
+    ReturnType<typeof getEventMediaQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventMedia({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventMediaQueryKey(options),
+  });
+
+export const getEventNexusInfoQueryKey = (
+  options: Options<GetEventNexusInfoData>,
+) => createQueryKey('getEventNexusInfo', options);
+
+/**
+ * Gets live match-queuing info and the pit map for an event from Nexus (https://frc.nexus/), or `null` if neither is currently available for this event.
+ */
+export const getEventNexusInfoOptions = (
+  options: Options<GetEventNexusInfoData>,
+) =>
+  queryOptions<
+    GetEventNexusInfoResponse,
+    GetEventNexusInfoError,
+    GetEventNexusInfoResponse,
+    ReturnType<typeof getEventNexusInfoQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventNexusInfo({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventNexusInfoQueryKey(options),
+  });
+
 export const getEventOprsQueryKey = (options: Options<GetEventOprsData>) =>
   createQueryKey('getEventOprs', options);
 
@@ -1070,6 +1235,34 @@ export const getEventOprsOptions = (options: Options<GetEventOprsData>) =>
       return data;
     },
     queryKey: getEventOprsQueryKey(options),
+  });
+
+export const getEventPlayoffAdvancementQueryKey = (
+  options: Options<GetEventPlayoffAdvancementData>,
+) => createQueryKey('getEventPlayoffAdvancement', options);
+
+/**
+ * Gets a list of playoff advancement levels for the given Event. For round robin (6-alliance) playoffs the first entry is the Round Robin Semifinals standings; the last entry is the finals bracket. Returns an empty list for events without computed playoff advancement.
+ */
+export const getEventPlayoffAdvancementOptions = (
+  options: Options<GetEventPlayoffAdvancementData>,
+) =>
+  queryOptions<
+    GetEventPlayoffAdvancementResponse,
+    GetEventPlayoffAdvancementError,
+    GetEventPlayoffAdvancementResponse,
+    ReturnType<typeof getEventPlayoffAdvancementQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventPlayoffAdvancement({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventPlayoffAdvancementQueryKey(options),
   });
 
 export const getEventPredictionsQueryKey = (
@@ -1489,7 +1682,7 @@ export const getInsightsV2YearCategoryQueryKey = (
 ) => createQueryKey('getInsightsV2YearCategory', options);
 
 /**
- * Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries.
+ * Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export const getInsightsV2YearCategoryOptions = (
   options: Options<GetInsightsV2YearCategoryData>,
@@ -1545,7 +1738,7 @@ export const getInsightsV2YearCategoryDistrictQueryKey = (
 ) => createQueryKey('getInsightsV2YearCategoryDistrict', options);
 
 /**
- * Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries.
+ * Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export const getInsightsV2YearCategoryDistrictOptions = (
   options: Options<GetInsightsV2YearCategoryDistrictData>,
@@ -1777,6 +1970,31 @@ export const getStatusOptions = (options?: Options<GetStatusData>) =>
       return data;
     },
     queryKey: getStatusQueryKey(options),
+  });
+
+export const getSponsorsQueryKey = (options?: Options<GetSponsorsData>) =>
+  createQueryKey('getSponsors', options);
+
+/**
+ * Returns TBA's platinum sponsors in display order (0 to 3 entries), for clients to credit. Separate from /status so a malformed sponsor entry can never break the status call.
+ */
+export const getSponsorsOptions = (options?: Options<GetSponsorsData>) =>
+  queryOptions<
+    GetSponsorsResponse,
+    GetSponsorsError,
+    GetSponsorsResponse,
+    ReturnType<typeof getSponsorsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSponsors({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSponsorsQueryKey(options),
   });
 
 export const getTeamQueryKey = (options: Options<GetTeamData>) =>

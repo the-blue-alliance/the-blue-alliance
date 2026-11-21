@@ -443,3 +443,170 @@ def test_district_details_api_tab_has_issue_key_link(
 
     soup = bs4.BeautifulSoup(resp.data, "html.parser")
     assert soup.find("a", href="/admin/api_auth/add") is not None
+
+
+def test_district_details_not_found(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.get("/admin/district/2020zz")
+    assert resp.status_code == 404
+
+
+def test_district_details_shows_home_dcmp_assignments(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    helpers.preseed_district("2020ne")
+    DistrictTeam(
+        id="2020ne_frc254",
+        team=ndb.Key("Team", "frc254"),
+        district_key=ndb.Key("District", "2020ne"),
+        year=2020,
+        home_dcmp_event_key="2020necmp1",
+    ).put()
+    DistrictTeam(
+        id="2020ne_frc1124",
+        team=ndb.Key("Team", "frc1124"),
+        district_key=ndb.Key("District", "2020ne"),
+        year=2020,
+    ).put()
+    resp = web_client.get("/admin/district/2020ne")
+    assert resp.status_code == 200
+    assert b"2020necmp1" in resp.data
+
+
+def test_district_add_webcast_channel_post_not_found(
+    web_client: Client, login_gae_admin
+) -> None:
+    resp = web_client.post(
+        "/admin/district/2020zz/webcasts/add", data={"channel_name": "x"}
+    )
+    assert resp.status_code == 404
+
+
+def test_district_add_webcast_channel_post_missing_name(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    helpers.preseed_district("2020ne")
+    resp = web_client.post(
+        "/admin/district/2020ne/webcasts/add", data={"channel_name": "  "}
+    )
+    assert resp.status_code == 302
+    assert (
+        resp.headers["Location"]
+        == "/admin/district/2020ne?webcast_error=missing_channel_name#webcasts"
+    )
+
+
+def test_district_add_webcast_channel_post_already_exists(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    District(
+        id="2020ne",
+        year=2020,
+        abbreviation="ne",
+        webcast_channels=[
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UC_existing",
+            )
+        ],
+    ).put()
+
+    with patch.object(
+        YouTubeVideoHelper,
+        "resolve_channel_id",
+        return_value=InstantFuture(
+            YouTubeChannel(channel_id="UC_existing", channel_name="FIRST in Michigan")
+        ),
+    ):
+        resp = web_client.post(
+            "/admin/district/2020ne/webcasts/add",
+            data={"channel_name": "FIRST in Michigan"},
+        )
+
+    assert resp.status_code == 302
+    assert (
+        resp.headers["Location"]
+        == "/admin/district/2020ne?webcast_error=channel_exists#webcasts"
+    )
+
+
+def test_district_remove_webcast_channel_post_not_found(
+    web_client: Client, login_gae_admin
+) -> None:
+    resp = web_client.post(
+        "/admin/district/2020zz/webcasts/remove", data={"channel_id": "x"}
+    )
+    assert resp.status_code == 404
+
+
+def test_district_remove_webcast_channel_post_missing_id(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    helpers.preseed_district("2020ne")
+    resp = web_client.post(
+        "/admin/district/2020ne/webcasts/remove", data={"channel_id": ""}
+    )
+    assert resp.status_code == 302
+    assert (
+        resp.headers["Location"]
+        == "/admin/district/2020ne?webcast_error=missing_channel_id#webcasts"
+    )
+
+
+def test_district_set_home_dcmp_not_found(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.post("/admin/district/2020zz/home_dcmp", data={})
+    assert resp.status_code == 404
+
+
+def test_district_set_home_dcmp_post(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    helpers.preseed_district("2020ne")
+    for team_key in ["frc254", "frc1124"]:
+        DistrictTeam(
+            id=f"2020ne_{team_key}",
+            team=ndb.Key("Team", team_key),
+            district_key=ndb.Key("District", "2020ne"),
+            year=2020,
+        ).put()
+
+    csv_data = "\n".join(
+        [
+            "# comment",
+            "",
+            "254,NECMP1",
+            "frc1124,necmp2",
+            "bad line",
+            "abc,necmp1",
+            "9999,necmp1",
+        ]
+    )
+    resp = web_client.post(
+        "/admin/district/2020ne/home_dcmp", data={"csv_data": csv_data}
+    )
+    assert resp.status_code == 302
+    location = resp.headers["Location"]
+    assert location.startswith("/admin/district/2020ne?")
+    assert location.endswith("#home_dcmp")
+    assert "home_dcmp_success=2" in location
+    assert "Invalid+line" in location or "Invalid%20line" in location
+    assert "Invalid+team+number" in location or "Invalid%20team%20number" in location
+    assert "No+DistrictTeam+found+for+frc9999" in location or (
+        "No%20DistrictTeam%20found%20for%20frc9999" in location
+    )
+
+    dt_254 = DistrictTeam.get_by_id("2020ne_frc254")
+    assert dt_254 is not None
+    assert dt_254.home_dcmp_event_key == "2020necmp1"
+    dt_1124 = DistrictTeam.get_by_id("2020ne_frc1124")
+    assert dt_1124 is not None
+    assert dt_1124.home_dcmp_event_key == "2020necmp2"
+
+
+def test_district_set_home_dcmp_post_empty(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    helpers.preseed_district("2020ne")
+    resp = web_client.post("/admin/district/2020ne/home_dcmp", data={})
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/district/2020ne#home_dcmp"

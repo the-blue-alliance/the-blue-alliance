@@ -253,3 +253,9 @@ def test_notables_dcmp_winner(ndb_stub):
             ],
         },
     ]
+
+
+def test_make_insights(ndb_stub):
+    insights = InsightsNotableHelper.make_insights(2024)
+    assert len(insights) > 0
+    assert all(i.year == 2024 for i in insights)

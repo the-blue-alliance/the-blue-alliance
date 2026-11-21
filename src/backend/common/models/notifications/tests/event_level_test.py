@@ -86,6 +86,17 @@ class TestEventLevelNotification(unittest.TestCase):
             == "Qualification matches at the Present Test Event are scheduled for 8:30 EST."
         )
 
+    def test_fcm_notification_scheduled_time_bad_timezone(self) -> None:
+        # An unknown timezone falls back to the raw UTC time
+        self.notification.event.timezone_id = "Not/AZone"
+        self.notification.match.time = datetime(2017, 11, 28, 13, 30, 59)
+
+        assert self.notification.fcm_notification is not None
+        assert (
+            self.notification.fcm_notification.body
+            == "Qualification matches at the Present Test Event are scheduled for 13:30."
+        )
+
     def test_fcm_notification_short_name_scheduled_time(self):
         self.notification.event.short_name = "Arizona North"
         # Set constant scheduled time for testing

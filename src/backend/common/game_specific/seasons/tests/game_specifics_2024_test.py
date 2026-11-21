@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import cast
 
 import pytest
@@ -11,10 +12,14 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2024
 from backend.common.game_specific.seasons.game_specifics_2024 import GameSpecifics2024
 from backend.common.game_specific.seasons.tests.conftest import (
+    assert_partial_breakdowns_split_counters,
+    assert_score_stats_without_breakdowns,
+    build_match,
     HELPERS_TESTS,
     tiebreak_winner,
 )
 from backend.common.models.event import Event
+from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 
 
@@ -88,3 +93,156 @@ def test_get_prediction_relevant_stats() -> None:
     stats = GameSpecifics2024().get_prediction_relevant_stats()
     assert len(stats) > 0
     assert stats[0][0] == "score"
+
+
+def _success_rate_match(
+    red_score: int,
+    blue_score: int,
+    red: dict | None = None,
+    blue: dict | None = None,
+    with_breakdown: bool = True,
+) -> Match:
+    def alliance(overrides: dict | None) -> dict:
+        breakdown = {
+            "melodyBonusAchieved": False,
+            "ensembleBonusAchieved": False,
+            "autoPoints": 0,
+        }
+        breakdown.update(overrides or {})
+        return breakdown
+
+    return Match(
+        id="2024casj_qm1",
+        comp_level="qm",
+        event=ndb.Key(Event, "2024casj"),
+        year=2024,
+        match_number=1,
+        set_number=1,
+        team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=json.dumps(
+            {
+                "red": {
+                    "score": red_score,
+                    "teams": ["frc1", "frc2", "frc3"],
+                    "surrogates": [],
+                    "dqs": [],
+                },
+                "blue": {
+                    "score": blue_score,
+                    "teams": ["frc4", "frc5", "frc6"],
+                    "surrogates": [],
+                    "dqs": [],
+                },
+            }
+        ),
+        score_breakdown_json=(
+            json.dumps({"red": alliance(red), "blue": alliance(blue)})
+            if with_breakdown
+            else None
+        ),
+    )
+
+
+def _measure(match: Match) -> dict:
+    return {
+        counter.name: counter.measure(match)
+        for counter in GameSpecifics2024().success_rate_counters()
+    }
+
+
+def test_success_rate_counter_names_and_labels() -> None:
+    counters = GameSpecifics2024().success_rate_counters()
+    assert [(c.name, c.label) for c in counters] == [
+        ("rp_1", "Melody RP"),
+        ("rp_2", "Ensemble RP"),
+        ("max_alliance_rp", "4 RP"),
+        ("max_match_rp", "6 RP"),
+        ("auto_win_conversion", "Auto Win Conversion"),
+    ]
+
+
+def test_success_rate_auto_win_conversion() -> None:
+    match = _success_rate_match(100, 80, red={"autoPoints": 10})
+    assert _measure(match)["auto_win_conversion"] == (1, 1)
+
+    match = _success_rate_match(80, 100, red={"autoPoints": 10})
+    assert _measure(match)["auto_win_conversion"] == (0, 1)
+
+
+def test_success_rate_auto_win_conversion_needs_both_winners() -> None:
+    match = _success_rate_match(
+        100, 80, red={"autoPoints": 10}, blue={"autoPoints": 10}
+    )
+    assert _measure(match)["auto_win_conversion"] == (0, 0)
+
+    match = _success_rate_match(80, 80, red={"autoPoints": 10})
+    assert _measure(match)["auto_win_conversion"] == (0, 0)
+
+
+def test_success_rate_auto_win_conversion_needs_auto_points() -> None:
+    match = _success_rate_match(
+        100, 80, red={"autoPoints": None}, blue={"autoPoints": None}
+    )
+    assert _measure(match)["auto_win_conversion"] == (0, 0)
+
+    match = _success_rate_match(100, 80, with_breakdown=False)
+    assert _measure(match)["auto_win_conversion"] == (0, 0)
+
+
+def test_tiebreak_criteria_without_breakdown_data() -> None:
+    empty = cast(ScoreDetailModelAlliance2024, {})
+    criteria = GameSpecifics2024().tiebreak_criteria(empty, empty)
+    assert criteria == [None] * 3
+    assert tiebreak_winner(criteria) == ""
+
+
+def _insights(matches: list[Match]) -> EventInsights:
+    return none_throws(GameSpecifics2024().calculate_event_insights(matches))
+
+
+def test_calculate_event_insights_without_finished_matches() -> None:
+    unplayed = build_match("2024test", "qm", 1, -1, -1, None)
+    assert _insights([]) == {"qual": None, "playoff": None}
+    assert _insights([unplayed]) == {"qual": None, "playoff": None}
+
+
+def test_insights_without_any_breakdowns() -> None:
+    assert_score_stats_without_breakdowns(GameSpecifics2024(), "2024test")
+
+
+def test_insights_with_some_breakdowns(test_data_importer) -> None:
+    test_data_importer.import_match_list(HELPERS_TESTS, "data/2024nytr_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, "2024nytr")).fetch()
+    assert_partial_breakdowns_split_counters(GameSpecifics2024(), matches)
+
+
+def test_rp_sweep_requires_melody_and_ensemble() -> None:
+    """A 4 RP sweep is WIN + MELODY + ENSEMBLE (2024 manual, Table 6-2)."""
+    melody_only = {"melodyBonusAchieved": True, "ensembleBonusAchieved": False}
+    both = {"melodyBonusAchieved": True, "ensembleBonusAchieved": True}
+    matches = [
+        # Red wins with only the MELODY RP: 3 RP, not a sweep.
+        build_match(
+            "2024test", "qm", 1, 30, 10, {"red": melody_only, "blue": melody_only}
+        ),
+        # Red wins with both bonus RPs: a 4 RP sweep, but blue has no bonus RP.
+        build_match("2024test", "qm", 2, 30, 10, {"red": both, "blue": {}}),
+    ]
+    qual = none_throws(_insights(matches)["qual"])
+    assert qual["four_rp_count"] == [1, 2, 50.0]
+    assert qual["six_rp_count"] == [0, 2, 0.0]
+
+
+def test_get_per_robot_coprs() -> None:
+    coprs = GameSpecifics2024().get_per_robot_coprs()
+    breakdown = {
+        "autoLineRobot1": "Yes",
+        "autoLineRobot2": "No",
+        "autoLineRobot3": "Yes",
+        "endGameRobot1": "Parked",
+        "endGameRobot2": "StageLeft",
+        "endGameRobot3": "None",
+    }
+    assert coprs["autoLeavePoints"](breakdown) == [2, 0, 2]
+    assert coprs["endGameParkPoints"](breakdown) == [1, 0, 0]
+    assert coprs["endGameOnStagePoints"](breakdown) == [0, 3, 0]

@@ -1,4 +1,3 @@
-import LogosTwitch from '~icons/logos/twitch';
 import LogosYoutubeIcon from '~icons/logos/youtube-icon';
 import MdiVideoOutline from '~icons/mdi/video-outline';
 import SimpleIconsFacebook from '~icons/simple-icons/facebook';
@@ -9,6 +8,7 @@ import SimpleIconsX from '~icons/simple-icons/x';
 
 import { Media, Webcast } from '~/api/tba/read';
 import InlineIcon from '~/components/tba/inlineIcon';
+import TwitchGlitchIcon from '~/components/tba/twitchGlitchIcon';
 import { Badge } from '~/components/ui/badge';
 
 interface MediaBadgeProps {
@@ -120,7 +120,7 @@ export function WebcastIcon({
       return (
         <MediaBadge
           className={className}
-          icon={<LogosTwitch />}
+          icon={<TwitchGlitchIcon />}
           href={`https://www.twitch.tv/${webcast.channel}`}
           label={webcast.channel}
         />

@@ -23,6 +23,7 @@ from backend.common.queries import (
     event_details_query,
     event_query,
     insight_query,
+    insight_v2_query,
     match_query,
     media_query,
     robot_query,
@@ -222,6 +223,8 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             # self.assertTrue(match_query.MatchGdcvDataQuery('2015casj_qm2').cache_key in cache_keys)
             match_query.EventMatchesQuery("2015casj").cache_key,
             match_query.EventMatchesQuery("2015cama").cache_key,
+            match_query.EventPracticeMatchesQuery("2015casj").cache_key,
+            match_query.EventPracticeMatchesQuery("2015cama").cache_key,
             # self.assertTrue(match_query.EventMatchesGdcvDataQuery('2015casj').cache_key in cache_keys)
             # self.assertTrue(match_query.EventMatchesGdcvDataQuery('2015cama').cache_key in cache_keys)
             match_query.TeamEventMatchesQuery("frc254", "2015casj").cache_key,
@@ -382,6 +385,22 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             media_query.EventTeamsPreferredMediasQuery("2015casj").cache_key,
         }
 
+    def test_eventteam_updated_clears_remapped_team_queries(self) -> None:
+        affected_refs = {
+            "event": set(),
+            "team": set(),
+            "year": {2025, 2026},
+            "remapped_team": {"frc1678", None},
+        }
+        cache_keys = {
+            q[0] for q in get_affected_queries.eventteam_updated(affected_refs)
+        }
+
+        assert cache_keys == {
+            event_query.TeamYearRemappedEventTeamsQuery("frc1678", 2025).cache_key,
+            event_query.TeamYearRemappedEventTeamsQuery("frc1678", 2026).cache_key,
+        }
+
     def test_districtteam_updated(self) -> None:
         affected_refs = {
             "district_key": {
@@ -474,6 +493,36 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             district_query.DistrictAbbreviationQuery("chs").cache_key,
             district_query.DistrictAbbreviationQuery("fch").cache_key,
             event_query.DistrictEventsQuery("2019chs").cache_key,
+        }
+
+    def test_regionalpoolteam_updated(self) -> None:
+        affected_refs = {"year": {2025, 2026}}
+        cache_keys = {
+            q[0] for q in get_affected_queries.regionalpoolteam_updated(affected_refs)
+        }
+
+        assert cache_keys == {
+            team_query.RegionalTeamsQuery(2025).cache_key,
+            team_query.RegionalTeamsQuery(2026).cache_key,
+        }
+
+    def test_insight_v2_updated(self) -> None:
+        affected_refs = {
+            "year": {2024},
+            "category": {"leaderboards"},
+            "district_abbreviation": {"ne"},
+        }
+        cache_keys = {
+            q[0] for q in get_affected_queries.insight_v2_updated(affected_refs)
+        }
+
+        assert cache_keys == {
+            insight_v2_query.InsightV2YearQuery(2024).cache_key,
+            insight_v2_query.InsightV2YearCategoryQuery(2024, "leaderboards").cache_key,
+            insight_v2_query.InsightV2YearDistrictQuery(2024, "ne").cache_key,
+            insight_v2_query.InsightV2YearCategoryDistrictQuery(
+                2024, "leaderboards", "ne"
+            ).cache_key,
         }
 
     def test_insight_updated(self) -> None:

@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from typing import List
 
@@ -8,6 +9,7 @@ from backend.common.consts.event_type import EventType
 from backend.common.consts.model_type import ModelType
 from backend.common.helpers.mytba import MyTBA
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
 from backend.common.models.favorite import Favorite
 from backend.common.models.match import Match
 from backend.common.models.mytba import MyTBAModel
@@ -173,3 +175,78 @@ def test_subscription(ndb_stub):
 
     subscription = mytba.subscription(ModelType.TEAM, "frc2")
     assert subscription is not None
+
+
+def _match(
+    event: Event, number: int, red: List[str], blue: List[str], scores: tuple
+) -> Match:
+    match = Match(
+        id=f"{event.key.string_id()}_qm{number}",
+        event=event.key,
+        year=2020,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=number,
+        team_key_names=red + blue,
+        alliances_json=json.dumps(
+            {
+                "red": {"teams": red, "score": scores[0]},
+                "blue": {"teams": blue, "score": scores[1]},
+            }
+        ),
+    )
+    match.put()
+    return match
+
+
+def test_attendance_stats(ndb_stub) -> None:
+    nyny = Event(
+        id="2020nyny",
+        year=2020,
+        event_short="nyny",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2020, 3, 5),
+        end_date=datetime(2020, 3, 7),
+    )
+    nyny.put()
+    ctha = Event(
+        id="2020ctha",
+        year=2020,
+        event_short="ctha",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 2),
+    )
+    ctha.put()
+    Team(id="frc254", team_number=254).put()
+    for event in (nyny, ctha):
+        EventTeam(
+            id=f"{event.key.string_id()}_frc254",
+            event=event.key,
+            team=ndb.Key(Team, "frc254"),
+            year=2020,
+        ).put()
+
+    others = ["frc1", "frc2", "frc3", "frc4", "frc5"]
+    _match(nyny, 1, ["frc254", "frc1", "frc2"], others[2:], (50, 10))  # win
+    _match(nyny, 2, ["frc254", "frc1", "frc2"], others[2:], (10, 50))  # loss
+    _match(nyny, 3, ["frc254", "frc1", "frc2"], others[2:], (20, 20))  # tie
+    _match(nyny, 4, others[:3], ["frc6", "frc7", "frc8"], (1, 2))  # not playing
+
+    mytba = MyTBA(
+        [
+            Favorite(model_key="2020nyny_frc254", model_type=ModelType.EVENT_TEAM),
+            Favorite(model_key="2020ctha_frc254", model_type=ModelType.EVENT_TEAM),
+            Favorite(model_key="frc254", model_type=ModelType.TEAM),
+        ]
+    )
+    assert len(mytba.event_teams_models) == 2
+
+    stats = mytba.attendance_stats_helper
+    assert [e.key.string_id() for e in stats.events] == ["2020ctha", "2020nyny"]
+    assert [t.key.string_id() for t in stats.teams] == ["frc254"]
+    assert stats.event_count == 2
+    assert stats.total_days == 5
+    assert stats.total_matches == 3
+    assert stats.record == {"wins": 1, "losses": 1, "ties": 1}
+    assert stats.winrate == 100 / 3

@@ -1,13 +1,12 @@
 import { Link, LinkOptions } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Fragment } from 'react/jsx-runtime';
+import { Temporal } from 'temporal-polyfill';
 
-import MoonIcon from '~icons/lucide/moon';
-import SunIcon from '~icons/lucide/sun';
 import GithubIcon from '~icons/simple-icons/github';
 
 import andymarkLogo from '~/images/images/andymark-logo.png';
-import { useTheme } from '~/lib/theme';
+import { useIsHydrated } from '~/lib/hooks';
 
 type InternalLink = {
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -34,6 +33,8 @@ const links: NavigationLink[] = [
   { label: 'Thanks', to: '/thanks' },
   { label: 'Add Data', to: '/add-data' },
   { label: 'API Documentation', to: '/apidocs' },
+  { label: 'FAQ', to: '/faq' },
+  { label: 'Brand', to: '/brand' },
   {
     label: 'Blog',
     href: 'https://blog.thebluealliance.com',
@@ -46,48 +47,31 @@ const links: NavigationLink[] = [
 // @ts-expect-error
 const commitHash = __COMMIT_HASH__ as string;
 
-const themes = [['light', SunIcon] as const, ['dark', MoonIcon] as const];
-
-function ThemeToggle() {
-  const { setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState<boolean>(false);
-  const value = mounted ? resolvedTheme : null;
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  return (
-    <button
-      className="group inline-flex cursor-pointer items-center rounded-full
-        border p-1"
-      aria-label="Toggle Theme"
-      data-mounted={mounted}
-      onClick={() => setTheme(value === 'light' ? 'dark' : 'light')}
-    >
-      {themes.map(([key, Icon]) => {
-        return (
-          <Icon
-            key={key}
-            fill="currentColor"
-            data-active={value === key}
-            className={`size-6.5 rounded-full p-1.5 text-muted-foreground
-            transition-colors group-hover:text-accent-foreground
-            data-[active=true]:bg-black/5
-            data-[active=true]:text-accent-foreground
-            dark:data-[active=true]:bg-accent`}
-          />
-        );
-      })}
-    </button>
-  );
+// Computed client-side (rather than in the root loader) so the timestamp
+// doesn't make the root loader non-deterministic — a stale value baked into
+// every cached SSR response and a hydration-mismatch hazard.
+function formatRenderTime(): string {
+  return Temporal.Now.zonedDateTimeISO().toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+  });
 }
 
-export const Footer = ({ renderTime }: { renderTime: string }) => {
+export const Footer = () => {
+  const hydrated = useIsHydrated();
+  const renderTime = useMemo(
+    () => (hydrated ? formatRenderTime() : null),
+    [hydrated],
+  );
+
   return (
     <footer
       className="mt-(--footer-inset-top) flex flex-col space-y-3 border-t
-        bg-neutral-50 dark:bg-neutral-900"
+        bg-surface-subtle"
     >
       <div
         className="mx-auto w-full px-4 sm:max-w-160 md:max-w-3xl md:px-8
@@ -130,7 +114,6 @@ export const Footer = ({ renderTime }: { renderTime: string }) => {
               </Fragment>
             ))}
           </div>
-          <ThemeToggle />
         </div>
         <div
           className="relative isolate flex justify-between gap-0.5 border-t
@@ -146,7 +129,9 @@ export const Footer = ({ renderTime }: { renderTime: string }) => {
               <img
                 src={andymarkLogo}
                 alt="AndyMark"
-                className="ml-2 inline h-4"
+                width={450}
+                height={81}
+                className="ml-2 inline h-4 w-auto"
               />
             </a>
           </span>
@@ -161,7 +146,7 @@ export const Footer = ({ renderTime }: { renderTime: string }) => {
             >
               <i>FIRST</i>® Events API
             </a>
-            . Generated on {renderTime}. Commit:{' '}
+            {renderTime && <>. Generated on {renderTime}</>}. Commit:{' '}
             <a
               href={`https://github.com/the-blue-alliance/the-blue-alliance/commit/${commitHash}`}
               target="_blank"

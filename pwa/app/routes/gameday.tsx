@@ -37,7 +37,8 @@ export const Route = createFileRoute('/gameday')({
     ],
   }),
   component: GamedayRoute,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function GamedayRoute() {
   const { event } = Route.useSearch();

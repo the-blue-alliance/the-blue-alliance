@@ -15,3 +15,4 @@ class WebcastType(StrEnum):
     HTML5 = "html5"
     DACAST = "dacast"
     STEMTV = "stemtv"
+    DIRECT_LINK = "direct_link"

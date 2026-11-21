@@ -1,7 +1,14 @@
+import json
+
+from google.appengine.ext import ndb
+
 from backend.common.helpers.insights_v2.leaderboards.highest_endgame_score import (
     HighestEndgameScoreV2Calculator,
 )
 from backend.common.helpers.insights_v2.registry import compute_insights_for_year
+from backend.common.helpers.tests.insights_v2.fakes import fake_event, fake_match
+from backend.common.models.event import Event
+from backend.common.models.match import Match
 
 
 def test_highest_endgame_score_year(ndb_stub, test_data_importer) -> None:
@@ -73,3 +80,41 @@ def test_highest_endgame_score_rankings_descending(
 
     values = [r["value"] for r in insights[0].data["rankings"]]
     assert values == sorted(values, reverse=True)
+
+
+def test_highest_endgame_score_skips_unusable_matches() -> None:
+    calc = HighestEndgameScoreV2Calculator()
+    calc.on_event(
+        fake_event(
+            [
+                fake_match(-1, -1),  # Unplayed
+                fake_match(10, 5),  # No score breakdown
+            ]
+        )
+    )
+    assert calc.counts == {}
+
+
+def test_highest_endgame_score_skips_match_missing_blue_breakdown(ndb_stub) -> None:
+    # A malformed upstream breakdown can carry a null alliance; only a match
+    # with both alliances' endgame points is ranked
+    match = Match(
+        id="2024test_qm1",
+        year=2024,
+        event=ndb.Key(Event, "2024test"),
+        comp_level="qm",
+        set_number=1,
+        match_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"teams": ["frc1", "frc2", "frc3"], "score": 10},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": 5},
+            }
+        ),
+        score_breakdown_json=json.dumps(
+            {"red": {"endGameTotalStagePoints": 15}, "blue": None}
+        ),
+    )
+    calc = HighestEndgameScoreV2Calculator()
+    calc.on_event(fake_event([match]))
+    assert calc.counts == {}

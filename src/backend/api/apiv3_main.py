@@ -20,7 +20,10 @@ from backend.api.handlers.event import (
     event_list_all,
     event_list_year,
     event_matches,
+    event_media,
+    event_nexus_info,
     event_playoff_advancement,
+    event_practice_matches,
     event_teams,
     event_teams_media,
     event_teams_statuses,
@@ -40,6 +43,7 @@ from backend.api.handlers.regional_advancement import (
     regional_rankings,
 )
 from backend.api.handlers.search import search_index
+from backend.api.handlers.sponsors import sponsors
 from backend.api.handlers.status import status
 from backend.api.handlers.team import (
     team,
@@ -65,6 +69,7 @@ api_v3 = Blueprint("apiv3", __name__, url_prefix="/api/v3")
 CORS(
     api_v3,
     origins="*",
+    send_wildcard=True,
     methods=["OPTIONS", "GET"],
     allow_headers=["X-TBA-Auth-Key", "If-None-Match", "If-Modified-Since"],
     expose_headers=["ETag"],
@@ -73,6 +78,9 @@ CORS(
 
 # Overall Status
 api_v3.add_url_rule("/status", view_func=status)
+
+# Platinum sponsors
+api_v3.add_url_rule("/sponsors", view_func=sponsors)
 
 # District
 api_v3.add_url_rule(
@@ -135,11 +143,20 @@ api_v3.add_url_rule(
     "/event/<string:event_key>/matches/<model_type:model_type>",
     view_func=event_matches,
 )
+api_v3.add_url_rule(
+    "/event/<string:event_key>/matches/practice", view_func=event_practice_matches
+)
+api_v3.add_url_rule(
+    "/event/<string:event_key>/matches/practice/<model_type:model_type>",
+    view_func=event_practice_matches,
+)
 api_v3.add_url_rule("/event/<string:event_key>/awards", view_func=event_awards)
 api_v3.add_url_rule(
     "/event/<string:event_key>/playoff_advancement", view_func=event_playoff_advancement
 )
 api_v3.add_url_rule("/event/<string:event_key>/team_media", view_func=event_teams_media)
+api_v3.add_url_rule("/event/<string:event_key>/media", view_func=event_media)
+api_v3.add_url_rule("/event/<string:event_key>/nexus_info", view_func=event_nexus_info)
 
 # Event List
 api_v3.add_url_rule("/events/all", view_func=event_list_all)

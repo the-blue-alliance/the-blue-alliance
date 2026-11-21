@@ -194,3 +194,15 @@ def test_parse_records_event_sync_failure(fms_api_secrets, ndb_stub) -> None:
     status = cache.get()
     assert status is not None
     assert status["tasks.get.fmsapi_matches"]["num_consecutive_failures"] == 1
+
+
+def test_request_endpoint_outside_request(fms_api_secrets) -> None:
+    assert DatafeedFMSAPI()._request_endpoint() is None
+
+
+def test_request_endpoint_inside_request(fms_api_secrets) -> None:
+    from backend.tasks_io.main import app
+
+    df = DatafeedFMSAPI()
+    with app.test_request_context("/backend-tasks/get/team_details/frc254"):
+        assert df._request_endpoint() == "frc_api.team_details"

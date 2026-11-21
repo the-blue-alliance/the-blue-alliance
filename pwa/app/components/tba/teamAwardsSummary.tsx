@@ -1,3 +1,5 @@
+import { cn } from 'cn';
+
 import { Award, AwardType, Event } from '~/api/tba/read';
 import { EventLink } from '~/components/tba/links';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
@@ -9,7 +11,7 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
-import { cn, pluralize } from '~/lib/utils';
+import { pluralize } from '~/lib/utils';
 
 interface TeamAwardsSummaryProps {
   awards: Award[];
@@ -223,7 +225,10 @@ function TeamAwardsSummary({ awards, events }: TeamAwardsSummaryProps) {
       </div>
 
       <TooltipProvider>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div
+          className="grid
+            grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))] gap-4"
+        >
           {AWARD_CATEGORIES.map((category) => {
             const categoryCount = getCategoryAwardCount(category, awards);
 
@@ -300,7 +305,7 @@ function TeamAwardsSummary({ awards, events }: TeamAwardsSummaryProps) {
 
                         return (
                           <Tooltip key={item.key}>
-                            <TooltipTrigger asChild>{content}</TooltipTrigger>
+                            <TooltipTrigger render={content} />
                             <TooltipContent
                               side="top"
                               align="start"

@@ -244,6 +244,7 @@ const videoGrid = (state = defaultState, action) => {
         displayed: [],
         domOrder: defaultDomOrder,
         positionMap: defaultPositionMap,
+        domOrderLivescoreOn: defaultDomOrderLivescoreOn,
       });
     case types.TOGGLE_POSITION_LIVESCORE:
       return toggleLivescore(state, action.position);

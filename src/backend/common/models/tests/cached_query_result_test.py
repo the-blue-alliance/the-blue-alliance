@@ -1,6 +1,8 @@
+import json
 import logging
 from typing import Any, Generator, List
 
+import orjson
 import pytest
 from google.appengine.ext import ndb
 
@@ -318,121 +320,62 @@ def test_query_version_from_key_string() -> None:
     assert CachedQueryResult.query_version_from_key_string("abc") is None
 
 
-def test_purge_query_class_global_version_rejects_non_subclass(ndb_stub) -> None:
-    with pytest.raises(TypeError):
-        CachedQueryResult.purge_query_class_global_version(
-            CachedQueryResult,
-            db_version=5,
-            page_size=100,
-            delete_batch_size=50,
-        )
+def test_get_json_bytes_from_datastore(ndb_stub) -> None:
+    data = {"team_key": "frc254", "year": 2024, "metrics": [1, 2, 3]}
+    c = CachedQueryResult(id="test_key", result_dict=data)
+    c.put()
+
+    fetched = CachedQueryResult.get_by_id("test_key")
+    assert fetched is not None
+    json_bytes = fetched.get_json_bytes()
+    assert isinstance(json_bytes, bytes)
+    assert json.loads(json_bytes) == data
 
 
-def test_purge_query_class_global_version_rejects_bad_batch_sizes(ndb_stub) -> None:
-    with pytest.raises(ValueError):
-        CachedQueryResult.purge_query_class_global_version(
-            _DummyCachedQueryForPurge,
-            db_version=5,
-            page_size=0,
-            delete_batch_size=50,
-        )
-
-    with pytest.raises(ValueError):
-        CachedQueryResult.purge_query_class_global_version(
-            _DummyCachedQueryForPurge,
-            db_version=5,
-            page_size=100,
-            delete_batch_size=0,
-        )
+def test_get_json_bytes_in_memory() -> None:
+    data = {"hello": "world"}
+    c = CachedQueryResult(result_dict=data)
+    json_bytes = c.get_json_bytes()
+    assert isinstance(json_bytes, bytes)
+    assert json.loads(json_bytes) == data
 
 
-def test_purge_query_class_global_version_deletes_only_matching_version(
-    ndb_stub,
-) -> None:
-    current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
-    db_version = current_v - 2  # Must be < current_v - 1 to pass validation
+def test_get_json_bytes_none(ndb_stub) -> None:
+    c = CachedQueryResult(id="none_key", result_dict=None)
+    c.put()
 
-    old_key = f"dummy_purge_query_a:1:{db_version}"
-    old_dict_key = f"dummy_purge_query_b:1:{db_version}~dictv3.0"
-    new_key = f"dummy_purge_query_c:1:{current_v}"
-    other_prefix_key = "dummy_other_query_z:1:4"
+    fetched = CachedQueryResult.get_by_id("none_key")
+    assert fetched is not None
+    assert fetched.get_json_bytes() is None
 
-    CachedQueryResult(id=old_key, result=None).put()
-    CachedQueryResult(id=old_dict_key, result=None).put()
-    CachedQueryResult(id=new_key, result=None).put()
-    CachedQueryResult(id=other_prefix_key, result=None).put()
+    empty = CachedQueryResult()
+    assert empty.get_json_bytes() is None
 
-    deleted = CachedQueryResult.purge_query_class_global_version(
-        _DummyCachedQueryForPurge,
-        db_version=db_version,
-        page_size=10,
-        delete_batch_size=2,
+
+def test_get_json_bytes_raw_types() -> None:
+    c_bytes = CachedQueryResult()
+    setattr(c_bytes, "_values", {b"result_dict": b'{"raw": "bytes"}'})
+    assert c_bytes.get_json_bytes() == b'{"raw": "bytes"}'
+
+    c_str = CachedQueryResult()
+    setattr(c_str, "_values", {b"result_dict": '{"raw": "str"}'})
+    assert c_str.get_json_bytes() == b'{"raw": "str"}'
+
+
+def test_get_json_bytes_uses_orjson(monkeypatch: pytest.MonkeyPatch) -> None:
+    data = {"hello": "world"}
+    c = CachedQueryResult(result_dict=data)
+    dumps_called = False
+    real_dumps = orjson.dumps
+
+    def mock_dumps(val: Any) -> bytes:
+        nonlocal dumps_called
+        dumps_called = True
+        return real_dumps(val)
+
+    monkeypatch.setattr(
+        "backend.common.models.cached_query_result.orjson.dumps", mock_dumps
     )
-
-    assert deleted == 2
-    assert CachedQueryResult.get_by_id(old_key) is None
-    assert CachedQueryResult.get_by_id(old_dict_key) is None
-    assert CachedQueryResult.get_by_id(new_key) is not None
-    assert CachedQueryResult.get_by_id(other_prefix_key) is not None
-
-
-def test_purge_query_class_global_version_rejects_non_positive_version(
-    ndb_stub,
-) -> None:
-    """Test that version 0 and negative versions are rejected."""
-    with pytest.raises(ValueError, match="must be a positive integer"):
-        CachedQueryResult.purge_query_class_global_version(
-            _DummyCachedQueryForPurge,
-            db_version=0,
-            page_size=100,
-            delete_batch_size=50,
-        )
-
-    with pytest.raises(ValueError, match="must be a positive integer"):
-        CachedQueryResult.purge_query_class_global_version(
-            _DummyCachedQueryForPurge,
-            db_version=-1,
-            page_size=100,
-            delete_batch_size=50,
-        )
-
-
-def test_purge_query_class_global_version_rejects_recent_version(
-    ndb_stub,
-) -> None:
-    """Test that versions >= (CURRENT_VERSION - 1) are rejected."""
-    current_version = CachedDatabaseQuery.DATABASE_QUERY_VERSION
-    min_safe_current = current_version - 1
-
-    # Try to delete the current version (should fail)
-    with pytest.raises(
-        ValueError,
-        match=f"must be less than {min_safe_current}",
-    ):
-        CachedQueryResult.purge_query_class_global_version(
-            _DummyCachedQueryForPurge,
-            db_version=current_version,
-            page_size=100,
-            delete_batch_size=50,
-        )
-
-    # Try to delete the prior version (should fail)
-    with pytest.raises(
-        ValueError,
-        match=f"must be less than {min_safe_current}",
-    ):
-        CachedQueryResult.purge_query_class_global_version(
-            _DummyCachedQueryForPurge,
-            db_version=min_safe_current,
-            page_size=100,
-            delete_batch_size=50,
-        )
-
-    # Older version should succeed (db_version = current - 2)
-    deleted = CachedQueryResult.purge_query_class_global_version(
-        _DummyCachedQueryForPurge,
-        db_version=current_version - 2,
-        page_size=100,
-        delete_batch_size=50,
-    )
-    assert deleted == 0  # No entries created, but validation passed
+    json_bytes = c.get_json_bytes()
+    assert dumps_called is True
+    assert json_bytes == b'{"hello":"world"}'

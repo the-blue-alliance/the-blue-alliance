@@ -5,6 +5,10 @@ from unittest.mock import patch
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 
+from backend.common.datafeeds.datafeed_youtube import (
+    YoutubeUpcomingStreamsDatafeed,
+    YoutubeVideoDetailsDatafeed,
+)
 from backend.common.futures import InstantFuture
 from backend.common.helpers.youtube_video_helper import (
     YouTubeChannel,
@@ -782,3 +786,125 @@ def test_get_upcoming_streams_pagination(ndb_context, mock_google_api_secret) ->
         scheduled_start_time="2026-03-16",
         live_broadcast_content="",
     )
+
+
+def test_get_scheduled_start_times_empty(ndb_context) -> None:
+    assert YouTubeVideoHelper.get_scheduled_start_times([]).get_result() == {}
+
+
+def test_get_scheduled_start_times_unexpected_error(ndb_context) -> None:
+    with patch.object(
+        YouTubeVideoHelper, "get_video_details_batch", side_effect=RuntimeError
+    ):
+        result = YouTubeVideoHelper.get_scheduled_start_times(["abc123"]).get_result()
+    assert result == {}
+
+
+def test_get_scheduled_start_times_unparseable_times(ndb_context) -> None:
+    details = {
+        "abc123": {
+            "scheduled_start_time": "not-a-date",
+            "actual_start_time": "also-not-a-date",
+        }
+    }
+    with patch.object(
+        YouTubeVideoHelper,
+        "get_video_details_batch",
+        return_value=InstantFuture(details),
+    ):
+        result = YouTubeVideoHelper.get_scheduled_start_times(["abc123"]).get_result()
+    # Falls back to the (unparsed) scheduled time
+    assert result == {"abc123": "not-a-date"}
+
+
+def test_get_video_details_batch_empty(ndb_context) -> None:
+    assert YouTubeVideoHelper.get_video_details_batch([]).get_result() == {}
+
+
+def test_resolve_channel_id_blank(ndb_context) -> None:
+    assert YouTubeVideoHelper.resolve_channel_id("  @ ").get_result() is None
+
+
+def _mock_channel_response(api_resp: dict) -> InstantFuture:
+    return InstantFuture(
+        URLFetchResult.mock_for_content(
+            "https://www.googleapis.com/youtube/v3/channels",
+            200,
+            json.dumps(api_resp),
+        )
+    )
+
+
+def test_resolve_channel_id_unusable_items(ndb_context, mock_google_api_secret) -> None:
+    # An item without an id or title parses to nothing
+    with patch(
+        "google.appengine.ext.ndb.Context.urlfetch",
+        return_value=_mock_channel_response({"items": [{}]}),
+    ):
+        result = YouTubeVideoHelper.resolve_channel_id("handle").get_result()
+    assert result is None
+
+
+def test_resolve_channel_id_unexpected_error(
+    ndb_context, mock_google_api_secret
+) -> None:
+    with patch(
+        "google.appengine.ext.ndb.Context.urlfetch", side_effect=RuntimeError("boom")
+    ):
+        result = YouTubeVideoHelper.resolve_channel_id("handle").get_result()
+    assert result is None
+
+
+def test_get_playlist_videos_null_body_and_missing_ids(
+    ndb_context, mock_google_api_secret
+) -> None:
+    page1 = {
+        "items": [
+            {"id": "item1", "snippet": {"title": "No video id"}},
+            {
+                "id": "item2",
+                "snippet": {"title": "Qual 1", "resourceId": {"videoId": "vid2"}},
+            },
+        ],
+        "nextPageToken": "page2",
+    }
+    with patch("google.appengine.ext.ndb.Context.urlfetch") as mock_urlfetch:
+        mock_urlfetch.side_effect = [
+            InstantFuture(
+                URLFetchResult.mock_for_content(
+                    "https://www.googleapis.com/youtube/v3/playlistItems",
+                    200,
+                    json.dumps(page1),
+                )
+            ),
+            InstantFuture(
+                URLFetchResult.mock_for_content(
+                    "https://www.googleapis.com/youtube/v3/playlistItems", 200, "null"
+                )
+            ),
+        ]
+        videos = YouTubeVideoHelper.videos_in_playlist("PL_123").get_result()
+
+    assert [v["video_id"] for v in videos] == ["vid2"]
+
+
+@pytest.mark.parametrize(
+    "details_future_kwargs",
+    [{"return_value": InstantFuture(None)}, {"side_effect": RuntimeError("boom")}],
+)
+def test_get_upcoming_streams_details_unavailable(
+    ndb_context, mock_google_api_secret, details_future_kwargs: dict
+) -> None:
+    with (
+        patch.object(
+            YoutubeUpcomingStreamsDatafeed,
+            "fetch_all_pages_async",
+            return_value=InstantFuture([{"video_id": "abc123", "title": "Stream"}]),
+        ),
+        patch.object(
+            YoutubeVideoDetailsDatafeed, "fetch_async", **details_future_kwargs
+        ),
+    ):
+        streams = YouTubeVideoHelper.get_upcoming_streams("UC_channel_id").get_result()
+
+    assert streams == []

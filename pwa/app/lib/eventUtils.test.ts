@@ -1,23 +1,34 @@
 import { Temporal } from 'temporal-polyfill';
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { Event, EventType } from '~/api/tba/read';
 import {
+  EVENT_SSR_TTL_SECONDS,
+  eventCacheControlHeaders,
+  eventSsrTtlSeconds,
   getCurrentWeekEvents,
+  getDivisionShortform,
+  getEventCompactDateString,
   getEventDateString,
+  getEventNormalizedName,
   getEventWeekString,
   getPublicAgendaUrl,
+  getRemappedRobots,
   groupEventsByParent,
   groupEventsBySections,
   hasEventEnded,
+  isAfterEventEndDate,
   isEventActive,
+  isEventWithinADay,
   isEventWithinDays,
   isValidEventKey,
+  sortEvents,
+  sortEventsComparator,
   stripParentPrefix,
   toCalendarEvent,
 } from '~/lib/eventUtils';
 
-describe.concurrent('groupEventsByParent', () => {
+describe('groupEventsByParent', () => {
   function makeEvent(
     key: string,
     start_date: string,
@@ -68,6 +79,45 @@ describe.concurrent('groupEventsByParent', () => {
     ).toEqual(['2024early', '2024cmp', '2024cmpnew']);
   });
 
+  test('parent that starts after all of its divisions still sorts first', () => {
+    // Real DCMP shape: the parent event is the finals day only, so it starts
+    // after every division.
+    const parent = makeEvent('2026necmp', '2026-04-18', [
+      '2026necmp1',
+      '2026necmp2',
+    ]);
+    const div1 = makeEvent('2026necmp1', '2026-04-15');
+    const div2 = makeEvent('2026necmp2', '2026-04-15');
+    expect(groupEventsByParent([div1, div2, parent]).map((e) => e.key)).toEqual(
+      ['2026necmp', '2026necmp1', '2026necmp2'],
+    );
+  });
+
+  test('divisions listed before their parent are regrouped under it', () => {
+    // Ordering produced by sortEventsComparator for the 2026 Week 7 section:
+    // divisions bubble to the top and parents sink to the bottom.
+    const events = [
+      makeEvent('2026necmp1', '2026-04-15'),
+      makeEvent('2026necmp2', '2026-04-15'),
+      makeEvent('2026nytr', '2026-04-15'),
+      makeEvent('2026oncmp1', '2026-04-16'),
+      makeEvent('2026oncmp2', '2026-04-16'),
+      makeEvent('2026incmp', '2026-04-17'),
+      makeEvent('2026necmp', '2026-04-18', ['2026necmp1', '2026necmp2']),
+      makeEvent('2026oncmp', '2026-04-19', ['2026oncmp1', '2026oncmp2']),
+    ];
+    expect(groupEventsByParent(events).map((e) => e.key)).toEqual([
+      '2026nytr',
+      '2026necmp',
+      '2026necmp1',
+      '2026necmp2',
+      '2026oncmp',
+      '2026oncmp1',
+      '2026oncmp2',
+      '2026incmp',
+    ]);
+  });
+
   test('division not present in the event list is silently omitted', () => {
     const parent = makeEvent('2024cmp', '2024-04-17', [
       '2024cmpnew',
@@ -81,7 +131,54 @@ describe.concurrent('groupEventsByParent', () => {
   });
 });
 
-describe.concurrent('stripParentPrefix', () => {
+describe('getRemappedRobots', () => {
+  function makeEvent(remap_teams: Record<string, string> | null): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return { key: '2026bc2', remap_teams };
+  }
+
+  test('returns the robot remapped to the team', () => {
+    expect(
+      getRemappedRobots(makeEvent({ frc9997: 'frc3467B' }), 'frc3467'),
+    ).toEqual([{ sourceTeamKey: 'frc9997', robotKey: 'frc3467B' }]);
+  });
+
+  test('ignores robots remapped to other teams', () => {
+    expect(
+      getRemappedRobots(makeEvent({ frc9990: 'frc190B' }), 'frc3467'),
+    ).toEqual([]);
+  });
+
+  test('ignores robots of a team whose number starts with the team number', () => {
+    expect(
+      getRemappedRobots(makeEvent({ frc9997: 'frc34671B' }), 'frc3467'),
+    ).toEqual([]);
+  });
+
+  test('ignores pre-rookie remaps without a letter suffix', () => {
+    expect(
+      getRemappedRobots(makeEvent({ frc9997: 'frc3467' }), 'frc3467'),
+    ).toEqual([]);
+  });
+
+  test('returns nothing when the event has no remaps', () => {
+    expect(getRemappedRobots(makeEvent(null), 'frc3467')).toEqual([]);
+  });
+
+  test('orders robots by letter', () => {
+    expect(
+      getRemappedRobots(
+        makeEvent({ frc9996: 'frc3467C', frc9997: 'frc3467B' }),
+        'frc3467',
+      ),
+    ).toEqual([
+      { sourceTeamKey: 'frc9997', robotKey: 'frc3467B' },
+      { sourceTeamKey: 'frc9996', robotKey: 'frc3467C' },
+    ]);
+  });
+});
+
+describe('stripParentPrefix', () => {
   test('strips matching prefix and space separator', () => {
     expect(
       stripParentPrefix(
@@ -135,7 +232,7 @@ describe.concurrent('stripParentPrefix', () => {
   });
 });
 
-describe.concurrent('isValidEventKey', () => {
+describe('isValidEventKey', () => {
   test.each(['2010ct', '2014onto2', '202121fim', '2022dc305'])(
     'valid event key',
     (key) => {
@@ -148,7 +245,7 @@ describe.concurrent('isValidEventKey', () => {
   });
 });
 
-describe.concurrent('getEventDateString', () => {
+describe('getEventDateString', () => {
   test('Same start and end date', () => {
     // @ts-expect-error: Don't need to fill out all the fields
     const event: Event = {
@@ -177,7 +274,20 @@ describe.concurrent('getEventDateString', () => {
   });
 });
 
-describe.concurrent('toCalendarEvent', () => {
+describe('getEventCompactDateString', () => {
+  test.each([
+    ['one-day event', '2024-03-05', '2024-03-05', 'Mar 5'],
+    ['same-month event', '2024-03-05', '2024-03-08', 'Mar 5–8'],
+    ['cross-month event', '2024-03-30', '2024-04-01', 'Mar 30 – Apr 1'],
+  ])('formats a %s', (_name, start_date, end_date, expected) => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = { start_date, end_date };
+
+    expect(getEventCompactDateString(event)).toEqual(expected);
+  });
+});
+
+describe('toCalendarEvent', () => {
   test('sets title, allDay, description, url, and location', () => {
     // @ts-expect-error: Don't need to fill out all the fields
     const event: Event = {
@@ -253,7 +363,7 @@ describe.concurrent('toCalendarEvent', () => {
   });
 });
 
-describe.concurrent('groupEventsBySections', () => {
+describe('groupEventsBySections', () => {
   function makeEvent(overrides: Partial<Event>): Event {
     // @ts-expect-error: Don't need to fill out all the fields
     return {
@@ -402,7 +512,7 @@ describe.concurrent('groupEventsBySections', () => {
   });
 });
 
-describe.concurrent('getEventWeekString', () => {
+describe('getEventWeekString', () => {
   test('Null year', () => {
     // @ts-expect-error: Don't need to fill out all the fields
     const event: Event = {
@@ -867,6 +977,38 @@ describe('hasEventEnded', () => {
   });
 });
 
+describe('isAfterEventEndDate', () => {
+  function makeEvent(end_date: string, timezone: string): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return { end_date, timezone };
+  }
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test('returns false on the last day of the event', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-13T03:00:00Z'));
+    expect(
+      isAfterEventEndDate(makeEvent('2024-04-12', 'America/New_York')),
+    ).toBe(false);
+  });
+
+  test('returns true the day after the event ends in the event timezone', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-13T05:00:00Z'));
+    expect(
+      isAfterEventEndDate(makeEvent('2024-04-12', 'America/New_York')),
+    ).toBe(true);
+  });
+
+  test('returns false for an event without dates', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    expect(isAfterEventEndDate({})).toBe(false);
+  });
+});
+
 describe('isEventActive', () => {
   function makeEvent(
     start_date: string,
@@ -941,7 +1083,7 @@ describe('isEventActive', () => {
   });
 });
 
-describe.concurrent('getPublicAgendaUrl', () => {
+describe('getPublicAgendaUrl', () => {
   function makeEvent(
     event_type: EventType,
     event_code: string,
@@ -1019,5 +1161,477 @@ describe.concurrent('getPublicAgendaUrl', () => {
   test('event_code is uppercased in the URL', () => {
     const event = makeEvent(EventType.REGIONAL, 'milwi', 2024);
     expect(getPublicAgendaUrl(event)).toContain('MILWI');
+  });
+});
+
+describe('eventSsrTtlSeconds', () => {
+  function makeEvent(overrides: Partial<Event>): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return {
+      start_date: '2030-04-10',
+      end_date: '2030-04-12',
+      year: 2030,
+      ...overrides,
+    };
+  }
+
+  test('previous season returns the past-season TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-06-01T12:00:00Z'));
+    expect(eventSsrTtlSeconds(makeEvent({ year: 2029 }))).toBe(
+      EVENT_SSR_TTL_SECONDS.PAST_SEASON,
+    );
+    vi.useRealTimers();
+  });
+
+  test('current season, ended over a week ago returns the stable TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-25T12:00:00Z'));
+    expect(eventSsrTtlSeconds(makeEvent({}))).toBe(
+      EVENT_SSR_TTL_SECONDS.STABLE,
+    );
+    vi.useRealTimers();
+  });
+
+  test('current season, ended within a week returns the live TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-16T12:00:00Z'));
+    expect(eventSsrTtlSeconds(makeEvent({}))).toBe(EVENT_SSR_TTL_SECONDS.LIVE);
+    vi.useRealTimers();
+  });
+
+  test('current season, starting over three days out returns the stable TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-05T12:00:00Z'));
+    expect(eventSsrTtlSeconds(makeEvent({}))).toBe(
+      EVENT_SSR_TTL_SECONDS.STABLE,
+    );
+    vi.useRealTimers();
+  });
+
+  test('current season, starting within three days returns the live TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-08T12:00:00Z'));
+    expect(eventSsrTtlSeconds(makeEvent({}))).toBe(EVENT_SSR_TTL_SECONDS.LIVE);
+    vi.useRealTimers();
+  });
+
+  test('current season, in progress returns the live TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-11T12:00:00Z'));
+    expect(eventSsrTtlSeconds(makeEvent({}))).toBe(EVENT_SSR_TTL_SECONDS.LIVE);
+    vi.useRealTimers();
+  });
+
+  test('current season with missing dates returns the live TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-11T12:00:00Z'));
+    expect(
+      eventSsrTtlSeconds(makeEvent({ start_date: '', end_date: '' })),
+    ).toBe(EVENT_SSR_TTL_SECONDS.LIVE);
+    vi.useRealTimers();
+  });
+});
+
+describe('eventCacheControlHeaders', () => {
+  function makeEvent(overrides: Partial<Event>): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return {
+      start_date: '2030-04-10',
+      end_date: '2030-04-12',
+      year: 2030,
+      ...overrides,
+    };
+  }
+
+  test('returns no headers outside production', () => {
+    expect(eventCacheControlHeaders(makeEvent({}))).toEqual({});
+  });
+
+  test('maps the event TTL onto cache-control headers in production', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-25T12:00:00Z'));
+    vi.stubEnv('NODE_ENV', 'production');
+
+    const ttl = EVENT_SSR_TTL_SECONDS.STABLE;
+    expect(eventCacheControlHeaders(makeEvent({}))).toEqual({
+      'Cache-Control': `public, max-age=${ttl}, stale-while-revalidate=${ttl * 2}`,
+      'CDN-Cache-Control': `max-age=${ttl}`,
+    });
+
+    vi.unstubAllEnvs();
+    vi.useRealTimers();
+  });
+
+  test('falls back to the live TTL when the event is missing', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const ttl = EVENT_SSR_TTL_SECONDS.LIVE;
+    expect(eventCacheControlHeaders(undefined)).toEqual({
+      'Cache-Control': `public, max-age=${ttl}, stale-while-revalidate=${ttl * 2}`,
+      'CDN-Cache-Control': `max-age=${ttl}`,
+    });
+    vi.unstubAllEnvs();
+  });
+});
+
+describe('getEventNormalizedName', () => {
+  const base = {
+    year: 2026,
+    city: 'Houston',
+    name: 'Full Name',
+    short_name: null,
+  };
+
+  test('district championship division uses the short name plus the type', () => {
+    expect(
+      getEventNormalizedName({
+        ...base,
+        event_type: EventType.DISTRICT_CMP_DIVISION,
+        short_name: 'NEDC - Newsom',
+        name: 'New England FIRST District Championship - Newsom Division presented by GE Aerospace',
+      }),
+    ).toBe('NEDC - Newsom District Championship Division');
+  });
+
+  test('does not repeat a type suffix already in the short name', () => {
+    expect(
+      getEventNormalizedName({
+        ...base,
+        event_type: EventType.REGIONAL,
+        short_name: 'Silicon Valley Regional',
+      }),
+    ).toBe('Silicon Valley Regional');
+  });
+
+  test('championship finals are named by city from 2017', () => {
+    expect(
+      getEventNormalizedName({ ...base, event_type: EventType.CMP_FINALS }),
+    ).toBe('Houston Championship');
+    expect(
+      getEventNormalizedName({
+        ...base,
+        year: 2016,
+        event_type: EventType.CMP_FINALS,
+      }),
+    ).toBe('Championship');
+  });
+
+  test('offseason events use the bare short name', () => {
+    expect(
+      getEventNormalizedName({
+        ...base,
+        event_type: EventType.OFFSEASON,
+        short_name: 'Chezy Champs',
+      }),
+    ).toBe('Chezy Champs');
+  });
+
+  test('falls back to the full name without a short name, or for FoC', () => {
+    expect(
+      getEventNormalizedName({ ...base, event_type: EventType.DISTRICT }),
+    ).toBe('Full Name');
+    expect(
+      getEventNormalizedName({
+        ...base,
+        event_type: EventType.FOC,
+        short_name: 'FoC short',
+      }),
+    ).toBe('Full Name');
+  });
+});
+
+describe('sortEventsComparator', () => {
+  function makeEvent(overrides: Partial<Event>): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return {
+      start_date: '2024-03-01',
+      end_date: '2024-03-03',
+      event_type: EventType.REGIONAL,
+      name: 'Event',
+      ...overrides,
+    };
+  }
+
+  test('the earlier start date sorts first', () => {
+    const later = makeEvent({
+      start_date: '2024-03-08',
+      end_date: '2024-03-10',
+    });
+    const earlier = makeEvent({});
+
+    expect(sortEventsComparator(later, earlier)).toBeGreaterThan(0);
+  });
+
+  test('with the same start, the earlier end date sorts first', () => {
+    const shorter = makeEvent({ end_date: '2024-03-02' });
+    const longer = makeEvent({ end_date: '2024-03-03' });
+
+    expect(sortEventsComparator(shorter, longer)).toBeLessThan(0);
+  });
+
+  test('a district championship sorts after its divisions on the same dates', () => {
+    const dcmp = makeEvent({ event_type: EventType.DISTRICT_CMP, name: 'A' });
+    const division = makeEvent({
+      event_type: EventType.DISTRICT_CMP_DIVISION,
+      name: 'B',
+    });
+
+    expect(sortEventsComparator(dcmp, division)).toBe(1);
+  });
+
+  test('a division sorts before its district championship on the same dates', () => {
+    const dcmp = makeEvent({ event_type: EventType.DISTRICT_CMP, name: 'A' });
+    const division = makeEvent({
+      event_type: EventType.DISTRICT_CMP_DIVISION,
+      name: 'B',
+    });
+
+    expect(sortEventsComparator(division, dcmp)).toBe(-1);
+  });
+
+  test('events on the same dates of the same type sort by name', () => {
+    const events = [makeEvent({ name: 'B' }), makeEvent({ name: 'A' })];
+
+    expect(events.sort(sortEventsComparator).map((e) => e.name)).toEqual([
+      'A',
+      'B',
+    ]);
+  });
+
+  test('a later name sorts after an earlier one', () => {
+    expect(
+      sortEventsComparator(makeEvent({ name: 'B' }), makeEvent({ name: 'A' })),
+    ).toBe(1);
+  });
+
+  test('identical events compare equal', () => {
+    expect(sortEventsComparator(makeEvent({}), makeEvent({}))).toBe(0);
+  });
+});
+
+describe('sortEvents', () => {
+  test('orders events chronologically', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const later: Event = {
+      key: 'later',
+      start_date: '2024-03-08',
+      end_date: '2024-03-10',
+      event_type: EventType.REGIONAL,
+      name: 'Later',
+    };
+    // @ts-expect-error: Don't need to fill out all the fields
+    const earlier: Event = {
+      key: 'earlier',
+      start_date: '2024-03-01',
+      end_date: '2024-03-03',
+      event_type: EventType.REGIONAL,
+      name: 'Earlier',
+    };
+
+    expect(sortEvents([later, earlier]).map((e) => e.key)).toEqual([
+      'earlier',
+      'later',
+    ]);
+  });
+
+  test('leaves the input array in its original order', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const later: Event = {
+      key: 'later',
+      start_date: '2024-04-01',
+      end_date: '2024-04-03',
+      event_type: EventType.REGIONAL,
+      name: 'Later',
+    };
+    // @ts-expect-error: Don't need to fill out all the fields
+    const earlier: Event = {
+      key: 'earlier',
+      start_date: '2024-03-01',
+      end_date: '2024-03-03',
+      event_type: EventType.REGIONAL,
+      name: 'Earlier',
+    };
+    const events = [later, earlier];
+
+    sortEvents(events);
+
+    expect(events.map((e) => e.key)).toEqual(['later', 'earlier']);
+  });
+});
+
+describe('getEventWeekString 2021 challenges', () => {
+  test('unknown 2021 challenge weeks have no label', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = { year: 2021, week: 3 };
+
+    expect(getEventWeekString(event)).toBeNull();
+  });
+});
+
+describe('groupEventsBySections with several events in a week', () => {
+  test('groups events from the same week together', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const first: Event = {
+      key: '2026a',
+      year: 2026,
+      event_type: EventType.REGIONAL,
+      week: 0,
+      start_date: '2026-02-27',
+      end_date: '2026-03-01',
+    };
+    // @ts-expect-error: Don't need to fill out all the fields
+    const second: Event = {
+      key: '2026b',
+      year: 2026,
+      event_type: EventType.REGIONAL,
+      week: 0,
+      start_date: '2026-02-28',
+      end_date: '2026-03-01',
+    };
+
+    const groups = groupEventsBySections([first, second]);
+
+    expect(
+      groups.map((g) => [g.groupName, g.events.map((e) => e.key)]),
+    ).toEqual([['Week 1', ['2026a', '2026b']]]);
+  });
+});
+
+describe('getDivisionShortform', () => {
+  test.each([
+    ['Newton Division', 'New'],
+    ['FIRST Championship - Archimedes Division', 'Arc'],
+    ['Carver Division', 'Crv'],
+  ])('%s is shortened to %s', (name, expected) => {
+    expect(getDivisionShortform(name)).toBe(expected);
+  });
+
+  test('unknown divisions use their first three letters', () => {
+    expect(getDivisionShortform('Unknown Division')).toBe('Unk');
+  });
+});
+
+describe('events with only one date', () => {
+  const onlyEnd = {
+    start_date: null,
+    end_date: '2024-03-03',
+    timezone: 'UTC',
+  } as unknown as Event;
+  const onlyStart = {
+    start_date: '2024-03-03',
+    timezone: 'UTC',
+  } as unknown as Event;
+  const undated = {
+    start_date: null,
+    end_date: null,
+    timezone: 'UTC',
+  } as unknown as Event;
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test.each([
+    ['only an end date', onlyEnd],
+    ['only a start date', onlyStart],
+  ])('an event with %s is a one-day event on that date', (_, event) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-03-03T12:00:00Z'));
+    expect(isEventActive(event)).toBe(true);
+    expect(hasEventEnded(event)).toBe(true);
+
+    vi.setSystemTime(new Date('2024-03-04T12:00:00Z'));
+    expect(isEventActive(event)).toBe(false);
+    expect(isEventWithinDays(event, 0, 1)).toBe(true);
+
+    vi.setSystemTime(new Date('2024-03-02T12:00:00Z'));
+    expect(isEventActive(event)).toBe(false);
+    expect(hasEventEnded(event)).toBe(false);
+  });
+
+  test('an event with no dates is never active or ended', () => {
+    expect(isEventActive(undated)).toBe(false);
+    expect(isEventWithinDays(undated, 365, 365)).toBe(false);
+    expect(hasEventEnded(undated)).toBe(false);
+    expect(getCurrentWeekEvents([undated])).toEqual([]);
+  });
+});
+
+describe('isEventWithinADay', () => {
+  function makeEvent(
+    start: Temporal.PlainDate,
+    end: Temporal.PlainDate,
+  ): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return {
+      start_date: start.toString(),
+      end_date: end.toString(),
+      timezone: 'UTC',
+    };
+  }
+
+  test('is true for an event running today', () => {
+    const today = Temporal.Now.plainDateISO('UTC');
+
+    expect(
+      isEventWithinADay(
+        makeEvent(today.subtract({ days: 3 }), today.add({ days: 3 })),
+      ),
+    ).toBe(true);
+  });
+
+  test('is true on the day of a one-day event', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-20T15:00:00Z'));
+    const event = makeEvent(
+      Temporal.PlainDate.from('2024-04-20'),
+      Temporal.PlainDate.from('2024-04-20'),
+    );
+    expect(isEventWithinADay(event)).toBe(true);
+    vi.useRealTimers();
+  });
+
+  test('is true the day before the event starts', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-17T15:00:00Z'));
+    const event = makeEvent(
+      Temporal.PlainDate.from('2024-04-18'),
+      Temporal.PlainDate.from('2024-04-20'),
+    );
+    expect(isEventWithinADay(event)).toBe(true);
+    vi.useRealTimers();
+  });
+
+  test('is false for an event that ended years ago', () => {
+    expect(
+      isEventWithinADay(
+        makeEvent(
+          Temporal.PlainDate.from('2000-01-01'),
+          Temporal.PlainDate.from('2000-01-03'),
+        ),
+      ),
+    ).toBe(false);
+  });
+});
+
+describe('hasEventEnded for a far future event', () => {
+  test('is false when the end date is years away in every timezone', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = { end_date: '2999-01-01', timezone: 'UTC' };
+
+    expect(hasEventEnded(event)).toBe(false);
+  });
+});
+
+describe('eventSsrTtlSeconds against the real clock', () => {
+  test("last season's events get the past-season TTL", () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      year: Temporal.Now.plainDateISO().year - 1,
+      start_date: '2020-04-10',
+      end_date: '2020-04-12',
+    };
+
+    expect(eventSsrTtlSeconds(event)).toBe(EVENT_SSR_TTL_SECONDS.PAST_SEASON);
   });
 });

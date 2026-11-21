@@ -1,5 +1,5 @@
 import logging
-from typing import Callable
+from typing import Any, Callable, TypeVar
 
 from werkzeug.local import Local
 
@@ -9,11 +9,14 @@ from backend.common.profiler import Span
 response_context = Local()
 
 
-def run_after_response(callback: Callable[[], None]) -> None:
+TCallback = TypeVar("TCallback", bound=Callable[..., Any])
+
+
+def run_after_response(callback: TCallback) -> TCallback:
     """
     Enqueues a callback to be run after the request response.
     Usage examples:
-    1) As a lambda (Note that this will not log the function name because it is a lambda)
+    1) As a lambda
     run_after_response(lambda: ...)
 
     2) As a named function
@@ -25,11 +28,15 @@ def run_after_response(callback: Callable[[], None]) -> None:
         ...
     """
     if not hasattr(response_context, "request"):
-        return
+        logging.debug(
+            "run_after_response called outside active request context; dropping callback."
+        )
+        return callback
 
     if not hasattr(response_context.request, "after_response_callbacks"):
         response_context.request.after_response_callbacks = []
     response_context.request.after_response_callbacks.append(callback)
+    return callback
 
 
 def execute_callbacks() -> None:
@@ -37,12 +44,14 @@ def execute_callbacks() -> None:
         return
 
     callbacks = getattr(response_context.request, "after_response_callbacks", [])
+    response_context.request.after_response_callbacks = []
 
     for callback in callbacks:
-        with Span(
-            f"execute_callback:{callback.__name__ if hasattr(callback, "__name__") else None}"
-        ):
-            try:
+        name = getattr(callback, "__name__", None) or getattr(
+            getattr(callback, "func", None), "__name__", None
+        )
+        try:
+            with Span(f"execute_callback:{name}"):
                 callback()
-            except Exception as e:
-                logging.info(f"Callback failed: {e}")
+        except Exception:
+            logging.warning(f"Callback {name} failed after response", exc_info=True)

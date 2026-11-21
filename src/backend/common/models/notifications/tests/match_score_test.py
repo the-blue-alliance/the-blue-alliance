@@ -20,6 +20,8 @@ class TestMatchScoreNotification(unittest.TestCase):
 
         self.event = EventTestCreator.create_present_event()
         self.match = self.event.matches[0]
+        self.match.alliances["red"]["score"] = 100
+        self.match.alliances["blue"]["score"] = 50
 
         self.notification = MatchScoreNotification(self.match)
 

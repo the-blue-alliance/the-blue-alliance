@@ -9,6 +9,14 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 
+function ConditionIcon({ condition }: { condition: boolean }) {
+  return condition ? (
+    <MdiCheck role="img" aria-label="Achieved" />
+  ) : (
+    <MdiClose role="img" aria-label="Not achieved" />
+  );
+}
+
 export function ConditionalCheckmark({
   condition,
   teamKey,
@@ -20,7 +28,7 @@ export function ConditionalCheckmark({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>
-          {condition ? <MdiCheck /> : <MdiClose />}
+          <ConditionIcon condition={condition} />
         </TooltipTrigger>
         <TooltipContent>{teamKey.substring(3)}</TooltipContent>
       </Tooltip>
@@ -31,7 +39,7 @@ export function ConditionalCheckmark({
 export function ConditionalRpAchieved({ condition }: { condition: boolean }) {
   return (
     <div className="flex items-center justify-center">
-      {condition ? <MdiCheck /> : <MdiClose />}
+      <ConditionIcon condition={condition} />
     </div>
   );
 }
@@ -50,60 +58,20 @@ export function ConditionalBadge({
       variant={condition ? 'secondary' : 'outline'}
       className="flex items-center justify-center gap-1"
     >
-      {alignIcon === 'left' && (condition ? <MdiCheck /> : <MdiClose />)}
+      {alignIcon === 'left' && <ConditionIcon condition={condition} />}
       {teamKey.substring(3)}
-      {alignIcon === 'right' && (condition ? <MdiCheck /> : <MdiClose />)}
+      {alignIcon === 'right' && <ConditionIcon condition={condition} />}
     </Badge>
   );
 }
 
-export function fmtFouls({
-  foulCount,
-  pointsPerFoul,
+/** Formats the fouls an alliance committed as "fouls / tech (or major) fouls". */
+export function fmtFoulsCommitted({
+  fouls,
+  techFouls,
 }: {
-  foulCount: number | undefined;
-  pointsPerFoul: number;
+  fouls: number | undefined;
+  techFouls: number | undefined;
 }): string {
-  const definedFoulCount = foulCount ?? 0;
-
-  return `${definedFoulCount} (+${definedFoulCount * pointsPerFoul})`;
-}
-
-export function FoulDisplay({
-  foulsReceived,
-  pointsPerFoul,
-  techFoulsReceived,
-  pointsPerTechFoul,
-  techOrMajor,
-}: {
-  foulsReceived: number | undefined;
-  pointsPerFoul: number;
-  techFoulsReceived: number | undefined;
-  pointsPerTechFoul: number;
-  techOrMajor: 'tech' | 'major'; // 1992-2024 Tech; 2025+ Major
-}) {
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <div className="flex items-center gap-1">
-        <span className="text-xs opacity-70">Regular:</span>
-        <span>
-          {fmtFouls({
-            foulCount: foulsReceived,
-            pointsPerFoul,
-          })}
-        </span>
-      </div>
-      <div className="flex items-center gap-1">
-        <span className="text-xs opacity-70">
-          {techOrMajor === 'tech' ? 'Tech' : 'Major'}:
-        </span>
-        <span>
-          {fmtFouls({
-            foulCount: techFoulsReceived,
-            pointsPerFoul: pointsPerTechFoul,
-          })}
-        </span>
-      </div>
-    </div>
-  );
+  return `${fouls ?? 0} / ${techFouls ?? 0}`;
 }

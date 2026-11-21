@@ -9,9 +9,13 @@ from backend.common.models.team import Team
 
 @freeze_time("2025-03-15")
 def test_seed_media_suggestions_redirects(local_client: Client, taskqueue_stub) -> None:
-    resp = local_client.post("/local/seed_media_suggestions")
+    resp = local_client.post(
+        "/local/seed_media_suggestions", environ_overrides={"GAE_ENV": "localdev"}
+    )
     assert resp.status_code == 302
-    assert "/suggest/team/media/review" in resp.headers["Location"]
+    # Local dev reviews in the local PWA dev server, never on production
+    assert resp.headers["Location"] == "http://localhost:5173/suggest/review/media"
+    assert "thebluealliance.com" not in resp.headers["Location"]
 
 
 @freeze_time("2025-03-15")

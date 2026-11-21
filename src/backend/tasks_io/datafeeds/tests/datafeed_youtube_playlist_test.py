@@ -49,3 +49,33 @@ class TestYoutubePlaylistItemsDatafeed:
             datafeed = YoutubePlaylistItemsDatafeed("PL_123")
             parser = datafeed.parser()
             assert isinstance(parser, YoutubePlaylistItemsParser)
+
+
+def test_playlist_items_parser_edge_cases() -> None:
+    results = YoutubePlaylistItemsParser().parse(
+        {
+            "items": [
+                {"id": "", "snippet": {"title": "No ID"}},
+                {"id": "item_no_title", "snippet": {"title": ""}},
+                {
+                    "id": "item_channel",
+                    "snippet": {
+                        "title": "Channel",
+                        "resourceId": {"channelId": "UC_id"},
+                    },
+                },
+                {
+                    "id": "item_playlist",
+                    "snippet": {
+                        "title": "Playlist",
+                        "resourceId": {"playlistId": "PL_id"},
+                    },
+                },
+            ]
+        }
+    )
+
+    assert results == [
+        {"item_id": "item_channel", "title": "Channel", "channel_id": "UC_id"},
+        {"item_id": "item_playlist", "title": "Playlist", "playlist_id": "PL_id"},
+    ]

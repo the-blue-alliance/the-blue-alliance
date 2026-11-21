@@ -18,6 +18,7 @@ from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_match_parser import (
     FMSAPIHybridScheduleParser,
     FMSAPIMatchDetailsParser,
+    FMSAPIPracticeScheduleParser,
 )
 
 
@@ -40,8 +41,14 @@ def test_get_event_matches() -> None:
         patch.object(
             FRCAPI, "match_scores", return_value=InstantFuture(score_response)
         ) as mock_match_scores_api,
+        patch.object(
+            FRCAPI, "match_schedule", return_value=InstantFuture(schedule_response)
+        ) as mock_match_schedule_api,
         patch.object(FMSAPIHybridScheduleParser, "parse") as mock_schedule_parse,
         patch.object(FMSAPIMatchDetailsParser, "parse") as mock_match_detail_parser,
+        patch.object(
+            FMSAPIPracticeScheduleParser, "parse", return_value=[]
+        ) as mock_practice_parse,
     ):
         mock_schedule_parse.side_effect = ([], [])
         mock_match_detail_parser.return_value = {}
@@ -56,6 +63,8 @@ def test_get_event_matches() -> None:
     mock_schedule_parse.assert_has_calls(
         [call({"Schedule": []}), call({"Schedule": []})]
     )
+    mock_match_schedule_api.assert_called_once_with(2020, "miket", "Practice")
+    mock_practice_parse.assert_called_once_with({"Schedule": []})
 
 
 def test_get_event_matches_cmp() -> None:
@@ -72,8 +81,14 @@ def test_get_event_matches_cmp() -> None:
         patch.object(
             FRCAPI, "match_scores", return_value=InstantFuture(score_response)
         ) as mock_match_scores_api,
+        patch.object(
+            FRCAPI, "match_schedule", return_value=InstantFuture(schedule_response)
+        ) as mock_match_schedule_api,
         patch.object(FMSAPIHybridScheduleParser, "parse") as mock_schedule_parse,
         patch.object(FMSAPIMatchDetailsParser, "parse") as mock_match_detail_parser,
+        patch.object(
+            FMSAPIPracticeScheduleParser, "parse", return_value=[]
+        ) as mock_practice_parse,
     ):
         mock_schedule_parse.side_effect = ([], [])
         mock_match_detail_parser.return_value = {}
@@ -88,6 +103,8 @@ def test_get_event_matches_cmp() -> None:
     mock_schedule_parse.assert_has_calls(
         [call({"Schedule": []}), call({"Schedule": []})]
     )
+    mock_match_schedule_api.assert_called_once_with(2014, "galileo", "Practice")
+    mock_practice_parse.assert_called_once_with({"Schedule": []})
 
 
 def test_get_event_matches_qual_sync_disabled() -> None:
@@ -116,8 +133,14 @@ def test_get_event_matches_qual_sync_disabled() -> None:
         patch.object(
             FRCAPI, "match_scores", return_value=InstantFuture(score_response)
         ) as mock_match_scores_api,
+        patch.object(
+            FRCAPI, "match_schedule", return_value=InstantFuture(schedule_response)
+        ) as mock_match_schedule_api,
         patch.object(FMSAPIHybridScheduleParser, "parse") as mock_schedule_parse,
         patch.object(FMSAPIMatchDetailsParser, "parse") as mock_match_detail_parser,
+        patch.object(
+            FMSAPIPracticeScheduleParser, "parse", return_value=[]
+        ) as mock_practice_parse,
     ):
         mock_schedule_parse.side_effect = ([], [])
         mock_match_detail_parser.return_value = {}
@@ -128,6 +151,8 @@ def test_get_event_matches_qual_sync_disabled() -> None:
     mock_schedule_parse.assert_has_calls(
         [call({"Schedule": []}), call({"Schedule": []})]
     )
+    mock_match_schedule_api.assert_not_called()
+    mock_practice_parse.assert_called_once_with({"Schedule": []})
 
 
 def test_get_event_matches_playoff_sync_disabled() -> None:
@@ -156,8 +181,14 @@ def test_get_event_matches_playoff_sync_disabled() -> None:
         patch.object(
             FRCAPI, "match_scores", return_value=InstantFuture(score_response)
         ) as mock_match_scores_api,
+        patch.object(
+            FRCAPI, "match_schedule", return_value=InstantFuture(schedule_response)
+        ) as mock_match_schedule_api,
         patch.object(FMSAPIHybridScheduleParser, "parse") as mock_schedule_parse,
         patch.object(FMSAPIMatchDetailsParser, "parse") as mock_match_detail_parser,
+        patch.object(
+            FMSAPIPracticeScheduleParser, "parse", return_value=[]
+        ) as mock_practice_parse,
     ):
         mock_schedule_parse.side_effect = ([], [])
         mock_match_detail_parser.return_value = {}
@@ -168,6 +199,8 @@ def test_get_event_matches_playoff_sync_disabled() -> None:
     mock_schedule_parse.assert_has_calls(
         [call({"Schedule": []}), call({"Schedule": []})]
     )
+    mock_match_schedule_api.assert_called_once_with(2025, "casj", "Practice")
+    mock_practice_parse.assert_called_once_with({"Schedule": []})
 
 
 def test_get_event_matches_both_sync_disabled() -> None:
@@ -198,8 +231,14 @@ def test_get_event_matches_both_sync_disabled() -> None:
         patch.object(
             FRCAPI, "match_scores", return_value=InstantFuture(score_response)
         ) as mock_match_scores_api,
+        patch.object(
+            FRCAPI, "match_schedule", return_value=InstantFuture(schedule_response)
+        ) as mock_match_schedule_api,
         patch.object(FMSAPIHybridScheduleParser, "parse") as mock_schedule_parse,
         patch.object(FMSAPIMatchDetailsParser, "parse") as mock_match_detail_parser,
+        patch.object(
+            FMSAPIPracticeScheduleParser, "parse", return_value=[]
+        ) as mock_practice_parse,
     ):
         mock_schedule_parse.side_effect = ([], [])
         mock_match_detail_parser.return_value = {}
@@ -210,3 +249,5 @@ def test_get_event_matches_both_sync_disabled() -> None:
     mock_schedule_parse.assert_has_calls(
         [call({"Schedule": []}), call({"Schedule": []})]
     )
+    mock_match_schedule_api.assert_not_called()
+    mock_practice_parse.assert_called_once_with({"Schedule": []})

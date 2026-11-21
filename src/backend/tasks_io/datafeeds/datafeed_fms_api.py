@@ -23,6 +23,7 @@ from backend.common.frc_api.types import (
     EventRankingListModelV2,
     EventScheduleHybridModelV2,
     RegionalRankingTeamDetailListModelV31,
+    ScheduleListModelV31,
     SeasonDistrictListModelV2,
     SeasonEventListModelV31,
     SeasonEventListModelV33,
@@ -72,6 +73,7 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_rankings_parser im
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_match_parser import (
     FMSAPIHybridScheduleParser,
     FMSAPIMatchDetailsParser,
+    FMSAPIPracticeScheduleParser,
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_regional_rankings_parser import (
     FMSAPIRegionalRankingsParser,
@@ -341,11 +343,13 @@ class DatafeedFMSAPI:
             qual_fetches = (
                 self.api.hybrid_schedule(year, api_event_short, "qual"),
                 self.api.match_scores(year, api_event_short, "qual"),
+                self.api.match_schedule(year, api_event_short, "Practice"),
             )
         else:
             qual_fetches = (
                 self._stub_fetch_hybrid_schedule(),
                 self._stub_fetch_match_scores(),
+                self._stub_fetch_hybrid_schedule(),
             )
 
         if sync_playoffs:
@@ -361,11 +365,13 @@ class DatafeedFMSAPI:
 
         qual_hybrid_schedule_result: EventScheduleHybridModelV2
         qual_scores_result: TScoreDetailReturn
+        practice_schedule_result: ScheduleListModelV31
         playoff_hybrid_schedule_result: EventScheduleHybridModelV2
         playoff_scores_result: TScoreDetailReturn
         (
             qual_hybrid_schedule_result,
             qual_scores_result,
+            practice_schedule_result,
             playoff_hybrid_schedule_result,
             playoff_scores_result,
         ) = yield (qual_fetches + playoff_fetches)
@@ -381,8 +387,16 @@ class DatafeedFMSAPI:
             event_key=event_key,
         )
 
+        practice_matches = (
+            self._parse(
+                practice_schedule_result,
+                FMSAPIPracticeScheduleParser(year, event_short),
+            )
+            or []
+        )
+
         # Organize matches by key
-        matches_by_key = {}
+        matches_by_key = {match.key.id(): match for match in practice_matches}
         if qual_matches_merged:
             for match in qual_matches_merged[0]:
                 matches_by_key[match.key.id()] = match

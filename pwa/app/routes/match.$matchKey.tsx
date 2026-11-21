@@ -1,32 +1,47 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { Temporal } from 'temporal-polyfill';
 
-import { PlayoffType, getEvent, getMatch } from '~/api/tba/read';
+import { PlayoffType } from '~/api/tba/read';
+import {
+  getEventOptions,
+  getMatchOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { EventLink } from '~/components/tba/links';
 import MatchDetails from '~/components/tba/match/matchDetails';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
-import { publicCacheControlHeaders } from '~/lib/utils';
+import { staleTimeForYear } from '~/lib/queryClient';
+import { doThrowNotFound, publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/match/$matchKey')({
-  loader: async ({ params }) => {
+  loader: async ({ params, context: { queryClient } }) => {
     if (!isValidMatchKey(params.matchKey)) {
       throw notFound();
     }
 
     const eventKey = params.matchKey.split('_')[0];
+    const eventStaleTime = staleTimeForYear(Number(eventKey.slice(0, 4)));
 
     const [event, match] = await Promise.all([
-      getEvent({ path: { event_key: eventKey } }),
-      getMatch({ path: { match_key: params.matchKey } }),
+      queryClient
+        .ensureQueryData({
+          ...getEventOptions({ path: { event_key: eventKey } }),
+          staleTime: eventStaleTime,
+        })
+        .catch(doThrowNotFound),
+      queryClient
+        .ensureQueryData({
+          ...getMatchOptions({ path: { match_key: params.matchKey } }),
+          staleTime: eventStaleTime,
+        })
+        .catch(doThrowNotFound),
     ]);
 
-    if (event.data === undefined || match.data === undefined) {
-      throw notFound();
-    }
-
     return {
-      event: event.data,
-      match: match.data,
+      eventKey,
+      matchKey: params.matchKey,
+      event,
+      match,
     };
   },
   headers: publicCacheControlHeaders(),
@@ -44,6 +59,9 @@ export const Route = createFileRoute('/match/$matchKey')({
     }
 
     const { event, match } = loaderData;
+    const location = [event.city, event.state_prov, event.country]
+      .filter(Boolean)
+      .join(', ');
     const playoffType = event.playoff_type ?? PlayoffType.CUSTOM;
     const title = matchTitleShort(match, playoffType);
 
@@ -109,7 +127,7 @@ export const Route = createFileRoute('/match/$matchKey')({
         },
         {
           name: 'description',
-          content: `${title} at the ${event.year} ${event.name} FIRST Robotics Competition in ${event.city}, ${event.state_prov}, ${event.country}`,
+          content: `${title} at the ${event.year} ${event.name} FIRST Robotics Competition${location ? ` in ${location}` : ''}`,
         },
       ],
       scripts: [
@@ -121,14 +139,25 @@ export const Route = createFileRoute('/match/$matchKey')({
     };
   },
   component: MatchPage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function MatchPage() {
-  const { event, match } = Route.useLoaderData();
+  const { eventKey, matchKey } = Route.useLoaderData();
+  const eventStaleTime = staleTimeForYear(Number(eventKey.slice(0, 4)));
+
+  const { data: event } = useSuspenseQuery({
+    ...getEventOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
+  const { data: match } = useSuspenseQuery({
+    ...getMatchOptions({ path: { match_key: matchKey } }),
+    staleTime: eventStaleTime,
+  });
 
   return (
     <div>
-      <h1 className="mt-8 mb-4 text-4xl">
+      <h1 className="mb-4 text-4xl">
         {matchTitleShort(match, event.playoff_type ?? PlayoffType.CUSTOM)}{' '}
         <small className="text-xl">
           <EventLink eventOrKey={event}>

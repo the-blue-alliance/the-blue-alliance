@@ -1,3 +1,4 @@
+from backend.common.consts.event_type import EventType
 from backend.common.helpers.insights_helper_utils import (
     create_insight,
     make_insights_from_functions,
@@ -5,6 +6,7 @@ from backend.common.helpers.insights_helper_utils import (
     make_leaderboard_from_dict_counts,
     sort_counter_dict,
 )
+from backend.common.models.event import Event
 from backend.common.models.insight import Insight
 
 
@@ -108,3 +110,21 @@ def test_make_insights_from_fns_only_computes_year(ndb_stub, test_data_importer)
     )
 
     assert len(insights) == 1
+
+
+def test_make_leaderboard_args_overall_uses_every_year(ndb_stub) -> None:
+    for event_key, event_type in [
+        ("2019nyny", EventType.REGIONAL),
+        ("2023nyny", EventType.REGIONAL),
+        ("2023iri", EventType.OFFSEASON),
+    ]:
+        Event(
+            id=event_key,
+            year=int(event_key[:4]),
+            event_short=event_key[4:],
+            event_type_enum=event_type,
+        ).put()
+
+    args = make_leaderboard_args(0)
+    assert args.year == 0
+    assert sorted(e.key_name for e in args.events) == ["2019nyny", "2023nyny"]

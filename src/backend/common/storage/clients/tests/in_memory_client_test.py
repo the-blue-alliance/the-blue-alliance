@@ -13,7 +13,14 @@ def test_write():
     client = InMemoryClient()
     client.write(file_name, file_content)
 
-    assert client.data == {file_name: file_content}
+    assert client.data == {file_name: b"some_content"}
+
+
+def test_write_bytes():
+    client = InMemoryClient()
+    client.write("some_file.json", b"some_content")
+
+    assert client.data == {"some_file.json": b"some_content"}
 
 
 def test_read_none():
@@ -30,7 +37,7 @@ def test_read():
     client = InMemoryClient()
     assert client.read(file_name) is None
     client.write(file_name, file_content)
-    assert client.read(file_name) == file_content
+    assert client.read(file_name) == b"some_content"
 
 
 def test_get_files():
@@ -52,3 +59,10 @@ def test_get_files_prefix():
     client.write(file_name, file_content)
     assert client.get_files("foo") == []
     assert client.get_files("some") == ["some_file.json"]
+
+
+def test_get_is_singleton(monkeypatch) -> None:
+    monkeypatch.setattr(InMemoryClient, "CLIENT", None)
+    client = InMemoryClient.get()
+    assert isinstance(client, InMemoryClient)
+    assert InMemoryClient.get() is client

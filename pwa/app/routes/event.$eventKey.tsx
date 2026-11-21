@@ -1,34 +1,38 @@
-import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import {
+  useQueries,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 import { Link, createFileRoute, notFound } from '@tanstack/react-router';
-import { ColumnDef } from '@tanstack/react-table';
-import { range } from 'lodash-es';
-import { useMemo, useState } from 'react';
+import { type ComponentProps, Suspense, lazy, useMemo, useState } from 'react';
 
 import ParentEventIcon from '~icons/lucide/arrow-up-right';
 import SourceIcon from '~icons/lucide/badge-check';
 import TeamsIcon from '~icons/lucide/bot';
 import DateIcon from '~icons/lucide/calendar-days';
+import MediaIcon from '~icons/lucide/camera';
 import StatbotIcon from '~icons/lucide/chart-spline';
 import ScoutingIcon from '~icons/lucide/clipboard-list';
+import Match13Icon from '~icons/lucide/cloud';
 import GlobeIcon from '~icons/lucide/globe';
 import RankingsIcon from '~icons/lucide/list-ordered';
 import DistrictPointsIcon from '~icons/lucide/map';
 import LocationIcon from '~icons/lucide/map-pin';
 import AgendaIcon from '~icons/lucide/paperclip';
+import PracticeIcon from '~icons/lucide/repeat';
 import InsightsIcon from '~icons/lucide/scatter-chart';
 import ChampsQualPointsIcon from '~icons/lucide/star';
 import AwardsIcon from '~icons/lucide/trophy';
 import LiveWebcastIcon from '~icons/lucide/video';
-import MediaIcon from '~icons/mdi/folder-media-outline';
 import ResultsIcon from '~icons/mdi/tournament';
 
-import { getEventColors } from '~/api/colors';
+import { getEventColorsOptions } from '~/api/colors/@tanstack/react-query.gen';
 import {
   Award,
   CompLevel,
   EliminationAlliance,
   Event,
-  EventCoprs,
   EventDistrictPoints,
   EventType,
   Match,
@@ -44,33 +48,41 @@ import {
   getEventCoprsOptions,
   getEventDistrictPointsOptions,
   getEventMatchesOptions,
+  getEventMediaOptions,
+  getEventNexusInfoOptions,
+  getEventOprsOptions,
   getEventOptions,
+  getEventPlayoffAdvancementOptions,
+  getEventPracticeMatchesOptions,
   getEventRankingsOptions,
   getEventSimpleOptions,
   getEventTeamMediaOptions,
   getEventTeamsOptions,
   getEventTeamsStatusesOptions,
+  getInsightsV2YearCategoryOptions,
   getRegionalAdvancementOptions,
   getRegionalChampsPoolPointsOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import AddToCalendarLinks from '~/components/tba/addToCalendarLinks';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
-import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
-import { DataTable } from '~/components/tba/dataTable';
+import { ComponentOprsTable } from '~/components/tba/componentOprsTable';
+import { DataTable, type TbaColumnDef } from '~/components/tba/dataTable';
 import DetailEntity from '~/components/tba/detailEntity';
 import DoubleElim4TeamBracket from '~/components/tba/doubleElim4TeamBracket';
 import EliminationBracket from '~/components/tba/eliminationBracket';
+import EventPracticeTab from '~/components/tba/eventPracticeTab';
+import { EventSuccessRateTable } from '~/components/tba/eventSuccessRateTable';
+import EventTeamsTab from '~/components/tba/eventTeamsTab';
 import FavoriteButton from '~/components/tba/favoriteButton';
 import InlineIcon from '~/components/tba/inlineIcon';
 import {
   DistrictLink,
   EventLink,
   EventLocationLink,
-  PitLocationLink,
   TeamLink,
-  TeamLocationLink,
 } from '~/components/tba/links';
+import LoadingSkeleton from '~/components/tba/loadingSkeleton';
 import {
   CHANGE_IN_COMP_LEVEL_BREAKER,
   CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER,
@@ -79,14 +91,17 @@ import {
   START_OF_QUALS_BREAKER,
 } from '~/components/tba/match/breakers';
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
+import QualMatchesCollapse from '~/components/tba/match/qualMatchesCollapse';
+import PlayoffAdvancement2015Table from '~/components/tba/playoffAdvancement2015Table';
 import RankingsTable from '~/components/tba/rankingsTable';
+import RoundRobinRankingsTable from '~/components/tba/roundRobinRankingsTable';
 import ScoutingTab from '~/components/tba/scoutingTab';
+import SmugmugAlbumGallery from '~/components/tba/smugmugAlbumGallery';
 import { WebcastIcon } from '~/components/tba/socialBadges';
 import {
   TableOfContents,
   TableOfContentsSection,
 } from '~/components/tba/tableOfContents';
-import TeamAvatar from '~/components/tba/teamAvatar';
 import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import TraditionalBracket from '~/components/tba/traditionalBracket';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
@@ -94,147 +109,119 @@ import {
   AnimatedTabs,
   AnimatedTabsTrigger,
 } from '~/components/ui/animated-tabs';
-import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '~/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '~/components/ui/dialog';
+import { Button, buttonVariants } from '~/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '~/components/ui/table';
 import { TabsContent, TabsList } from '~/components/ui/tabs';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
-import { TRADITIONAL_BRACKET_TYPES } from '~/lib/api/PlayoffType';
+import {
+  ROUND_ROBIN_TYPES,
+  TRADITIONAL_BRACKET_TYPES,
+} from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
+  eventCacheControlHeaders,
   getCurrentWeekEvents,
   getEventDateString,
+  getEventWeekString,
   getPublicAgendaUrl,
   hasEventEnded,
+  isAfterEventEndDate,
   isEventWithinADay,
   isValidEventKey,
   stripParentPrefix,
 } from '~/lib/eventUtils';
+import { getFinalsResult, sortMatchComparator } from '~/lib/matchUtils';
+import { getEventVideos, getSmugmugAlbums } from '~/lib/mediaUtils';
+import { type NexusMatchStatus, buildNexusStatusMap } from '~/lib/nexus';
 import {
-  calculateMedianTurnaroundTime,
-  getHighScoreMatch,
-  sortMatchComparator,
-} from '~/lib/matchUtils';
-import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
-import {
-  type NexusMatchStatus,
-  buildNexusStatusMap,
-  getNexusEventStatusOptions,
-} from '~/lib/nexus';
-import {
-  getDefaultAutoComponentName,
+  eventOprsToComponents,
+  getDefaultCoprYAxisComponentName,
   getDefaultTeleopComponentName,
 } from '~/lib/oprUtils';
-import {
-  RANKING_POINT_LABELS,
-  getBonusRankingPoints,
-} from '~/lib/rankingPoints';
-import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
-import {
-  MODEL_TYPE,
-  camelCaseToHumanReadable,
-  cn,
-  doThrowNotFound,
-  publicCacheControlHeaders,
-  splitIntoNChunks,
-} from '~/lib/utils';
+import { staleTimeForYear } from '~/lib/queryClient';
+import { sortTeamKeysComparator } from '~/lib/teamUtils';
+import { useHashTab } from '~/lib/useHashTab';
+import { MODEL_TYPE, doThrowNotFound } from '~/lib/utils';
+
+// Lazy-loaded: recharts is heavy and this chart only renders once the
+// insights tab is opened, which most visitors never do.
+type CoprScatterChartComponent =
+  typeof import('~/components/tba/charts/coprScatterChart').default;
+
+let preloadedCoprScatterChart: CoprScatterChartComponent | undefined;
+
+const loadCoprScatterChart = () =>
+  import('~/components/tba/charts/coprScatterChart').then((module) => {
+    preloadedCoprScatterChart = module.default;
+    return module;
+  });
+
+const LazyCoprScatterChart = lazy(loadCoprScatterChart);
+
+function CoprScatterChart(props: ComponentProps<CoprScatterChartComponent>) {
+  const [Chart] = useState(
+    () => preloadedCoprScatterChart ?? LazyCoprScatterChart,
+  );
+  return <Chart {...props} />;
+}
 
 export const Route = createFileRoute('/event/$eventKey')({
+  staticData: {
+    // Drawn in the server-rendered TOC placeholder. Matches aren't in the
+    // loader data, so this assumes the event has qualification matches.
+    tocPreview: () => ({ activeLabel: 'Qualification Matches' }),
+  },
   loader: async ({ params, context: { queryClient } }) => {
     if (!isValidEventKey(params.eventKey)) {
       throw notFound();
     }
 
+    // Event keys are prefixed with their 4-digit year (e.g. "2024mil"), so we
+    // can determine the staleTime tier without waiting on the event fetch.
+    const eventYear = Number(params.eventKey.slice(0, 4));
+    const eventStaleTime = staleTimeForYear(eventYear);
+
     // spawn these now, we don't need to await them yet though
     const matchesQuery = queryClient
-      .ensureQueryData(
-        getEventMatchesOptions({ path: { event_key: params.eventKey } }),
-      )
+      .ensureQueryData({
+        ...getEventMatchesOptions({ path: { event_key: params.eventKey } }),
+        staleTime: eventStaleTime,
+      })
       .catch(() => []);
     const alliancesQuery = queryClient
-      .ensureQueryData(
-        getEventAlliancesOptions({ path: { event_key: params.eventKey } }),
-      )
+      .ensureQueryData({
+        ...getEventAlliancesOptions({ path: { event_key: params.eventKey } }),
+        staleTime: eventStaleTime,
+      })
       .catch(() => []);
-    const nexusQuery = queryClient
-      .ensureQueryData(getNexusEventStatusOptions(params.eventKey))
-      .catch(() => null);
+    // App Engine buffers SSR responses, so anything fetched on the server
+    // delays the first byte. Non-blocking data loads in the browser only.
+    if (!import.meta.env.SSR) {
+      void queryClient.prefetchQuery({
+        ...getEventTeamsOptions({ path: { event_key: params.eventKey } }),
+        staleTime: eventStaleTime,
+      });
+    }
 
     const event = await queryClient
-      .ensureQueryData(
-        getEventOptions({ path: { event_key: params.eventKey } }),
-      )
+      .ensureQueryData({
+        ...getEventOptions({ path: { event_key: params.eventKey } }),
+        staleTime: eventStaleTime,
+      })
       .catch(doThrowNotFound);
 
-    // Greedily kick off parent/division event fetches so the dropdowns
-    // render immediately and populate client-side as data arrives.
-    if (event.parent_event_key) {
-      void queryClient
-        .ensureQueryData(
-          getEventOptions({ path: { event_key: event.parent_event_key } }),
-        )
-        .then((parentEvent) => {
-          // Also kick off sibling division fetches
-          for (const key of parentEvent.division_keys) {
-            if (key !== params.eventKey) {
-              void queryClient
-                .ensureQueryData(
-                  getEventSimpleOptions({ path: { event_key: key } }),
-                )
-                .catch(() => undefined);
-            }
-          }
-        })
-        .catch(() => undefined);
-    }
-    for (const key of event.division_keys) {
-      void queryClient
-        .ensureQueryData(getEventSimpleOptions({ path: { event_key: key } }))
-        .catch(() => undefined);
-    }
-
-    await Promise.all([matchesQuery, alliancesQuery, nexusQuery]);
+    await Promise.all([matchesQuery, alliancesQuery]);
 
     // event needs to be returned so we can access it in meta
     return { eventKey: params.eventKey, event };
   },
-  headers: publicCacheControlHeaders(),
+  headers: ({ loaderData }) => eventCacheControlHeaders(loaderData?.event),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
@@ -302,63 +289,146 @@ export const Route = createFileRoute('/event/$eventKey')({
     };
   },
   component: EventPage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
+
+const EVENT_TAB_VALUES = [
+  'results',
+  'rankings',
+  'awards',
+  'teams',
+  'insights',
+  'district-points',
+  'champs-qual-points',
+  'media',
+  'scouting',
+  'practice',
+] as const;
+// Hash names the Jinja event page has used for years, so old links still work
+const LEGACY_EVENT_TAB_HASHES = {
+  'event-insights': 'insights',
+  'cmp-points': 'champs-qual-points',
+} as const;
 
 function EventPage() {
   const { eventKey } = Route.useLoaderData();
 
-  const { data: event } = useSuspenseQuery(
-    getEventOptions({ path: { event_key: eventKey } }),
-  );
+  // Event keys are prefixed with their 4-digit year (e.g. "2024mil").
+  const eventStaleTime = staleTimeForYear(Number(eventKey.slice(0, 4)));
 
-  const { data: matches } = useSuspenseQuery(
-    getEventMatchesOptions({ path: { event_key: eventKey } }),
-  );
-
-  const { data: unsafeAlliances } = useSuspenseQuery(
-    getEventAlliancesOptions({ path: { event_key: eventKey } }),
-  );
-  const alliances = unsafeAlliances ?? [];
-
-  const awardsQuery = useQuery(
-    getEventAwardsOptions({ path: { event_key: eventKey } }),
-  );
-
-  const coprsQuery = useQuery(
-    getEventCoprsOptions({ path: { event_key: eventKey } }),
-  );
-
-  const colorsQuery = useQuery({
-    queryKey: ['eventColors', eventKey],
-    queryFn: () => getEventColors({ eventKey: eventKey }),
+  const { data: event } = useSuspenseQuery({
+    ...getEventOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
   });
 
-  const rankingsQuery = useQuery(
-    getEventRankingsOptions({ path: { event_key: eventKey } }),
+  const matchesQuery = useQuery({
+    ...getEventMatchesOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
+  const matches = useMemo(() => matchesQuery.data ?? [], [matchesQuery.data]);
+  const tabs = useHashTab({
+    values: EVENT_TAB_VALUES,
+    defaultValue: matches.length > 0 ? 'results' : 'teams',
+    legacyHashes: LEGACY_EVENT_TAB_HASHES,
+  });
+  const [intendedTabs, setIntendedTabs] = useState<ReadonlySet<string>>(
+    () => new Set(),
   );
+  const tabIsWanted = (...values: string[]) =>
+    values.some((v) => v === tabs.value || intendedTabs.has(v));
+  const intendTab = (value: string) =>
+    setIntendedTabs((prev) =>
+      prev.has(value) ? prev : new Set([...prev, value]),
+    );
 
-  const teamsQuery = useQuery(
-    getEventTeamsOptions({ path: { event_key: eventKey } }),
-  );
+  const canHavePracticeMatches =
+    SEASON_EVENT_TYPES.has(event.event_type) && event.year >= 2015;
+  const practiceMatchesQuery = useQuery({
+    ...getEventPracticeMatchesOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+    enabled: canHavePracticeMatches,
+  });
+  const practiceMatches = practiceMatchesQuery.data ?? [];
+  const shouldShowPracticeTab =
+    canHavePracticeMatches &&
+    (practiceMatchesQuery.isPending || practiceMatches.length > 0);
 
-  const teamMediaQuery = useQuery(
-    getEventTeamMediaOptions({ path: { event_key: eventKey } }),
-  );
+  const alliancesQuery = useQuery({
+    ...getEventAlliancesOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
+  const alliances = alliancesQuery.data ?? [];
 
-  const teamStatusesQuery = useQuery(
-    getEventTeamsStatusesOptions({ path: { event_key: eventKey } }),
-  );
+  const awardsQuery = useQuery({
+    ...getEventAwardsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
 
-  const districtPointsQuery = useQuery(
-    getEventDistrictPointsOptions({ path: { event_key: eventKey } }),
-  );
+  const usesLegacyOprs = event.year <= 2014;
 
-  const regionalChampsPoolPointsQuery = useQuery(
-    getRegionalChampsPoolPointsOptions({ path: { event_key: eventKey } }),
-  );
+  const oprsQuery = useQuery({
+    ...getEventOprsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+    enabled: usesLegacyOprs,
+  });
+
+  const wantsCoprs = !usesLegacyOprs && tabIsWanted('insights', 'scouting');
+
+  const coprsQuery = useQuery({
+    ...getEventCoprsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+    enabled: wantsCoprs,
+  });
+
+  const colorsQuery = useQuery({
+    ...getEventColorsOptions({ path: { eventKey: eventKey } }),
+    staleTime: eventStaleTime,
+    enabled: wantsCoprs,
+  });
+
+  const rankingsQuery = useQuery({
+    ...getEventRankingsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
+
+  const teamsQuery = useQuery({
+    ...getEventTeamsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
+
+  const teamMediaQuery = useQuery({
+    ...getEventTeamMediaOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+    enabled: tabIsWanted('teams', 'scouting'),
+  });
+
+  const eventMediaQuery = useQuery({
+    ...getEventMediaOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
+
+  const teamStatusesQuery = useQuery({
+    ...getEventTeamsStatusesOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+    enabled: tabIsWanted('teams'),
+  });
+
+  const isDistrictEvent = DISTRICT_EVENT_TYPES.has(event.event_type);
+  const districtPointsQuery = useQuery({
+    ...getEventDistrictPointsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+    enabled: isDistrictEvent,
+  });
+
+  const regionalChampsPoolPointsQuery = useQuery({
+    ...getRegionalChampsPoolPointsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+    enabled: event.event_type === EventType.REGIONAL,
+  });
 
   const regionalAdvancementQuery = useQuery({
     ...getRegionalAdvancementOptions({ path: { year: event.year } }),
+    staleTime: eventStaleTime,
     enabled: event.event_type === EventType.REGIONAL,
   });
 
@@ -367,6 +437,7 @@ function EventPage() {
     ...getEventOptions({
       path: { event_key: event.parent_event_key ?? '' },
     }),
+    staleTime: eventStaleTime,
     enabled: event.parent_event_key !== null,
   });
 
@@ -380,9 +451,10 @@ function EventPage() {
   );
 
   const siblingDivisionQueries = useQueries({
-    queries: siblingDivisionKeys.map((key) =>
-      getEventSimpleOptions({ path: { event_key: key } }),
-    ),
+    queries: siblingDivisionKeys.map((key) => ({
+      ...getEventSimpleOptions({ path: { event_key: key } }),
+      staleTime: eventStaleTime,
+    })),
   });
 
   const siblingEvents = siblingDivisionQueries
@@ -391,32 +463,55 @@ function EventPage() {
 
   // For parent events: fetch each division event
   const ownDivisionQueries = useQueries({
-    queries: event.division_keys.map((key) =>
-      getEventSimpleOptions({ path: { event_key: key } }),
-    ),
+    queries: event.division_keys.map((key) => ({
+      ...getEventSimpleOptions({ path: { event_key: key } }),
+      staleTime: eventStaleTime,
+    })),
   });
 
   const ownDivisionEvents = ownDivisionQueries
     .map((q) => q.data)
     .filter((e): e is NonNullable<typeof e> => e !== undefined);
 
-  const { data: nexusStatus } = useQuery(getNexusEventStatusOptions(eventKey));
+  const { data: nexusInfo } = useQuery({
+    ...getEventNexusInfoOptions({ path: { event_key: eventKey } }),
+    staleTime: 30_000,
+  });
   const nexusStatusByKey = useMemo(
-    () => buildNexusStatusMap(eventKey, nexusStatus),
-    [eventKey, nexusStatus],
+    () => buildNexusStatusMap(nexusInfo),
+    [nexusInfo],
   );
   const sortedMatches = useMemo(
-    () => matches.sort(sortMatchComparator),
+    () => matches.toSorted(sortMatchComparator),
     [matches],
   );
 
+  const isCmpFinals = event.event_type === EventType.CMP_FINALS;
   const shouldPreviewAwardsTab =
     SEASON_EVENT_TYPES.has(event.event_type) && hasEventEnded(event);
   const shouldPreviewInsightsTab = matches.length > 0;
-  const shouldPreviewRankingsTab = matches.length > 0;
+  const queryClient = useQueryClient();
+  const intendInsights = () => {
+    intendTab('insights');
+    void queryClient.prefetchQuery({
+      ...getInsightsV2YearCategoryOptions({
+        path: { year: event.year, category: 'game_stats' },
+      }),
+      staleTime: staleTimeForYear(event.year),
+    });
+    void loadCoprScatterChart();
+  };
+  const isInsightsPending = usesLegacyOprs
+    ? oprsQuery.isPending
+    : coprsQuery.isPending || colorsQuery.isPending;
+  const hasInsightsData = usesLegacyOprs
+    ? !!oprsQuery.data
+    : !!(coprsQuery.data && colorsQuery.data);
+  const shouldPreviewRankingsTab = matches.length > 0 && !isCmpFinals;
+  const shouldPreviewDistrictPointsTab = isDistrictEvent && matches.length > 0;
 
   return (
-    <div className="py-8">
+    <div>
       <div className="mb-2 flex items-center gap-2">
         <h1 className="text-3xl font-medium">
           {event.name} {event.year}
@@ -426,27 +521,36 @@ function EventPage() {
       {event.parent_event_key && (
         <div className="mb-2">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="cursor-pointer py-1.5">
-                Other Divisions
-              </Button>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="outline" className="cursor-pointer py-1.5" />
+              }
+            >
+              Other Divisions
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               {siblingEvents.map((e) => (
                 <DropdownMenuItem
                   key={e.key}
-                  asChild
                   className="cursor-pointer"
+                  render={
+                    <Link
+                      to="/event/$eventKey"
+                      params={{ eventKey: e.key }}
+                      className="text-foreground"
+                    />
+                  }
                 >
-                  <Link
-                    to="/event/$eventKey"
-                    params={{ eventKey: e.key }}
-                    className="text-foreground"
-                  >
-                    {stripParentPrefix(e.name, parentEventQuery.data?.name)}
-                  </Link>
+                  {stripParentPrefix(e.name, parentEventQuery.data?.name)}
                 </DropdownMenuItem>
               ))}
+              {(parentEventQuery.isPending ||
+                siblingDivisionQueries.some((q) => q.isPending)) && (
+                <LoadingSkeleton
+                  label="Loading divisions"
+                  className="m-1 h-6 w-40"
+                />
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -454,114 +558,150 @@ function EventPage() {
       {event.division_keys.length > 0 && (
         <div className="mb-2">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="cursor-pointer py-1.5">
-                Event Divisions
-              </Button>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="outline" className="cursor-pointer py-1.5" />
+              }
+            >
+              Event Divisions
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               {ownDivisionEvents.map((e) => (
                 <DropdownMenuItem
                   key={e.key}
-                  asChild
                   className="cursor-pointer"
+                  render={
+                    <Link
+                      to="/event/$eventKey"
+                      params={{ eventKey: e.key }}
+                      className="text-foreground"
+                    />
+                  }
                 >
-                  <Link
-                    to="/event/$eventKey"
-                    params={{ eventKey: e.key }}
-                    className="text-foreground"
-                  >
-                    {stripParentPrefix(e.name, event.name)}
-                  </Link>
+                  {stripParentPrefix(e.name, event.name)}
                 </DropdownMenuItem>
               ))}
+              {ownDivisionQueries.some((q) => q.isPending) && (
+                <LoadingSkeleton
+                  label="Loading divisions"
+                  className="m-1 h-6 w-40"
+                />
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       )}
 
-      <div className="mb-4 space-y-1">
-        {event.district && (
-          <DetailEntity icon={<GlobeIcon />}>
-            <DistrictLink
-              districtAbbreviation={event.district.abbreviation}
-              year={event.district.year}
-            >
-              {event.district.display_name}
-            </DistrictLink>{' '}
-            Event
-          </DetailEntity>
-        )}
-        {event.parent_event_key && (
-          <DetailEntity icon={<ParentEventIcon />}>
-            Winners advance to{' '}
-            <EventLink eventOrKey={event.parent_event_key}>
-              {parentEventQuery.data?.name ?? event.parent_event_key}
-            </EventLink>
-          </DetailEntity>
-        )}
-        <DetailEntity icon={<DateIcon />}>
-          {getEventDateString(event, 'long')}
-          <AddToCalendarLinks event={event} />
-          {event.week !== null && (
-            <Badge className="mx-2 h-[1.5em] align-text-top">
-              Week {event.week + 1}
-            </Badge>
-          )}
-        </DetailEntity>
-        <DetailEntity icon={<LocationIcon />}>
-          <EventLocationLink event={event} />
-        </DetailEntity>
-        {event.website && (
-          <DetailEntity icon={<GlobeIcon />}>
-            <a href={event.website} target="_blank" rel="noreferrer">
-              View event&apos;s website
-            </a>
-          </DetailEntity>
-        )}
-        {event.first_event_code && (
-          <DetailEntity icon={<SourceIcon />}>
-            Details on{' '}
-            <a
-              href={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              FRC Events
-            </a>
-          </DetailEntity>
-        )}
-        {(!hasEventEnded(event) || isEventWithinADay(event)) &&
-          getPublicAgendaUrl(event) && (
-            <DetailEntity icon={<AgendaIcon />}>
-              <a
-                href={getPublicAgendaUrl(event) ?? ''}
-                target="_blank"
-                rel="noreferrer"
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+        <div className="space-y-1">
+          {event.district && (
+            <DetailEntity icon={<GlobeIcon />}>
+              <DistrictLink
+                districtAbbreviation={event.district.abbreviation}
+                year={event.district.year}
               >
-                Public Agenda
+                {event.district.display_name}
+              </DistrictLink>{' '}
+              Event
+            </DetailEntity>
+          )}
+          {event.parent_event_key && (
+            <DetailEntity icon={<ParentEventIcon />}>
+              Winners advance to{' '}
+              <EventLink eventOrKey={event.parent_event_key}>
+                {parentEventQuery.isPending ? (
+                  <LoadingSkeleton
+                    label="Loading parent event"
+                    className="inline-block h-4 w-40 align-middle"
+                  />
+                ) : (
+                  (parentEventQuery.data?.name ?? event.parent_event_key)
+                )}
+              </EventLink>
+            </DetailEntity>
+          )}
+          <DetailEntity icon={<DateIcon />}>
+            {getEventDateString(event, 'long')}
+            <AddToCalendarLinks event={event} />
+            {getEventWeekString(event) && (
+              <Badge className="mx-2 h-[1.5em] align-text-top">
+                {getEventWeekString(event)}
+              </Badge>
+            )}
+          </DetailEntity>
+          <DetailEntity icon={<LocationIcon />}>
+            <EventLocationLink event={event} />
+          </DetailEntity>
+          {event.website && (
+            <DetailEntity icon={<GlobeIcon />}>
+              <a href={event.website} target="_blank" rel="noreferrer">
+                View event&apos;s website
               </a>
             </DetailEntity>
           )}
-        <DetailEntity icon={<StatbotIcon />}>
-          <a
-            href={`https://www.statbotics.io/event/${event.key}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Statbotics
-          </a>
-        </DetailEntity>
-        {event.webcasts.length > 0 &&
-          getCurrentWeekEvents([event]).length > 0 && (
-            <DetailEntity className="font-medium" icon={<LiveWebcastIcon />}>
-              Watch live on <a href={`/gameday/${eventKey}`}>TBA GameDay</a>
+          {event.first_event_code && (
+            <DetailEntity icon={<SourceIcon />}>
+              Details on{' '}
+              <a
+                href={`https://frc-events.firstinspires.org/${event.year}/${event.first_event_code}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                FRC Events
+              </a>
             </DetailEntity>
           )}
+          {(!hasEventEnded(event) || isEventWithinADay(event)) &&
+            getPublicAgendaUrl(event) && (
+              <DetailEntity icon={<AgendaIcon />}>
+                <a
+                  href={getPublicAgendaUrl(event) ?? ''}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Public Agenda
+                </a>
+              </DetailEntity>
+            )}
+          <div className="flex items-center gap-4">
+            <DetailEntity icon={<StatbotIcon />}>
+              <a
+                href={`https://www.statbotics.io/event/${event.key}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Statbotics
+              </a>
+            </DetailEntity>
+            <DetailEntity icon={<Match13Icon />}>
+              <a
+                href={`https://www.match13.com/event/${event.key}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Match13
+              </a>
+            </DetailEntity>
+          </div>
+          {event.webcasts.length > 0 &&
+            getCurrentWeekEvents([event]).length > 0 && (
+              <DetailEntity className="font-medium" icon={<LiveWebcastIcon />}>
+                Watch live on <a href={`/gameday/${eventKey}`}>TBA GameDay</a>
+              </DetailEntity>
+            )}
+        </div>
+        <Link
+          to="/suggest/event/video"
+          search={{ event_key: eventKey }}
+          className={buttonVariants({ variant: 'secondary' })}
+        >
+          Add Match Videos
+        </Link>
       </div>
 
       <AnimatedTabs
-        defaultValue={matches.length > 0 ? 'results' : 'teams'}
+        value={tabs.value}
+        onValueChange={tabs.onValueChange}
         className="mt-4"
       >
         <TabsList
@@ -576,15 +716,17 @@ function EventPage() {
               </InlineIcon>
             </AnimatedTabsTrigger>
           )}
-          {(shouldPreviewRankingsTab ||
-            (rankingsQuery.data && rankingsQuery.data.rankings.length > 0)) && (
-            <AnimatedTabsTrigger value="rankings">
-              <InlineIcon>
-                <RankingsIcon />
-                Rankings
-              </InlineIcon>
-            </AnimatedTabsTrigger>
-          )}
+          {!isCmpFinals &&
+            (shouldPreviewRankingsTab ||
+              (rankingsQuery.data &&
+                rankingsQuery.data.rankings.length > 0)) && (
+              <AnimatedTabsTrigger value="rankings">
+                <InlineIcon>
+                  <RankingsIcon />
+                  Rankings
+                </InlineIcon>
+              </AnimatedTabsTrigger>
+            )}
           {((shouldPreviewAwardsTab && awardsQuery.isPending) ||
             (awardsQuery.data !== undefined &&
               awardsQuery.data.length > 0)) && (
@@ -595,28 +737,44 @@ function EventPage() {
               </InlineIcon>
             </AnimatedTabsTrigger>
           )}
-          <AnimatedTabsTrigger value="teams">
+          <AnimatedTabsTrigger
+            value="teams"
+            onPointerEnter={() => intendTab('teams')}
+            onFocus={() => intendTab('teams')}
+          >
             <InlineIcon>
               <TeamsIcon />
               Teams
               <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
-                {teamsQuery.data?.length ?? '-'}
+                {teamsQuery.isPending ? (
+                  <LoadingSkeleton
+                    label="Loading team count"
+                    className="h-3 w-4"
+                  />
+                ) : (
+                  (teamsQuery.data?.length ?? '-')
+                )}
               </Badge>
             </InlineIcon>
           </AnimatedTabsTrigger>
-          {((shouldPreviewInsightsTab &&
-            (coprsQuery.isPending || colorsQuery.isPending)) ||
-            (coprsQuery.data && colorsQuery.data)) &&
+          {((shouldPreviewInsightsTab && isInsightsPending) ||
+            hasInsightsData) &&
             matches.length > 0 && (
-              <AnimatedTabsTrigger value="insights">
+              <AnimatedTabsTrigger
+                value="insights"
+                onPointerEnter={intendInsights}
+                onFocus={intendInsights}
+              >
                 <InlineIcon>
                   <InsightsIcon />
                   Insights
                 </InlineIcon>
               </AnimatedTabsTrigger>
             )}
-          {districtPointsQuery.data &&
-            DISTRICT_EVENT_TYPES.has(event.event_type) && (
+          {isDistrictEvent &&
+            ((shouldPreviewDistrictPointsTab &&
+              districtPointsQuery.isPending) ||
+              districtPointsQuery.data) && (
               <AnimatedTabsTrigger value="district-points">
                 <InlineIcon>
                   <DistrictPointsIcon />
@@ -637,21 +795,41 @@ function EventPage() {
             <InlineIcon>
               <MediaIcon />
               Media
+              <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
+                {eventMediaQuery.isPending ? (
+                  <LoadingSkeleton
+                    label="Loading media count"
+                    className="h-3 w-4"
+                  />
+                ) : eventMediaQuery.data ? (
+                  eventMediaQuery.data.length + event.webcasts.length
+                ) : (
+                  '-'
+                )}
+              </Badge>
             </InlineIcon>
           </AnimatedTabsTrigger>
-          <AnimatedTabsTrigger value="scouting">
+          <AnimatedTabsTrigger
+            value="scouting"
+            onPointerEnter={() => intendTab('scouting')}
+            onFocus={() => intendTab('scouting')}
+          >
             <InlineIcon>
               <ScoutingIcon />
               Scouting
             </InlineIcon>
           </AnimatedTabsTrigger>
+          {shouldShowPracticeTab && (
+            <AnimatedTabsTrigger value="practice">
+              <InlineIcon>
+                <PracticeIcon />
+                Practice
+              </InlineIcon>
+            </AnimatedTabsTrigger>
+          )}
         </TabsList>
 
-        <TabsContent
-          value="results"
-          forceMount
-          className="data-[state=inactive]:hidden"
-        >
+        <TabsContent value="results" keepMounted className="data-hidden:hidden">
           <ResultsTab
             event={event}
             sortedMatches={sortedMatches}
@@ -660,93 +838,145 @@ function EventPage() {
           />
         </TabsContent>
 
-        {rankingsQuery.data && (
+        {!isCmpFinals && (
           <TabsContent value="rankings">
-            <RankingsTable
-              year={event.year}
-              rankings={rankingsQuery.data}
-              winners={
-                alliances.find((a) => a.status?.status === 'won')?.picks ?? []
-              }
-              captains={alliances.map((a) => a.picks[0])}
-            />
+            {rankingsQuery.isPending ? (
+              <TabSkeleton label="Loading rankings" />
+            ) : (
+              rankingsQuery.data && (
+                <RankingsTable
+                  year={event.year}
+                  rankings={rankingsQuery.data}
+                  winners={
+                    getFinalsResult(
+                      alliances,
+                      matches,
+                      isAfterEventEndDate(event),
+                    ).winner?.picks ?? []
+                  }
+                  captains={alliances.map((a) => a.picks[0])}
+                />
+              )
+            )}
           </TabsContent>
         )}
 
         <TabsContent value="awards">
-          {awardsQuery.data && <AwardsTab awards={awardsQuery.data} />}
+          {awardsQuery.isPending ? (
+            <TabSkeleton label="Loading awards" />
+          ) : (
+            awardsQuery.data && <AwardsTab awards={awardsQuery.data} />
+          )}
         </TabsContent>
 
         <TabsContent value="teams">
+          {(teamsQuery.isPending || teamMediaQuery.isPending) && (
+            <TabSkeleton label="Loading teams" />
+          )}
           {teamsQuery.data && teamMediaQuery.data && (
-            <TeamsTab
+            <EventTeamsTab
+              event={event}
               teams={teamsQuery.data}
+              matches={sortedMatches}
               media={teamMediaQuery.data}
-              year={event.year}
-              firstEventCode={event.first_event_code}
-              pitLocations={teamStatusesQuery.data}
+              statuses={teamStatusesQuery.data}
+              pitMap={nexusInfo?.pit_map}
+              relatedEventKeys={[
+                ...siblingDivisionKeys,
+                ...event.division_keys,
+              ]}
             />
           )}
         </TabsContent>
 
-        <TabsContent
-          value="insights"
-          forceMount
-          className="data-[state=inactive]:hidden"
-        >
-          <MatchStatsTable
-            matches={sortedMatches.filter(
-              (m) =>
-                m.alliances.red.score !== -1 && m.alliances.blue.score !== -1,
-            )}
-            year={event.year}
-          />
-          {coprsQuery.data && Object.keys(coprsQuery.data).length > 0 && (
-            <>
-              <CoprScatterChart
-                colors={
-                  colorsQuery.data?.status === 200
-                    ? colorsQuery.data.data
-                    : { teams: {} }
-                }
-                coprs={coprsQuery.data}
-                defaultXCopr={getDefaultTeleopComponentName(event.year)}
-                defaultYCopr={getDefaultAutoComponentName(event.year)}
+        <TabsContent value="insights">
+          <div className="space-y-6">
+            {isInsightsPending && <TabSkeleton label="Loading insights" />}
+            {oprsQuery.data && (
+              <ComponentOprsTable
+                title="OPRs"
+                coprs={eventOprsToComponents(oprsQuery.data)}
+                year={event.year}
               />
-              <ComponentsTable coprs={coprsQuery.data} year={event.year} />
-            </>
-          )}
+            )}
+            {coprsQuery.data && Object.keys(coprsQuery.data).length > 0 && (
+              <>
+                <Suspense
+                  fallback={
+                    <div
+                      className="h-96 w-full animate-pulse rounded-lg
+                        bg-muted/50"
+                    />
+                  }
+                >
+                  <CoprScatterChart
+                    colors={colorsQuery.data ?? { teams: {} }}
+                    coprs={coprsQuery.data}
+                    defaultXCopr={getDefaultTeleopComponentName(event.year)}
+                    defaultYCopr={getDefaultCoprYAxisComponentName(
+                      coprsQuery.data,
+                      event.year,
+                    )}
+                  />
+                </Suspense>
+                <ComponentOprsTable
+                  title="Component OPRs"
+                  coprs={coprsQuery.data}
+                  year={event.year}
+                />
+              </>
+            )}
+            <EventSuccessRateTable eventKey={eventKey} year={event.year} />
+          </div>
         </TabsContent>
 
-        {districtPointsQuery.data &&
-          DISTRICT_EVENT_TYPES.has(event.event_type) && (
-            <TabsContent value="district-points">
+        {isDistrictEvent && (
+          <TabsContent value="district-points">
+            {districtPointsQuery.isPending && (
+              <TabSkeleton label="Loading district points" />
+            )}
+            {districtPointsQuery.data && (
               <DistrictPointsTab
                 districtPoints={districtPointsQuery.data}
                 year={event.year}
               />
-            </TabsContent>
-          )}
+            )}
+          </TabsContent>
+        )}
 
         {event.event_type === EventType.REGIONAL &&
           (event.year >= 2025 || regionalAdvancementQuery.data != null) && (
             <TabsContent value="champs-qual-points">
-              <ChampsQualPointsTab
-                teams={teamsQuery.data ?? []}
-                champsPoolPoints={regionalChampsPoolPointsQuery.data ?? null}
-                advancement={regionalAdvancementQuery.data ?? null}
-                eventKey={eventKey}
-                eventWeek={event.week}
-                year={event.year}
-              />
+              {teamsQuery.isPending ||
+              regionalChampsPoolPointsQuery.isPending ||
+              regionalAdvancementQuery.isPending ? (
+                <TabSkeleton label="Loading champs qual points" />
+              ) : (
+                <ChampsQualPointsTab
+                  teams={teamsQuery.data ?? []}
+                  champsPoolPoints={regionalChampsPoolPointsQuery.data ?? null}
+                  advancement={regionalAdvancementQuery.data ?? null}
+                  eventKey={eventKey}
+                  eventWeek={event.week}
+                  year={event.year}
+                />
+              )}
             </TabsContent>
           )}
 
         <TabsContent value="media">
-          <MediaTab webcasts={event.webcasts} eventKey={event.key} />
+          <MediaTab
+            webcasts={event.webcasts}
+            media={eventMediaQuery.data ?? []}
+            eventKey={event.key}
+          />
+          {eventMediaQuery.isPending && <TabSkeleton label="Loading media" />}
         </TabsContent>
 
         <TabsContent value="scouting">
+          {(teamsQuery.isPending || teamMediaQuery.isPending) && (
+            <TabSkeleton label="Loading scouting" />
+          )}
           {teamsQuery.data && teamMediaQuery.data && (
             <ScoutingTab
               teams={teamsQuery.data}
@@ -755,6 +985,15 @@ function EventPage() {
               eventKey={event.key}
               coprs={coprsQuery.data ?? undefined}
             />
+          )}
+        </TabsContent>
+
+        <TabsContent value="practice">
+          {canHavePracticeMatches && practiceMatchesQuery.isPending && (
+            <TabSkeleton label="Loading practice matches" />
+          )}
+          {practiceMatches.length > 0 && (
+            <EventPracticeTab event={event} matches={practiceMatches} />
           )}
         </TabsContent>
       </AnimatedTabs>
@@ -826,6 +1065,20 @@ function ResultsTab({
   const showTraditionalBracket =
     alliances.length > 0 && TRADITIONAL_BRACKET_TYPES.has(event.playoff_type);
 
+  const isRoundRobin = ROUND_ROBIN_TYPES.has(event.playoff_type);
+  const isAverageScorePlayoff =
+    event.playoff_type === PlayoffType.AVG_SCORE_8_TEAM;
+
+  const playoffAdvancementQuery = useQuery({
+    ...getEventPlayoffAdvancementOptions({ path: { event_key: event.key } }),
+    staleTime: staleTimeForYear(event.year),
+    enabled: isRoundRobin || isAverageScorePlayoff,
+  });
+
+  const roundRobinAdvancement = playoffAdvancementQuery.data?.find(
+    (level) => level.type === 'round_robin',
+  );
+
   const tocItems = [
     ...(hasQuals
       ? [{ slug: 'qual-matches', label: 'Qualification Matches' }]
@@ -834,6 +1087,52 @@ function ResultsTab({
     { slug: 'playoff-matches', label: 'Playoff Matches' },
     { slug: 'playoff-bracket', label: 'Playoff Bracket' },
   ];
+
+  const isEinstein = !hasQuals && event.event_type === EventType.CMP_FINALS;
+
+  const alliancesSection = alliances.length > 0 && (
+    <TableOfContentsSection id="alliances" setInView={setInView}>
+      <AllianceSelectionTable
+        alliances={alliances}
+        matches={elims}
+        eventOver={isAfterEventEndDate(event)}
+        year={event.year}
+        remapTeams={event.remap_teams}
+      />
+      {isRoundRobin && playoffAdvancementQuery.isPending && (
+        <LoadingSkeleton
+          label="Loading round robin rankings"
+          className="mt-4 h-48 w-full"
+        />
+      )}
+      {roundRobinAdvancement && (
+        <RoundRobinRankingsTable
+          advancement={roundRobinAdvancement}
+          year={event.year}
+          remapTeams={event.remap_teams}
+        />
+      )}
+    </TableOfContentsSection>
+  );
+
+  const playoffMatchesSection = (
+    <TableOfContentsSection id="playoff-matches" setInView={setInView}>
+      <h2 className="mb-2 text-xl font-medium">Playoff Matches</h2>
+      {rightSideElims}
+      {isAverageScorePlayoff && playoffAdvancementQuery.isPending && (
+        <LoadingSkeleton
+          label="Loading playoff advancement"
+          className="h-48 w-full"
+        />
+      )}
+      {isAverageScorePlayoff && playoffAdvancementQuery.data && (
+        <PlayoffAdvancement2015Table
+          advancements={playoffAdvancementQuery.data}
+          year={event.year}
+        />
+      )}
+    </TableOfContentsSection>
+  );
 
   return (
     <>
@@ -847,22 +1146,25 @@ function ResultsTab({
             className="basis-full lg:basis-1/2"
           >
             <h2 className="mb-2 text-xl font-medium">Qualification Matches</h2>
-            {leftSideMatches}
+            <QualMatchesCollapse matches={quals} hasElims={elims.length > 0}>
+              {leftSideMatches}
+            </QualMatchesCollapse>
           </TableOfContentsSection>
         )}
 
-        <div className={`basis-full ${hasQuals ? 'lg:basis-1/2' : ''}`}>
-          {alliances.length > 0 && (
-            <TableOfContentsSection id="alliances" setInView={setInView}>
-              <AllianceSelectionTable alliances={alliances} year={event.year} />
-            </TableOfContentsSection>
-          )}
-
-          <TableOfContentsSection id="playoff-matches" setInView={setInView}>
-            <h2 className="mb-2 text-xl font-medium">Playoff Matches</h2>
-            {rightSideElims}
-          </TableOfContentsSection>
-        </div>
+        {isEinstein ? (
+          <>
+            <div className="basis-full lg:basis-1/2">
+              {playoffMatchesSection}
+            </div>
+            <div className="basis-full lg:basis-1/2">{alliancesSection}</div>
+          </>
+        ) : (
+          <div className={`basis-full ${hasQuals ? 'lg:basis-1/2' : ''}`}>
+            {alliancesSection}
+            {playoffMatchesSection}
+          </div>
+        )}
       </div>
 
       {showDoubleElim8Bracket && (
@@ -898,13 +1200,16 @@ function ResultsTab({
   );
 }
 
+function TabSkeleton({ label }: { label: string }) {
+  return <LoadingSkeleton label={label} className="h-64 w-full" />;
+}
+
 function AwardsTab({ awards }: { awards: Award[] }) {
-  awards.sort(sortAwardsComparator);
   return (
     <div className="flex flex-wrap-reverse">
       <div className="mt-1 flow-root w-full">
         <dl className="divide-y text-sm">
-          {awards.map((award) => (
+          {awards.toSorted(sortAwardsComparator).map((award) => (
             <div
               key={award.name}
               className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3 sm:gap-4
@@ -913,14 +1218,21 @@ function AwardsTab({ awards }: { awards: Award[] }) {
               <dt className="font-medium sm:col-span-2">{award.name}</dt>
               <dd className="text-muted-foreground sm:text-right">
                 {award.recipient_list
-                  .sort((a, b) =>
+                  .toSorted((a, b) =>
                     sortTeamKeysComparator(
                       a.team_key ?? '0',
                       b.team_key ?? '0',
                     ),
                   )
                   .map((r, i) => [
-                    i > 0 && (r.awardee ? <br /> : ', '),
+                    i > 0 &&
+                      (r.awardee ? (
+                        <br
+                          key={`br-${award.award_type}-${r.awardee}-${r.team_key}`}
+                        />
+                      ) : (
+                        ', '
+                      )),
                     <AwardRecipientLink
                       recipient={r}
                       key={`${award.award_type}-${r.awardee}-${r.team_key}`}
@@ -936,283 +1248,6 @@ function AwardsTab({ awards }: { awards: Award[] }) {
   );
 }
 
-function TeamsTab({
-  teams,
-  media,
-  year,
-  firstEventCode,
-  pitLocations,
-}: {
-  teams: Team[];
-  media: Media[];
-  year: number;
-  firstEventCode: string | null;
-  pitLocations?: { [key: string]: { pit_location?: string | null } | null };
-}) {
-  teams.sort(sortTeamsComparator);
-
-  const showPitLocations = pitLocations
-    ? Object.values(pitLocations).some((s) => s?.pit_location)
-    : false;
-
-  const teamChunks = splitIntoNChunks(teams, 2);
-
-  return (
-    <div className="flex flex-row flex-wrap md:flex-nowrap">
-      {teamChunks.map((chunk, idx) => (
-        <Table key={`chunk-${idx}`}>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[60px] text-center">Avatar</TableHead>
-              <TableHead className="w-[30ch]">Team</TableHead>
-              <TableHead>Location</TableHead>
-              {showPitLocations && <TableHead>Pit</TableHead>}
-              <TableHead>Pic</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {chunk.map((t) => {
-              const teamMedia = media.filter((m) =>
-                m.team_keys.includes(t.key),
-              );
-
-              const maybeAvatar = teamMedia.find((m) => m.type === 'avatar');
-              const maybeRobotPic = getTeamPreferredRobotPicMedium(teamMedia);
-              const pitLoc = pitLocations?.[t.key]?.pit_location;
-
-              return (
-                <TableRow key={t.key}>
-                  <TableCell
-                    className={cn({
-                      'h-[61px]': maybeAvatar === undefined,
-                    })}
-                  >
-                    {maybeAvatar && (
-                      <div
-                        className="flex h-full w-full items-center
-                          justify-center"
-                      >
-                        <TeamAvatar media={maybeAvatar} />
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="mt-1 flex flex-col">
-                    <TeamLink teamOrKey={t.key} year={year}>
-                      {t.team_number}
-                    </TeamLink>
-                    <div>{t.nickname}</div>
-                  </TableCell>
-                  <TableCell className={'text-xs'}>
-                    <TeamLocationLink team={t} />
-                  </TableCell>
-                  {showPitLocations && (
-                    <TableCell className="text-xs">
-                      {pitLoc && firstEventCode ? (
-                        <PitLocationLink
-                          teamNumber={t.team_number}
-                          year={year}
-                          firstEventCode={firstEventCode}
-                          pitLocation={pitLoc}
-                        />
-                      ) : (
-                        (pitLoc ?? '--')
-                      )}
-                    </TableCell>
-                  )}
-                  {maybeRobotPic && (
-                    <TableCell>
-                      <Dialog>
-                        <DialogTrigger className="align-middle">
-                          <Avatar className="size-12 cursor-pointer">
-                            <AvatarImage src={maybeRobotPic} />
-                          </Avatar>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>
-                              <TeamLink teamOrKey={t.key}>
-                                Team {t.team_number} - {t.nickname}
-                              </TeamLink>
-                            </DialogTitle>
-                            <DialogDescription>
-                              <img
-                                src={maybeRobotPic}
-                                alt=""
-                                className="max-h-[80vh] w-3xl rounded-lg
-                                  object-cover"
-                                loading="lazy"
-                              />
-                            </DialogDescription>
-                          </DialogHeader>
-                        </DialogContent>
-                      </Dialog>
-                    </TableCell>
-                  )}
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      ))}
-    </div>
-  );
-}
-
-function MatchStatsTable({
-  matches,
-  year,
-}: {
-  matches: Match[];
-  year: number;
-}) {
-  const highScoreQual = useMemo(
-    () =>
-      getHighScoreMatch(matches.filter((m) => m.comp_level === CompLevel.QM)),
-    [matches],
-  );
-  const highScorePlayoff = useMemo(
-    () =>
-      getHighScoreMatch(matches.filter((m) => m.comp_level !== CompLevel.QM)),
-    [matches],
-  );
-  const medianTurnaround = useMemo(
-    () => calculateMedianTurnaroundTime(matches),
-    [matches],
-  );
-
-  const rpPercentages = useMemo(
-    () =>
-      range(0, (RANKING_POINT_LABELS[year] ?? []).length).map(
-        (i) =>
-          matches
-            .filter((m) => m.score_breakdown !== null)
-            .map((m) => [
-              getBonusRankingPoints(m.score_breakdown?.red ?? {}),
-              getBonusRankingPoints(m.score_breakdown?.blue ?? {}),
-            ])
-            .map((rps) => (rps[0][i] ? 1 : 0) + (rps[1][i] ? 1 : 0))
-            .reduce((prev, curr) => prev + curr, 0) /
-          Math.max(1, matches.length * 2),
-      ),
-    [matches, year],
-  );
-
-  return (
-    <Table>
-      <TableBody>
-        <TableRow>
-          <TableCell>Total Matches</TableCell>
-          <TableCell>{matches.length}</TableCell>
-        </TableRow>
-        {highScoreQual && (
-          <TableRow>
-            <TableCell>High Score (Quals)</TableCell>
-            <TableCell>
-              Qual {highScoreQual.match_number} -{' '}
-              {Math.max(
-                highScoreQual.alliances.red.score,
-                highScoreQual.alliances.blue.score,
-              )}{' '}
-              points
-            </TableCell>
-          </TableRow>
-        )}
-        {highScorePlayoff && (
-          <TableRow>
-            <TableCell>High Score (Playoffs)</TableCell>
-            <TableCell>
-              {highScorePlayoff.comp_level.toUpperCase()}
-              {highScorePlayoff.set_number}-{highScorePlayoff.match_number} -{' '}
-              {Math.max(
-                highScorePlayoff.alliances.red.score,
-                highScorePlayoff.alliances.blue.score,
-              )}{' '}
-              points
-            </TableCell>
-          </TableRow>
-        )}
-        {medianTurnaround !== undefined && (
-          <TableRow>
-            <TableCell>Median Turnaround Time</TableCell>
-            <TableCell>{(medianTurnaround / 60).toFixed(2)} mins</TableCell>
-          </TableRow>
-        )}
-        {rpPercentages.map((rp, i) => (
-          <TableRow key={i}>
-            <TableCell>{RANKING_POINT_LABELS[year][i]} percentage</TableCell>
-            <TableCell>{(rp * 100).toPrecision(2)}%</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-}
-
-function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
-  const [component, setComponent] = useState('totalPoints');
-
-  // filter any components that are just all zeros
-  const excludedComponents = Object.keys(coprs).filter((k) =>
-    Object.values(coprs[k]).every((v) => v === 0),
-  );
-
-  const columns: ColumnDef<{ teamKey: string; value: number }>[] = [
-    {
-      header: 'Team',
-      accessorFn: (row) => row.teamKey,
-      cell: (cell) => (
-        <TeamLinkWithTooltip teamKey={cell.getValue<string>()} year={year} />
-      ),
-    },
-    {
-      header: 'Value',
-      accessorFn: (row) => row.value.toFixed(2),
-    },
-  ];
-
-  return (
-    <div>
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <div className="flex items-center">
-              <span className="basis-1/2">Component OPRs</span>
-              <Select onValueChange={setComponent}>
-                <SelectTrigger className="font-normal">
-                  <SelectValue
-                    placeholder={camelCaseToHumanReadable(component)}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.keys(coprs)
-                    .filter((k) => !excludedComponents.includes(k))
-                    .map((k) => (
-                      <SelectItem key={k} value={k}>
-                        {camelCaseToHumanReadable(k)}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardTitle>
-          <CardDescription></CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DataTable
-            columns={columns}
-            data={Object.entries(coprs[component])
-              .map(([k, v]) => ({
-                teamKey: k,
-                value: v,
-              }))
-              .toSorted((a, b) => b.value - a.value)}
-          />
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
 function DistrictPointsTab({
   districtPoints,
   year,
@@ -1220,7 +1255,7 @@ function DistrictPointsTab({
   districtPoints: EventDistrictPoints;
   year: number;
 }) {
-  const columns: ColumnDef<{
+  const columns: TbaColumnDef<{
     teamKey: string;
     qualPoints: number;
     elimPoints: number;
@@ -1300,7 +1335,7 @@ function ChampsQualPointsTab({
 
   const hasPoints = champsPoolPoints !== null;
 
-  const columns: ColumnDef<RowData>[] = [
+  const columns: TbaColumnDef<RowData>[] = [
     {
       header: 'Team',
       accessorFn: (row) => row.teamKey,
@@ -1315,7 +1350,7 @@ function ChampsQualPointsTab({
           { header: 'Alliance', accessorFn: (row) => row.alliancePoints },
           { header: 'Award', accessorFn: (row) => row.awardPoints },
           { header: 'Total', accessorFn: (row) => row.total },
-        ] satisfies ColumnDef<RowData>[])
+        ] satisfies TbaColumnDef<RowData>[])
       : []),
     {
       header: 'CMP Advancement',
@@ -1409,51 +1444,114 @@ function ChampsQualPointsTab({
         : parseInt(a.teamKey.substring(3)) - parseInt(b.teamKey.substring(3)),
     );
 
-  return <DataTable columns={columns} data={data} />;
+  return (
+    <>
+      {year >= 2025 && (
+        <div className="mb-2 text-right text-sm">
+          <Link to="/events/regional/{-$year}" params={{ year: String(year) }}>
+            Full regional pool rankings
+          </Link>
+        </div>
+      )}
+      <DataTable columns={columns} data={data} />
+    </>
+  );
 }
 
 function MediaTab({
   webcasts,
+  media,
   eventKey,
 }: {
   webcasts: Webcast[];
+  media: Media[];
   eventKey: string;
 }) {
   const youtubeWebcasts = webcasts.filter((w) => w.type === 'youtube');
   const otherWebcasts = webcasts.filter((w) => w.type !== 'youtube');
+  const videos = getEventVideos(media);
+  const albums = getSmugmugAlbums(media);
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Webcasts</h1>
-      {webcasts.length > 0 ? (
-        <>
-          {youtubeWebcasts.length > 0 && (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {youtubeWebcasts.map((w) => (
-                <YoutubeEmbed
-                  videoId={w.channel}
-                  title={w.channel}
-                  key={w.channel}
-                />
-              ))}
-            </div>
-          )}
-          {otherWebcasts.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {otherWebcasts.map((w) => (
-                <WebcastIcon webcast={w} key={w.channel} />
-              ))}
-            </div>
-          )}
-        </>
-      ) : (
-        <Button variant="secondary" asChild>
+    <div className="space-y-8">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-bold">Webcasts</h1>
+          <div className="flex flex-wrap justify-end gap-2">
+            <Link
+              to="/suggest/event/video"
+              search={{ event_key: eventKey }}
+              className={buttonVariants({ variant: 'secondary' })}
+            >
+              Add Match Videos
+            </Link>
+            <Link
+              to="/suggest/event/media"
+              search={{ event_key: eventKey }}
+              className={buttonVariants()}
+            >
+              Add Event Media
+            </Link>
+          </div>
+        </div>
+        {webcasts.length > 0 ? (
+          <>
+            {youtubeWebcasts.length > 0 && (
+              <div
+                className="grid
+                  grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))]
+                  gap-4"
+              >
+                {youtubeWebcasts.map((w) => (
+                  <YoutubeEmbed
+                    videoId={w.channel}
+                    title={w.channel}
+                    key={w.channel}
+                  />
+                ))}
+              </div>
+            )}
+            {otherWebcasts.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {otherWebcasts.map((w) => (
+                  <WebcastIcon webcast={w} key={w.channel} />
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
           <a
             href={`https://www.thebluealliance.com/suggest/event/webcast?event_key=${eventKey}`}
+            className={buttonVariants({ variant: 'secondary' })}
           >
             Add Webcast
           </a>
-        </Button>
+        )}
+      </div>
+
+      {videos.length > 0 && (
+        <div className="space-y-4">
+          <h1 className="text-2xl font-bold">Videos</h1>
+          <div
+            className="grid
+              grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))] gap-4"
+          >
+            {videos.map((m) => (
+              <YoutubeEmbed
+                videoId={m.foreign_key}
+                title={m.foreign_key}
+                key={m.foreign_key}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {albums.length > 0 && (
+        <div className="space-y-4">
+          <h1 className="text-2xl font-bold">Photo Galleries</h1>
+          <SmugmugAlbumGallery albums={albums} />
+        </div>
       )}
     </div>
   );

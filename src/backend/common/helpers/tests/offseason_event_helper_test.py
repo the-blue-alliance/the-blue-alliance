@@ -1,4 +1,6 @@
 import datetime
+from types import SimpleNamespace
+from typing import cast
 
 import pytest
 
@@ -311,3 +313,10 @@ def test_categorize_offseasons_same_date_and_location():
     assert len(existing) == 2
     assert (event1, first_event1) in existing
     assert (event2, first_event2) in existing
+
+
+def test_is_direct_match_error_is_not_a_match() -> None:
+    # A malformed first_code raises inside the check, which is logged
+    tba_event = cast(Event, SimpleNamespace(key_name="2020tba", first_code=123))
+    first_event = cast(Event, SimpleNamespace(key_name="2020first", event_short="x"))
+    assert OffseasonEventHelper.is_direct_match(tba_event, first_event) is False

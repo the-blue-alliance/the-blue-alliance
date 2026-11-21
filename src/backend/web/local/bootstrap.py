@@ -1,11 +1,13 @@
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from typing import Any, cast, Dict, List, Optional, Union
+from typing import Any, Callable, cast, Dict, List, Optional, Union
 
 import requests
 from google.appengine.ext import ndb
 
 from backend.common.consts.renamed_districts import ALL_KNOWN_DISTRICT_ABBREVIATIONS
 from backend.common.helpers.deferred import defer_safe
+from backend.common.helpers.listify import listify
 from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.manipulators.district_manipulator import DistrictManipulator
 from backend.common.manipulators.district_team_manipulator import (
@@ -70,29 +72,50 @@ class LocalDataBootstrap:
         return TeamManipulator.createOrUpdate(team)
 
     @staticmethod
-    def store_district_team(team: Team, district: District) -> DistrictTeam:
-        return DistrictTeamManipulator.createOrUpdate(
+    def store_teams(data: List[Dict]) -> List[Team]:
+        teams = [TeamConverter.dictToModel_v3(t) for t in data]
+        if not teams:
+            return []
+        return listify(TeamManipulator.createOrUpdate(teams))
+
+    @staticmethod
+    def store_district_teams(
+        teams: List[Team], district: District
+    ) -> List[DistrictTeam]:
+        district_teams = [
             DistrictTeam(
                 id="{}_{}".format(district.key_name, team.key_name),
                 district_key=district.key,
                 team=team.key,
                 year=district.year,
             )
-        )
+            for team in teams
+        ]
+        if not district_teams:
+            return []
+        return listify(DistrictTeamManipulator.createOrUpdate(district_teams))
 
     @staticmethod
-    def store_team_media(
-        data: Dict, year: Optional[int], team_key: Optional[TeamKey]
-    ) -> Media:
-        media = MediaConverter.dictToModel_v3(data, year, team_key)
-
-        return MediaManipulator.createOrUpdate(media)
+    def store_team_medias(
+        data: List[Dict], year: Optional[int], team_key: Optional[TeamKey]
+    ) -> List[Media]:
+        medias = [MediaConverter.dictToModel_v3(m, year, team_key) for m in data]
+        if not medias:
+            return []
+        return listify(MediaManipulator.createOrUpdate(medias))
 
     @classmethod
     def store_match(cls, data: Dict) -> Match:
         match = MatchConverter.dictToModel_v3(data)
 
         return MatchManipulator.createOrUpdate(match)
+
+    @classmethod
+    def store_matches(cls, data: List[Dict]) -> List[Match]:
+        matches = [MatchConverter.dictToModel_v3(m) for m in data]
+        if not matches:
+            return []
+        return listify(MatchManipulator.createOrUpdate(matches))
 
     @classmethod
     def store_match_zebra(cls, data: Dict) -> None:
@@ -103,28 +126,44 @@ class LocalDataBootstrap:
         ZebraMotionWorks(id=match_key, event=ndb.Key(Event, event_key), data=data).put()
 
     @staticmethod
-    def store_eventteam(team: Team, event: Event) -> EventTeam:
-        eventteam = EventTeam(id="{}_{}".format(event.key_name, team.key_name))
-        eventteam.event = event.key
-        eventteam.team = team.key
-        eventteam.year = event.year
+    def store_eventteams(
+        teams: List[Team],
+        event: Event,
+        pit_locations: Optional[Dict[str, EventTeamPitLocation]] = None,
+    ) -> List[EventTeam]:
+        eventteams = []
+        for team in teams:
+            eventteam = EventTeam(id="{}_{}".format(event.key_name, team.key_name))
+            eventteam.event = event.key
+            eventteam.team = team.key
+            eventteam.year = event.year
+            if pit_locations and team.key_name in pit_locations:
+                eventteam.pit_location = pit_locations[team.key_name]
+            eventteams.append(eventteam)
 
-        return EventTeamManipulator.createOrUpdate(eventteam)
+        if not eventteams:
+            return []
+        return listify(EventTeamManipulator.createOrUpdate(eventteams))
 
     @classmethod
-    def store_eventdetail(
-        cls, event: Event, detail_type: str, data: Any
-    ) -> EventDetails:
-        detail = EventDetails.get_or_insert(event.key_name)
-        setattr(detail, detail_type, data)
+    def store_event_details(cls, event: Event, **attrs: Any) -> EventDetails:
+        """
+        Write all of the given EventDetails attrs (rankings2, alliance_selections,
+        predictions, district_points, ...) in a single createOrUpdate call, instead
+        of a separate get_or_insert + createOrUpdate round-trip per attr.
+        """
+        detail = EventDetails(id=event.key_name)
+        for attr, value in attrs.items():
+            setattr(detail, attr, value)
 
         return EventDetailsManipulator.createOrUpdate(detail)
 
     @classmethod
-    def store_award(cls, data: Dict, event: Event) -> Award:
-        award = AwardConverter.dictToModel_v3(data, event)
-
-        return AwardManipulator.createOrUpdate(award)
+    def store_awards(cls, data: List[Dict], event: Event) -> List[Award]:
+        awards = [AwardConverter.dictToModel_v3(a, event) for a in data]
+        if not awards:
+            return []
+        return listify(AwardManipulator.createOrUpdate(awards))
 
     @classmethod
     def fetch_endpoint(cls, endpoint: str, auth_token: str) -> Union[Dict, List]:
@@ -139,9 +178,11 @@ class LocalDataBootstrap:
         return cast(Dict, cls.fetch_endpoint(f"team/{team_key}", auth_token))
 
     @classmethod
-    def fetch_team_media(cls, team_key: TeamKey, year: int, auth_token: str) -> Dict:
+    def fetch_team_media(
+        cls, team_key: TeamKey, year: int, auth_token: str
+    ) -> List[Dict]:
         return cast(
-            Dict, cls.fetch_endpoint(f"team/{team_key}/media/{year}", auth_token)
+            List[Dict], cls.fetch_endpoint(f"team/{team_key}/media/{year}", auth_token)
         )
 
     @classmethod
@@ -188,9 +229,11 @@ class LocalDataBootstrap:
         return cast(Dict, cls.fetch_endpoint(f"event/{event_key}/{detail}", auth_token))
 
     @classmethod
-    def fetch_district_teams(cls, district_key: DistrictKey, auth_token: str) -> Dict:
+    def fetch_district_teams(
+        cls, district_key: DistrictKey, auth_token: str
+    ) -> List[Dict]:
         return cast(
-            Dict, cls.fetch_endpoint(f"district/{district_key}/teams", auth_token)
+            List[Dict], cls.fetch_endpoint(f"district/{district_key}/teams", auth_token)
         )
 
     @classmethod
@@ -199,48 +242,68 @@ class LocalDataBootstrap:
             cls.update_event(key, auth_token)
 
     @classmethod
+    def _fetch_event_bundle(cls, key: EventKey, auth_token: str) -> Dict[str, Any]:
+        """
+        Fetch the event resource and all of its sub-resources concurrently, since
+        none of these API calls depend on each other's results. This turns ~9
+        sequential blocking HTTP round-trips per event into 1 round-trip's worth
+        of wall-clock time.
+        """
+        fetchers: Dict[str, Callable[[], Union[Dict, List]]] = {
+            "event": lambda: cls.fetch_event(key, auth_token),
+            "teams": lambda: cls.fetch_event_detail(key, "teams", auth_token),
+            "teams_statuses": lambda: cls.fetch_event_detail(
+                key, "teams/statuses", auth_token
+            ),
+            "matches": lambda: cls.fetch_event_detail(key, "matches", auth_token),
+            "rankings": lambda: cls.fetch_event_detail(key, "rankings", auth_token),
+            "alliances": lambda: cls.fetch_event_detail(key, "alliances", auth_token),
+            "awards": lambda: cls.fetch_event_detail(key, "awards", auth_token),
+            "predictions": lambda: cls.fetch_event_detail(
+                key, "predictions", auth_token
+            ),
+            "district_points": lambda: cls.fetch_event_detail(
+                key, "district_points", auth_token
+            ),
+        }
+        with ThreadPoolExecutor(max_workers=len(fetchers)) as executor:
+            futures = {name: executor.submit(fn) for name, fn in fetchers.items()}
+            return {name: future.result() for name, future in futures.items()}
+
+    @classmethod
     def update_event(cls, key: EventKey, auth_token: str) -> None:
-        event_data = cls.fetch_event(key, auth_token)
-        event = cls.store_event(event_data)
+        fetched = cls._fetch_event_bundle(key, auth_token)
 
-        event_teams = cls.fetch_event_detail(key, "teams", auth_token)
-        teams = list(map(cls.store_team, event_teams))
-        list(map(lambda t: cls.store_eventteam(t, event), teams))
+        event = cls.store_event(fetched["event"])
 
-        # Fetch pit locations from teams/statuses endpoint
-        event_statuses = cls.fetch_event_detail(key, "teams/statuses", auth_token)
+        teams = cls.store_teams(fetched["teams"])
+
+        # Fold pit locations (from the teams/statuses endpoint) into the same
+        # batch write as the EventTeams themselves, instead of a separate
+        # get + put per team.
+        pit_locations: Dict[str, EventTeamPitLocation] = {}
+        event_statuses = fetched["teams_statuses"]
         if event_statuses:
             for team_key_str, status in event_statuses.items():
                 if status and "pit_location" in status:
-                    et = EventTeam.get_by_id(f"{key}_{team_key_str}")
-                    if et:
-                        et.pit_location = EventTeamPitLocation(
-                            location=status["pit_location"]
-                        )
-                        EventTeamManipulator.createOrUpdate(et)
+                    pit_locations[team_key_str] = EventTeamPitLocation(
+                        location=status["pit_location"]
+                    )
+        cls.store_eventteams(teams, event, pit_locations)
 
-        event_matches = cls.fetch_event_detail(key, "matches", auth_token)
-        list(map(cls.store_match, event_matches))
+        cls.store_matches(fetched["matches"])
+        cls.store_awards(fetched["awards"], event)
 
-        event_rankings = cls.fetch_event_detail(key, "rankings", auth_token)
-        cls.store_eventdetail(
-            event, "rankings2", event_rankings["rankings"] if event_rankings else []
-        )
-
-        event_alliances = cls.fetch_event_detail(key, "alliances", auth_token)
-        cls.store_eventdetail(event, "alliance_selections", event_alliances)
-
-        event_awards = cls.fetch_event_detail(key, "awards", auth_token)
-        list(map(lambda t: cls.store_award(t, event), event_awards))
-
-        event_predictions = cls.fetch_event_detail(key, "predictions", auth_token)
-        cls.store_eventdetail(event, "predictions", event_predictions)
-
-        event_district_points = cls.fetch_event_detail(
-            key, "district_points", auth_token
-        )
+        event_rankings = fetched["rankings"]
+        detail_attrs: Dict[str, Any] = {
+            "rankings2": event_rankings["rankings"] if event_rankings else [],
+            "alliance_selections": fetched["alliances"],
+            "predictions": fetched["predictions"],
+        }
+        event_district_points = fetched["district_points"]
         if event_district_points:
-            cls.store_eventdetail(event, "district_points", event_district_points)
+            detail_attrs["district_points"] = event_district_points
+        cls.store_event_details(event, **detail_attrs)
 
     @classmethod
     def update_team(cls, key: TeamKey, auth_token: str) -> None:
@@ -248,8 +311,8 @@ class LocalDataBootstrap:
         cls.store_team(team_data)
 
         year = datetime.now().year
-        for media in cls.fetch_team_media(key, year, auth_token):
-            cls.store_team_media(media, year, key)
+        media_data = cls.fetch_team_media(key, year, auth_token)
+        cls.store_team_medias(media_data, year, key)
 
     @classmethod
     def update_match(cls, key: MatchKey, auth_token: str) -> None:
@@ -263,11 +326,9 @@ class LocalDataBootstrap:
     def update_district(cls, district_data: Dict, auth_token: str) -> None:
         district = cls.store_district(district_data)
 
-        district_teams = cls.fetch_district_teams(district.key_name, auth_token)
-        teams = list(map(cls.store_team, district_teams))
-
-        for team in teams:
-            cls.store_district_team(team, district)
+        district_teams_data = cls.fetch_district_teams(district.key_name, auth_token)
+        teams = cls.store_teams(district_teams_data)
+        cls.store_district_teams(teams, district)
 
         district_events = cls.fetch_district_events(district.key_name, auth_token)
         for event in district_events:

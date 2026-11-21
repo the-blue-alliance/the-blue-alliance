@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
-from pyre_extensions import none_throws
-
-from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.frc_api.types import ScoreDetailModelAlliance2026
 from backend.common.game_specific.base import (
+    per_robot_points,
     PredictionStatConfig,
+    RobotPointsAccessor,
+    safe_div,
     StatAccessor,
+    SuccessRateCounter,
     TCriteria,
     TripleWinTotalPointsScoreBonusRpGameConfig,
 )
@@ -32,6 +34,47 @@ class GameSpecifics2026(
         "prob_supercharged_bonus",
         "prob_traversal_bonus",
     )
+    BONUS_RP_LABELS = (
+        "Energized",
+        "Supercharged",
+        "Traversal",
+    )
+
+    def determine_auto_winner(
+        self, red: Dict[str, Any], blue: Dict[str, Any]
+    ) -> Optional[AllianceColor]:
+        # Compare total auto points
+        if red.get("totalAutoPoints") > blue.get("totalAutoPoints"):
+            return AllianceColor.RED
+        if blue.get("totalAutoPoints") > red.get("totalAutoPoints"):
+            return AllianceColor.BLUE
+
+        # Auto tied: compare shift 1
+        if red.get("hubScore").get("shift1Count") > 0:
+            return AllianceColor.BLUE
+        if blue.get("hubScore").get("shift1Count") > 0:
+            return AllianceColor.RED
+
+        # No scoring in shift 1: compare shift 2
+        if red.get("hubScore").get("shift2Count") > 0:
+            return AllianceColor.RED
+        if blue.get("hubScore").get("shift2Count") > 0:
+            return AllianceColor.BLUE
+
+        # No scoring in shift 2: compare shift 3
+        if red.get("hubScore").get("shift3Count") > 0:
+            return AllianceColor.BLUE
+        if blue.get("hubScore").get("shift3Count") > 0:
+            return AllianceColor.RED
+
+        # No scoring in shift 3: compare shift 4
+        if red.get("hubScore").get("shift4Count") > 0:
+            return AllianceColor.RED
+        if blue.get("hubScore").get("shift4Count") > 0:
+            return AllianceColor.BLUE
+
+        # Fully tied
+        return None
 
     def tiebreak_criteria(
         self, red: ScoreDetailModelAlliance2026, blue: ScoreDetailModelAlliance2026
@@ -107,47 +150,14 @@ class GameSpecifics2026(
 
         high_score: Tuple[int, str, str] = (0, "", "")
 
-        finished_matches = 0
-
-        def determine_auto_winner(red, blue) -> Optional[AllianceColor]:
-            # Compare total auto points
-            if red.get("totalAutoPoints") > blue.get("totalAutoPoints"):
-                return AllianceColor.RED
-            if blue.get("totalAutoPoints") > red.get("totalAutoPoints"):
-                return AllianceColor.BLUE
-
-            # Auto tied: compare shift 1
-            if red.get("hubScore").get("shift1Count") > 0:
-                return AllianceColor.BLUE
-            if blue.get("hubScore").get("shift1Count") > 0:
-                return AllianceColor.RED
-
-            # No scoring in shift 1: compare shift 2
-            if red.get("hubScore").get("shift2Count") > 0:
-                return AllianceColor.RED
-            if blue.get("hubScore").get("shift2Count") > 0:
-                return AllianceColor.BLUE
-
-            # No scoring in shift 2: compare shift 3
-            if red.get("hubScore").get("shift3Count") > 0:
-                return AllianceColor.BLUE
-            if blue.get("hubScore").get("shift3Count") > 0:
-                return AllianceColor.RED
-
-            # No scoring in shift 3: compare shift 4
-            if red.get("hubScore").get("shift4Count") > 0:
-                return AllianceColor.RED
-            if blue.get("hubScore").get("shift4Count") > 0:
-                return AllianceColor.BLUE
-
-            # Fully tied
-            return None
+        scored_matches = 0  # played matches, for alliance-score stats
+        breakdown_matches = 0  # played matches with a score breakdown
 
         for match in matches:
             if not match.has_been_played:
                 continue
 
-            finished_matches += 1
+            scored_matches += 1
 
             red_score = match.alliances[AllianceColor.RED]["score"]
             blue_score = match.alliances[AllianceColor.BLUE]["score"]
@@ -156,11 +166,17 @@ class GameSpecifics2026(
             if win_score > high_score[0]:
                 high_score = (win_score, match.key_name, match.short_name)
 
-            if match.score_breakdown is None:
-                continue
+            total_scores += red_score + blue_score
+            total_win_margins += win_score - min(red_score, blue_score)
+            total_winning_scores += win_score
 
-            red_sb = none_throws(match.score_breakdown)[AllianceColor.RED]
-            blue_sb = none_throws(match.score_breakdown)[AllianceColor.BLUE]
+            score_breakdown = match.score_breakdown
+            if not score_breakdown:
+                continue
+            breakdown_matches += 1
+
+            red_sb = score_breakdown[AllianceColor.RED]
+            blue_sb = score_breakdown[AllianceColor.BLUE]
 
             if red_sb.get("energizedAchieved"):
                 energized_rp_count += 1
@@ -195,7 +211,7 @@ class GameSpecifics2026(
                 if red_all_rp and blue_all_rp:
                     nine_rp_count += 1
 
-            auto_winner = determine_auto_winner(red_sb, blue_sb)
+            auto_winner = self.determine_auto_winner(red_sb, blue_sb)
 
             if (auto_winner is None) or (red_score == blue_score):
                 undefined_auto_conversion_matches += 1
@@ -204,11 +220,7 @@ class GameSpecifics2026(
             elif (auto_winner == AllianceColor.BLUE) and (blue_score > red_score):
                 auto_win_conversion += 1
 
-            for i in range(3):
-                if red_sb.get("autoTowerRobot{}".format(i + 1)) != "None":
-                    auto_climb_count += 1
-                if blue_sb.get("autoTowerRobot{}".format(i + 1)) != "None":
-                    auto_climb_count += 1
+            auto_climb_count += _count_auto_climb(match)[0]
 
             auto_fuel_scored += red_sb.get("hubScore").get("autoCount")
             auto_fuel_scored += blue_sb.get("hubScore").get("autoCount")
@@ -236,131 +248,152 @@ class GameSpecifics2026(
                 if tower_level == "Level3":
                     endgame_climb_count[2] += 1
 
-            total_scores += red_score + blue_score
-            total_win_margins += win_score - min(red_score, blue_score)
-            total_winning_scores += win_score
-
-        if finished_matches == 0:
+        if scored_matches == 0:
             return None
 
         return {
             "energized_rp_count": [
                 energized_rp_count,
-                finished_matches * 2,
-                100.0 * energized_rp_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * energized_rp_count, breakdown_matches * 2),
             ],
             "supercharged_rp_count": [
                 supercharged_rp_count,
-                finished_matches * 2,
-                100.0 * supercharged_rp_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * supercharged_rp_count, breakdown_matches * 2),
             ],
             "traversal_rp_count": [
                 traversal_rp_count,
-                finished_matches * 2,
-                100.0 * traversal_rp_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * traversal_rp_count, breakdown_matches * 2),
             ],
             "six_rp_count": [
                 six_rp_count,
-                finished_matches,
-                100.0 * six_rp_count / finished_matches,
+                breakdown_matches,
+                safe_div(100.0 * six_rp_count, breakdown_matches),
             ],
             "nine_rp_count": [
                 nine_rp_count,
-                finished_matches,
-                100.0 * nine_rp_count / finished_matches,
+                breakdown_matches,
+                safe_div(100.0 * nine_rp_count, breakdown_matches),
             ],
             "auto_win_conversion": [
                 auto_win_conversion,
-                finished_matches - undefined_auto_conversion_matches,
+                breakdown_matches - undefined_auto_conversion_matches,
                 (
                     0
-                    if (finished_matches - undefined_auto_conversion_matches) == 0
+                    if (breakdown_matches - undefined_auto_conversion_matches) == 0
                     else 100.0
                     * auto_win_conversion
-                    / (finished_matches - undefined_auto_conversion_matches)
+                    / (breakdown_matches - undefined_auto_conversion_matches)
                 ),
             ],
             "auto_fuel_scored": [
                 auto_fuel_scored,
-                auto_fuel_scored / (finished_matches * 2),
-                auto_fuel_scored / (finished_matches * 6),
+                safe_div(auto_fuel_scored, breakdown_matches * 2),
+                safe_div(auto_fuel_scored, breakdown_matches * 6),
             ],
             "teleop_fuel_scored": [
                 teleop_fuel_scored,
-                teleop_fuel_scored / (finished_matches * 2),
-                teleop_fuel_scored / (finished_matches * 6),
+                safe_div(teleop_fuel_scored, breakdown_matches * 2),
+                safe_div(teleop_fuel_scored, breakdown_matches * 6),
             ],
             "total_fuel_scored": [
                 total_fuel_scored,
-                total_fuel_scored / (finished_matches * 2),
-                total_fuel_scored / (finished_matches * 6),
+                safe_div(total_fuel_scored, breakdown_matches * 2),
+                safe_div(total_fuel_scored, breakdown_matches * 6),
             ],
             "auto_climb_count": [
                 auto_climb_count,
-                finished_matches * 4,
-                100.0 * auto_climb_count / (finished_matches * 4),
+                breakdown_matches * 4,
+                safe_div(100.0 * auto_climb_count, breakdown_matches * 4),
             ],
             "level1_climb_count": [
                 endgame_climb_count[0],
-                finished_matches * 6,
-                100.0 * endgame_climb_count[0] / (finished_matches * 6),
+                breakdown_matches * 6,
+                safe_div(100.0 * endgame_climb_count[0], breakdown_matches * 6),
             ],
             "level2_climb_count": [
                 endgame_climb_count[1],
-                finished_matches * 6,
-                100.0 * endgame_climb_count[1] / (finished_matches * 6),
+                breakdown_matches * 6,
+                safe_div(100.0 * endgame_climb_count[1], breakdown_matches * 6),
             ],
             "level3_climb_count": [
                 endgame_climb_count[2],
-                finished_matches * 6,
-                100.0 * endgame_climb_count[2] / (finished_matches * 6),
+                breakdown_matches * 6,
+                safe_div(100.0 * endgame_climb_count[2], breakdown_matches * 6),
             ],
-            "average_score": total_scores / (finished_matches * 2),
-            "average_win_margin": total_win_margins / finished_matches,
-            "average_winning_score": total_winning_scores / finished_matches,
+            "average_score": total_scores / (scored_matches * 2),
+            "average_win_margin": total_win_margins / scored_matches,
+            "average_winning_score": total_winning_scores / scored_matches,
             "high_score": high_score,
         }
 
+    def success_rate_counters(self) -> Sequence[SuccessRateCounter]:
+        return [
+            *super().success_rate_counters(),
+            SuccessRateCounter("auto_climb", "Auto Climb", _count_auto_climb),
+            SuccessRateCounter(
+                "level1_climb", "Level 1 Climb", _tower_level_counter("Level1")
+            ),
+            SuccessRateCounter(
+                "level2_climb", "Level 2 Climb", _tower_level_counter("Level2")
+            ),
+            SuccessRateCounter(
+                "level3_climb", "Level 3 Climb", _tower_level_counter("Level3")
+            ),
+        ]
+
     def get_manual_coprs(self) -> Dict[str, StatAccessor]:
         return {
-            "Hub Auto Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("autoCount", 0),
-            "Hub Teleop Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("teleopCount", 0),
-            "Hub Endgame Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("endgameCount", 0),
-            "Hub Total Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("totalCount", 0),
-            "Hub Transition Fuel Count": lambda match, color: match.score_breakdown[
-                color
-            ]["hubScore"].get("transitionCount", 0),
-            "Hub Shift 1 Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("shift1Count", 0),
-            "Hub Shift 2 Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("shift2Count", 0),
-            "Hub Shift 3 Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("shift3Count", 0),
-            "Hub Shift 4 Fuel Count": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("shift4Count", 0),
+            "Hub Auto Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("autoCount", 0)
+            ),
+            "Hub Teleop Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("teleopCount", 0)
+            ),
+            "Hub Endgame Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("endgameCount", 0)
+            ),
+            "Hub Total Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("totalCount", 0)
+            ),
+            "Hub Transition Fuel Count": lambda match, color: (
+                match.score_breakdown[color]
+                .get("hubScore", {})
+                .get("transitionCount", 0)
+            ),
+            "Hub Shift 1 Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("shift1Count", 0)
+            ),
+            "Hub Shift 2 Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("shift2Count", 0)
+            ),
+            "Hub Shift 3 Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("shift3Count", 0)
+            ),
+            "Hub Shift 4 Fuel Count": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("shift4Count", 0)
+            ),
             "Hub First Active Shift Count": lambda match, color: (
-                match.score_breakdown[color]["hubScore"].get("shift1Count", 0)
-                + match.score_breakdown[color]["hubScore"].get("shift2Count", 0)
+                match.score_breakdown[color].get("hubScore", {}).get("shift1Count", 0)
+                + match.score_breakdown[color].get("hubScore", {}).get("shift2Count", 0)
             ),
             "Hub Second Active Shift Count": lambda match, color: (
-                match.score_breakdown[color]["hubScore"].get("shift3Count", 0)
-                + match.score_breakdown[color]["hubScore"].get("shift4Count", 0)
+                match.score_breakdown[color].get("hubScore", {}).get("shift3Count", 0)
+                + match.score_breakdown[color].get("hubScore", {}).get("shift4Count", 0)
             ),
-            "Hub Uncounted": lambda match, color: match.score_breakdown[color][
-                "hubScore"
-            ].get("uncounted", 0),
+            "Hub Uncounted": lambda match, color: (
+                match.score_breakdown[color].get("hubScore", {}).get("uncounted", 0)
+            ),
+        }
+
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
+        return {
+            "autoTowerPoints": per_robot_points("autoTowerRobot{}", {"Level1": 15}),
+            "endGameTowerPoints": per_robot_points(
+                "endGameTowerRobot{}", {"Level1": 10, "Level2": 20, "Level3": 30}
+            ),
         }
 
     def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
@@ -378,3 +411,43 @@ class GameSpecifics2026(
             {"name": "Avg Auto Fuel", "precision": 2},
             {"name": "Avg Tower", "precision": 2},
         ]
+
+
+def _robot_tower_states(
+    breakdown: Dict[AllianceColor, Any], prefix: str
+) -> List[Optional[str]]:
+    return [
+        breakdown[color].get(f"{prefix}{i + 1}")
+        for color in ALLIANCE_COLORS
+        for i in range(3)
+    ]
+
+
+# 2026 Game Manual, Table 6-4: "Each ROBOT at LEVEL 1 (2 ROBOTS max in AUTO)".
+MAX_AUTO_CLIMBS_PER_ALLIANCE = 2
+
+
+def _count_auto_climb(match: Match) -> Tuple[int, int]:
+    breakdown = match.score_breakdown
+    if breakdown is None:
+        return (0, 0)
+    climbs = 0
+    for color in ALLIANCE_COLORS:
+        alliance_climbs = sum(
+            1
+            for i in range(3)
+            if breakdown[color].get(f"autoTowerRobot{i + 1}") not in (None, "None")
+        )
+        climbs += min(alliance_climbs, MAX_AUTO_CLIMBS_PER_ALLIANCE)
+    return (climbs, MAX_AUTO_CLIMBS_PER_ALLIANCE * len(ALLIANCE_COLORS))
+
+
+def _tower_level_counter(level: str) -> Callable[[Match], Tuple[int, int]]:
+    def measure(match: Match) -> Tuple[int, int]:
+        breakdown = match.score_breakdown
+        if breakdown is None:
+            return (0, 0)
+        states = _robot_tower_states(breakdown, "endGameTowerRobot")
+        return (sum(1 for state in states if state == level), len(states))
+
+    return measure

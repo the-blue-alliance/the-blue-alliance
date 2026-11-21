@@ -1,0 +1,551 @@
+"""
+Ranks upcoming matches across currently-live events for the GameDay match
+suggestion feed.
+
+Not to be confused with `match_suggestion_accepter.py`, which is about the
+user-submitted Suggestion moderation queue.
+"""
+
+import datetime
+import logging
+import math
+from typing import Dict, List, Optional, Tuple
+
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.playoff_type import (
+    DOUBLE_ELIM_TYPES,
+    DoubleElimRound,
+    PlayoffType,
+)
+from backend.common.helpers.event_helper import EventHelper
+from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
+from backend.common.helpers.team_favorite_counts_helper import TeamFavoriteCountsHelper
+from backend.common.models.event import Event
+from backend.common.models.event_predictions import MatchPrediction
+from backend.common.models.keys import MatchKey, TeamKey
+from backend.common.models.match import Match
+from backend.common.models.match_suggestion import (
+    MatchSuggestion,
+    MatchSuggestionComponents,
+    MatchSuggestions,
+)
+
+# Weights sum to 1.0, so the final score also lands in [0, 1]
+W_FAVORITES: float = 0.175
+W_SIGNIFICANCE: float = 0.225
+W_TIME_DECAY: float = 0.40
+W_HIGH_SCORE: float = 0.10
+W_CLOSE_SCORE: float = 0.10
+
+NUM_SUGGESTIONS: int = 25
+
+LEVEL_WEIGHTS: Dict[CompLevel, float] = {
+    CompLevel.QM: 0.0,
+    CompLevel.EF: 5.0,
+    CompLevel.QF: 10.0,
+    CompLevel.SF: 20.0,
+    CompLevel.F: 50.0,
+}
+MAX_LEVEL_WEIGHT: float = 50.0
+
+# From 2023 on the whole double elim bracket is `sf`, so the comp level alone
+# cannot tell a first-round match from the one deciding the last finals slot.
+# These ramp between the flat `sf` weight and `f`.
+DOUBLE_ELIM_ROUND_WEIGHTS: Dict[DoubleElimRound, float] = {
+    DoubleElimRound.ROUND1: 15.0,
+    DoubleElimRound.ROUND2: 20.0,
+    DoubleElimRound.ROUND3: 27.0,
+    DoubleElimRound.ROUND4: 33.0,
+    DoubleElimRound.ROUND5: 40.0,
+    DoubleElimRound.FINALS: 50.0,
+}
+
+# A champs match cycle is ~7-10 minutes, so a 15 minute future e-folding time
+# keeps roughly the next two matches per field hot while allowing every timed,
+# unplayed match at a live event to participate in scoring and normalization.
+#
+# PAST covers a match whose time has gone by but which still has no score.
+# That is either a match on the field right now -- the most valuable thing we
+# can show -- or a dead schedule entry that will never be played. Keep matches
+# fully hot for a short window while they are likely ongoing, then use the short
+# PAST tau to fade stale schedule entries.
+TIME_DECAY_TAU_FUTURE_S: int = 15 * 60
+TIME_DECAY_TAU_PAST_S: int = 5 * 60
+TIME_DECAY_ONGOING_GRACE_S: int = 5 * 60
+
+DEGENERATE_NORMALIZED_VALUE: float = 0.5
+EPSILON: float = 1e-9
+
+
+class MatchSuggestionHelper:
+    @classmethod
+    def compute_match_suggestions(
+        cls,
+        events: Optional[List[Event]] = None,
+        now: Optional[datetime.datetime] = None,
+    ) -> MatchSuggestions:
+        """
+        Score every upcoming match at the given events and return the top
+        `NUM_SUGGESTIONS` of them, ranked best-first.
+
+        `events` and `now` are injectable for testing; by default this uses the
+        events that are live right now and the current (naive UTC) time.
+        """
+        now = now or datetime.datetime.now()
+
+        if events is None:
+            events = [e for e in EventHelper.events_within_a_day() if e.now]
+
+        ranked = cls._rank(cls._candidate_matches(events), now)
+        return MatchSuggestions(
+            updated_at=int(now.timestamp()),
+            suggestions={s.match_key: s for s in ranked[:NUM_SUGGESTIONS]},
+        )
+
+    @classmethod
+    def score_all_matches(
+        cls,
+        events: List[Event],
+        now: Optional[datetime.datetime] = None,
+    ) -> MatchSuggestions:
+        """
+        Score every match at the given events, played or not, ignoring the
+        schedule entirely.
+
+        A validation tool, not used by the cron. Time decay is forced to 0 so
+        that favorites, significance, high score, and close score can be compared
+        without a scheduling term swamping them -- which also means `score` here
+        tops out at the sum of the other four weights rather than 1.0.
+
+        High score and favorites are still min-max normalized across whatever you
+        pass in, so scoring two events together ranks them against each other,
+        while scoring them separately does not.
+        """
+        now = now or datetime.datetime.now()
+
+        for event in events:
+            event.prep_matches()
+        candidates = [(event, match) for event in events for match in event.matches]
+
+        ranked = cls._rank(candidates, now, time_weighted=False)
+        return MatchSuggestions(
+            updated_at=int(now.timestamp()),
+            suggestions={s.match_key: s for s in ranked},
+        )
+
+    @classmethod
+    def _rank(
+        cls,
+        candidates: List[Tuple[Event, Match]],
+        now: datetime.datetime,
+        time_weighted: bool = True,
+    ) -> List[MatchSuggestion]:
+        """
+        Score every candidate and return them all, best-first, with `rank` assigned.
+
+        Callers truncate; ranks are 0-based over the full list, so slicing a prefix
+        leaves them contiguous.
+
+        `time_weighted=False` reports `time_decay` as a flat 0.0 rather than merely
+        weighting it away, so that `score_all_matches` publishes a component value
+        that matches the score it contributed.
+        """
+        if not candidates:
+            return []
+
+        matches = [match for _, match in candidates]
+        team_keys = {
+            team_key for match in matches for team_key in cls._match_teams(match)
+        }
+
+        predictions = cls._match_predictions([event for event, _ in candidates])
+        favorite_counts = TeamFavoriteCountsHelper.get_counts(team_keys)
+
+        raw_favorites: List[float] = []
+        predicted_indices: List[int] = []
+        raw_magnitude: List[float] = []
+        closeness_by_index: Dict[int, float] = {}
+        for i, match in enumerate(matches):
+            # log1p because favorite counts are heavy-tailed -- without it a single
+            # megastar team would swamp the whole component
+            raw_favorites.append(
+                sum(
+                    math.log1p(favorite_counts.get(tk, 0))
+                    for tk in cls._match_teams(match)
+                )
+            )
+
+            prediction = predictions.get(match.key_name)
+            if prediction is None:
+                continue
+            red_score = prediction["red"]["score"]
+            blue_score = prediction["blue"]["score"]
+            predicted_indices.append(i)
+            raw_magnitude.append(red_score + blue_score)
+            closeness_by_index[i] = min(1.0, max(0.0, 2.0 * (1.0 - prediction["prob"])))
+
+        favorites = cls._min_max_normalize(raw_favorites)
+
+        high_scores = [DEGENERATE_NORMALIZED_VALUE] * len(matches)
+        close_scores = [DEGENERATE_NORMALIZED_VALUE] * len(matches)
+        magnitude_normalized = cls._min_max_normalize(raw_magnitude)
+        for slot, i in enumerate(predicted_indices):
+            high_scores[i] = magnitude_normalized[slot]
+            close_scores[i] = closeness_by_index[i]
+
+        cls._log_pool_summary(
+            candidates,
+            now,
+            time_weighted,
+            raw_favorites,
+            raw_magnitude,
+            len(predicted_indices),
+        )
+
+        scored: List[Tuple[float, Event, Match, MatchSuggestionComponents, int]] = []
+        for i, (event, match) in enumerate(candidates):
+            components = MatchSuggestionComponents(
+                favorites=favorites[i],
+                significance=cls._significance(event, match),
+                time_decay=(
+                    cls._time_decay(match.predicted_time or match.time, now)
+                    if time_weighted
+                    else 0.0
+                ),
+                high_score=high_scores[i],
+                close_score=close_scores[i],
+            )
+            score = round(
+                W_FAVORITES * components.favorites
+                + W_SIGNIFICANCE * components.significance
+                + W_TIME_DECAY * components.time_decay
+                + W_HIGH_SCORE * components.high_score
+                + W_CLOSE_SCORE * components.close_score,
+                4,
+            )
+            scored.append((score, event, match, components, i))
+
+        # Tiebreak on play order so ranks are stable between runs
+        scored.sort(key=lambda s: (-s[0], s[2].key_name))
+
+        for rank, (score, event, match, components, i) in enumerate(
+            scored[:NUM_SUGGESTIONS]
+        ):
+            cls._log_suggestion(
+                rank,
+                score,
+                event,
+                match,
+                components,
+                now,
+                time_weighted,
+                raw_favorites[i],
+                cls._range(raw_favorites),
+                favorite_counts,
+                predictions.get(match.key_name),
+            )
+
+        return [
+            MatchSuggestion(
+                match_key=match.key_name,
+                event_key=event.key_name,
+                event_name=event.name,
+                event_short_name=event.short_name,
+                comp_level=match.comp_level,
+                set_number=match.set_number,
+                match_number=match.match_number,
+                display_name=match.short_name,
+                red_team_numbers=[
+                    int(tk[3:]) for tk in match.alliances[AllianceColor.RED]["teams"]
+                ],
+                blue_team_numbers=[
+                    int(tk[3:]) for tk in match.alliances[AllianceColor.BLUE]["teams"]
+                ],
+                predicted_time=(
+                    int(match.predicted_time.timestamp())
+                    if match.predicted_time
+                    else None
+                ),
+                scheduled_time=(int(match.time.timestamp()) if match.time else None),
+                predicted_red_score=(
+                    predictions[match.key_name]["red"]["score"]
+                    if match.key_name in predictions
+                    else None
+                ),
+                predicted_blue_score=(
+                    predictions[match.key_name]["blue"]["score"]
+                    if match.key_name in predictions
+                    else None
+                ),
+                rank=rank,
+                score=score,
+                components=components,
+            )
+            for rank, (score, event, match, components, _) in enumerate(scored)
+        ]
+
+    @classmethod
+    def _candidate_matches(cls, events: List[Event]) -> List[Tuple[Event, Match]]:
+        """
+        Every unplayed match with a known time and assigned alliances from the
+        given events.
+        """
+        for event in events:
+            event.prep_matches()
+
+        candidates: List[Tuple[Event, Match]] = []
+        for event in events:
+            candidates.extend(
+                (event, match)
+                for match in event.matches
+                if not match.has_been_played
+                and (match.predicted_time is not None or match.time is not None)
+                and match.alliances[AllianceColor.RED]["teams"]
+                and match.alliances[AllianceColor.BLUE]["teams"]
+            )
+
+        return candidates
+
+    @staticmethod
+    def _match_teams(match: Match) -> List[TeamKey]:
+        return (
+            match.alliances[AllianceColor.RED]["teams"]
+            + match.alliances[AllianceColor.BLUE]["teams"]
+        )
+
+    @staticmethod
+    def _match_predictions(events: List[Event]) -> Dict[MatchKey, MatchPrediction]:
+        """
+        Every stored per-match score prediction across the given events, flattened
+        into one map keyed by match key.
+
+        Predictions come from `PredictionHelper` via the event matchstats task and
+        live on `EventDetails.predictions`. They only exist for 2016+ in-season
+        events, and not until that task has first run, so this map is routinely
+        missing entries for otherwise-valid matches.
+        """
+        unique_events = list({event.key_name: event for event in events}.values())
+        for event in unique_events:
+            event.prep_details()
+
+        predictions: Dict[MatchKey, MatchPrediction] = {}
+        for event in unique_events:
+            details = event.details
+            if details is None or details.predictions is None:
+                continue
+            by_level = details.predictions.get("match_predictions") or {}
+            for level_predictions in by_level.values():
+                predictions.update(level_predictions)
+
+        return predictions
+
+    @staticmethod
+    def _time_decay(
+        match_time: Optional[datetime.datetime], now: datetime.datetime
+    ) -> float:
+        """
+        Peaks at 1.0 when the match is starting, stays there while an unscored
+        match is likely ongoing, and then decays smoothly. Future matches decay
+        toward the peak as they approach their start time.
+
+        Deliberately absolute rather than pool-normalized: on a day where every
+        candidate is 40 minutes out, normalizing would still hand one of them a
+        1.0 and claim it was imminent.
+        """
+        if match_time is None:
+            return 0.0
+        delta = (match_time - now).total_seconds()
+        if delta >= 0:
+            return math.exp(-delta / TIME_DECAY_TAU_FUTURE_S)
+        if delta >= -TIME_DECAY_ONGOING_GRACE_S:
+            return 1.0
+        return math.exp((delta + TIME_DECAY_ONGOING_GRACE_S) / TIME_DECAY_TAU_PAST_S)
+
+    @classmethod
+    def _significance(cls, event: Event, match: Match) -> float:
+        """
+        How much the match matters, from quals (0.0) up to finals (1.0).
+
+        Also deliberately absolute: min-max normalizing would make quals score
+        like finals on a quals-only afternoon.
+
+        2023+ double elim brackets are entirely `sf`, so those matches are placed
+        by bracket round instead of by comp level.
+        """
+        return cls._significance_weight(event, match) / MAX_LEVEL_WEIGHT
+
+    @classmethod
+    def _significance_weight(cls, event: Event, match: Match) -> float:
+        weight = LEVEL_WEIGHTS.get(match.comp_level, 0.0)
+        elim_round = cls._double_elim_round(event, match)
+        if elim_round is not None:
+            weight = DOUBLE_ELIM_ROUND_WEIGHTS.get(elim_round, weight)
+        return weight
+
+    @staticmethod
+    def _double_elim_round(event: Event, match: Match) -> Optional[DoubleElimRound]:
+        """
+        The bracket round a 2023+ double elim match sits in, or None when the
+        match is not part of such a bracket or its set number falls outside the
+        bracket shape.
+        """
+        if not (
+            match.year >= 2023
+            and match.comp_level == CompLevel.SF
+            and event.playoff_type in DOUBLE_ELIM_TYPES
+        ):
+            return None
+
+        try:
+            if event.playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
+                return PlayoffTypeHelper.get_double_elim_4_round(
+                    match.comp_level, match.set_number
+                )
+            elif event.playoff_type == PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM:
+                return PlayoffTypeHelper.get_double_elim_round_pre_2023(
+                    match.comp_level, match.set_number
+                )
+            return PlayoffTypeHelper.get_double_elim_round(
+                match.comp_level, match.set_number
+            )
+        except ValueError:
+            return None
+
+    @staticmethod
+    def _min_max_normalize(values: List[float]) -> List[float]:
+        """
+        When every value is equal there is no signal to extract, so return a
+        neutral 0.5 rather than zeroing out or maxing out the whole component.
+        Ranking is unaffected either way.
+        """
+        if not values:
+            return []
+        low = min(values)
+        high = max(values)
+        if (high - low) < EPSILON:
+            return [DEGENERATE_NORMALIZED_VALUE] * len(values)
+        return [(value - low) / (high - low) for value in values]
+
+    @staticmethod
+    def _range(values: List[float]) -> Optional[Tuple[float, float]]:
+        if not values:
+            return None
+        return (min(values), max(values))
+
+    @staticmethod
+    def _format_range(bounds: Optional[Tuple[float, float]]) -> str:
+        if bounds is None:
+            return "[]"
+        return f"[{bounds[0]:.2f}, {bounds[1]:.2f}]"
+
+    @classmethod
+    def _log_pool_summary(
+        cls,
+        candidates: List[Tuple[Event, Match]],
+        now: datetime.datetime,
+        time_weighted: bool,
+        raw_favorites: List[float],
+        raw_magnitude: List[float],
+        num_predicted: int,
+    ) -> None:
+        event_keys = {event.key_name for event, _ in candidates}
+        logging.info(
+            f"[match_suggestions] mode={'live' if time_weighted else 'all'} "
+            f"events={len(event_keys)} candidates={len(candidates)}"
+            f" | favorites raw={cls._format_range(cls._range(raw_favorites))}"
+            f" | predictions={num_predicted}/{len(candidates)}"
+            f" magnitude raw={cls._format_range(cls._range(raw_magnitude))}"
+            f" | now={now.isoformat()}"
+        )
+
+    @classmethod
+    def _log_suggestion(
+        cls,
+        rank: int,
+        score: float,
+        event: Event,
+        match: Match,
+        components: MatchSuggestionComponents,
+        now: datetime.datetime,
+        time_weighted: bool,
+        raw_favorite_sum: float,
+        favorite_pool: Optional[Tuple[float, float]],
+        favorite_counts: Dict[TeamKey, int],
+        prediction: Optional[MatchPrediction],
+    ) -> None:
+        teams = ",".join(
+            f"{tk}={favorite_counts.get(tk, 0)}" for tk in cls._match_teams(match)
+        )
+        fav = (
+            f"fav {components.favorites:.3f}*{W_FAVORITES}"
+            f"={W_FAVORITES * components.favorites:.3f}"
+            f" raw={raw_favorite_sum:.2f} pool={cls._format_range(favorite_pool)} {teams}"
+        )
+
+        sig = (
+            f"sig {components.significance:.3f}*{W_SIGNIFICANCE}"
+            f"={W_SIGNIFICANCE * components.significance:.3f}"
+            f" {match.comp_level}{cls._elim_round_suffix(event, match)}"
+            f" weight={cls._significance_weight(event, match):.1f}/{MAX_LEVEL_WEIGHT:.1f}"
+        )
+
+        td = (
+            f"td {components.time_decay:.3f}*{W_TIME_DECAY}"
+            f"={W_TIME_DECAY * components.time_decay:.3f}"
+            f" {cls._time_decay_detail(match, now, time_weighted)}"
+        )
+
+        if prediction is None:
+            hs_detail = "no-prediction"
+            cs_detail = "no-prediction"
+        else:
+            red_score = prediction["red"]["score"]
+            blue_score = prediction["blue"]["score"]
+            hs_detail = (
+                f"raw={red_score + blue_score:.2f} "
+                f"(red {red_score:.2f} + blue {blue_score:.2f})"
+            )
+            cs_detail = f"prob={prediction['prob']:.3f}"
+
+        hs = (
+            f"hs {components.high_score:.3f}*{W_HIGH_SCORE}"
+            f"={W_HIGH_SCORE * components.high_score:.3f} {hs_detail}"
+        )
+        cs = (
+            f"cs {components.close_score:.3f}*{W_CLOSE_SCORE}"
+            f"={W_CLOSE_SCORE * components.close_score:.3f} {cs_detail}"
+        )
+
+        logging.info(
+            f"[match_suggestions] rank={rank} {match.key_name} score={score:.4f}"
+            f" | {fav} | {sig} | {td} | {hs} | {cs}"
+        )
+
+    @classmethod
+    def _time_decay_detail(
+        cls, match: Match, now: datetime.datetime, time_weighted: bool
+    ) -> str:
+        if not time_weighted:
+            return "disabled"
+
+        if match.predicted_time is not None:
+            source, match_time = "predicted_time", match.predicted_time
+        elif match.time is not None:
+            source, match_time = "time", match.time
+        else:
+            return "none"
+
+        delta = (match_time - now).total_seconds()
+        if delta >= 0:
+            phase = "future"
+        elif delta >= -TIME_DECAY_ONGOING_GRACE_S:
+            phase = "ongoing"
+        else:
+            phase = "past"
+        return f"{source} delta={delta / 60:+.1f}m phase={phase}"
+
+    @classmethod
+    def _elim_round_suffix(cls, event: Event, match: Match) -> str:
+        elim_round = cls._double_elim_round(event, match)
+        return f"/{elim_round.name}" if elim_round is not None else ""

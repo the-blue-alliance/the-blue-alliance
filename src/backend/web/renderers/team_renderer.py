@@ -87,7 +87,7 @@ class TeamRenderer:
             if district and district.year == year and district.year != 2021:
                 has_valid_district = True
                 district_abbrev = district.abbreviation
-                district_name = district.display_name
+                district_name = district.render_name
                 if district.rankings:
                     team_district_points = next(
                         iter(

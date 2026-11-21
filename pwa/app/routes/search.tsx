@@ -2,21 +2,27 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { z } from 'zod';
 
 import { getSearchIndexOptions } from '~/api/tba/read/@tanstack/react-query.gen';
+import { STALE_TIME } from '~/lib/queryClient';
 import { getSearchRedirect } from '~/lib/search/searchRedirect';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 const searchSchema = z.object({
-  q: z.string().optional().default(''),
+  q: z.coerce.string().optional().default(''),
 });
 
 export const Route = createFileRoute('/search')({
   validateSearch: searchSchema,
-  beforeLoad: async ({ context: { queryClient }, search }) => {
-    const searchIndex = await queryClient.ensureQueryData(
-      getSearchIndexOptions({}),
-    );
+  beforeLoad: async ({ context: { queryClient, currentSeason }, search }) => {
+    const searchIndex = await queryClient.ensureQueryData({
+      ...getSearchIndexOptions({}),
+      staleTime: STALE_TIME.SEARCH_INDEX,
+    });
     // Tanstack may auto-parse '604' to a number, so just stringify it just in case
-    const result = getSearchRedirect(searchIndex, search.q.toString());
+    const result = getSearchRedirect(
+      searchIndex,
+      search.q.toString(),
+      currentSeason,
+    );
 
     // If we found a team or event, redirect to it
     if (result.type === 'team' || result.type === 'event') {
@@ -37,13 +43,14 @@ export const Route = createFileRoute('/search')({
     ],
   }),
   component: SearchRoute,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function SearchRoute() {
   const { query } = Route.useRouteContext();
 
   return (
-    <div className="container max-w-2xl py-8">
+    <div className="mx-auto max-w-2xl px-4">
       <h1 className="mb-4 text-3xl font-medium">No Results Found</h1>
       {query && (
         <p className="mb-4 text-muted-foreground">
@@ -58,6 +65,10 @@ function SearchRoute() {
           <li>
             Team nicknames (e.g., &quot;Cheesy Poofs&quot;,
             &quot;Quixilver&quot;)
+          </li>
+          <li>
+            Team number and year (e.g., &quot;254 2024&quot;,
+            &quot;604/2025&quot;)
           </li>
           <li>Event keys (e.g., &quot;2024casj&quot;, &quot;2024mil&quot;)</li>
           <li>Event names (e.g., &quot;Silicon Valley Regional&quot;)</li>

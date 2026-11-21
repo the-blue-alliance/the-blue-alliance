@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import traceback
-from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
 from backend.common.consts.alliance_color import (
@@ -14,6 +13,8 @@ from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2019
 from backend.common.game_specific.base import (
     PredictionStatConfig,
+    RobotPointsAccessor,
+    safe_div,
     StatAccessor,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
@@ -21,6 +22,18 @@ from backend.common.game_specific.base import (
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
+
+
+def _sandstorm_bonus_points(breakdown: Dict[str, Any]) -> List[float]:
+    level_points = {"HabLevel1": 3.0, "HabLevel2": 6.0}
+    return [
+        (
+            level_points.get(breakdown.get(f"preMatchLevelRobot{robot}"), 0.0)
+            if breakdown.get(f"habLineRobot{robot}") == "CrossedHabLineInSandstorm"
+            else 0.0
+        )
+        for robot in (1, 2, 3)
+    ]
 
 
 class GameSpecifics2019(
@@ -32,6 +45,10 @@ class GameSpecifics2019(
         "habDockingRankingPoint",
     )
     BONUS_RP_PREDICTION_FIELDS = ("prob_complete_rocket", "prob_hab_docking")
+    BONUS_RP_LABELS = (
+        "Complete Rocket",
+        "HAB Docking",
+    )
 
     def tiebreak_criteria(
         self, red: ScoreDetailModelAlliance2019, blue: ScoreDetailModelAlliance2019
@@ -112,8 +129,15 @@ class GameSpecifics2019(
         cargo_ship_cargo_preload_count = [0] * 6  # 0 starts from far left
         cargo_ship_hatch_panel_count = [0] * 8  # 0 starts from far left
         cargo_ship_cargo_count = [0] * 8  # 0 starts from far left
-        rocket_hatch_panel_count = defaultdict(int)
-        rocket_cargo_count = defaultdict(int)
+        # Every slot is present so templates render even without breakdowns
+        rocket_slots = [
+            f"{level}{side}{end}"
+            for level in ("low", "mid", "top")
+            for side in ("Left", "Right")
+            for end in ("Near", "Far")
+        ]
+        rocket_hatch_panel_count: Dict[str, int] = {slot: 0 for slot in rocket_slots}
+        rocket_cargo_count: Dict[str, int] = {slot: 0 for slot in rocket_slots}
         hatch_panel_points = 0
         cargo_points = 0
         level1_climb_count = 0
@@ -131,11 +155,12 @@ class GameSpecifics2019(
         foul_scores = 0
         high_score: Tuple[int, str, str] = (0, "", "")  # kpa, match key, match name
 
-        finished_matches = 0
-        has_insights = False
+        scored_matches = 0  # played matches, for alliance-score stats
+        breakdown_matches = 0  # played matches with a score breakdown
         for match in matches:
             if not match.has_been_played:
                 continue
+            scored_matches += 1
 
             red_score = match.alliances[AllianceColor.RED]["score"]
             blue_score = match.alliances[AllianceColor.BLUE]["score"]
@@ -248,12 +273,9 @@ class GameSpecifics2019(
                             elif NFSide == "Far" and LRSide == "Left":
                                 alLRSide = "Right" if isRed else "Left"
                                 alNFSide = "Far" if isRed else "Near"
-                            elif NFSide == "Far" and LRSide == "Right":
+                            else:  # NFSide == "Far" and LRSide == "Right"
                                 alLRSide = "Right" if isRed else "Left"
                                 alNFSide = "Near" if isRed else "Far"
-                            else:
-                                alLRSide = ""
-                                alNFSide = ""
 
                             rocket_hatch_panel_count[
                                 "low{}{}".format(alLRSide, alNFSide)
@@ -302,7 +324,6 @@ class GameSpecifics2019(
                     )
 
                     foul_scores += alliance_breakdown["foulPoints"]
-                    has_insights = True
                 except Exception:
                     msg = "Event insights failed for {}".format(match.key.id())
                     # event.get() below should be cheap since it's backed by context cache
@@ -311,107 +332,108 @@ class GameSpecifics2019(
                         logging.warning(traceback.format_exc())
                     else:
                         logging.info(msg)
-            finished_matches += 1
+            breakdown_matches += 1
 
-        if not has_insights:
+        if scored_matches == 0:
             return None
 
-        if finished_matches == 0:
-            return {}
-
-        opportunities_1x = 2 * finished_matches  # once per alliance
-        opportunities_3x = 6 * finished_matches  # 3x per alliance
+        opportunities_1x = 2 * breakdown_matches  # once per alliance
+        opportunities_3x = 6 * breakdown_matches  # 3x per alliance
         average_rocket_hatch_panel_count = {}
         for key, value in rocket_hatch_panel_count.items():
-            average_rocket_hatch_panel_count[key] = (
-                100 * float(value) / opportunities_1x
+            average_rocket_hatch_panel_count[key] = safe_div(
+                100 * value, opportunities_1x
             )
         average_rocket_cargo_count = {}
         for key, value in rocket_cargo_count.items():
-            average_rocket_cargo_count[key] = 100 * float(value) / opportunities_1x
+            average_rocket_cargo_count[key] = safe_div(100 * value, opportunities_1x)
         event_insights = {
             # Auto
-            "average_sandstorm_bonus_auto": float(sandstorm_bonus_auto)
-            / (2 * finished_matches),
-            "average_points_auto": float(points_auto) / (2 * finished_matches),
+            "average_sandstorm_bonus_auto": safe_div(
+                sandstorm_bonus_auto, 2 * breakdown_matches
+            ),
+            "average_points_auto": safe_div(points_auto, 2 * breakdown_matches),
             # Teleop
-            "average_hab_climb_teleop": float(hab_climb_teleop)
-            / (2 * finished_matches),
-            "average_points_teleop": float(points_teleop) / (2 * finished_matches),
+            "average_hab_climb_teleop": safe_div(
+                hab_climb_teleop, 2 * breakdown_matches
+            ),
+            "average_points_teleop": safe_div(points_teleop, 2 * breakdown_matches),
             # Overall
             "cross_hab_line_count": [
                 cross_hab_line_count,
                 opportunities_3x,
-                100.0 * float(cross_hab_line_count) / opportunities_3x,
+                safe_div(100.0 * cross_hab_line_count, opportunities_3x),
             ],
             "cross_hab_line_sandstorm_count": [
                 cross_hab_line_sandstorm_count,
                 opportunities_3x,
-                100.0 * float(cross_hab_line_sandstorm_count) / opportunities_3x,
+                safe_div(100.0 * cross_hab_line_sandstorm_count, opportunities_3x),
             ],
             "level1_climb_count": [
                 level1_climb_count,
                 opportunities_3x,
-                100.0 * float(level1_climb_count) / opportunities_3x,
+                safe_div(100.0 * level1_climb_count, opportunities_3x),
             ],
             "level2_climb_count": [
                 level2_climb_count,
                 opportunities_3x,
-                100.0 * float(level2_climb_count) / opportunities_3x,
+                safe_div(100.0 * level2_climb_count, opportunities_3x),
             ],
             "level3_climb_count": [
                 level3_climb_count,
                 opportunities_3x,
-                100.0 * float(level3_climb_count) / opportunities_3x,
+                safe_div(100.0 * level3_climb_count, opportunities_3x),
             ],
             "complete_1_rocket_count": [
                 complete_1_rocket_count,
                 opportunities_1x,
-                100.0 * float(complete_1_rocket_count) / opportunities_1x,
+                safe_div(100.0 * complete_1_rocket_count, opportunities_1x),
             ],
             "complete_2_rockets_count": [
                 complete_2_rockets_count,
                 opportunities_1x,
-                100.0 * float(complete_2_rockets_count) / opportunities_1x,
+                safe_div(100.0 * complete_2_rockets_count, opportunities_1x),
             ],
             "average_cargo_ship_hatch_panel_preload_count": [
-                100.0 * float(x) / opportunities_1x
+                safe_div(100.0 * x, opportunities_1x)
                 for x in cargo_ship_hatch_panel_preload_count
             ],
             "average_cargo_ship_cargo_preload_count": [
-                100.0 * float(x) / opportunities_1x
+                safe_div(100.0 * x, opportunities_1x)
                 for x in cargo_ship_cargo_preload_count
             ],
             "average_cargo_ship_hatch_panel_count": [
-                100.0 * float(x) / opportunities_1x
+                safe_div(100.0 * x, opportunities_1x)
                 for x in cargo_ship_hatch_panel_count
             ],
             "average_cargo_ship_cargo_count": [
-                100.0 * float(x) / opportunities_1x for x in cargo_ship_cargo_count
+                safe_div(100.0 * x, opportunities_1x) for x in cargo_ship_cargo_count
             ],
             "average_rocket_hatch_panel_count": average_rocket_hatch_panel_count,
             "average_rocket_cargo_count": average_rocket_cargo_count,
-            "average_hatch_panel_points": float(hatch_panel_points) / opportunities_1x,
-            "average_cargo_points": float(cargo_points) / opportunities_1x,
+            "average_hatch_panel_points": safe_div(
+                hatch_panel_points, opportunities_1x
+            ),
+            "average_cargo_points": safe_div(cargo_points, opportunities_1x),
             "rocket_rp_achieved": [
                 rocket_rp_achieved,
                 opportunities_1x,
-                100.0 * float(rocket_rp_achieved) / opportunities_1x,
+                safe_div(100.0 * rocket_rp_achieved, opportunities_1x),
             ],
             "climb_rp_achieved": [
                 climb_rp_achieved,
                 opportunities_1x,
-                100.0 * float(climb_rp_achieved) / opportunities_1x,
+                safe_div(100.0 * climb_rp_achieved, opportunities_1x),
             ],
             "unicorn_matches": [
                 unicorn_matches,
                 opportunities_1x,
-                100.0 * float(unicorn_matches) / opportunities_1x,
+                safe_div(100.0 * unicorn_matches, opportunities_1x),
             ],
-            "average_win_score": float(winning_scores) / finished_matches,
-            "average_win_margin": float(win_margins) / finished_matches,
-            "average_score": float(total_scores) / opportunities_1x,
-            "average_foul_score": float(foul_scores) / opportunities_1x,
+            "average_win_score": float(winning_scores) / scored_matches,
+            "average_win_margin": float(win_margins) / scored_matches,
+            "average_score": float(total_scores) / (2 * scored_matches),
+            "average_foul_score": safe_div(foul_scores, opportunities_1x),
             "high_score": list(high_score),  # [score, match key, match name]
         }
 
@@ -423,6 +445,11 @@ class GameSpecifics2019(
                 match.score_breakdown[color].get("cargoPoints", 0)
                 + match.score_breakdown[color].get("hatchPanelPoints", 0)
             )
+        }
+
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
+        return {
+            "sandStormBonusPoints": _sandstorm_bonus_points,
         }
 
     def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:

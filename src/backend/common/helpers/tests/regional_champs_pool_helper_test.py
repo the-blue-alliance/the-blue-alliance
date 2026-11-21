@@ -1,9 +1,12 @@
 import json
-from typing import cast
+from types import SimpleNamespace
+from typing import cast, List
 
 import pytest
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
+from backend.common.futures import TypedFuture
 from backend.common.helpers.regional_champs_pool_helper import (
     DistrictRankingTeamTotal,
     RegionalChampsPoolHelper,
@@ -318,3 +321,47 @@ def test_single_event_bonus_includes_rookie_bonus(setup_full_event) -> None:
     assert rankings["frc9002"]["rookie_bonus"] == 10
     assert rankings["frc9002"]["single_event_bonus"] == 35
     assert rankings["frc9002"]["point_total"] == 70
+
+
+def test_calc_rankings_counts_first_two_events_and_accepts_futures() -> None:
+    def fake_event(event_key: str, total: int) -> Event:
+        return cast(
+            Event,
+            SimpleNamespace(
+                key_name=event_key,
+                regional_champs_pool_points={
+                    "points": {
+                        "frc254": {
+                            "qual_points": total,
+                            "elim_points": 0,
+                            "alliance_points": 0,
+                            "award_points": 0,
+                            "total": total,
+                        }
+                    },
+                    "tiebreakers": {},
+                },
+            ),
+        )
+
+    events = [
+        fake_event("2025e1", 10),
+        fake_event("2025e2", 20),
+        fake_event("2025e3", 40),  # A third event doesn't count
+    ]
+
+    team_future = ndb.Future()
+    team_future.set_result(Team(id="frc254", team_number=254))
+    teams_future = ndb.Future()
+    teams_future.set_result([team_future])
+
+    rankings = RegionalChampsPoolHelper.calculate_rankings(
+        events, cast(TypedFuture[List[Team]], teams_future), 2025, None
+    )
+
+    assert list(rankings.keys()) == ["frc254"]
+    assert rankings["frc254"]["point_total"] == 30
+    assert [e[0].key_name for e in rankings["frc254"]["event_points"]] == [
+        "2025e1",
+        "2025e2",
+    ]

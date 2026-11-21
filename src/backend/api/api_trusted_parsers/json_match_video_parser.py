@@ -6,7 +6,7 @@ from backend.common.datafeed_parsers.exceptions import ParserInputException
 from backend.common.models.keys import EventKey, MatchKey
 from backend.common.models.match import Match
 
-YOUTUBE_VIDEO_ID_PATTERN = re.compile(r"^[0-9A-Za-z\-_]{11}$")
+YOUTUBE_VIDEO_ID_PATTERN = re.compile(r"^[0-9A-Za-z\-_]{11}(\?t=\d+)?$")
 
 
 class JSONMatchVideoParser:

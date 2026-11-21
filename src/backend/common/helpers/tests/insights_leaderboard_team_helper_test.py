@@ -1,10 +1,15 @@
+from types import SimpleNamespace
+from typing import cast, List
+
 from google.appengine.ext import ndb
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.insights_leaderboard_team_helper import (
+    AbstractLeaderboardCalculator,
     InsightsLeaderboardTeamCalculator,
     LongestEinsteinStreakCalculator,
+    LongestQualifyingEventStreakCalculator,
     MostAwardsCalculator,
     MostBlueBannersCalculator,
     MostEventsPlayedAtCalculator,
@@ -336,3 +341,63 @@ def test_most_wffas(ndb_stub, test_data_importer):
     assert insight is not None
     assert insight.data["rankings"] == [{"keys": ["frc250", "frc395"], "value": 1}]
     assert insight.data["key_type"] == "team"
+
+
+def test_abstract_calculator_defaults() -> None:
+    class NoopCalculator(AbstractLeaderboardCalculator):
+        pass
+
+    calculator = NoopCalculator()
+    assert calculator.on_event(Event(id="2020nyny")) is None
+    assert calculator.make_insight(0) is None
+
+
+def test_einstein_streaks_with_gap() -> None:
+    assert LongestEinsteinStreakCalculator.get_streaks([2015, 2016, 2018]) == [2, 1]
+
+
+def _fake_event(
+    event_type: EventType, winners: List[str], teams: List[str], has_matches=True
+) -> Event:
+    return cast(
+        Event,
+        SimpleNamespace(
+            event_type_enum=event_type,
+            matches=[object()] if has_matches else [],
+            awards=[
+                SimpleNamespace(
+                    award_type_enum=AwardType.WINNER,
+                    team_list=[ndb.Key(Team, t) for t in winners],
+                ),
+                SimpleNamespace(
+                    award_type_enum=AwardType.CHAIRMANS,
+                    team_list=[ndb.Key(Team, "frc111")],
+                ),
+            ],
+            teams=[Team(id=t, team_number=int(t[3:])) for t in teams],
+        ),
+    )
+
+
+def test_longest_qualifying_event_streak() -> None:
+    calculator = LongestQualifyingEventStreakCalculator()
+    teams = ["frc254", "frc1114", "frc2056"]
+
+    calculator.on_event(_fake_event(EventType.REGIONAL, ["frc254", "frc1114"], teams))
+    calculator.on_event(_fake_event(EventType.DISTRICT, ["frc254", "frc1114"], teams))
+    # Ignored: not a qualifying event type, and a cancelled event
+    calculator.on_event(_fake_event(EventType.OFFSEASON, [], teams))
+    calculator.on_event(_fake_event(EventType.REGIONAL, [], teams, has_matches=False))
+    # frc1114's streak is broken
+    calculator.on_event(_fake_event(EventType.REGIONAL, ["frc254", "frc2056"], teams))
+    calculator.on_event(_fake_event(EventType.REGIONAL, ["frc2056"], teams))
+    calculator.on_event(_fake_event(EventType.REGIONAL, ["frc2056"], teams))
+
+    assert calculator.make_insight(2020) is None
+
+    insight = calculator.make_insight(0)
+    assert insight is not None
+    assert insight.data["rankings"] == [
+        {"keys": ["frc254", "frc2056"], "value": 3},
+        {"keys": ["frc1114"], "value": 2},
+    ]

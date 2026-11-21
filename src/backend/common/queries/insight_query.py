@@ -54,7 +54,7 @@ class InsightsNotablesYearQuery(CachedDatabaseQuery[List[Insight], List[InsightD
         return insights
 
 
-class DistrictInsightQuery(CachedDatabaseQuery[Insight, InsightDict]):
+class DistrictInsightQuery(CachedDatabaseQuery[List[Insight], List[InsightDict]]):
     CACHE_VERSION = 10
     CACHE_KEY_FORMAT = "insight_{insight_name}_{year}_{district_abbreviation}"
     DICT_CONVERTER = InsightConverter
@@ -71,14 +71,14 @@ class DistrictInsightQuery(CachedDatabaseQuery[Insight, InsightDict]):
     @typed_tasklet
     def _query_async(
         self, insight_name: str, year: Year, district_abbreviation: DistrictAbbreviation
-    ) -> Generator[Any, Any, Insight]:
-        insight = yield Insight.query(
+    ) -> Generator[Any, Any, List[Insight]]:
+        insights = yield Insight.query(
             Insight.name == insight_name,
             Insight.year == year,
             Insight.district_abbreviation == district_abbreviation,
         ).fetch_async()
 
-        return insight
+        return insights
 
 
 class DistrictInsightsYearQuery(CachedDatabaseQuery[List[Insight], List[InsightDict]]):

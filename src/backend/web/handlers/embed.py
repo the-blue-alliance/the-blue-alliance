@@ -12,7 +12,7 @@ from backend.common.models.media import Media
 from backend.common.models.team import Team
 
 
-@cached_public(ttl=timedelta(hours=24))
+@cached_public(ttl=timedelta(hours=24), not_found_ttl=timedelta(hours=24))
 def avatar_png(year: int, team_key: str):
     if not Environment.is_dev() and (
         not request.referrer or ("thebluealliance.com" not in request.referrer)

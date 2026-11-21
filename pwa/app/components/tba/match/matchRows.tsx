@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
-import { Temporal } from 'temporal-polyfill';
+import { cn } from 'cn';
 
+import BiStarFill from '~icons/bi/star-fill';
 import HourglassIcon from '~icons/ic/baseline-hourglass-empty';
 import PlayArrowIcon from '~icons/ic/baseline-play-arrow';
 import PendingIcon from '~icons/ic/outline-pending';
@@ -24,9 +25,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { matchTitleShort } from '~/lib/matchUtils';
+import { useFavoriteTeamKeys } from '~/lib/hooks/useFavoriteTeams';
+import { formatMatchTime, matchTitleShort } from '~/lib/matchUtils';
 import type { NexusMatchStatus } from '~/lib/nexus';
-import { cn } from '~/lib/utils';
 
 interface PlaylistEntry {
   url: string;
@@ -63,13 +64,13 @@ export default function SimpleMatchRowsWithBreaks({
   matches,
   event,
   breakers,
-  focusTeamKey,
+  focusTeamKeys,
   nexusStatusByKey,
 }: {
   matches: Match[];
   event: Event;
   breakers: ShouldInsertBreakCallback[];
-  focusTeamKey?: string;
+  focusTeamKeys?: string[];
   nexusStatusByKey?: Record<string, NexusMatchStatus>;
 }) {
   const playlistUrls = buildYoutubePlaylistUrls(matches, event.name);
@@ -96,6 +97,7 @@ export default function SimpleMatchRowsWithBreaks({
           <BreakRow
             key={`break-before-${i}-${bi}`}
             text={result.text ?? 'Break'}
+            size={result.size}
             playlists={isFirst ? playlistUrls : undefined}
           />,
         );
@@ -108,11 +110,9 @@ export default function SimpleMatchRowsWithBreaks({
         event={event}
         year={event.year}
         key={match.key}
-        focusTeamKey={focusTeamKey}
+        focusTeamKeys={focusTeamKeys}
         nexusStatus={nexusStatusByKey?.[match.key]}
-        className={cn(
-          zebraIdx % 2 === 0 && 'bg-neutral-50 dark:bg-neutral-900',
-        )}
+        className={cn(zebraIdx % 2 === 0 && 'bg-surface-subtle')}
       />,
     );
     zebraIdx++;
@@ -132,6 +132,7 @@ export default function SimpleMatchRowsWithBreaks({
           <BreakRow
             key={`break-after-${i}-${bi}`}
             text={result.text ?? 'Break'}
+            size={result.size}
             playlists={isFirst ? playlistUrls : undefined}
           />,
         );
@@ -139,7 +140,7 @@ export default function SimpleMatchRowsWithBreaks({
     }
   }
 
-  return <div className="flex flex-col divide-y">{divs}</div>;
+  return <div className="@container flex flex-col divide-y">{divs}</div>;
 }
 
 const NEXUS_STATUS_ICONS: Record<NexusMatchStatus, React.ReactNode> = {
@@ -151,13 +152,15 @@ const NEXUS_STATUS_ICONS: Record<NexusMatchStatus, React.ReactNode> = {
 function NexusStatusIconWithTooltip({ status }: { status: NexusMatchStatus }) {
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <span
-          className="mx-2 inline-flex items-center justify-center"
-          aria-label={`Nexus status: ${status}`}
-        >
-          {NEXUS_STATUS_ICONS[status]}
-        </span>
+      <TooltipTrigger
+        render={
+          <span
+            className="mx-2 inline-flex items-center justify-center"
+            aria-label={`Nexus status: ${status}`}
+          />
+        }
+      >
+        {NEXUS_STATUS_ICONS[status]}
       </TooltipTrigger>
       <TooltipContent sideOffset={6}>{status}</TooltipContent>
     </Tooltip>
@@ -168,14 +171,14 @@ export function MatchRow({
   match,
   event,
   year,
-  focusTeamKey,
+  focusTeamKeys = [],
   nexusStatus,
   className,
 }: {
   match: Match;
   event: Event;
   year: number;
-  focusTeamKey?: string;
+  focusTeamKeys?: string[];
   nexusStatus?: NexusMatchStatus;
   className?: string;
 }) {
@@ -183,13 +186,18 @@ export function MatchRow({
   const maybeVideoURL = maybeGetFirstMatchVideoURL(match);
   const isPlayed =
     match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
-  const focusedAlliance = focusTeamKey
-    ? match.alliances.red.team_keys.includes(focusTeamKey)
-      ? AllianceColor.RED
-      : match.alliances.blue.team_keys.includes(focusTeamKey)
-        ? AllianceColor.BLUE
-        : null
-    : null;
+  const matchTime = match.predicted_time ?? match.time;
+  const isRedFocused = match.alliances.red.team_keys.some((k) =>
+    focusTeamKeys.includes(k),
+  );
+  const isBlueFocused = match.alliances.blue.team_keys.some((k) =>
+    focusTeamKeys.includes(k),
+  );
+  const { teamKeys: favoriteTeamKeys } = useFavoriteTeamKeys();
+  const hasFavorite = [
+    ...match.alliances.red.team_keys,
+    ...match.alliances.blue.team_keys,
+  ].some((teamKey) => favoriteTeamKeys.includes(teamKey));
 
   /* Desktop: 1x11 grid, Mobile: 2x6 grid */
   return (
@@ -197,14 +205,16 @@ export function MatchRow({
       className={cn(
         `mx-auto grid w-full max-w-6xl grid-cols-[2.5em_7em_repeat(4,1fr)]
         grid-rows-[2em_2em] gap-0.5 text-sm numeric-data
-        xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1`,
+        @min-[34rem]:grid-cols-[2.5em_7em_repeat(9,1fr)]
+        @min-[34rem]:grid-rows-1`,
         className,
       )}
     >
       {/* Play Button */}
       <div
         className="row-span-2 flex items-center justify-center rounded-tl-lg
-          xl:col-span-1 xl:row-span-1 xl:rounded-l-lg"
+          @min-[34rem]:col-span-1 @min-[34rem]:row-span-1
+          @min-[34rem]:rounded-l-lg"
       >
         {maybeVideoURL ? (
           <Link
@@ -223,60 +233,63 @@ export function MatchRow({
       {/* Match Name */}
       <div
         className="row-span-2 flex items-center justify-center p-1.5
-          xl:col-span-2 xl:row-span-1"
+          @min-[34rem]:col-span-2 @min-[34rem]:row-span-1"
       >
-        <MatchLink
-          matchOrKey={match}
-          event={event}
-          className="text-center text-sm text-foreground"
-        >
-          {matchTitleShort(match, playoffType)}
-        </MatchLink>
+        <span className="relative">
+          {hasFavorite && (
+            <span className="absolute top-1/2 right-full mr-1 -translate-y-1/2">
+              <BiStarFill aria-hidden className="size-3 text-yellow-500" />
+              <span className="sr-only">Includes a favorite team</span>
+            </span>
+          )}
+          <MatchLink
+            matchOrKey={match}
+            event={event}
+            className="text-center text-sm text-foreground"
+          >
+            {matchTitleShort(match, playoffType)}
+          </MatchLink>
+        </span>
       </div>
 
       {/* Red Team Players - Subgrid Component */}
       <TeamListSubgrid
         teamKeys={match.alliances.red.team_keys}
         allianceColor="red"
-        className="col-span-3 pt-0.5 xl:col-span-3 xl:pb-0.5"
-        teamCellClassName="max-xl:first:rounded-tl-lg max-xl:last:rounded-tr-lg xl:first:rounded-l-lg"
+        className="col-span-3 pt-0.5 @min-[34rem]:col-span-3
+          @min-[34rem]:pb-0.5"
+        teamCellClassName="@max-[34rem]:first:rounded-tl-lg @max-[34rem]:last:rounded-tr-lg @min-[34rem]:first:rounded-l-lg"
         winner={match.winning_alliance === AllianceColor.RED}
         dq={match.alliances.red.dq_team_keys}
         surrogate={match.alliances.red.surrogate_team_keys}
         year={year}
-        focusTeamKey={focusTeamKey}
+        focusTeamKeys={focusTeamKeys}
+        favoriteTeamKeys={favoriteTeamKeys}
       />
 
       {/* Blue Team Players - Subgrid Component */}
       <TeamListSubgrid
         teamKeys={match.alliances.blue.team_keys}
         allianceColor="blue"
-        className="col-span-3 pb-0.5 xl:col-span-3 xl:pt-0.5"
-        teamCellClassName="max-xl:first:rounded-bl-lg max-xl:last:rounded-br-lg xl:last:rounded-r-lg"
+        className="col-span-3 pb-0.5 @min-[34rem]:col-span-3
+          @min-[34rem]:pt-0.5"
+        teamCellClassName="@max-[34rem]:first:rounded-bl-lg @max-[34rem]:last:rounded-br-lg @min-[34rem]:last:rounded-r-lg"
         winner={match.winning_alliance === AllianceColor.BLUE}
         dq={match.alliances.blue.dq_team_keys}
         surrogate={match.alliances.blue.surrogate_team_keys}
         year={year}
-        focusTeamKey={focusTeamKey}
+        focusTeamKeys={focusTeamKeys}
+        favoriteTeamKeys={favoriteTeamKeys}
       />
 
       {!isPlayed && (
         <div
-          className="col-start-6 row-span-2 row-start-1 xl:col-span-2
-            xl:col-start-auto xl:row-span-1 xl:row-start-auto"
+          className="col-start-6 row-span-2 row-start-1 @min-[34rem]:col-span-2
+            @min-[34rem]:col-start-auto @min-[34rem]:row-span-1
+            @min-[34rem]:row-start-auto"
         >
           <span className="flex h-full items-center justify-center text-center">
-            {match.predicted_time &&
-              Temporal.Instant.fromEpochMilliseconds(
-                match.predicted_time * 1000,
-              )
-                .toZonedDateTimeISO(Temporal.Now.timeZoneId())
-                .toLocaleString('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  weekday: 'short',
-                  hour12: true,
-                })}
+            {matchTime && formatMatchTime(matchTime)}
           </span>
         </div>
       )}
@@ -286,14 +299,15 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.red.score}
           allianceColor="red"
-          className="col-start-6 row-start-1 mt-0.5 max-lg:rounded-t-lg
-            xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mb-0.5
-            xl:rounded-l-lg"
+          className="col-start-6 row-start-1 mt-0.5 @max-[34rem]:rounded-t-lg
+            @min-[34rem]:col-span-1 @min-[34rem]:col-start-auto
+            @min-[34rem]:row-start-auto @min-[34rem]:mb-0.5
+            @min-[34rem]:rounded-l-lg"
           winner={match.winning_alliance === AllianceColor.RED}
           scoreBreakdown={match.score_breakdown?.red}
           year={year}
           compLevel={match.comp_level}
-          focused={focusedAlliance === AllianceColor.RED}
+          focused={isRedFocused}
         />
       )}
 
@@ -302,14 +316,15 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.blue.score}
           allianceColor="blue"
-          className="col-start-6 row-start-2 mb-0.5 max-lg:rounded-b-lg
-            xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mt-0.5
-            xl:rounded-r-lg"
+          className="col-start-6 row-start-2 mb-0.5 @max-[34rem]:rounded-b-lg
+            @min-[34rem]:col-span-1 @min-[34rem]:col-start-auto
+            @min-[34rem]:row-start-auto @min-[34rem]:mt-0.5
+            @min-[34rem]:rounded-r-lg"
           winner={match.winning_alliance === AllianceColor.BLUE}
           scoreBreakdown={match.score_breakdown?.blue}
           year={year}
           compLevel={match.comp_level}
-          focused={focusedAlliance === AllianceColor.BLUE}
+          focused={isBlueFocused}
         />
       )}
     </div>
@@ -326,6 +341,7 @@ export function SimpleMatchRow({
 }) {
   const isPlayed =
     match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
+  const matchTime = match.predicted_time ?? match.time;
 
   return (
     <div>
@@ -379,18 +395,7 @@ export function SimpleMatchRow({
             className="col-start-4 row-span-2 row-start-2 flex items-center
               justify-center text-center"
           >
-            <span>
-              {match.predicted_time &&
-                new Date(match.predicted_time * 1000).toLocaleTimeString(
-                  'en-US',
-                  {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    weekday: 'short',
-                    hour12: true,
-                  },
-                )}
-            </span>
+            <span>{matchTime && formatMatchTime(matchTime)}</span>
           </div>
         )}
 
@@ -429,16 +434,19 @@ function maybeGetFirstMatchVideoURL(match: Match): string | undefined {
     return undefined;
   }
 
-  return `https://www.youtube.com/watch?v=${match.videos[0].key}`;
+  // Video key may contain start time query param (e.g., "?t=123"); convert "?" to "&" for watch?v= URL structure
+  return `https://www.youtube.com/watch?v=${match.videos[0].key.replace('?', '&')}`;
 }
 
 interface BreakRowProps extends React.HTMLAttributes<HTMLDivElement> {
   text: string;
+  size?: 'default' | 'small';
   playlists?: PlaylistEntry[];
 }
 export function BreakRow({
   className,
   text,
+  size = 'default',
   playlists,
   ...props
 }: BreakRowProps) {
@@ -448,12 +456,15 @@ export function BreakRow({
       {...props}
     >
       <div
-        className="relative flex h-8 w-full items-center justify-center text-sm
-          font-medium"
+        className={cn(
+          `grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2 px-2
+          font-medium`,
+          size === 'small' ? 'h-5 text-xs' : 'h-8 text-sm',
+        )}
       >
-        <span>{text}</span>
+        <span className="col-start-2">{text}</span>
         {playlists && playlists.length > 0 && (
-          <div className="absolute right-2 flex items-center">
+          <div className="flex items-center justify-self-end whitespace-nowrap">
             {playlists.length === 1 ? (
               <a
                 href={playlists[0].url}
@@ -478,17 +489,20 @@ export function BreakRow({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {playlists.map(({ url, label }) => (
-                    <DropdownMenuItem key={url} asChild>
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex cursor-pointer items-center gap-2"
-                      >
-                        <YoutubeIcon className="size-3.5" />
-                        {label}
-                      </a>
-                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      key={url}
+                      render={
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex cursor-pointer items-center gap-2"
+                        >
+                          <YoutubeIcon className="size-3.5" />
+                          {label}
+                        </a>
+                      }
+                    />
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -11,7 +11,11 @@ class LivescoreDisplay extends React.PureComponent {
 
   componentDidMount() {
     this.updateCurrentTime();
-    setInterval(this.updateCurrentTime, 10000);
+    this.interval = setInterval(this.updateCurrentTime, 10000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   updateCurrentTime = () => {
@@ -198,10 +202,12 @@ class LivescoreDisplay extends React.PureComponent {
           <h3>{matchLabel}</h3>
           <div className="col-container">
             <div className="side-col">
-              <div className={`booleanIndicator ${redScaleOwned && "red"}`}>
+              <div className={`booleanIndicator ${redScaleOwned ? "red" : ""}`}>
                 Scale
               </div>
-              <div className={`booleanIndicator ${redSwitchOwned && "red"}`}>
+              <div
+                className={`booleanIndicator ${redSwitchOwned ? "red" : ""}`}
+              >
                 Switch
               </div>
               <div className="powerupsContainer">
@@ -225,10 +231,12 @@ class LivescoreDisplay extends React.PureComponent {
                   played={redBoostPlayed}
                 />
               </div>
-              <div className={`booleanIndicator ${redAutoQuest && "red"}`}>
+              <div className={`booleanIndicator ${redAutoQuest ? "red" : ""}`}>
                 Auto Quest
               </div>
-              <div className={`booleanIndicator ${redFaceTheBoss && "red"}`}>
+              <div
+                className={`booleanIndicator ${redFaceTheBoss ? "red" : ""}`}
+              >
                 Face The Boss
               </div>
             </div>
@@ -275,10 +283,14 @@ class LivescoreDisplay extends React.PureComponent {
               )}
             </div>
             <div className="side-col">
-              <div className={`booleanIndicator ${blueScaleOwned && "blue"}`}>
+              <div
+                className={`booleanIndicator ${blueScaleOwned ? "blue" : ""}`}
+              >
                 Scale
               </div>
-              <div className={`booleanIndicator ${blueSwitchOwned && "blue"}`}>
+              <div
+                className={`booleanIndicator ${blueSwitchOwned ? "blue" : ""}`}
+              >
                 Switch
               </div>
               <div className="powerupsContainer">
@@ -302,10 +314,14 @@ class LivescoreDisplay extends React.PureComponent {
                   played={blueBoostPlayed}
                 />
               </div>
-              <div className={`booleanIndicator ${blueAutoQuest && "blue"}`}>
+              <div
+                className={`booleanIndicator ${blueAutoQuest ? "blue" : ""}`}
+              >
                 Auto Quest
               </div>
-              <div className={`booleanIndicator ${blueFaceTheBoss && "blue"}`}>
+              <div
+                className={`booleanIndicator ${blueFaceTheBoss ? "blue" : ""}`}
+              >
                 Face The Boss
               </div>
             </div>
@@ -317,7 +333,7 @@ class LivescoreDisplay extends React.PureComponent {
 }
 
 LivescoreDisplay.propTypes = {
-  matches: PropTypes.list,
+  matches: PropTypes.array,
   matchState: PropTypes.object,
 };
 

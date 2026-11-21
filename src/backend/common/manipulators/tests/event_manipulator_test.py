@@ -190,3 +190,70 @@ def test_get_event_location_official_event(
     else:
         get_event_location_mock.assert_called_once()
         get_timezone_id_mock.assert_called_once()
+
+
+@pytest.mark.usefixtures("ndb_context")
+def test_updateMerge_webcast_onto_event_without_webcasts(new_event: Event) -> None:
+    """When the old event has no webcasts, the new event's webcasts are taken as-is."""
+    old_event_no_webcast = Event(
+        id="2011ct",
+        event_short="ct",
+        event_type_enum=EventType.REGIONAL,
+        year=2011,
+    )
+    assert old_event_no_webcast.webcast == []
+
+    merged = EventManipulator.updateMerge(new_event, old_event_no_webcast)
+    assert merged.webcast_json == new_event.webcast_json
+    assert merged.webcast == [{"type": "ustream", "channel": "foo"}]
+    assert merged._dirty
+
+
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
+@patch.object(LocationHelper, "get_timezone_id")
+@patch.object(LocationHelper, "get_event_location", side_effect=Exception("boom"))
+def test_post_update_hook_get_event_location_throws(
+    get_event_location_mock,
+    get_timezone_id_mock,
+    old_event: Event,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    """A location lookup failure is logged and leaves timezone_id untouched."""
+    old_event.official = False
+    EventManipulator.createOrUpdate(old_event)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        run_from_task(task)
+
+    get_event_location_mock.assert_called_once()
+    get_timezone_id_mock.assert_not_called()
+    assert none_throws(Event.get_by_id("2011ct")).timezone_id is None
+
+
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
+@patch.object(LocationHelper, "get_timezone_id", return_value=None)
+@patch.object(LocationHelper, "get_event_location")
+def test_post_update_hook_timezone_lookup_returns_nothing(
+    get_event_location_mock,
+    get_timezone_id_mock,
+    old_event: Event,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    """An empty timezone lookup is logged and leaves timezone_id untouched."""
+    old_event.official = False
+    EventManipulator.createOrUpdate(old_event)
+
+    get_event_location_mock.return_value = Location(
+        lat_lng=ndb.GeoPt(37.335480, -121.893028),
+    )
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        run_from_task(task)
+
+    get_event_location_mock.assert_called_once()
+    get_timezone_id_mock.assert_called_once()
+    assert none_throws(Event.get_by_id("2011ct")).timezone_id is None

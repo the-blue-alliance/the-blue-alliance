@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import {
   type Dispatch,
   type JSX,
@@ -22,6 +23,7 @@ import {
   Match,
   PlayoffType,
 } from '~/api/tba/read';
+import BracketAllianceName from '~/components/tba/bracketAllianceName';
 import {
   EliminationBracketPaths,
   type PlayoffMatchHandle,
@@ -33,8 +35,11 @@ import { MatchLink } from '~/components/tba/links';
 import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import { Card, CardHeader, CardTitle } from '~/components/ui/card';
 import { getDivisionShortform } from '~/lib/eventUtils';
-import { sortMatchComparator } from '~/lib/matchUtils';
-import { cn } from '~/lib/utils';
+import {
+  allianceRobots,
+  findAllianceNumber,
+  sortMatchComparator,
+} from '~/lib/matchUtils';
 
 const _BracketMatchCard = forwardRef<
   PlayoffMatchHandle,
@@ -74,8 +79,10 @@ const _BracketMatchCard = forwardRef<
 
   if (!result) return null;
 
-  const isRedHighlighted = hoveredAlliance === result.redAllianceNumber;
-  const isBlueHighlighted = hoveredAlliance === result.blueAllianceNumber;
+  const isRedHighlighted =
+    hoveredAlliance !== null && hoveredAlliance === result.redAllianceNumber;
+  const isBlueHighlighted =
+    hoveredAlliance !== null && hoveredAlliance === result.blueAllianceNumber;
   const isHighlighted = isRedHighlighted || isBlueHighlighted;
 
   return (
@@ -83,7 +90,8 @@ const _BracketMatchCard = forwardRef<
       ref={cardRef}
       className={cn(
         `min-w-40 overflow-hidden rounded-md border border-neutral-200
-        bg-background transition-all duration-200 dark:border-neutral-700`,
+        bg-background transition-[border-color,box-shadow] duration-200
+        dark:border-neutral-700`,
         {
           [`border-transparent shadow-lg ring-2 ring-alliance-red-accent/75
           dark:border-transparent`]: isHighlighted && result.redWon,
@@ -101,27 +109,17 @@ const _BracketMatchCard = forwardRef<
           {result.redAllianceNumber && result.blueAllianceNumber && (
             <span className="text-xs font-normal">
               (
-              <span
-                className={cn(
-                  'transition-all duration-200',
-                  isRedHighlighted &&
-                    `rounded bg-red-100 px-1 text-sm dark:bg-red-900
-                    dark:text-white`,
-                )}
-              >
-                {getAllianceDisplayName(result.redAllianceNumber)}
-              </span>{' '}
+              <BracketAllianceName
+                name={getAllianceDisplayName(result.redAllianceNumber)}
+                color="red"
+                isHighlighted={isRedHighlighted}
+              />{' '}
               vs{' '}
-              <span
-                className={cn(
-                  'transition-all duration-200',
-                  isBlueHighlighted &&
-                    `rounded bg-blue-100 px-1 text-sm dark:bg-blue-900
-                    dark:text-white`,
-                )}
-              >
-                {getAllianceDisplayName(result.blueAllianceNumber)}
-              </span>
+              <BracketAllianceName
+                name={getAllianceDisplayName(result.blueAllianceNumber)}
+                color="blue"
+                isHighlighted={isBlueHighlighted}
+              />
               )
             </span>
           )}
@@ -140,11 +138,13 @@ const _BracketMatchCard = forwardRef<
         </div>
       </div>
       <div
-        className={`group flex cursor-pointer items-center justify-between
+        className={`flex cursor-pointer items-center justify-between
           bg-alliance-red-loser px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-red-accent
-          data-[highlight=true]:text-white`}
+          data-[highlight=true]:ring-2 data-[highlight=true]:ring-foreground
+          data-[highlight=true]:ring-inset
+          data-[winner=true]:bg-alliance-red-winner`}
         data-highlight={isRedHighlighted}
+        data-winner={result.redWon}
         ref={redRowRef}
         onMouseEnter={() =>
           result.redAllianceNumber &&
@@ -161,8 +161,7 @@ const _BracketMatchCard = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm
-                    group-data-[highlight=true]:text-white`,
+                    'w-12 text-center text-sm',
                     result.redWon && 'font-bold',
                   )}
                 >
@@ -176,7 +175,10 @@ const _BracketMatchCard = forwardRef<
             })}
           </div>
         </div>
-        <div className="flex items-center gap-1">
+        <div
+          className="flex items-center gap-1 self-stretch border-l
+            border-current/20 pl-1"
+        >
           <div className="flex min-w-0 gap-1">
             {result.redResults.map((r, i) => (
               <span
@@ -193,11 +195,13 @@ const _BracketMatchCard = forwardRef<
         </div>
       </div>
       <div
-        className={`group flex cursor-pointer items-center justify-between
+        className={`flex cursor-pointer items-center justify-between
           bg-alliance-blue-loser px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-blue-accent
-          data-[highlight=true]:text-white`}
+          data-[highlight=true]:ring-2 data-[highlight=true]:ring-foreground
+          data-[highlight=true]:ring-inset
+          data-[winner=true]:bg-alliance-blue-winner`}
         data-highlight={isBlueHighlighted}
+        data-winner={result.blueWon}
         ref={blueRowRef}
         onMouseEnter={() =>
           result.blueAllianceNumber &&
@@ -214,8 +218,7 @@ const _BracketMatchCard = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm
-                    group-data-[highlight=true]:text-white`,
+                    'w-12 text-center text-sm',
                     result.blueWon && 'font-bold',
                   )}
                 >
@@ -229,13 +232,16 @@ const _BracketMatchCard = forwardRef<
             })}
           </div>
         </div>
-        <div className="flex items-center gap-1">
+        <div
+          className="flex items-center gap-1 self-stretch border-l
+            border-current/20 pl-1"
+        >
           <div className="flex min-w-0 gap-1">
             {result.blueResults.map((r, i) => (
               <span
                 key={i}
                 className={cn(
-                  'w-8 flex-shrink-0 text-center text-sm',
+                  'w-8 shrink-0 text-center text-sm',
                   r.won && 'font-bold',
                 )}
               >
@@ -358,17 +364,8 @@ export default function TraditionalBracket({
   }, [matchGroups, is4Team, hasEighthFinals]);
 
   const getAllianceNumber = useCallback(
-    (teamKeys: string[]): number | null => {
-      for (let i = 0; i < alliances.length; i++) {
-        const allianceTeamKeys = alliances[i].picks.map((pick) =>
-          pick.substring(3),
-        );
-        if (teamKeys.every((team) => allianceTeamKeys.includes(team))) {
-          return i + 1;
-        }
-      }
-      return null;
-    },
+    (teamKeys: string[]): number | null =>
+      findAllianceNumber(teamKeys, alliances),
     [alliances],
   );
 
@@ -394,17 +391,24 @@ export default function TraditionalBracket({
       const matchBlueTeams = setMatches[0].alliances.blue.team_keys.map((t) =>
         t.substring(3),
       );
+      if (matchRedTeams.length === 0 && matchBlueTeams.length === 0) {
+        return null;
+      }
 
-      const redAllianceNumber = getAllianceNumber(matchRedTeams);
-      const blueAllianceNumber = getAllianceNumber(matchBlueTeams);
+      const redAllianceNumber = getAllianceNumber(
+        setMatches[0].alliances.red.team_keys,
+      );
+      const blueAllianceNumber = getAllianceNumber(
+        setMatches[0].alliances.blue.team_keys,
+      );
 
       const redTeams = redAllianceNumber
-        ? alliances[redAllianceNumber - 1].picks.map((pick) =>
+        ? allianceRobots(alliances[redAllianceNumber - 1]).map((pick) =>
             pick.substring(3),
           )
         : matchRedTeams;
       const blueTeams = blueAllianceNumber
-        ? alliances[blueAllianceNumber - 1].picks.map((pick) =>
+        ? allianceRobots(alliances[blueAllianceNumber - 1]).map((pick) =>
             pick.substring(3),
           )
         : matchBlueTeams;

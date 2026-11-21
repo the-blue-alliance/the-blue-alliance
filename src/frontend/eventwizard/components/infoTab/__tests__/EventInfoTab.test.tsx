@@ -832,3 +832,184 @@ describe("EventInfoTab", () => {
     });
   });
 });
+
+describe("EventInfoTab editing through its child components", () => {
+  const playoffTypes = [
+    { label: "Bracket: 8 Alliances", value: 0 },
+    { label: "Double Elimination", value: 10 },
+  ];
+  const baseEvent: ApiEvent = {
+    key: "2020test",
+    playoff_type: 0,
+    playoff_type_string: "Bracket: 8 Alliances",
+    first_event_code: "TEST123",
+    webcasts: [
+      { type: "twitch", channel: "tba", url: "https://twitch.tv/tba", date: "2020-03-01" },
+    ],
+    remap_teams: { frc123: "frc456" },
+  };
+  let mockMakeTrustedRequest: jest.Mock;
+  let mockMakeApiV3Request: jest.Mock;
+
+  const renderWithEvent = async (event: ApiEvent): Promise<void> => {
+    // EventInfoTab edits the nested webcasts/remap_teams of the fetched object
+    // in place, so hand each test its own copy of the fixture.
+    mockMakeApiV3Request.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(JSON.parse(JSON.stringify(event))),
+    });
+    render(
+      <EventInfoTab
+        authId="auth"
+        selectedEvent="2020test"
+        makeTrustedRequest={mockMakeTrustedRequest}
+        makeApiV3Request={mockMakeApiV3Request}
+      />
+    );
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Publish Changes" })).toBeEnabled();
+    });
+  };
+
+  const publishedInfo = async (): Promise<ApiEvent> => {
+    fireEvent.click(screen.getByRole("button", { name: "Publish Changes" }));
+    await waitFor(() => {
+      expect(mockMakeTrustedRequest).toHaveBeenCalledWith(
+        "/api/trusted/v1/event/2020test/info/update",
+        expect.any(String)
+      );
+    });
+    return JSON.parse(mockMakeTrustedRequest.mock.calls[0][1]);
+  };
+
+  beforeEach(() => {
+    mockMakeTrustedRequest = jest.fn().mockResolvedValue({ ok: true });
+    mockMakeApiV3Request = jest.fn();
+    global.fetch = jest.fn().mockResolvedValue({
+      json: () => Promise.resolve(playoffTypes),
+    }) as jest.Mock;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    delete (global as any).fetch;
+  });
+
+  test("edits the FIRST sync code", async () => {
+    await renderWithEvent(baseEvent);
+
+    fireEvent.change(screen.getByLabelText("FIRST Sync Code"), {
+      target: { value: "NEWCODE" },
+    });
+
+    expect(screen.getByLabelText("FIRST Sync Code")).toHaveValue("NEWCODE");
+    expect((await publishedInfo()).first_event_code).toBe("NEWCODE");
+  });
+
+  test("changes the playoff type from the dropdown", async () => {
+    await renderWithEvent(baseEvent);
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "ArrowDown", keyCode: 40 });
+    fireEvent.click(await screen.findByText("Double Elimination"));
+
+    const info = await publishedInfo();
+    expect(info.playoff_type).toBe(10);
+    expect(info.playoff_type_string).toBe("Double Elimination");
+  });
+
+  test("adds a webcast with a date and one without", async () => {
+    await renderWithEvent(baseEvent);
+
+    fireEvent.change(screen.getByPlaceholderText("https://youtu.be/abc123"), {
+      target: { value: "https://youtu.be/one" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("2025-03-02 (optional)"), {
+      target: { value: "2020-03-02" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add Webcast" }));
+    fireEvent.change(screen.getByPlaceholderText("https://youtu.be/abc123"), {
+      target: { value: "https://youtu.be/two" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add Webcast" }));
+
+    expect(screen.getByText("3 webcasts found")).toBeInTheDocument();
+    const info = await publishedInfo();
+    expect(info.webcasts).toEqual([
+      baseEvent.webcasts![0],
+      { type: "", channel: "", url: "https://youtu.be/one", date: "2020-03-02" },
+      { type: "", channel: "", url: "https://youtu.be/two" },
+    ]);
+  });
+
+  test("creates the webcast list when the event has none", async () => {
+    const { webcasts: _webcasts, ...eventWithoutWebcasts } = baseEvent;
+    await renderWithEvent(eventWithoutWebcasts);
+    expect(screen.getByText("No webcasts found")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText("https://youtu.be/abc123"), {
+      target: { value: "https://youtu.be/only" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add Webcast" }));
+
+    expect(screen.getByText("1 webcasts found")).toBeInTheDocument();
+    expect((await publishedInfo()).webcasts).toHaveLength(1);
+  });
+
+  test("removes a webcast", async () => {
+    await renderWithEvent(baseEvent);
+    expect(screen.getByText("1 webcasts found")).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByText(/twitch.tv\/tba/).querySelector("button") as HTMLElement
+    );
+
+    expect(screen.getByText("No webcasts found")).toBeInTheDocument();
+    expect((await publishedInfo()).webcasts).toEqual([]);
+  });
+
+  test("adds a team mapping, upper-casing the suffix", async () => {
+    await renderWithEvent(baseEvent);
+
+    fireEvent.change(screen.getByPlaceholderText("9254"), {
+      target: { value: "9254" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("254B"), {
+      target: { value: "254b" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add Mapping" }));
+
+    expect(screen.getByText("2 team mappings found")).toBeInTheDocument();
+    expect((await publishedInfo()).remap_teams).toEqual({
+      frc123: "frc456",
+      frc9254: "frc254B",
+    });
+  });
+
+  test("creates the team mapping table when the event has none", async () => {
+    const { remap_teams: _remap, ...eventWithoutMappings } = baseEvent;
+    await renderWithEvent(eventWithoutMappings);
+    expect(screen.getByText("No team mappings found")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText("9254"), {
+      target: { value: "1" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("254B"), {
+      target: { value: "2" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add Mapping" }));
+
+    expect(screen.getByText("1 team mappings found")).toBeInTheDocument();
+    expect((await publishedInfo()).remap_teams).toEqual({ frc1: "frc2" });
+  });
+
+  test("removes a team mapping", async () => {
+    await renderWithEvent(baseEvent);
+    expect(screen.getByText("1 team mappings found")).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByText("123", { exact: false }).querySelector("button") as HTMLElement
+    );
+
+    expect(screen.getByText("No team mappings found")).toBeInTheDocument();
+    expect((await publishedInfo()).remap_teams).toEqual({});
+  });
+});

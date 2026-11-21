@@ -6,12 +6,14 @@ from unittest.mock import patch
 import pytest
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
+from google.appengine.ext import testbed
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.firebase_pusher import FirebasePusher
+from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.models.event import Event
 from backend.common.models.match import Match
@@ -809,3 +811,222 @@ def test_postUpdateHook_new_played_match_no_schedule_notification(
     assert "2012ct_qm1_match_score" in task_names
     assert "2012ct_event_schedule" not in task_names
     assert "2012ct_schedule_upcoming_matches" not in task_names
+
+
+PLAYED_ALLIANCES_JSON = """{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}"""
+UNPLAYED_ALLIANCES_JSON = """{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}"""
+
+
+def _run_post_update_hooks(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    with patch.object(Event, "now", return_value=True):
+        run_from_task(tasks[0])
+
+
+def test_updateHook_enqueueStats_taskqueueThrows(
+    ndb_context, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    """Every stats task enqueue failure is logged and swallowed, so one
+    failing queue never prevents the rest of the hook from running."""
+    Event(
+        id="2025ct", event_short="ct", year=2025, event_type_enum=EventType.REGIONAL
+    ).put()
+    MatchManipulator.createOrUpdate(
+        Match(
+            id="2025ct_qm1",
+            alliances_json=PLAYED_ALLIANCES_JSON,
+            comp_level="qm",
+            event=ndb.Key(Event, "2025ct"),
+            year=2025,
+            set_number=1,
+            match_number=1,
+        )
+    )
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    with mock.patch.object(taskqueue, "add", side_effect=Exception) as mock_add:
+        run_from_task(tasks[0])
+
+    # district points, regional champs pool points, event team status,
+    # playoff advancement, matchstats
+    assert mock_add.call_count == 5
+    assert taskqueue_stub.get_filtered_tasks(queue_names="stats") == []
+
+
+def test_postUpdateHook_match_score_deferThrows(
+    ndb_context, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    """A failure enqueuing the match_score notification is swallowed."""
+    Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    ).put()
+    MatchManipulator.createOrUpdate(
+        Match(
+            id="2012ct_qm1",
+            alliances_json=PLAYED_ALLIANCES_JSON,
+            comp_level="qm",
+            event=ndb.Key(Event, "2012ct"),
+            year=2012,
+            set_number=1,
+            match_number=1,
+        )
+    )
+
+    with patch(
+        "backend.common.manipulators.match_manipulator.defer_safe",
+        side_effect=Exception,
+    ) as mock_defer:
+        _run_post_update_hooks(taskqueue_stub)
+
+    mock_defer.assert_called_once()
+    assert mock_defer.call_args[0][0] == TBANSHelper.match_score
+    assert taskqueue_stub.get_filtered_tasks(queue_names="push-notifications") == []
+
+
+def test_postUpdateHook_breakdown_webhook_deferThrows(
+    ndb_context, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    """A failure enqueuing the breakdown-only webhook notification is swallowed."""
+    Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    ).put()
+    Match(
+        id="2012ct_qm1",
+        alliances_json=PLAYED_ALLIANCES_JSON,
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+    ).put()
+    MatchManipulator.createOrUpdate(
+        Match(
+            id="2012ct_qm1",
+            alliances_json=PLAYED_ALLIANCES_JSON,
+            score_breakdown_json=json.dumps(
+                {
+                    "red": {"auto": 20, "teleop": 54},
+                    "blue": {"auto": 30, "teleop": 27},
+                }
+            ),
+            comp_level="qm",
+            event=ndb.Key(Event, "2012ct"),
+            year=2012,
+            set_number=1,
+            match_number=1,
+        )
+    )
+
+    with patch(
+        "backend.common.manipulators.match_manipulator.defer_safe",
+        side_effect=Exception,
+    ) as mock_defer:
+        _run_post_update_hooks(taskqueue_stub)
+
+    mock_defer.assert_called_once()
+    assert mock_defer.call_args[0][0] == TBANSHelper.match_score
+    assert mock_defer.call_args[1]["is_score_breakdown_update"] is True
+    assert taskqueue_stub.get_filtered_tasks(queue_names="push-notifications") == []
+
+
+def test_postUpdateHook_schedule_notifications_deferThrows(
+    ndb_context, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    """Failures enqueuing event_schedule and schedule_upcoming_matches are
+    swallowed independently, so the second is still attempted after the first fails."""
+    Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    ).put()
+    MatchManipulator.createOrUpdate(
+        Match(
+            id="2012ct_qm1",
+            alliances_json=UNPLAYED_ALLIANCES_JSON,
+            comp_level="qm",
+            event=ndb.Key(Event, "2012ct"),
+            year=2012,
+            set_number=1,
+            match_number=1,
+        )
+    )
+
+    with patch(
+        "backend.common.manipulators.match_manipulator.defer_safe",
+        side_effect=Exception,
+    ) as mock_defer:
+        _run_post_update_hooks(taskqueue_stub)
+
+    assert [c[0][0] for c in mock_defer.call_args_list] == [
+        TBANSHelper.event_schedule,
+        TBANSHelper.schedule_upcoming_matches,
+    ]
+    assert taskqueue_stub.get_filtered_tasks(queue_names="push-notifications") == []
+
+
+def _create_match_then_add_video(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    ).put()
+    Match(
+        id="2012ct_qm1",
+        alliances_json=PLAYED_ALLIANCES_JSON,
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+    ).put()
+    MatchManipulator.createOrUpdate(
+        Match(
+            id="2012ct_qm1",
+            alliances_json=PLAYED_ALLIANCES_JSON,
+            comp_level="qm",
+            event=ndb.Key(Event, "2012ct"),
+            year=2012,
+            set_number=1,
+            match_number=1,
+            youtube_videos=["P3C2BOtL7e8"],
+        )
+    )
+
+
+def test_postUpdateHook_video_added_notification(
+    ndb_context, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    """Going from no video to a video enqueues a named match_video notification."""
+    _create_match_then_add_video(taskqueue_stub)
+    _run_post_update_hooks(taskqueue_stub)
+
+    video_tasks = taskqueue_stub.get_filtered_tasks(
+        name="2012ct_qm1_match_video", queue_names="push-notifications"
+    )
+    assert len(video_tasks) == 1
+    # Only the video changed, so no match_score notification is sent
+    assert (
+        taskqueue_stub.get_filtered_tasks(
+            name="2012ct_qm1_match_score", queue_names="push-notifications"
+        )
+        == []
+    )
+
+
+def test_postUpdateHook_video_added_deferThrows(
+    ndb_context, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    """A failure enqueuing the match_video notification is swallowed."""
+    _create_match_then_add_video(taskqueue_stub)
+
+    with patch(
+        "backend.common.manipulators.match_manipulator.defer_safe",
+        side_effect=Exception,
+    ) as mock_defer:
+        _run_post_update_hooks(taskqueue_stub)
+
+    mock_defer.assert_called_once()
+    assert mock_defer.call_args[0][0] == TBANSHelper.match_video
+    assert taskqueue_stub.get_filtered_tasks(queue_names="push-notifications") == []

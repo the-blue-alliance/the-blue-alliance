@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Optional, Set
+from typing import cast, Dict, List, Optional, Set
 
 from google.appengine.ext import ndb
 from pyre_extensions import safe_cast
@@ -12,6 +12,7 @@ from backend.common.models.cached_model import CachedModel
 from backend.common.models.district_advancement import (
     AdvancementCounts,
     DistrictAdvancement,
+    DistrictAdvancementCutoffs,
 )
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey, TeamKey, Year
@@ -40,6 +41,10 @@ class District(CachedModel):
         DistrictAdvancement, ndb.JsonProperty()
     )
 
+    advancement_cutoffs: Optional[DistrictAdvancementCutoffs] = cast(
+        Optional[DistrictAdvancementCutoffs], ndb.JsonProperty()
+    )
+
     # other changes from FIRST to correct errors
     adjustments: Dict[TeamKey, int] = ndb.JsonProperty()
 
@@ -59,6 +64,7 @@ class District(CachedModel):
     _mutable_attrs: Set[str] = {
         "adjustments",
         "advancement",
+        "advancement_cutoffs",
         "display_name",
         "elasticsearch_name",
         "rankings",
@@ -94,9 +100,9 @@ class District(CachedModel):
         # Returns the advancement counts as specified in the FIRST manual for the district
         # If the district/year is not found, returns 0 for both dcmp and cmp
 
-        latest_code = RenamedDistricts.get_latest_code(self.abbreviation)
+        canonical_code = RenamedDistricts.get_canonical_code(self.abbreviation)
         return FIRST_MANUAL_DISTRICT_ADVANCEMENT_COUNTS.get(self.year, {}).get(
-            latest_code, AdvancementCounts(dcmp=0, cmp=0)
+            canonical_code, AdvancementCounts(dcmp=0, cmp=0)
         )
 
     @classmethod

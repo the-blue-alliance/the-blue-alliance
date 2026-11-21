@@ -18,23 +18,19 @@ from backend.common.tasklets import typed_tasklet
 class DistrictQuery(CachedDatabaseQuery[Optional[District], Optional[DistrictDict]]):
     CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "district_{district_key}"
+    MODEL_CACHING_ENABLED = False  # No need to cache a point query
+    DICT_CACHING_ENABLED = False  # No need to cache a point query dict
     DICT_CONVERTER = DistrictConverter
 
     def __init__(self, district_key: DistrictKey) -> None:
-        super().__init__(district_key=district_key)
+        super().__init__(district_key=RenamedDistricts.get_key_for_year(district_key))
 
     @typed_tasklet
     def _query_async(
         self, district_key: DistrictKey
     ) -> Generator[Any, Any, Optional[District]]:
-        # Fetch all equivalent keys
-        keys = RenamedDistricts.get_equivalent_keys(district_key)
-        districts = yield ndb.get_multi_async([ndb.Key(District, key) for key in keys])
-        for district in districts:
-            if district:
-                # Return first key that exists
-                return district
-        return None
+        district = yield District.get_by_id_async(district_key)
+        return district
 
 
 class DistrictsInYearQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]):

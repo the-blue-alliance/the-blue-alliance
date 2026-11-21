@@ -219,3 +219,104 @@ describe("MatchResultsFromMatchPlay", () => {
     });
   });
 });
+
+describe("MatchResultsFromMatchPlay ordering and score entry", () => {
+  const mockMakeTrustedRequest = jest.fn<Promise<Response>, [string, string]>();
+  const mockMakeApiV3Request = jest.fn<Promise<Response>, [string]>();
+  const selectedEvent = "2024nytr";
+
+  const makeJsonResponse = (payload: unknown): Response =>
+    ({ ok: true, statusText: "OK", json: async () => payload }) as Response;
+
+  const makeMatch = (
+    key: string,
+    comp_level: string,
+    set_number: number,
+    match_number: number,
+    scores: { red?: number; blue?: number } = {}
+  ) => ({
+    key: `${selectedEvent}_${key}`,
+    comp_level,
+    set_number,
+    match_number,
+    alliances: {
+      red: { team_keys: ["frc254", "frc971", "frc1678"], score: scores.red },
+      blue: { team_keys: ["frc1323", "frc2056", "frc5499"], score: scores.blue },
+    },
+  });
+
+  const renderAndFetch = async (matches: unknown[]): Promise<void> => {
+    mockMakeApiV3Request.mockResolvedValue(makeJsonResponse(matches));
+    render(
+      <MatchResultsFromMatchPlay
+        selectedEvent={selectedEvent}
+        makeTrustedRequest={mockMakeTrustedRequest}
+        makeApiV3Request={mockMakeApiV3Request}
+      />
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Fetch Matches/i }));
+    await screen.findByText(`Loaded ${matches.length} matches`);
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("orders playoff matches by set number before match number, after qualifications", async () => {
+    await renderAndFetch([
+      makeMatch("sf2m1", "sf", 2, 1),
+      makeMatch("f1m1", "f", 1, 1),
+      makeMatch("sf1m2", "sf", 1, 2),
+      makeMatch("sf1m1", "sf", 1, 1),
+      makeMatch("qm2", "qm", 1, 2),
+      makeMatch("qm1", "qm", 1, 1),
+    ]);
+
+    const names = screen
+      .getAllByRole("row")
+      .slice(1)
+      .map((row) => row.querySelector("strong")?.textContent);
+    expect(names).toEqual([
+      "Qualification 1",
+      "Qualification 2",
+      "Semifinal 1-1",
+      "Semifinal 1-2",
+      "Semifinal 2-1",
+      "Final 1-1",
+    ]);
+  });
+
+  it("lets the user edit both alliance scores before updating", async () => {
+    mockMakeTrustedRequest.mockResolvedValue(makeJsonResponse({}));
+    await renderAndFetch([makeMatch("qm1", "qm", 1, 1, { red: 10, blue: 20 })]);
+    const [redInput, blueInput] = screen.getAllByPlaceholderText("Score");
+    expect(redInput).toHaveValue(10);
+    expect(blueInput).toHaveValue(20);
+
+    fireEvent.change(redInput, { target: { value: "55" } });
+    fireEvent.change(blueInput, { target: { value: "44" } });
+    expect(redInput).toHaveValue(55);
+    expect(blueInput).toHaveValue(44);
+
+    fireEvent.click(screen.getByRole("button", { name: /Update/i }));
+
+    await screen.findByText("Successfully updated Qualification 1!");
+    const body = JSON.parse(mockMakeTrustedRequest.mock.calls[0][1]);
+    expect(body[0].alliances.red.score).toBe(55);
+    expect(body[0].alliances.blue.score).toBe(44);
+  });
+
+  it("refuses to update a match until both scores are valid numbers", async () => {
+    await renderAndFetch([makeMatch("qm1", "qm", 1, 1)]);
+    const [redInput] = screen.getAllByPlaceholderText("Score");
+    expect(redInput).toHaveValue(null);
+    fireEvent.change(redInput, { target: { value: "12" } });
+
+    fireEvent.click(screen.getByRole("button", { name: /Update/i }));
+
+    expect(
+      screen.getByText("Please enter valid scores for both alliances")
+    ).toBeInTheDocument();
+    expect(mockMakeTrustedRequest).not.toHaveBeenCalled();
+  });
+});

@@ -76,7 +76,7 @@ def team_detail(team_number: int) -> str:
             team_medias_by_year[media.year].append(media)
     media_years = sorted(
         team_medias_by_year.keys(),
-        key=lambda m: 0 if media.year is None else media.year,
+        key=lambda y: 0 if y is None else y,
         reverse=True,
     )
 

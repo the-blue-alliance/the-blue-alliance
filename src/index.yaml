@@ -113,6 +113,11 @@ indexes:
       - name: year
       - name: event
 
+  - kind: EventTeam
+    properties:
+      - name: remapped_team
+      - name: year
+
   - kind: Insight
     properties:
       - name: name
@@ -123,6 +128,11 @@ indexes:
       - name: name
       - name: district_abbreviation
       - name: year
+
+  - kind: Match
+    properties:
+      - name: event
+      - name: comp_level
 
   - kind: Match
     properties:
@@ -156,6 +166,18 @@ indexes:
       - name: team_key_names
       - name: set_number
       - name: match_number
+
+  - kind: Match
+    properties:
+      - name: event
+      - name: team_key_names
+      - name: comp_level
+
+  - kind: Match
+    properties:
+      - name: team_key_names
+      - name: year
+      - name: comp_level
 
   - kind: Subscription
     properties:

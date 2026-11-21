@@ -1,8 +1,7 @@
-import * as AccordionPrimitive from '@radix-ui/react-accordion';
+import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
+import { cn } from 'cn';
 
 import ChevronDownIcon from '~icons/lucide/chevron-down';
-
-import { cn } from '~/lib/utils';
 
 function Accordion({
   ...props
@@ -34,11 +33,11 @@ function AccordionTrigger({
         data-slot="accordion-trigger"
         className={cn(
           `flex flex-1 cursor-pointer items-start justify-between gap-4
-          rounded-md py-4 text-left text-sm font-medium transition-all
-          outline-none hover:underline focus-visible:border-ring
-          focus-visible:ring-[3px] focus-visible:ring-ring/50
-          disabled:pointer-events-none disabled:opacity-50
-          [&[data-state=open]>svg]:rotate-180`,
+          rounded-md py-4 text-left text-sm font-medium outline-hidden
+          transition-[color,border-color,box-shadow] hover:underline
+          focus-visible:border-ring focus-visible:ring-[3px]
+          focus-visible:ring-ring/50 aria-disabled:pointer-events-none
+          aria-disabled:opacity-50 [&[data-panel-open]>svg]:rotate-180`,
           className,
         )}
         {...props}
@@ -46,7 +45,7 @@ function AccordionTrigger({
         {children}
         <ChevronDownIcon
           className="pointer-events-none size-4 shrink-0 translate-y-0.5
-            text-muted-foreground transition-transform duration-200"
+            text-muted-foreground duration-200 motion-safe:transition-transform"
         />
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
@@ -57,17 +56,17 @@ function AccordionContent({
   className,
   children,
   ...props
-}: React.ComponentProps<typeof AccordionPrimitive.Content>) {
+}: React.ComponentProps<typeof AccordionPrimitive.Panel>) {
   return (
-    <AccordionPrimitive.Content
+    <AccordionPrimitive.Panel
       data-slot="accordion-content"
       className="overflow-hidden text-sm
-        data-[state=closed]:animate-accordion-up
-        data-[state=open]:animate-accordion-down"
+        motion-safe:data-open:animate-accordion-down
+        motion-safe:data-closed:animate-accordion-up"
       {...props}
     >
       <div className={cn('pt-0 pb-4', className)}>{children}</div>
-    </AccordionPrimitive.Content>
+    </AccordionPrimitive.Panel>
   );
 }
 

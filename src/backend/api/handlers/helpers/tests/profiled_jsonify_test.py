@@ -49,3 +49,45 @@ def test_profiled_jsonify_uses_span(mock_span, app: Flask) -> None:
         profiled_jsonify({"test": "data"})
 
     mock_span.assert_called_once_with("profiled_jsonify")
+
+
+def test_profiled_jsonify_bytes_passthrough(app: Flask) -> None:
+    with app.app_context():
+        raw_json = b'{"test": "passthrough", "number": 123}'
+        response = profiled_jsonify(raw_json)
+
+        assert response.content_type == "application/json"
+        assert response.data == raw_json
+        assert json.loads(response.data) == {"test": "passthrough", "number": 123}
+
+
+def test_profiled_jsonify_bytearray_passthrough(app: Flask) -> None:
+    with app.app_context():
+        raw_json = bytearray(b'{"test": "bytearray"}')
+        response = profiled_jsonify(raw_json)
+
+        assert response.content_type == "application/json"
+        assert response.data == b'{"test": "bytearray"}'
+        assert json.loads(response.data) == {"test": "bytearray"}
+
+
+def test_profiled_jsonify_none(app: Flask) -> None:
+    with app.app_context():
+        response = profiled_jsonify(None)
+
+        assert response.content_type == "application/json"
+        assert response.data == b"null"
+        assert json.loads(response.data) is None
+
+
+def test_profiled_jsonify_fallback_on_orjson_error(app: Flask, caplog) -> None:
+    with app.app_context():
+        with patch("orjson.dumps", side_effect=TypeError("Cannot serialize")):
+            response = profiled_jsonify({"fallback": "test"})
+
+            assert response.content_type == "application/json"
+            assert json.loads(response.data) == {"fallback": "test"}
+            assert (
+                "orjson.dumps failed in profiled_jsonify, falling back to jsonify"
+                in caplog.text
+            )

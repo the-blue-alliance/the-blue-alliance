@@ -12,7 +12,6 @@ from backend.common.memcache import MemcacheClient
 from backend.common.models.event import Event
 from backend.common.models.location import Location
 from backend.common.models.sitevar import Sitevar
-from backend.common.models.team import Team
 
 
 class LocationInfo(TypedDict, total=False):
@@ -20,7 +19,7 @@ class LocationInfo(TypedDict, total=False):
     lat: float
     lng: float
     name: str
-    types: str
+    types: List[str]
     street_number: str
     street: str
     city: str
@@ -28,7 +27,7 @@ class LocationInfo(TypedDict, total=False):
     state_prov_short: str
     country: str
     country_short: str
-    postal_code: int
+    postal_code: str
     formatted_address: str
     place_details: Dict
 
@@ -54,8 +53,8 @@ class LocationHelper:
         a = a.lower().strip()
         b = b.lower().strip()
 
-        a_split = filter(lambda x: x, re.split(r"\s+|,|-", a))
-        b_split = filter(lambda x: x, re.split(r"\s+|,|-", b))
+        a_split = [x for x in re.split(r"\s+|,|-", a) if x]
+        b_split = [x for x in re.split(r"\s+|,|-", b) if x]
         a_sorted = " ".join(sorted(a_split))
         b_sorted = " ".join(sorted(b_split))
         a_acr = "".join([w[0] if w else "" for w in a_split]).lower()
@@ -201,7 +200,9 @@ class LocationHelper:
             score = pow(
                 max(
                     cls.get_similarity(query_name, location_info["name"]),
-                    cls.get_similarity(query_name, location_info["formatted_address"]),
+                    cls.get_similarity(
+                        query_name, location_info.get("formatted_address", "")
+                    ),
                 ),
                 1.0 / 3,
             )
@@ -209,61 +210,6 @@ class LocationHelper:
             score = 0
 
         return score
-
-    @classmethod
-    def update_team_location(cls, team: Team) -> None:
-        if not team.location:
-            return
-
-        # # Try with and without textsearch, pick best
-        # location_info, score = cls.get_team_location_info(team)
-        # if score < 0.7:
-        #     logging.warning("Using textsearch for {}".format(team.key.id()))
-        #     location_info2, score2 = cls.get_team_location_info(team, textsearch=True)
-        #     if score2 > score:
-        #         location_info = location_info2
-        #         score = score2
-
-        # # Log performance
-        # text = "Team {} location score: {}".format(team.key.id(), score)
-        # if score < 0.8:
-        #     logging.warning(text)
-        # else:
-        #     logging.info(text)
-
-        # # Don't trust anything below a certain threshold Super strict for now.
-        # if score < 0.9:
-        #     logging.warning("Location score too low for team {}".format(team.key.id()))
-        #     location_info = {}
-        location_info: LocationInfo = {}  # Force imprecise locations
-
-        # Fallback to location only
-        if not location_info:
-            # logging.warning("Falling back to location only for team {}".format(team.key.id()))
-            geocode_result = cls.google_maps_geocode(team.location)
-            if geocode_result:
-                location_info = cls.construct_location_info(
-                    geocode_result[0], auto_fill=False
-                )
-
-        # Fallback to city, country
-        if not location_info:
-            logging.warning(
-                "Falling back to city/country only for team {}".format(team.key.id())
-            )
-            city_country = "{} {}".format(
-                team.city if team.city else "", team.country if team.country else ""
-            )
-            geocode_result = cls.google_maps_geocode(city_country)
-            if geocode_result:
-                location_info = cls.construct_location_info(
-                    geocode_result[0], auto_fill=False
-                )
-            else:
-                logging.warning("Team {} location failed!".format(team.key.id()))
-
-        # Update team
-        team.normalized_location = cls.build_normalized_location(location_info)
 
     @classmethod
     def build_normalized_location(cls, location_info: LocationInfo) -> Location:
@@ -286,112 +232,6 @@ class LocationHelper:
             place_id=location_info.get("place_id"),
             place_details=location_info.get("place_details"),
         )
-
-    @classmethod
-    def get_team_location_info(
-        cls, team: Team, textsearch: bool = False
-    ) -> Tuple[LocationInfo, float]:
-        """
-        Search for different combinations of team name (which should include
-        high school or title sponsor) with city, state_prov, postalcode, and country
-        in attempt to find the correct location associated with the team.
-        """
-        # Find possible schools/title sponsors
-        possible_names = []
-        MAX_SPLIT = 3  # Filters out long names that are unlikely
-        if team.name:
-            # Guessing sponsors/school by splitting name by '/' or '&'
-            split1 = re.split("&", team.name)
-            split2 = re.split("/", team.name)
-
-            if (
-                split1
-                and split1[-1].count("&") < MAX_SPLIT
-                and split1[-1].count("/") < MAX_SPLIT
-            ):
-                possible_names.append(split1[-1])
-            if (
-                split2
-                and split2[-1] not in possible_names
-                and split2[-1].count("&") < MAX_SPLIT
-                and split2[-1].count("/") < MAX_SPLIT
-            ):
-                possible_names.append(split2[-1])
-            if (
-                split1
-                and split1[0] not in possible_names
-                and split1[0].count("&") < MAX_SPLIT
-                and split1[0].count("/") < MAX_SPLIT
-            ):
-                possible_names.append(split1[0])
-            if (
-                split2
-                and split2[0] not in possible_names
-                and split2[0].count("&") < MAX_SPLIT
-                and split2[0].count("/") < MAX_SPLIT
-            ):
-                possible_names.append(split2[0])
-
-        # Geocode for lat/lng
-        lat_lng = cls.get_lat_lng(team.location)
-        if not lat_lng:
-            return {}, 0
-
-        # Try to find place based on possible queries
-        best_score = 0
-        best_location_info: LocationInfo = {}
-        for j, name in enumerate(possible_names):
-            places = cls.google_maps_placesearch(name, lat_lng, textsearch=textsearch)
-            for i, place in enumerate(places[:5]):
-                location_info = cls.construct_location_info(place)
-                score = cls.compute_team_location_score(name, location_info, lat_lng)
-                score *= pow(0.9, 0 if j < 2 else 1) * pow(
-                    0.9, i
-                )  # discount by ranking
-                if score == 1:
-                    return location_info, score
-                elif score > best_score:
-                    best_location_info = location_info
-                    best_score = score
-
-        return best_location_info, best_score
-
-    @classmethod
-    def compute_team_location_score(
-        cls, query_name: str, location_info: LocationInfo, lat_lng: LatLng
-    ) -> float:
-        """
-        Score for correctness. 1.0 is perfect.
-        Not checking for absolute equality in case of existing data errors.
-        """
-        # Check radius
-        R = 6373.0  # approximate radius of earth in km
-        lat1 = math.radians(lat_lng[0])
-        lon1 = math.radians(lat_lng[1])
-        lat2 = math.radians(location_info["lat"])
-        lon2 = math.radians(location_info["lng"])
-        dlon = lon2 - lon1
-        dlat = lat2 - lat1
-        a = (
-            math.sin(dlat / 2) ** 2
-            + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
-        )
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        distance = R * c
-        if distance > 100:
-            return 0
-
-        query_name = query_name.lower().replace("school", "").replace("high", "")
-        result_name = (
-            location_info["name"].lower().replace("school", "").replace("high", "")
-        )
-        score = pow(cls.get_similarity(query_name, result_name), 0.7)
-        if not {"school", "university"}.intersection(
-            set(location_info.get("types", ""))
-        ):
-            score *= 0.9
-
-        return score
 
     @classmethod
     def construct_location_info(
@@ -472,7 +312,7 @@ class LocationHelper:
                 cls.GOOGLE_API_KEY = GOOGLE_SECRETS.contents["api_key"]
             else:
                 logging.warning(
-                    "Must have sitevar google.api_key to use Google Maps nearbysearch"
+                    "Must have sitevar google.secrets to use Google Maps nearbysearch"
                 )
                 return []
 
@@ -549,7 +389,7 @@ class LocationHelper:
                 cls.GOOGLE_API_KEY = GOOGLE_SECRETS.contents["api_key"]
             else:
                 logging.warning(
-                    "Must have sitevar google.api_key to use Google Maps PlaceDetails"
+                    "Must have sitevar google.secrets to use Google Maps PlaceDetails"
                 )
                 return None
 
@@ -616,7 +456,7 @@ class LocationHelper:
         cache_key = "google_maps_geocode:{}".format(location).encode()
         memcache = MemcacheClient.get()
         results = memcache.get(cache_key)
-        if not results:
+        if results is None:
             if not location:
                 return []
 
@@ -624,7 +464,7 @@ class LocationHelper:
             google_api_key = None
             if google_secrets is None:
                 logging.warning(
-                    "Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit."
+                    "Missing sitevar: google.secrets. API calls rate limited by IP and may be over rate limit."
                 )
             else:
                 google_api_key = google_secrets.contents["api_key"]
@@ -682,7 +522,7 @@ class LocationHelper:
         google_api_key = None
         if google_secrets is None:
             logging.warning(
-                "Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit."
+                "Missing sitevar: google.secrets. API calls rate limited by IP and may be over rate limit."
             )
         else:
             google_api_key = google_secrets.contents["api_key"]

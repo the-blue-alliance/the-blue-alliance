@@ -1,6 +1,6 @@
 // How many layouts are defined
 // Valid layout IDs are in the range [0, NUM_LAYOUTS - 1]
-export const NUM_LAYOUTS = 12;
+export const NUM_LAYOUTS = 13;
 
 // The maximum number of views any layout can support.
 // Currently 9 for the nona-view

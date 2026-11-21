@@ -59,4 +59,5 @@ class HighestLosingScoreV2Calculator(MatchAllianceLeaderboardV2Calculator):
                 match_key=match.key_name,  # type: ignore[union-attr]
                 score=losing_score,
                 alliance=list(match.alliances[losing_color]["teams"]),  # type: ignore[index]
+                district=event.event_district_abbrev,
             )

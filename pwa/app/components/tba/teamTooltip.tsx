@@ -16,6 +16,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
+import { STALE_TIME } from '~/lib/queryClient';
 
 export interface TeamTooltipProps {
   teamKey: string;
@@ -24,6 +25,13 @@ export interface TeamTooltipProps {
   surrogate?: boolean;
   isWinner?: boolean;
   isCaptain?: boolean;
+}
+
+function deviceCanHover(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches
+  );
 }
 
 export function TeamLinkWithTooltip({
@@ -36,7 +44,11 @@ export function TeamLinkWithTooltip({
   ...props
 }: TeamTooltipProps & Omit<ComponentProps<typeof TeamLink>, 'teamOrKey'>) {
   const teamNumber = teamKey.substring(3);
-  const { data: searchIndex } = useQuery(getSearchIndexOptions({}));
+  const { data: searchIndex } = useQuery({
+    ...getSearchIndexOptions({}),
+    staleTime: STALE_TIME.SEARCH_INDEX,
+    enabled: deviceCanHover(),
+  });
   const teamName = useMemo(
     () => searchIndex?.teams.find((t) => t.key === teamKey)?.nickname,
     [searchIndex, teamKey],
@@ -74,11 +86,12 @@ export function TeamLinkWithTooltip({
   }
 
   return (
-    <Tooltip delayDuration={1500}>
-      <TooltipTrigger asChild>
-        <TeamLink teamOrKey={teamKey} year={year} {...props}>
-          {label}
-        </TeamLink>
+    <Tooltip>
+      <TooltipTrigger
+        delay={1500}
+        render={<TeamLink teamOrKey={teamKey} year={year} {...props} />}
+      >
+        {label}
       </TooltipTrigger>
       <TooltipContent>
         {disqualified
@@ -101,7 +114,10 @@ export function TeamTooltip({
     getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
   );
 
-  const { data: searchIndex } = useSuspenseQuery(getSearchIndexOptions({}));
+  const { data: searchIndex } = useSuspenseQuery({
+    ...getSearchIndexOptions({}),
+    staleTime: STALE_TIME.SEARCH_INDEX,
+  });
 
   const team = useMemo(
     () => searchIndex && searchIndex.teams.find((t) => t.key === teamKey),
@@ -117,7 +133,7 @@ export function TeamTooltip({
 
   return (
     <div>
-      {maybeAvatar && <TeamAvatar media={maybeAvatar} />}
+      <TeamAvatar media={maybeAvatar} />
       <h1>{team.nickname}</h1>
       {disqualified && (
         <i>
@@ -145,30 +161,31 @@ export function TeamLinkWithAvatarTooltip({
   const teamNumber = teamKey.substring(3);
 
   return (
-    <Tooltip delayDuration={1000}>
-      <TooltipTrigger asChild>
-        <TeamLink teamOrKey={teamKey} year={year} {...props}>
-          {isWinner ? (
-            <InlineIcon className="relative right-[1ch] justify-center">
-              <BiTrophy />
-              {teamNumber}
-              {isCaptain && (
-                <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
-                  C
-                </sup>
-              )}
-            </InlineIcon>
-          ) : isCaptain ? (
-            <>
-              {teamNumber}
+    <Tooltip>
+      <TooltipTrigger
+        delay={1000}
+        render={<TeamLink teamOrKey={teamKey} year={year} {...props} />}
+      >
+        {isWinner ? (
+          <InlineIcon className="relative right-[1ch] justify-center">
+            <BiTrophy />
+            {teamNumber}
+            {isCaptain && (
               <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
                 C
               </sup>
-            </>
-          ) : (
-            <>{teamNumber}</>
-          )}
-        </TeamLink>
+            )}
+          </InlineIcon>
+        ) : isCaptain ? (
+          <>
+            {teamNumber}
+            <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
+              C
+            </sup>
+          </>
+        ) : (
+          <>{teamNumber}</>
+        )}
       </TooltipTrigger>
       <Suspense>
         <TooltipContent>

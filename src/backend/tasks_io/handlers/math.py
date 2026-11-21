@@ -10,6 +10,9 @@ from werkzeug.wrappers import Response
 
 from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
 from backend.common.futures import InstantFuture, TypedFuture
+from backend.common.helpers.district_advancement_helper import (
+    DistrictAdvancementHelper,
+)
 from backend.common.helpers.district_helper import DistrictHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
@@ -311,6 +314,9 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
 
     if rankings:
         district.rankings = rankings
+        cutoffs = DistrictAdvancementHelper.calculate_for_district(district, events)
+        if cutoffs:
+            district.advancement_cutoffs = cutoffs
         DistrictManipulator.createOrUpdate(district)
 
     if (

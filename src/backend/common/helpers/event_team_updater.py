@@ -1,4 +1,5 @@
 import datetime
+import re
 from typing import List, Set, Tuple
 
 from google.appengine.ext import ndb
@@ -6,6 +7,7 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
+from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
@@ -76,6 +78,12 @@ class EventTeamUpdater:
                 )
                 team_ids = team_ids.union(division_winners)
 
+        remap_teams = event.remap_teams or {}
+        remapped_from = {old for old, new in remap_teams.items() if new in team_ids}
+        team_ids = {
+            "frc" + re.sub("[^0-9]", "", team_id) for team_id in team_ids
+        } | remapped_from
+
         # Create or update EventTeams
         teams = [
             Team(id=team_id, team_number=int(team_id[3:]))
@@ -95,6 +103,7 @@ class EventTeamUpdater:
             ]
         else:
             event_teams = []
+        EventRemapTeamsHelper.remapteams_eventteams(event_teams, remap_teams)
 
         # Delete EventTeams for teams who did not participate in the event
         # Only runs if event is over

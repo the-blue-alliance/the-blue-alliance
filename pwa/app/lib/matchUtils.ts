@@ -1,13 +1,15 @@
+import { Temporal } from 'temporal-polyfill';
+
 import {
   AllianceColor,
   CompLevel,
+  EliminationAlliance,
   Event,
   Match,
   MatchAlliance,
   PlayoffType,
   WltRecord,
 } from '~/api/tba/read';
-import { median } from '~/lib/utils';
 
 const COMP_LEVEL_SORT_ORDER: Record<CompLevel, number> = {
   [CompLevel.F]: 5,
@@ -15,6 +17,7 @@ const COMP_LEVEL_SORT_ORDER: Record<CompLevel, number> = {
   [CompLevel.QF]: 3,
   [CompLevel.EF]: 2,
   [CompLevel.QM]: 1,
+  [CompLevel.PM]: 0,
 };
 
 export const COMP_LEVEL_SHORT_STRINGS: Record<CompLevel, string> = {
@@ -23,6 +26,7 @@ export const COMP_LEVEL_SHORT_STRINGS: Record<CompLevel, string> = {
   [CompLevel.QF]: 'Quarters',
   [CompLevel.EF]: 'Eighths',
   [CompLevel.QM]: 'Quals',
+  [CompLevel.PM]: 'Practice',
 };
 
 export const COMP_LEVEL_LONG_STRINGS: Record<CompLevel, string> = {
@@ -31,12 +35,13 @@ export const COMP_LEVEL_LONG_STRINGS: Record<CompLevel, string> = {
   [CompLevel.QF]: 'Quarterfinals',
   [CompLevel.EF]: 'Eighthfinals',
   [CompLevel.QM]: 'Qualifications',
+  [CompLevel.PM]: 'Practice',
 };
 
 type RecycleRushWLTStrategy = 'official' | 'score-based';
 
 export function isValidMatchKey(key: string) {
-  return /^[1-9]\d{3}[a-z]+[0-9]*_(?:qm|ef\d{1,2}m|qf\d{1,2}m|sf\d{1,2}m|f\dm)\d+$/.test(
+  return /^[1-9]\d{3}[a-z]+[0-9]*_(?:pm|qm|ef\d{1,2}m|qf\d{1,2}m|sf\d{1,2}m|f\dm)\d+$/.test(
     key,
   );
 }
@@ -60,10 +65,14 @@ export function sortMultipleEventsMatches(matches: Match[], events: Event[]) {
 }
 
 export function matchTitleShort(
-  match: Match,
-  playoffType: PlayoffType,
+  match: Pick<Match, 'comp_level' | 'set_number' | 'match_number'>,
+  playoffType: PlayoffType | null,
 ): string {
-  if (match.comp_level === CompLevel.QM || match.comp_level === CompLevel.F) {
+  if (
+    match.comp_level === CompLevel.PM ||
+    match.comp_level === CompLevel.QM ||
+    match.comp_level === CompLevel.F
+  ) {
     return `${COMP_LEVEL_SHORT_STRINGS[match.comp_level]} ${match.match_number}`;
   }
 
@@ -88,8 +97,77 @@ export function matchTitleShort(
   return `${COMP_LEVEL_SHORT_STRINGS[match.comp_level]} ${match.set_number} Match ${match.match_number}`;
 }
 
-function matchHasBeenPlayed(match: Match) {
+export function matchHasBeenPlayed(match: Match) {
   return match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
+}
+
+/**
+ * Finds the finals winner and finalists from the finals matches, without
+ * knowing the finals format. Most events play first to 2 wins, but some give
+ * the upper bracket alliance a 1-0 head start, which the match data does not
+ * show.
+ *
+ * - An alliance with 2 finals match wins is the winner in both formats. With a
+ *   head start, the upper bracket alliance stops at 1 real win, so only the
+ *   lower bracket alliance can reach 2.
+ * - Once the finals are over, the winner of the last finals match is the
+ *   winner in both formats. We can only be sure the finals are over once the
+ *   event's last day has passed, so before then a 1-0 or 1-1 series shows no
+ *   winner.
+ */
+export function getFinalsResult(
+  alliances: EliminationAlliance[],
+  matches: Match[],
+  eventOver: boolean,
+): { winner?: EliminationAlliance; finalists: EliminationAlliance[] } {
+  const allianceOf = (teamKeys: string[]) =>
+    alliances.find((a) => a.picks.some((p) => teamKeys.includes(p)));
+  const finals = matches
+    .filter((m) => m.comp_level === CompLevel.F)
+    .sort(sortMatchComparator);
+
+  const finalists = [
+    ...new Set(
+      finals.flatMap((m) => [
+        allianceOf(m.alliances.red.team_keys),
+        allianceOf(m.alliances.blue.team_keys),
+      ]),
+    ),
+  ].filter((a) => a !== undefined);
+  const matchWinners = finals.flatMap((m) =>
+    m.winning_alliance === AllianceColor.RED ||
+    m.winning_alliance === AllianceColor.BLUE
+      ? [allianceOf(m.alliances[m.winning_alliance].team_keys)]
+      : [],
+  );
+
+  const twoTimeWinner = finalists.find(
+    (a) => matchWinners.filter((w) => w === a).length >= 2,
+  );
+
+  return {
+    winner: twoTimeWinner ?? (eventOver ? matchWinners.at(-1) : undefined),
+    finalists,
+  };
+}
+
+export function allianceRobots(alliance: EliminationAlliance): string[] {
+  return alliance.backup
+    ? [...alliance.picks, alliance.backup.in]
+    : alliance.picks;
+}
+
+export function findAllianceNumber(
+  teamKeys: string[],
+  alliances: EliminationAlliance[],
+): number | null {
+  if (teamKeys.length === 0) {
+    return null;
+  }
+  const index = alliances.findIndex((alliance) =>
+    teamKeys.every((key) => allianceRobots(alliance).includes(key)),
+  );
+  return index === -1 ? null : index + 1;
 }
 
 function getMaybeUnpenalizedScores(m: Match): { blue: number; red: number } {
@@ -254,6 +332,78 @@ export function calculateTeamRecordsFromMatches(
   return { quals: qualsRecord, playoff: playoffRecord };
 }
 
+export interface TeamAvgScore {
+  qualAvg: number | null;
+  playoffAvg: number | null;
+}
+
+/**
+ * Average alliance score for a team across played matches, split into
+ * qualification and playoff. Matches Recycle Rush (2015) Jinja pages, where
+ * W-L-T is not meaningful for most of the season.
+ */
+export function calculateTeamAvgScore(
+  teamKey: string,
+  matches: Match[],
+): TeamAvgScore {
+  const qualScores: number[] = [];
+  const playoffScores: number[] = [];
+
+  for (const match of matches) {
+    if (!matchHasBeenPlayed(match)) {
+      continue;
+    }
+
+    for (const alliance of [match.alliances.red, match.alliances.blue]) {
+      if (!alliance.team_keys.includes(teamKey)) {
+        continue;
+      }
+      if (
+        match.comp_level === CompLevel.QM ||
+        match.comp_level === CompLevel.PM
+      ) {
+        qualScores.push(alliance.score);
+      } else {
+        playoffScores.push(alliance.score);
+      }
+      break;
+    }
+  }
+
+  return {
+    qualAvg:
+      qualScores.length > 0
+        ? qualScores.reduce((sum, score) => sum + score, 0) / qualScores.length
+        : null,
+    playoffAvg:
+      playoffScores.length > 0
+        ? playoffScores.reduce((sum, score) => sum + score, 0) /
+          playoffScores.length
+        : null,
+  };
+}
+
+export function formatAvgScore(value: number): string {
+  return value.toFixed(2);
+}
+
+export function calculateRobotsRecord(
+  robots: { robotKey: string; matches: Match[] }[],
+): WltRecord {
+  return robots
+    .flatMap((r) =>
+      Object.values(calculateTeamRecordsFromMatches(r.robotKey, r.matches)),
+    )
+    .reduce(
+      (total, record) => ({
+        wins: total.wins + record.wins,
+        losses: total.losses + record.losses,
+        ties: total.ties + record.ties,
+      }),
+      { wins: 0, losses: 0, ties: 0 },
+    );
+}
+
 export function getTeamsUnpenalizedHighScore(
   teamKey: string,
   matches: Match[],
@@ -339,35 +489,73 @@ export function getMatchScoreWithoutAdjustPoints(match: Match): {
   };
 }
 
-export function getHighScoreMatch(matches: Match[]): Match | undefined {
-  if (matches.length === 0) {
-    return undefined;
-  }
+const MATCH_KEY_PATTERN =
+  /^(?<eventKey>[1-9]\d{3}[a-z]+[0-9]*)_(?<compLevel>pm|qm|ef|qf|sf|f)(?:(?<setNumber>\d{1,2})m)?(?<matchNumber>\d+)$/;
 
-  const scores = matches.map((m) => ({
-    match: m,
-    score: Math.max(m.alliances.red.score, m.alliances.blue.score),
-  }));
-
-  scores.sort((a, b) => b.score - a.score);
-
-  return scores[0].match;
+export interface ParsedMatchKey {
+  eventKey: string;
+  compLevel: CompLevel;
+  setNumber: number;
+  matchNumber: number;
 }
 
-export function calculateMedianTurnaroundTime(
-  matches: Match[],
-): number | undefined {
-  const turnarounds = [];
-
-  for (let i = 1; i < matches.length; i++) {
-    const currTime = matches[i].actual_time;
-    const prevTime = matches[i - 1].actual_time;
-
-    if (currTime !== null && prevTime !== null) {
-      turnarounds.push(currTime - prevTime);
-    }
+/** Splits a match key like `2026arc_sf3m1` into its parts; null if malformed. */
+export function parseMatchKey(key: string): ParsedMatchKey | null {
+  const groups = MATCH_KEY_PATTERN.exec(key)?.groups;
+  if (!groups) {
+    return null;
   }
+  return {
+    eventKey: groups.eventKey,
+    compLevel: groups.compLevel as CompLevel,
+    setNumber: groups.setNumber ? Number(groups.setNumber) : 1,
+    matchNumber: Number(groups.matchNumber),
+  };
+}
 
-  turnarounds.sort((a, b) => a - b);
-  return median(turnarounds);
+/**
+ * Human-friendly name for a match key, e.g. "Archimedes Match 3" or
+ * "Galileo Quals 87", using the event's short name and the same title strings
+ * the event and match pages use. Without the event (not loaded, or unknown) it falls back
+ * to the match title alone, and to the raw key if it can't be parsed.
+ */
+export function formatMatchKeyName(
+  key: string,
+  event?: Pick<Event, 'short_name' | 'name' | 'playoff_type'>,
+): string {
+  const parsed = parseMatchKey(key);
+  if (!parsed) {
+    return key;
+  }
+  const title = matchTitleShort(
+    {
+      comp_level: parsed.compLevel,
+      set_number: parsed.setNumber,
+      match_number: parsed.matchNumber,
+    },
+    event?.playoff_type ?? null,
+  );
+  return event ? `${event.short_name || event.name} ${title}` : title;
+}
+
+/**
+ * A match time such as "Sat 9:30 AM", in the viewer's time zone unless one is
+ * given. Uses a numeric hour: with a 2-digit hour, native Temporal and the
+ * polyfill disagree on zero-padding.
+ */
+export function formatMatchTime(
+  seconds: number,
+  {
+    timeZone = Temporal.Now.timeZoneId(),
+    weekday = true,
+  }: { timeZone?: string; weekday?: boolean } = {},
+): string {
+  return Temporal.Instant.fromEpochMilliseconds(seconds * 1000)
+    .toZonedDateTimeISO(timeZone)
+    .toLocaleString('en-US', {
+      ...(weekday && { weekday: 'short' }),
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
 }

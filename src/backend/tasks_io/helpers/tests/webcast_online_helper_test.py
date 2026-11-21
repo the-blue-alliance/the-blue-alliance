@@ -418,3 +418,17 @@ def test_add_online_status_twitch_without_token(
     assert webcast["viewer_count"] == 1337
 
     assert none_throws(TwitchOauthTokenMemcache().get())["access_token"] == "t2"
+
+
+@mock.patch.object(YoutubeWebcastStatusBatch, "fetch_async")
+def test_add_online_status_batch_empty_list(youtube_mock: mock.Mock) -> None:
+    WebcastOnlineHelper.add_online_status_batch_async([]).get_result()
+
+    youtube_mock.assert_not_called()
+
+
+@mock.patch.object(YoutubeWebcastStatusBatch, "fetch_async")
+def test_add_youtube_status_batch_empty_list(youtube_mock: mock.Mock) -> None:
+    WebcastOnlineHelper._add_youtube_status_batch_async([]).get_result()
+
+    youtube_mock.assert_not_called()

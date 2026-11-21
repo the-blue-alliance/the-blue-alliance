@@ -109,18 +109,13 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
     return payload;
   };
 
-  const fetchMatches = async (): Promise<void> => {
-    if (!selectedEvent) {
-      setStatusMessage("Please select an event first");
-      return;
-    }
-
+  const fetchMatches = async (eventKey: string): Promise<void> => {
     setLoading(true);
     setStatusMessage("Loading matches...");
 
     try {
       const response = await makeApiV3Request(
-        `/api/v3/event/${selectedEvent}/matches`
+        `/api/v3/event/${eventKey}/matches`
       );
       const data = await response.json();
 
@@ -172,17 +167,9 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
     });
   };
 
-  const fetchPlaylistVideos = async (): Promise<void> => {
-    if (!selectedEvent) {
-      setStatusMessage("Please select an event first");
-      return;
-    }
-
-    if (matches.length === 0) {
-      setStatusMessage("Fetch matches before loading a playlist");
-      return;
-    }
-
+  // Only bound to the Load Playlist button once matches are fetched (see
+  // canLoadPlaylist below), so `matches` is non-empty here.
+  const fetchPlaylistVideos = async (eventKey: string): Promise<void> => {
     const playlistId = extractPlaylistId(playlistUrl);
     if (!playlistId) {
       setStatusMessage("Please enter a valid YouTube playlist URL or ID");
@@ -194,7 +181,7 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
 
     try {
       const response = await makeTrustedRequest(
-        `/api/_eventwizard/_playlist/${selectedEvent}/${encodeURIComponent(
+        `/api/_eventwizard/_playlist/${eventKey}/${encodeURIComponent(
           playlistId
         )}`,
         ""
@@ -207,7 +194,7 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
 
       const matchesByPartial = new Map<string, Match>(
         matches.map((match) => [
-          match.key.replace(`${selectedEvent}_`, ""),
+          match.key.replace(`${eventKey}_`, ""),
           match,
         ])
       );
@@ -262,32 +249,26 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
     }
   };
 
-  const addAllVideos = async (): Promise<void> => {
-    if (!selectedEvent) {
-      setStatusMessage("Please select an event first");
-      return;
-    }
-
-    const payload = getPendingVideoAddPayload();
+  // Only bound to the Add All button when something is pending (see
+  // pendingAddPayload below), so `payload` is non-empty here.
+  const addAllVideos = async (
+    eventKey: string,
+    payload: Record<string, string>
+  ): Promise<void> => {
     const pendingEntries = Object.entries(payload);
-
-    if (pendingEntries.length === 0) {
-      setStatusMessage("No new videos to add");
-      return;
-    }
 
     setAddingAllVideos(true);
     setStatusMessage(`Adding ${pendingEntries.length} videos...`);
 
     try {
       await makeTrustedRequest(
-        `/api/trusted/v1/event/${selectedEvent}/match_videos/add`,
+        `/api/trusted/v1/event/${eventKey}/match_videos/add`,
         JSON.stringify(payload)
       );
 
       setMatches((prevMatches) =>
         prevMatches.map((match) => {
-          const partialMatchKey = match.key.replace(`${selectedEvent}_`, "");
+          const partialMatchKey = match.key.replace(`${eventKey}_`, "");
           const videoId = payload[partialMatchKey];
           if (!videoId || isVideoAlreadyOnMatch(match, videoId)) {
             return match;
@@ -303,7 +284,7 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
       setNewVideoIds((prev) => {
         const next = { ...prev };
         pendingEntries.forEach(([partialMatchKey]) => {
-          next[`${selectedEvent}_${partialMatchKey}`] = "";
+          next[`${eventKey}_${partialMatchKey}`] = "";
         });
         return next;
       });
@@ -311,7 +292,7 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
       setPlaylistVideoTitles((prev) => {
         const next = { ...prev };
         pendingEntries.forEach(([partialMatchKey]) => {
-          delete next[`${selectedEvent}_${partialMatchKey}`];
+          delete next[`${eventKey}_${partialMatchKey}`];
         });
         return next;
       });
@@ -432,7 +413,10 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
     return null;
   };
 
-  const pendingAddCount = Object.keys(getPendingVideoAddPayload()).length;
+  const pendingAddPayload = getPendingVideoAddPayload();
+  const pendingAddCount = Object.keys(pendingAddPayload).length;
+  const canLoadPlaylist = !!selectedEvent && matches.length > 0;
+  const canAddAll = !!selectedEvent && pendingAddCount > 0;
 
   return (
     <div className="tab-pane" id="match-videos">
@@ -451,7 +435,7 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
             <div className="panel-body">
               <button
                 className="btn btn-primary"
-                onClick={fetchMatches}
+                onClick={selectedEvent ? () => fetchMatches(selectedEvent) : undefined}
                 disabled={loading || !selectedEvent}
               >
                 {loading ? "Loading..." : "Fetch Matches"}
@@ -476,26 +460,24 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
                 </div>
                 <button
                   className="btn btn-default"
-                  onClick={fetchPlaylistVideos}
-                  disabled={
-                    !selectedEvent ||
-                    loadingPlaylist ||
-                    addingAllVideos ||
-                    matches.length === 0
+                  onClick={
+                    canLoadPlaylist
+                      ? () => fetchPlaylistVideos(selectedEvent)
+                      : undefined
                   }
+                  disabled={!canLoadPlaylist || loadingPlaylist || addingAllVideos}
                   style={{ marginRight: "10px" }}
                 >
                   {loadingPlaylist ? "Loading Playlist..." : "Load Playlist"}
                 </button>
                 <button
                   className="btn btn-success"
-                  onClick={addAllVideos}
-                  disabled={
-                    !selectedEvent ||
-                    addingAllVideos ||
-                    loadingPlaylist ||
-                    pendingAddCount === 0
+                  onClick={
+                    canAddAll
+                      ? () => addAllVideos(selectedEvent, pendingAddPayload)
+                      : undefined
                   }
+                  disabled={!canAddAll || addingAllVideos || loadingPlaylist}
                 >
                   {addingAllVideos
                     ? "Adding All..."

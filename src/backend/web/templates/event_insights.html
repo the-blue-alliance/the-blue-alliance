@@ -166,7 +166,7 @@
 {% endblock %}
 
 {% block inline_javascript %}
-<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js" integrity="sha384-86mmuxXJYGTFcyG3Tr7nKO2BYpngqxq/EYijDDr0VCbSXm5HK6tfJbGl4HSwEoUk" crossorigin="anonymous"></script>
 <script>
   var predictions = {{distribution_info_json|safe}};  // Kind of hacky
   Chart.defaults.global.legend.display = false;
