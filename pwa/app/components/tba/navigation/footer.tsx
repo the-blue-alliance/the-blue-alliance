@@ -33,6 +33,8 @@ const links: NavigationLink[] = [
   { label: 'Thanks', to: '/thanks' },
   { label: 'Add Data', to: '/add-data' },
   { label: 'API Documentation', to: '/apidocs' },
+  { label: 'FAQ', to: '/faq' },
+  { label: 'Brand', to: '/brand' },
   {
     label: 'Blog',
     href: 'https://blog.thebluealliance.com',

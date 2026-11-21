@@ -43,6 +43,7 @@ from backend.api.handlers.regional_advancement import (
     regional_rankings,
 )
 from backend.api.handlers.search import search_index
+from backend.api.handlers.sponsors import sponsors
 from backend.api.handlers.status import status
 from backend.api.handlers.team import (
     team,
@@ -77,6 +78,9 @@ CORS(
 
 # Overall Status
 api_v3.add_url_rule("/status", view_func=status)
+
+# Platinum sponsors
+api_v3.add_url_rule("/sponsors", view_func=sponsors)
 
 # District
 api_v3.add_url_rule(

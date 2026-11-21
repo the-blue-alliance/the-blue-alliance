@@ -2,16 +2,15 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
-  AllianceColor,
   AutoChargeStationRobot2023,
-  CompLevel,
+  BridgeState2023,
   EndGameChargeStationRobot2023,
-  type Match,
   type MatchScoreBreakdown2023,
   type MatchScoreBreakdown2023Alliance,
   MobilityRobot2023,
 } from '~/api/tba/read';
 import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
+import { makeMatch, makeAlliance as makeMatchAlliance } from '~/test/factories';
 
 // The icon-only helpers are swapped for text so each robot's condition is
 // visible in the rendered row. The real helpers are covered in common.test.tsx.
@@ -114,34 +113,14 @@ function makeBreakdown(
   };
 }
 
-const match: Match = {
+const match = makeMatch({
   key: '2023test_qm1',
-  comp_level: CompLevel.QM,
-  set_number: 1,
-  match_number: 1,
   alliances: {
-    red: {
-      score: 120,
-      team_keys: ['frc254', 'frc1114', 'frc2056'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
-    blue: {
-      score: 53,
-      team_keys: ['frc148', 'frc217', 'frc33'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
+    red: makeMatchAlliance(120, ['frc254', 'frc1114', 'frc2056']),
+    blue: makeMatchAlliance(53, ['frc148', 'frc217', 'frc33']),
   },
-  winning_alliance: AllianceColor.RED,
   event_key: '2023test',
-  time: null,
-  actual_time: null,
-  predicted_time: null,
-  post_result_time: null,
-  score_breakdown: null,
-  videos: [],
-};
+});
 
 function renderBreakdown(scoreBreakdown = makeBreakdown()) {
   return render(
@@ -188,13 +167,25 @@ describe('ScoreBreakdown2023', () => {
   });
 
   test.each([
-    { name: '254 Docked (+10) Robot 1 Endgame 148 None (+0)' },
+    { name: '254 Docked (+6) Robot 1 Endgame 148 None (+0)' },
     { name: '1114 Parked (+2) Robot 2 Endgame 217 Park (+2)' },
     { name: '2056 Park (+2) Robot 3 Endgame 33 (+0)' },
   ])('shows the charge station state and points in row "$name"', ({ name }) => {
     renderBreakdown();
 
     expect(screen.getByRole('row', { name })).toBeTruthy();
+  });
+
+  test('scores a robot docked on a level charge station as engaged', () => {
+    renderBreakdown(
+      makeBreakdown({ endGameBridgeState: BridgeState2023.LEVEL }),
+    );
+
+    expect(
+      screen.getByRole('row', {
+        name: '254 Docked (+10) Robot 1 Endgame 148 None (+0)',
+      }),
+    ).toBeTruthy();
   });
 
   test('shows the link count with link points', () => {

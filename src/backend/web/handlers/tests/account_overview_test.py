@@ -1,6 +1,6 @@
 import datetime
 from random import randint
-from typing import List, Optional
+from typing import Any, List, Optional, Tuple
 from unittest.mock import ANY, Mock, patch
 from urllib.parse import parse_qsl, urlparse
 
@@ -13,10 +13,12 @@ from backend.common.consts.auth_type import (
     AuthType,
     WRITE_TYPE_NAMES as AUTH_TYPE_WRITE_TYPE_NAMES,
 )
+from backend.common.consts.event_type import EventType
+from backend.common.models.event import Event
 from backend.common.sitevars.notifications_enable import NotificationsEnable
-from backend.web.handlers.account import blueprint
+from backend.web.handlers.account import ACCOUNT_WRITE_TYPE_LABELS, blueprint
 from backend.web.handlers.conftest import CapturedTemplate
-from backend.web.handlers.tests.helpers import assert_alert, get_page_title
+from backend.web.handlers.tests.helpers import get_page_title
 
 
 def test_blueprint() -> None:
@@ -71,6 +73,20 @@ def test_overview_unregistered(login_user, web_client: FlaskClient) -> None:
     }
 
 
+def _assert_alert(div: Any, message: str, success: bool) -> None:
+    assert ("alert-success" if success else "alert-danger") in div["class"]
+    assert div.find("button", attrs={"data-dismiss": "alert"})
+    assert div.find(class_="account-alert-message").text == message
+
+
+def _secret(td: Any) -> str:
+    return td.find(class_="account-secret-value").text.strip()
+
+
+def _stat(row: Any) -> Tuple[str, str]:
+    return (row.find("th").text.strip(), row.find("td").text.strip())
+
+
 def test_overview(
     login_user,
     captured_templates: List[CapturedTemplate],
@@ -91,7 +107,7 @@ def test_overview(
         "webhook_verification_success",
         "ping_sent",
         "ping_enabled",
-        "auth_write_type_names",
+        "auth_write_type_labels",
         "user",
     }
     assert set(context_keys) <= set(context)
@@ -100,30 +116,22 @@ def test_overview(
 @pytest.mark.parametrize(
     "status, message, success",
     [
-        ("account_edit_success", "Your profile has been updated.", True),
-        (
-            "read_key_add_success",
-            "A new read API key has been successfully added.",
-            True,
-        ),
+        ("account_edit_success", "Profile updated.", True),
+        ("read_key_add_success", "New read API key added.", True),
         (
             "read_key_add_no_description",
-            "You must specify a description when adding a read API key. Please try again.",
+            "Add a description to create a read API key.",
             False,
         ),
         (
             "read_key_add_failure",
-            "Unable to add a read API key. If this problem persists, please contact us.",
+            "Couldn't add a read API key. If this keeps happening, please contact us.",
             False,
         ),
-        (
-            "read_key_delete_success",
-            "The selected read API key has been deleted.",
-            True,
-        ),
+        ("read_key_delete_success", "Read API key deleted.", True),
         (
             "read_key_delete_failure",
-            "Unable to delete the specified read API key. If this problem persists, please contact us.",
+            "Couldn't delete that read API key. If this keeps happening, please contact us.",
             False,
         ),
     ],
@@ -152,7 +160,7 @@ def test_overview_status(
     soup = bs4.BeautifulSoup(response.data, "html.parser")
     status_row = soup.find(id="status-row", attrs={"class": "row"})
     status = status_row.find("div", attrs={"class": "alert"})
-    assert_alert(status, ("Success!" if success else "Oops!"), message, success)
+    _assert_alert(status, message, success)
 
 
 def test_overview_no_status(
@@ -197,9 +205,7 @@ def test_overview_webhook_verification_success(
     soup = bs4.BeautifulSoup(response.data, "html.parser")
     webhook_row = soup.find(id="webhook-row", attrs={"class": "row"})
     webhook_alert = webhook_row.find("div", attrs={"class": "alert"})
-    assert_alert(
-        webhook_alert, "Success!", "The webhook has been properly verified!", True
-    )
+    _assert_alert(webhook_alert, "Webhook verified.", True)
 
 
 def test_overview_no_webhook_verification_success(
@@ -246,11 +252,8 @@ def test_overview_ping_sent(
     soup = bs4.BeautifulSoup(response.data, "html.parser")
     ping_row = soup.find(id="ping-row", attrs={"class": "row"})
     ping_alert = ping_row.find("div", attrs={"class": "alert"})
-    assert_alert(
-        ping_alert,
-        ("Success!" if success else "Failure"),
-        ("Ping was sent." if success else "Failed to send ping."),
-        success,
+    _assert_alert(
+        ping_alert, ("Ping sent." if success else "Couldn't send the ping."), success
     )
 
 
@@ -316,6 +319,7 @@ def test_ping_disabled(
     soup = bs4.BeautifulSoup(response.data, "html.parser")
     ping_button_disabled = soup.find("button", attrs={"class": "ping", "disabled": ""})
     assert ping_button_disabled
+    assert "turned off" in ping_button_disabled.find_parent("form")["title"]
 
 
 def test_num_favorites(
@@ -339,7 +343,7 @@ def test_num_favorites(
     mytba_favorites_row = soup.find(id="mytba-favorites-count-row")
 
     assert mytba_favorites_row is not None
-    assert mytba_favorites_row.text.strip() == "Favorites:\n{}".format(favorites_count)
+    assert _stat(mytba_favorites_row) == ("Favorites", str(favorites_count))
 
 
 def test_num_subscriptions(
@@ -363,9 +367,7 @@ def test_num_subscriptions(
     mytba_subscriptions_row = soup.find(id="mytba-subscriptions-count-row")
 
     assert mytba_subscriptions_row is not None
-    assert mytba_subscriptions_row.text.strip() == "Subscriptions:\n{}".format(
-        subscriptions_count
-    )
+    assert _stat(mytba_subscriptions_row) == ("Subscriptions", str(subscriptions_count))
 
 
 def test_submissions_pending(
@@ -389,9 +391,7 @@ def test_submissions_pending(
     submissions_pending_row = soup.find(id="submissions-pending-count-row")
 
     assert submissions_pending_row is not None
-    assert submissions_pending_row.text.strip() == "Pending:\n{}".format(
-        submissions_pending_count
-    )
+    assert _stat(submissions_pending_row) == ("Pending", str(submissions_pending_count))
 
 
 def test_submissions_accepted(
@@ -415,8 +415,9 @@ def test_submissions_accepted(
     submissions_accepted_row = soup.find(id="submissions-accepted-count-row")
 
     assert submissions_accepted_row is not None
-    assert submissions_accepted_row.text.strip() == "Accepted:\n{}".format(
-        submissions_accepted_count
+    assert _stat(submissions_accepted_row) == (
+        "Accepted",
+        str(submissions_accepted_count),
     )
 
 
@@ -441,8 +442,9 @@ def test_submissions_reviewed(
     submissions_reviewed_row = soup.find(id="submissions-reviewed-count-row")
 
     assert submissions_reviewed_row is not None
-    assert submissions_reviewed_row.text.strip() == "Reviewed:\n{}".format(
-        submissions_reviewed_count
+    assert _stat(submissions_reviewed_row) == (
+        "Reviewed",
+        str(submissions_reviewed_count),
     )
 
 
@@ -473,6 +475,8 @@ def test_has_review_permissions(
         assert link["href"] == "https://beta.thebluealliance.com/suggest/review"
     else:
         assert review_permissions_row is None
+        assert soup.find(id="submissions-reviewed-count-row") is None
+        assert soup.find("a", href="/add-data").text.strip() == "How to add data →"
 
 
 @pytest.mark.parametrize("setup_keys", [(True), (False)])
@@ -507,18 +511,23 @@ def test_api_read_keys(
     if setup_keys:
         assert len(api_read) == 1
         api_read = api_read[0]
-        assert [td.text.strip() for td in api_read.find_all("td")] == [
+        tds = api_read.find_all("td")
+        assert [tds[0].text.strip(), _secret(tds[1]), tds[2].text.strip()] == [
+            api_key_description,
             "some_api_key",
             api_key_created.strftime("%Y-%m-%d"),
-            api_key_description,
-            "Delete",
         ]
+        # Read keys aren't masked, only copyable.
+        assert "is-masked" not in tds[1].find(class_="account-secret-field")["class"]
 
         # Last TD should be a form with proper delete information
         delete_form = api_read.find("form")
         assert delete_form is not None
         assert delete_form.get("method") == "POST"
         assert delete_form.get("action") == "/account/api/read_key_delete"
+        assert delete_form.get("data-confirm") == (
+            "Delete the \u201cTesting API Read Key\u201d key? Apps using it will stop working."
+        )
 
         delete_form_input = delete_form.find_all("input")
         assert set([input.get("type") for input in delete_form_input]) == {"hidden"}
@@ -526,9 +535,7 @@ def test_api_read_keys(
             (input.get("name"), input.get("value")) for input in delete_form_input
         ] == [("key_id", "some_api_key"), ("csrf_token", ANY)]
 
-        delete_form_button = delete_form.find(
-            "button", attrs={"class": "btn btn-danger", "type": "submit"}
-        )
+        delete_form_button = delete_form.find("button", attrs={"type": "submit"})
         assert delete_form_button.text == " Delete"
     else:
         assert len(api_read) == 0
@@ -550,7 +557,7 @@ def test_api_write_keys(
 
     api_key_id = "some_api_key"
     api_key_secret = "some_api_key_secret"
-    api_write_key_expiration = datetime.datetime.now()
+    api_write_key_expiration = datetime.datetime.now() + datetime.timedelta(days=30)
     api_write_key = Mock(
         event_list=[event],
         auth_types_enum=[AuthType.MATCH_VIDEO, AuthType.ZEBRA_MOTIONWORKS],
@@ -590,8 +597,8 @@ def test_api_write_keys(
 
         # Second TD is a list of permissions for the key
         assert [li.text for li in api_write_tds[1].find_all("li")] == [
-            "match video",
-            "zebra motionworks",
+            "Match videos",
+            "Zebra MotionWorks",
         ]
 
         # Third TD is the expiration for the key
@@ -600,13 +607,16 @@ def test_api_write_keys(
                 "%Y-%m-%d"
             )
         else:
-            assert api_write_tds[2].text.strip() == "--"
+            assert api_write_tds[2].text.strip() == "Never"
 
         # Fourth TD is the key ID
         assert api_write_tds[3].text.strip() == api_key_id
 
         # Fifth TD is the key secret
-        assert api_write_tds[4].text.strip() == api_key_secret
+        assert _secret(api_write_tds[4]) == api_key_secret
+        assert (
+            "is-masked" in api_write_tds[4].find(class_="account-secret-field")["class"]
+        )
     else:
         assert len(api_write) == 0
 
@@ -700,7 +710,7 @@ def test_api_write_keys_sorted_by_event_key(
         assert expected_caret in carets[0].get("class")
 
 
-def test_auth_write_type_names(
+def test_auth_write_type_labels(
     login_user,
     captured_templates: List[CapturedTemplate],
     web_client: FlaskClient,
@@ -708,12 +718,12 @@ def test_auth_write_type_names(
     response = web_client.get("/account")
 
     assert response.status_code == 200
-    assert len(captured_templates) == 1
-
-    template = captured_templates[0][0]
     context = captured_templates[0][1]
-    assert template.name == "account_overview.html"
-    assert context["auth_write_type_names"] == AUTH_TYPE_WRITE_TYPE_NAMES
+    assert context["auth_write_type_labels"] == ACCOUNT_WRITE_TYPE_LABELS
+
+
+def test_account_write_type_labels_cover_every_write_type() -> None:
+    assert set(ACCOUNT_WRITE_TYPE_LABELS) == set(AUTH_TYPE_WRITE_TYPE_NAMES)
 
 
 def test_overview_api_read_add_form(
@@ -740,7 +750,7 @@ def test_overview_api_read_add_form(
     ] == [("description", None, "text"), ("csrf_token", ANY, "hidden")]
 
     api_read_key_form_button = api_read_key_form.find(
-        "button", attrs={"class": "btn btn-success", "type": "submit"}
+        "button", attrs={"type": "submit"}
     )
     assert api_read_key_form_button.text == " Add New Key"
 
@@ -757,10 +767,174 @@ def test_overview_api_write_add_button(
     assert template.name == "account_overview.html"
 
     soup = bs4.BeautifulSoup(response.data, "html.parser")
-    api_write_key_row = soup.find(
-        "div", attrs={"class": "row"}, id="api-write-keys-row"
-    )
+    api_write_key_row = soup.find("div", id="api-write-keys-row")
     api_write_key_row_button = api_write_key_row.find(
-        "a", attrs={"href": "/request/apiwrite", "class": "btn btn-success pull-right"}
+        "a", attrs={"href": "/request/apiwrite"}
     )
-    assert api_write_key_row_button.text == " Request Tokens"
+    assert api_write_key_row_button.text == " Request a Write Key"
+
+
+def test_overview_empty_sections(login_user, web_client: FlaskClient) -> None:
+    response = web_client.get("/account")
+
+    assert response.status_code == 200
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    assert soup.find(id="api-read-keys") is None
+    assert soup.find(id="api-write-keys") is None
+    empty = [div.text.strip() for div in soup.find_all("div", class_="account-empty")]
+    assert empty == [
+        "You don't have any read API keys yet.",
+        "You don't have any write API keys.",
+        "No devices found.",
+    ]
+
+
+def test_api_write_keys_show_event_names(login_user, web_client: FlaskClient) -> None:
+    Event(
+        id="2026nhdur",
+        year=2026,
+        event_short="nhdur",
+        event_type_enum=EventType.DISTRICT,
+        name="NE District UNH Event",
+        short_name="UNH",
+    ).put()
+
+    def event_key(key_id: str) -> Mock:
+        event = Mock()
+        event.configure_mock(**{"id.return_value": key_id})
+        return event
+
+    api_write_key = Mock(
+        event_list=[event_key("2026nhdur"), event_key("2026zzzz")],
+        auth_types_enum=[],
+    )
+    api_write_key.expiration = None
+    api_write_key.secret = "secret"
+    api_write_key.key.configure_mock(**{"id.return_value": "key"})
+    login_user.api_write_keys = [api_write_key]
+
+    response = web_client.get("/account")
+
+    assert response.status_code == 200
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    events = soup.find("tr", class_="api-write-key").find_all(
+        "div", class_="account-write-key-event"
+    )
+    # Known events show year + display name with the key beneath; unknown ones fall back to the key.
+    assert [e.find("a").text for e in events] == ["2026 UNH", "2026zzzz"]
+    assert [e.find("a").get("href") for e in events] == [
+        "/event/2026nhdur",
+        "/event/2026zzzz",
+    ]
+    assert events[0].find(class_="account-event-key").text == "2026nhdur"
+    assert events[1].find(class_="account-event-key") is None
+
+
+def test_api_write_keys_event_name_falls_back_from_empty_short_name(
+    login_user, web_client: FlaskClient
+) -> None:
+    for key, name in [
+        ("2026azrl4", "Arizona Robotics League Qualifier 4"),
+        ("2023nytv", ""),
+    ]:
+        Event(
+            id=key,
+            year=int(key[:4]),
+            event_short=key[4:],
+            event_type_enum=EventType.OFFSEASON,
+            name=name,
+            short_name="",
+        ).put()
+
+    def event_key(key_id: str) -> Mock:
+        event = Mock()
+        event.configure_mock(**{"id.return_value": key_id})
+        return event
+
+    api_write_key = Mock(
+        event_list=[event_key("2026azrl4"), event_key("2023nytv")],
+        auth_types_enum=[],
+    )
+    api_write_key.expiration = None
+    api_write_key.secret = "secret"
+    api_write_key.key.configure_mock(**{"id.return_value": "key"})
+    login_user.api_write_keys = [api_write_key]
+
+    response = web_client.get("/account")
+
+    assert response.status_code == 200
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    events = soup.find("tr", class_="api-write-key").find_all(
+        "div", class_="account-write-key-event"
+    )
+    # Empty short name uses the full name; no name at all falls back to the key.
+    assert [e.find("a").text for e in events] == [
+        "2026 Arizona Robotics League Qualifier 4",
+        "2023nytv",
+    ]
+
+
+def test_delete_account_is_last_section(login_user, web_client: FlaskClient) -> None:
+    response = web_client.get("/account")
+
+    assert response.status_code == 200
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    delete_links = soup.find_all("a", href="/account/delete")
+    assert len(delete_links) == 1
+    section = delete_links[0].find_parent(id="delete-account-row")
+    assert section is not None
+    assert section.find_next_sibling() is None
+
+
+@pytest.mark.parametrize(
+    "verified, status, has_verify_link",
+    [(True, "Verified", False), (False, "Not verified", True)],
+)
+def test_webhook_verification_status(
+    login_user,
+    web_client: FlaskClient,
+    verified: bool,
+    status: str,
+    has_verify_link: bool,
+) -> None:
+    webhook = Mock(is_webhook=True, verified=verified, display_name="Scouting")
+    webhook.key.configure_mock(**{"id.return_value": "wh1"})
+    login_user.mobile_clients = [webhook]
+
+    response = web_client.get("/account")
+
+    assert response.status_code == 200
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    assert soup.find(class_="account-webhook-status").text.strip() == status
+    assert (soup.find("a", href="/webhooks/verify/wh1") is not None) == has_verify_link
+
+
+def test_api_write_key_expired(login_user, web_client: FlaskClient) -> None:
+    def api_write_key(key_id: str, days: int) -> Mock:
+        key = Mock(event_list=[], auth_types_enum=[])
+        key.expiration = datetime.datetime.now() + datetime.timedelta(days=days)
+        key.secret = "secret"
+        key.key.configure_mock(**{"id.return_value": key_id})
+        return key
+
+    login_user.api_write_keys = [api_write_key("live", 5), api_write_key("old", -5)]
+
+    response = web_client.get("/account")
+
+    assert response.status_code == 200
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    rows = {
+        row.find_all("td")[3].text.strip(): row
+        for row in soup.find_all("tr", class_="api-write-key")
+    }
+    assert "account-key-expired" not in rows["live"]["class"]
+    assert "Expired" not in rows["live"].find_all("td")[2].text
+    assert "account-key-expired" in rows["old"]["class"]
+    assert "Expired" in rows["old"].find_all("td")[2].text
+
+
+def test_read_key_description_required(login_user, web_client: FlaskClient) -> None:
+    response = web_client.get("/account")
+
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    assert soup.find("input", id="form-description").has_attr("required")

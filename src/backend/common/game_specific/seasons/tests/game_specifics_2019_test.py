@@ -147,3 +147,16 @@ def test_insights_with_some_breakdowns(test_data_importer) -> None:
     test_data_importer.import_match_list(HELPERS_TESTS, "data/2019nyny_matches.json")
     matches = Match.query(Match.event == ndb.Key(Event, "2019nyny")).fetch()
     assert_partial_breakdowns_split_counters(GameSpecifics2019(), matches)
+
+
+def test_get_per_robot_coprs() -> None:
+    coprs = GameSpecifics2019().get_per_robot_coprs()
+    breakdown = {
+        "preMatchLevelRobot1": "HabLevel2",
+        "preMatchLevelRobot2": "HabLevel1",
+        "preMatchLevelRobot3": "HabLevel2",
+        "habLineRobot1": "CrossedHabLineInSandstorm",
+        "habLineRobot2": "CrossedHabLineInSandstorm",
+        "habLineRobot3": "CrossedHabLineInTeleop",
+    }
+    assert coprs["sandStormBonusPoints"](breakdown) == [6, 3, 0]

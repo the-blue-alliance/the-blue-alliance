@@ -178,6 +178,9 @@ import type {
   GetSearchIndexData,
   GetSearchIndexErrors,
   GetSearchIndexResponses,
+  GetSponsorsData,
+  GetSponsorsErrors,
+  GetSponsorsResponses,
   GetStatusData,
   GetStatusErrors,
   GetStatusResponses,
@@ -449,6 +452,8 @@ import {
   zGetRegionalRankingsResponse,
   zGetSearchIndexHeaders,
   zGetSearchIndexResponse,
+  zGetSponsorsHeaders,
+  zGetSponsorsResponse,
   zGetStatusHeaders,
   zGetStatusResponse,
   zGetTeamAwardsByYearHeaders,
@@ -1428,7 +1433,7 @@ export const getEventMedia = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Gets live match-queuing info for an event from Nexus (https://frc.nexus/), or `null` if no data is currently available for this event.
+ * Gets live match-queuing info and the pit map for an event from Nexus (https://frc.nexus/), or `null` if neither is currently available for this event.
  */
 export const getEventNexusInfo = <ThrowOnError extends boolean = false>(
   options: Options<GetEventNexusInfoData, ThrowOnError>,
@@ -2300,6 +2305,33 @@ export const getStatus = <ThrowOnError extends boolean = false>(
       await zGetStatusResponse.parseAsync(data),
     security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/status',
+    ...options,
+  });
+
+/**
+ * Returns TBA's platinum sponsors in display order (0 to 3 entries), for clients to credit. Separate from /status so a malformed sponsor entry can never break the status call.
+ */
+export const getSponsors = <ThrowOnError extends boolean = false>(
+  options?: Options<GetSponsorsData, ThrowOnError>,
+): RequestResult<GetSponsorsResponses, GetSponsorsErrors, ThrowOnError> =>
+  (options?.client ?? client).get<
+    GetSponsorsResponses,
+    GetSponsorsErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetSponsorsHeaders.optional(),
+          path: z.never().optional(),
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetSponsorsResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/sponsors',
     ...options,
   });
 

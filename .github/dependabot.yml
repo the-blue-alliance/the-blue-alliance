@@ -11,10 +11,6 @@ updates:
   - dependency-name: pyre-check
     versions:
     - 0.0.62
-  # Pinned at 7.4.0 until we migrate from registration tokens to FIDs
-  - dependency-name: firebase-admin
-    versions:
-    - ">7.4.0"
 - package-ecosystem: npm
   directory: "/"
   schedule:

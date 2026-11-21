@@ -47,6 +47,21 @@ class CachedQueryResult(ndb.Model):
                 span.set_label("uncompressed_bytes", str(len(res_bytes)))
             return res_bytes
 
+    def stored_size_bytes(self) -> int:
+        """
+        Returns the compressed size of result + result_dict as written to Datastore.
+        Reuses the base values NDB cached during a put attempt, so calling this after
+        a failed put does not re-pickle or re-compress.
+        """
+        size = 0
+        for prop in (CachedQueryResult.result, CachedQueryResult.result_dict):
+            for base in prop._get_base_value_unwrapped_as_list(self):
+                if isinstance(base, ndb.model._CompressedValue):
+                    size += len(base.z_val)
+                elif isinstance(base, (bytes, bytearray)):
+                    size += len(base)
+        return size
+
     @staticmethod
     def cache_key_prefix_from_format(cache_key_format: str) -> str:
         cache_key_splits = cache_key_format.split("_")
@@ -120,54 +135,6 @@ class CachedQueryResult(ndb.Model):
             return int(parts[1])
         except ValueError:
             return None
-
-    @classmethod
-    def purge_query_class_global_version(
-        cls,
-        query_class: Any,
-        db_version: int,
-        page_size: int,
-        delete_batch_size: int,
-    ) -> int:
-        from backend.common.queries.database_query import CachedDatabaseQuery
-
-        if not isinstance(query_class, type) or not issubclass(
-            query_class, CachedDatabaseQuery
-        ):
-            raise TypeError("query_class must be a CachedDatabaseQuery subclass")
-
-        if page_size <= 0:
-            raise ValueError("page_size must be > 0")
-        if delete_batch_size <= 0:
-            raise ValueError("delete_batch_size must be > 0")
-
-        CachedDatabaseQuery.validate_db_version_for_deletion(db_version)
-
-        cache_key_prefix = cls.cache_key_prefix_from_format(
-            query_class.CACHE_KEY_FORMAT
-        )
-
-        deleted = 0
-        keys_to_delete = []
-        for key in cls.iter_keys_by_cache_key_prefix(cache_key_prefix, page_size):
-            key_string = key.string_id()
-            if key_string is None:
-                continue
-            key_db_version = cls.db_version_from_key_string(key_string)
-            if key_db_version is None or key_db_version != db_version:
-                continue
-
-            keys_to_delete.append(key)
-            if len(keys_to_delete) >= delete_batch_size:
-                deleted += len(keys_to_delete)
-                ndb.delete_multi(keys_to_delete)
-                keys_to_delete = []
-
-        if keys_to_delete:
-            deleted += len(keys_to_delete)
-            ndb.delete_multi(keys_to_delete)
-
-        return deleted
 
     def _validate_result_properties(self) -> bool:
         """

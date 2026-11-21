@@ -14,6 +14,7 @@ import { District, Media, MediaAvatar, Team } from '~/api/tba/read';
 import DetailEntity from '~/components/tba/detailEntity';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { DistrictLink, TeamLocationLink } from '~/components/tba/links';
+import LoadingSkeleton from '~/components/tba/loadingSkeleton';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import TeamSocialMediaList from '~/components/tba/teamSocialMediaList';
 import {
@@ -35,14 +36,18 @@ export default function TeamPageTeamInfo({
   socials,
   district,
   favoriteButton,
+  avatarLoading = false,
+  socialsLoading = false,
 }: {
   team: Team;
   maybeAvatar: MediaAvatar | undefined;
   socials: Media[];
   district?: District;
   favoriteButton?: ReactNode;
+  avatarLoading?: boolean;
+  socialsLoading?: boolean;
 }) {
-  const sponsors = attemptToParseSponsors(team.name);
+  const sponsors = attemptToParseSponsors(team.name, team.school_name);
   const schoolName =
     team.school_name ?? attemptToParseSchoolNameFromOldTeamName(team.name);
 
@@ -50,98 +55,114 @@ export default function TeamPageTeamInfo({
     <>
       <div>
         <div className="mb-2 flex items-center gap-2">
-          <TeamAvatar media={maybeAvatar} />
-          <h1 className="text-3xl font-medium">
+          {avatarLoading ? (
+            <LoadingSkeleton
+              label="Loading avatar"
+              className="size-12 shrink-0"
+            />
+          ) : (
+            <TeamAvatar media={maybeAvatar} className="shrink-0" />
+          )}
+          <h1 className="text-2xl font-medium md:text-3xl">
             Team {team.team_number} - {team.nickname}
           </h1>
-          {favoriteButton}
+          <div className="hidden md:block">{favoriteButton}</div>
         </div>
 
-        <div className="mb-2 space-y-1">
-          <DetailEntity icon={<LocationIcon />}>
-            <TeamLocationLink team={team} />
-          </DetailEntity>
-
-          {district && (
-            <DetailEntity icon={<DistrictIcon />}>
-              Part of the{' '}
-              <DistrictLink
-                districtAbbreviation={district.abbreviation}
-                year={district.year}
-              >
-                {district.display_name}
-              </DistrictLink>{' '}
-              District
+        <div className="mb-2 flex items-start justify-between gap-2">
+          <div className="space-y-1">
+            <DetailEntity icon={<LocationIcon />}>
+              <TeamLocationLink team={team} />
             </DetailEntity>
-          )}
 
-          {sponsors.length > 0 ? (
-            <Accordion>
-              <AccordionItem value="item-1" className="border-0">
-                <AccordionTrigger
-                  className="justify-normal p-0 text-left font-normal"
+            {district && (
+              <DetailEntity icon={<DistrictIcon />}>
+                Part of the{' '}
+                <DistrictLink
+                  districtAbbreviation={district.abbreviation}
+                  year={district.year}
                 >
-                  <DetailEntity icon={<SponsorsIcon />}>
-                    {schoolName}
-                    {sponsors.length > 0 &&
-                      ` with ${pluralize(sponsors.length, 'sponsor', 'sponsors')}`}
-                  </DetailEntity>
-                </AccordionTrigger>
-                <AccordionContent className="pb-0">
-                  {sponsors.map((sponsor, i) => (
-                    <Badge
-                      className="m-px font-normal"
-                      key={i}
-                      variant={'secondary'}
-                    >
-                      {sponsor}
-                    </Badge>
-                  ))}
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          ) : (
-            <DetailEntity icon={<SponsorsIcon />}>{schoolName}</DetailEntity>
-          )}
+                  {district.display_name}
+                </DistrictLink>{' '}
+                District
+              </DetailEntity>
+            )}
 
-          <DetailEntity icon={<RookieIcon />}>
-            Rookie Year: {team.rookie_year}
-          </DetailEntity>
-          <DetailEntity icon={<SourceIcon />}>
-            Details on{' '}
-            <a
-              href={`https://frc-events.firstinspires.org/team/${team.team_number}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              FRC Events
-            </a>
-          </DetailEntity>
-          <div className="flex items-center gap-4">
-            <DetailEntity icon={<StatbotIcon />}>
+            {sponsors.length > 0 ? (
+              <Accordion>
+                <AccordionItem value="item-1" className="border-0">
+                  <AccordionTrigger
+                    className="justify-normal p-0 text-left font-normal"
+                  >
+                    <DetailEntity icon={<SponsorsIcon />}>
+                      {schoolName}
+                      {sponsors.length > 0 &&
+                        ` with ${pluralize(sponsors.length, 'sponsor', 'sponsors')}`}
+                    </DetailEntity>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-0">
+                    {sponsors.map((sponsor, i) => (
+                      <Badge
+                        className="m-px font-normal"
+                        key={i}
+                        variant={'secondary'}
+                      >
+                        {sponsor}
+                      </Badge>
+                    ))}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            ) : (
+              <DetailEntity icon={<SponsorsIcon />}>{schoolName}</DetailEntity>
+            )}
+
+            <DetailEntity icon={<RookieIcon />}>
+              Rookie Year: {team.rookie_year}
+            </DetailEntity>
+            <DetailEntity icon={<SourceIcon />}>
+              Details on{' '}
               <a
-                href={`https://www.statbotics.io/team/${team.team_number}`}
+                href={`https://frc-events.firstinspires.org/team/${team.team_number}`}
                 target="_blank"
                 rel="noreferrer"
               >
-                Statbotics
+                FRC Events
               </a>
             </DetailEntity>
-            <DetailEntity icon={<Match13Icon />}>
-              <a
-                href={`https://www.match13.com/team/${team.team_number}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Match13
-              </a>
-            </DetailEntity>
+            <div className="flex items-center gap-4">
+              <DetailEntity icon={<StatbotIcon />}>
+                <a
+                  href={`https://www.statbotics.io/team/${team.team_number}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Statbotics
+                </a>
+              </DetailEntity>
+              <DetailEntity icon={<Match13Icon />}>
+                <a
+                  href={`https://www.match13.com/team/${team.team_number}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Match13
+                </a>
+              </DetailEntity>
+            </div>
           </div>
+          <div className="md:hidden">{favoriteButton}</div>
         </div>
       </div>
 
       <div className="flex flex-wrap justify-center md:justify-start">
         <TeamSocialMediaList socials={socials}>
+          {socialsLoading && (
+            <LoadingSkeleton
+              label="Loading social media"
+              className="h-5 w-48 rounded-full"
+            />
+          )}
           <Badge variant="secondary">
             <Link
               to="/suggest/team/social_media"

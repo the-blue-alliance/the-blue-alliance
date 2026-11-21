@@ -10,10 +10,36 @@ from backend.common.logging import logging_context
 from backend.common.profiler import send_traces, Span, trace_context
 from backend.common.run_after_response import execute_callbacks, response_context
 
+# Hostnames that serve the production app directly from App Engine, bypassing
+# Cloudflare. tbatv-prod is the app's legacy ID and still routes here.
+PROD_APPSPOT_HOSTS = (
+    "tbatv-prod-hrd.appspot.com",
+    "tbatv-prod.appspot.com",
+)
+
+# Set by App Engine on cron and Cloud Tasks requests, and stripped from external ones
+INTERNAL_REQUEST_HEADERS = (
+    "X-Appengine-Cron",
+    "X-AppEngine-QueueName",
+)
+
+
+def is_prod_appspot_host(host: str) -> bool:
+    """
+    True for the production appspot hostnames and any subdomain of them
+    (www., www2., default., ...), except "-dot-" version/service targeting
+    URLs, which deploys and debugging rely on.
+    """
+    host = host.lower().split(":")[0]
+    if "-dot-" in host:
+        return False
+    return any(host == base or host.endswith(f".{base}") for base in PROD_APPSPOT_HOSTS)
+
 
 class AppspotRedirectMiddleware:
     """
-    A middleware that redirects requests from tbatv-prod-hrd.appspot.com hosts to www.thebluealliance.com
+    A middleware that redirects requests to the production appspot.com hostnames
+    to www.thebluealliance.com, so all user and crawler traffic goes through Cloudflare
     """
 
     app: Callable[[Any, Any], Any]
@@ -23,11 +49,11 @@ class AppspotRedirectMiddleware:
 
     def __call__(self, environ: Any, start_response: Any):
         request = Request(environ)
-        host = request.host.lower()
 
-        if not request.path.startswith("/_ah/") and host in (
-            "tbatv-prod-hrd.appspot.com",
-            "www.tbatv-prod-hrd.appspot.com",
+        if (
+            not request.path.startswith("/_ah/")
+            and not any(h in request.headers for h in INTERNAL_REQUEST_HEADERS)
+            and is_prod_appspot_host(request.host)
         ):
             redirect_url = f"https://www.thebluealliance.com{request.full_path}"
 

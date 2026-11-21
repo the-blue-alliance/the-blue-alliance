@@ -1,9 +1,20 @@
 import { EventCoprs, Match, Media, Team } from '~/api/tba/read';
 import { sortMatchComparator } from '~/lib/matchUtils';
 import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
+import { MatchScoreBreakdownAlliance } from '~/lib/rankingPoints';
+import {
+  ROBOT_ACTIONS,
+  RobotActionName,
+  STATIONS,
+  Station,
+  getRobotScore,
+  getUnscoredRobotFields,
+} from '~/lib/robotScoring';
+import { sortTeamKeysComparator } from '~/lib/teamUtils';
 
-function extractTeamNumber(teamKey: string): number {
-  return parseInt(teamKey.replace(/^frc/, ''), 10);
+function teamLabel(teamKey: string): number | string {
+  const team = teamKey.replace(/^frc/, '');
+  return /^\d+$/.test(team) ? Number(team) : team;
 }
 
 export function formatDate(timestamp: number | null): string {
@@ -77,22 +88,22 @@ export function transformMatchesToSchedule(
 
   return sortedMatches.map((match) => {
     const red1 = match.alliances.red.team_keys[0]
-      ? extractTeamNumber(match.alliances.red.team_keys[0])
+      ? teamLabel(match.alliances.red.team_keys[0])
       : '';
     const red2 = match.alliances.red.team_keys[1]
-      ? extractTeamNumber(match.alliances.red.team_keys[1])
+      ? teamLabel(match.alliances.red.team_keys[1])
       : '';
     const red3 = match.alliances.red.team_keys[2]
-      ? extractTeamNumber(match.alliances.red.team_keys[2])
+      ? teamLabel(match.alliances.red.team_keys[2])
       : '';
     const blue1 = match.alliances.blue.team_keys[0]
-      ? extractTeamNumber(match.alliances.blue.team_keys[0])
+      ? teamLabel(match.alliances.blue.team_keys[0])
       : '';
     const blue2 = match.alliances.blue.team_keys[1]
-      ? extractTeamNumber(match.alliances.blue.team_keys[1])
+      ? teamLabel(match.alliances.blue.team_keys[1])
       : '';
     const blue3 = match.alliances.blue.team_keys[2]
-      ? extractTeamNumber(match.alliances.blue.team_keys[2])
+      ? teamLabel(match.alliances.blue.team_keys[2])
       : '';
 
     return [
@@ -131,15 +142,105 @@ export function transformMatchesToFlatSchedule(
     ];
 
     for (const teamKey of match.alliances.red.team_keys) {
-      rows.push([...baseData, 'red', extractTeamNumber(teamKey)]);
+      rows.push([...baseData, 'red', teamLabel(teamKey)]);
     }
 
     for (const teamKey of match.alliances.blue.team_keys) {
-      rows.push([...baseData, 'blue', extractTeamNumber(teamKey)]);
+      rows.push([...baseData, 'blue', teamLabel(teamKey)]);
     }
   }
 
   return rows;
+}
+
+const ROBOT_ACTION_COLUMNS: Record<RobotActionName, string> = {
+  leave: 'leave',
+  autoClimb: 'auto_climb',
+  endgame: 'endgame',
+};
+
+function robotCells(
+  year: number,
+  alliance: MatchScoreBreakdownAlliance,
+  station: Station,
+): Record<string, string | number> {
+  const score = getRobotScore(year, alliance, station);
+  if (score === undefined) {
+    return getUnscoredRobotFields(alliance, station);
+  }
+
+  return Object.fromEntries(
+    ROBOT_ACTIONS.flatMap((name) => {
+      const action = score[name];
+      const column = ROBOT_ACTION_COLUMNS[name];
+      return action
+        ? [
+            [column, action.result],
+            [`${column}_points`, action.points],
+          ]
+        : [];
+    }),
+  );
+}
+
+export function transformMatchesToRobotBreakdown(matches: Match[]): {
+  columns: string[];
+  data: (string | number)[][];
+} {
+  const baseColumns = [
+    'match_key',
+    'comp_level',
+    'set_number',
+    'match_number',
+    'color',
+    'station',
+    'team',
+  ];
+  const robots: {
+    base: (string | number)[];
+    cells: Record<string, string | number>;
+  }[] = [];
+
+  for (const match of [...matches].sort(sortMatchComparator)) {
+    if (match.score_breakdown === null) {
+      continue;
+    }
+
+    const year = Number(match.key.slice(0, 4));
+
+    for (const color of ['red', 'blue'] as const) {
+      for (const station of STATIONS) {
+        const teamKey = match.alliances[color].team_keys[station - 1];
+        robots.push({
+          base: [
+            match.key,
+            match.comp_level,
+            match.set_number,
+            match.match_number,
+            color,
+            station,
+            teamKey ? teamLabel(teamKey) : '',
+          ],
+          cells: robotCells(year, match.score_breakdown[color], station),
+        });
+      }
+    }
+  }
+
+  const robotColumns = [
+    ...new Set(robots.flatMap(({ cells }) => Object.keys(cells))),
+  ];
+  if (robotColumns.length === 0) {
+    return { columns: baseColumns, data: [] };
+  }
+
+  return {
+    columns: [...baseColumns, ...robotColumns],
+    data: robots.map(({ base, cells }) => [
+      ...base,
+      ...robotColumns.map((column) => cells[column] ?? ''),
+    ]),
+  };
 }
 
 export function transformCoprsToTable(coprs: EventCoprs): {
@@ -156,15 +257,13 @@ export function transformCoprsToTable(coprs: EventCoprs): {
   }
 
   const teamKeys = Object.keys(coprs[componentNames[0]]);
-  const sortedTeamKeys = teamKeys.sort((a, b) => {
-    const numA = extractTeamNumber(a);
-    const numB = extractTeamNumber(b);
-    return numA - numB;
-  });
+  const sortedTeamKeys = teamKeys.sort(
+    (a, b) => sortTeamKeysComparator(a, b) || a.localeCompare(b),
+  );
 
   const columns = ['team_number', ...componentNames];
   const data = sortedTeamKeys.map((teamKey) => {
-    const teamNumber = extractTeamNumber(teamKey);
+    const teamNumber = teamLabel(teamKey);
     const row: (string | number)[] = [teamNumber];
 
     for (const componentName of componentNames) {

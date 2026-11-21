@@ -11,19 +11,19 @@
     "@mui/material": "^7.3.9",
     "classnames": "^2.5.1",
     "element-resize-event": "^3.0.6",
-    "firebase": "^12.19.0",
+    "firebase": "^13.3.0",
     "firedux": "^1.1.0",
     "heatmap.js": "^2.0.5",
-    "less-loader": "^13.0.0",
-    "prettier": "^3.9.9",
+    "less-loader": "^13.1.0",
+    "prettier": "^3.10.1",
     "prop-types": "^15.8.1",
-    "query-string": "^9.5.1",
-    "react": "^19.3.0",
+    "query-string": "^10.0.0",
+    "react": "^19.3.1",
     "react-bootstrap": "^2.10.10",
     "react-countup": "^6.5.3",
-    "react-dom": "^19.3.0",
-    "react-ga4": "^2.1.0",
-    "react-redux": "^9.3.0",
+    "react-dom": "^19.3.1",
+    "react-ga4": "^3.0.1",
+    "react-redux": "^9.3.1",
     "react-select": "^5.10.2",
     "react-transition-group": "^4.4.5",
     "redux": "^5.0.1",
@@ -33,12 +33,12 @@
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
-    "@babel/core": "^8.0.6",
-    "@babel/plugin-transform-runtime": "^8.0.6",
+    "@babel/core": "^8.1.2",
+    "@babel/plugin-transform-runtime": "^8.1.2",
     "@babel/polyfill": "^7.12.1",
-    "@babel/preset-env": "^8.0.6",
+    "@babel/preset-env": "^8.0.7",
     "@babel/preset-react": "^8.0.1",
-    "@babel/preset-typescript": "^8.0.1",
+    "@babel/preset-typescript": "^8.0.7",
     "@eslint/eslintrc": "^3.3.7",
     "@eslint/js": "^10.0.1",
     "@testing-library/dom": "^10.4.2",
@@ -47,16 +47,16 @@
     "@types/md5": "^2.3.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@types/react-redux": "^7.1.34",
+    "@types/react-redux": "^7.1.35",
     "babel-loader": "^10.1.1",
     "cross-env": "^10.1.0",
     "css-loader": "^7.1.5",
     "css-minimizer-webpack-plugin": "^8.0.0",
-    "eslint": "^10.12.0",
+    "eslint": "^10.14.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-prettier": "^5.5.7",
     "eslint-plugin-react": "^7.37.4",
-    "globals": "^17.13.0",
+    "globals": "^17.14.0",
     "jest-cli": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
     "jest-puppeteer": "^11.0.0",
@@ -65,12 +65,12 @@
     "mini-css-extract-plugin": "^2.10.2",
     "node-fetch": "^2.7.0",
     "process": "^0.11.10",
-    "puppeteer": "^25.12.0",
+    "puppeteer": "^25.17.0",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.6.2",
     "typescript": "^6.0.3",
-    "webpack": "^5.111.1",
-    "webpack-cli": "^7.2.3"
+    "webpack": "^5.112.2",
+    "webpack-cli": "^7.3.1"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack --watch",
@@ -117,7 +117,7 @@
           ]
         }
       ],
-      "^.+\\.jsx?$": [
+      "^.+\\.m?jsx?$": [
         "babel-jest",
         {
           "presets": [
@@ -143,7 +143,11 @@
       "tsx",
       "js",
       "jsx",
+      "mjs",
       "json"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!react-ga4/)"
     ],
     "coverageDirectory": "./.node_coverage/",
     "collectCoverage": true,

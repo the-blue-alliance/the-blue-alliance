@@ -155,3 +155,13 @@ def test_insights_with_some_breakdowns(test_data_importer) -> None:
     test_data_importer.import_match_list(HELPERS_TESTS, "data/2017nyny_matches.json")
     matches = Match.query(Match.event == ndb.Key(Event, "2017nyny")).fetch()
     assert_partial_breakdowns_split_counters(GameSpecifics2017(), matches)
+
+
+def test_get_per_robot_coprs() -> None:
+    coprs = GameSpecifics2017().get_per_robot_coprs()
+    breakdown = {
+        "robot1Auto": "Mobility",
+        "robot2Auto": "None",
+        "robot3Auto": "Unknown",
+    }
+    assert coprs["autoMobilityPoints"](breakdown) == [5, 0, 0]

@@ -9,6 +9,14 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 
+function ConditionIcon({ condition }: { condition: boolean }) {
+  return condition ? (
+    <MdiCheck role="img" aria-label="Achieved" />
+  ) : (
+    <MdiClose role="img" aria-label="Not achieved" />
+  );
+}
+
 export function ConditionalCheckmark({
   condition,
   teamKey,
@@ -20,7 +28,7 @@ export function ConditionalCheckmark({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>
-          {condition ? <MdiCheck /> : <MdiClose />}
+          <ConditionIcon condition={condition} />
         </TooltipTrigger>
         <TooltipContent>{teamKey.substring(3)}</TooltipContent>
       </Tooltip>
@@ -31,7 +39,7 @@ export function ConditionalCheckmark({
 export function ConditionalRpAchieved({ condition }: { condition: boolean }) {
   return (
     <div className="flex items-center justify-center">
-      {condition ? <MdiCheck /> : <MdiClose />}
+      <ConditionIcon condition={condition} />
     </div>
   );
 }
@@ -50,9 +58,9 @@ export function ConditionalBadge({
       variant={condition ? 'secondary' : 'outline'}
       className="flex items-center justify-center gap-1"
     >
-      {alignIcon === 'left' && (condition ? <MdiCheck /> : <MdiClose />)}
+      {alignIcon === 'left' && <ConditionIcon condition={condition} />}
       {teamKey.substring(3)}
-      {alignIcon === 'right' && (condition ? <MdiCheck /> : <MdiClose />)}
+      {alignIcon === 'right' && <ConditionIcon condition={condition} />}
     </Badge>
   );
 }

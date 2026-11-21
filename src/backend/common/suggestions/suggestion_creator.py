@@ -530,6 +530,21 @@ class SuggestionCreator:
         suggestion.put()
         return SuggestionCreationStatus.SUCCESS, None
 
+    @staticmethod
+    def requestable_auth_types(event: Event, auth_types: List[int]) -> List[AuthType]:
+        """The write types an API write key request for `event` may ask for."""
+        clean_auth_types = [
+            AuthType(t) for t in auth_types if t in WRITE_TYPE_NAMES.keys()
+        ]
+
+        # If we're requesting keys for an official event, filter out everything but videos
+        # Admin can still override this at review time, but it's unlikely
+        if event.event_type_enum in SEASON_EVENT_TYPES:
+            clean_auth_types = [
+                a for a in clean_auth_types if a == AuthType.MATCH_VIDEO
+            ]
+        return clean_auth_types
+
     @classmethod
     def createApiWriteSuggestion(
         cls,
@@ -554,16 +569,7 @@ class SuggestionCreator:
                     target_model="api_auth_access",
                     target_key=event_key,
                 )
-                clean_auth_types = [
-                    AuthType(t) for t in auth_types if t in WRITE_TYPE_NAMES.keys()
-                ]
-
-                # If we're requesting keys for an official event, filter out everything but videos
-                # Admin can still override this at review time, but it's unlikely
-                if event.event_type_enum in SEASON_EVENT_TYPES:
-                    clean_auth_types = list(
-                        filter(lambda a: a == AuthType.MATCH_VIDEO, clean_auth_types)
-                    )
+                clean_auth_types = cls.requestable_auth_types(event, auth_types)
 
                 suggestion.contents = {
                     "event_key": event_key,

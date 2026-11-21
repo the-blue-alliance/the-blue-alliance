@@ -1,4 +1,56 @@
-import { expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+
+import { getTeam } from '~/api/tba/read';
+
+import { expect, test } from './fixtures';
+import { gotoHydrated, hangRequests } from './helpers';
+
+test('shows the team name while event alliances are still loading', async ({
+  page,
+  mockTba,
+}) => {
+  await mockTba(
+    getTeam,
+    { path: { team_key: 'frc604' } },
+    {
+      key: 'frc604',
+      team_number: 604,
+      nickname: 'Mocked Quixilver',
+      name: 'Leland High School',
+      school_name: 'Leland High School',
+      city: 'San Jose',
+      state_prov: 'California',
+      country: 'USA',
+      address: null,
+      postal_code: '95120',
+      gmaps_place_id: null,
+      gmaps_url: null,
+      lat: null,
+      lng: null,
+      location_name: null,
+      website: 'https://frc604.org',
+      rookie_year: 2001,
+      motto: null,
+    },
+  );
+  await hangRequests(page, /\/api\/v3\/event\/[^/]+\/alliances/);
+
+  await page.goto('/team/604/2024');
+
+  await expect(page.locator('h1')).toHaveText('Team 604 - Mocked Quixilver');
+});
+
+test('shows a social media placeholder while team social media is loading', async ({
+  page,
+}) => {
+  await hangRequests(page, /\/api\/v3\/team\/frc604\/social_media/);
+
+  await page.goto('/team/604/2024');
+
+  await expect(
+    page.getByRole('status', { name: 'Loading social media' }),
+  ).toBeVisible();
+});
 
 [
   ['history', '/team/604/history', 'History'],
@@ -8,8 +60,7 @@ import { expect, test } from '@playwright/test';
   test(`keeps the year selector the same size on the ${pageName} page`, async ({
     page,
   }) => {
-    await page.goto(path);
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, path);
 
     const boundingBox = await page
       .getByRole('button', { name: currentYearLabel, exact: true })
@@ -22,10 +73,31 @@ import { expect, test } from '@playwright/test';
   });
 });
 
+test.describe('/team/1768/2026', () => {
+  test('links Onshape models from the media gallery', async ({ page }) => {
+    await gotoHydrated(page, '/team/1768/2026');
+
+    await expect(
+      page
+        .getByTestId('team-media-gallery')
+        .getByRole('link', { name: 'Nightshade 2026' }),
+    ).toHaveAttribute('href', /^https:\/\/cad\.onshape\.com\/documents\//);
+  });
+});
+
+test.describe('/team/604/2015', () => {
+  test('shows the team avatar from a recent year', async ({ page }) => {
+    await gotoHydrated(page, '/team/604/2015');
+
+    await expect(
+      page.getByRole('img', { name: 'Team Avatar', exact: true }),
+    ).toBeVisible();
+  });
+});
+
 test.describe('/team/604/2024', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/team/604/2024');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/604/2024');
   });
 
   test('displays the team name', async ({ page }) => {
@@ -105,6 +177,20 @@ test.describe('/team/604/2024', () => {
     });
   });
 
+  test('mobile: names the scrolled-to event in the table-of-contents bar', async ({
+    page,
+  }) => {
+    await page
+      .locator('section[id="2024camb"]')
+      .evaluate((section) => section.scrollIntoView({ block: 'start' }));
+
+    await expect(
+      page
+        .locator('[data-toc-bar]')
+        .getByRole('button', { name: 'Monterey Bay', exact: true }),
+    ).toBeVisible();
+  });
+
   [
     ['Silicon Valley Regional', '2024casj', '/event/2024casj'],
     ['Sacramento Regional', '2024cada', '/event/2024cada'],
@@ -166,7 +252,7 @@ test.describe('/team/604/2024', () => {
         .locator('a[aria-current="page"]')
         .filter({ hasText: /^604$/ })
         .locator('div'),
-    ).toHaveClass(/bg-secondary/);
+    ).toHaveClass(/bg-primary/);
   });
 
   test('does not mark an alliance partner as the current page', async ({
@@ -247,8 +333,7 @@ test.describe('/team/604/2024', () => {
 
 test.describe('/team/2713/2024', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/team/2713/2024');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/2713/2024');
   });
 
   test('displays the district ranking summary', async ({ page }) => {
@@ -269,8 +354,7 @@ test.describe('/team/2713/2024', () => {
 test.describe('/team/4946/2026', () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 1600, height: 900 });
-    await page.goto('/team/4946/2026');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/4946/2026');
   });
 
   test('keeps blue banners from adjacent event appearances separated', async ({
@@ -288,10 +372,58 @@ test.describe('/team/4946/2026', () => {
   });
 });
 
+test.describe('/team/3467/2026', () => {
+  const mayhemSection = (page: Page) => page.locator('section[id="2026nhmm"]');
+
+  test.beforeEach(async ({ page }) => {
+    await gotoHydrated(page, '/team/3467/2026');
+  });
+
+  test('offers a tab for the remapped B robot', async ({ page }) => {
+    await expect(
+      mayhemSection(page).getByRole('tab', { name: '3467B' }),
+    ).toBeVisible();
+  });
+
+  test('leaves B robot matches off the main robot tab', async ({ page }) => {
+    await expect(
+      mayhemSection(page)
+        .getByRole('tabpanel')
+        .getByRole('link', { name: 'Quals 1', exact: true }),
+    ).toHaveCount(0);
+  });
+
+  test('lists B robot matches on its tab', async ({ page }) => {
+    await mayhemSection(page).getByRole('tab', { name: '3467B' }).click();
+
+    await expect(
+      mayhemSection(page)
+        .getByRole('tabpanel')
+        .getByRole('link', { name: 'Quals 1', exact: true }),
+    ).toBeVisible();
+  });
+});
+
+test.describe('/team/11175/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await gotoHydrated(page, '/team/11175/2026');
+  });
+
+  test('strikes through and underlines the team in a match it was disqualified from', async ({
+    page,
+  }) => {
+    await expect(
+      page
+        .locator('section[id="2026ctsou"]')
+        .getByRole('link', { name: '11175', exact: true })
+        .first(),
+    ).toHaveCSS('text-decoration-line', 'underline line-through');
+  });
+});
+
 test.describe('/team/6324/history', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/team/6324/history');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/6324/history');
   });
 
   test('alternates highlights between years', async ({ page }) => {
@@ -328,7 +460,7 @@ test.describe('/team/6324/history', () => {
 });
 
 function isImgurThumb(url: string): boolean {
-  return /i\.imgur\.com\/[A-Za-z0-9]{7}[lh]\.\w+(\?.*)?$/.test(url);
+  return /i\.imgur\.com\/[A-Za-z0-9]{7}[mlh]\.\w+(\?.*)?$/.test(url);
 }
 
 function isImgurOriginal(url: string): boolean {
@@ -339,8 +471,7 @@ function isImgurOriginal(url: string): boolean {
 
 test.describe('/team/254/2026', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/team/254/2026');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/team/254/2026');
   });
 
   test('renders multiple robot picture slides', async ({ page }) => {
@@ -354,7 +485,7 @@ test.describe('/team/254/2026', () => {
   });
 
   [
-    ['first', 'eager', 'high'],
+    ['first', 'eager', 'auto'],
     ['next', 'lazy', 'low'],
   ].forEach(([position, loading, fetchPriority], index) => {
     test(`loads the ${position} robot picture with the expected priority`, async ({
@@ -409,9 +540,7 @@ test.describe('/team/254/2026', () => {
     await expect(lastSlide.locator('img')).toHaveCount(0);
   });
 
-  test('links the first robot picture to its original media', async ({
-    page,
-  }) => {
+  test('links the first robot picture to a larger image', async ({ page }) => {
     await expect(
       page
         .locator('[aria-roledescription="carousel"]')
@@ -464,6 +593,20 @@ test.describe('/team/254/2026', () => {
       .toBeGreaterThan(initialX - 100);
   });
 
+  test('starts the robot pictures at the first slide after changing years', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: 'Next slide' }).click();
+    await page.getByRole('button', { name: 'Next slide' }).click();
+    await page.getByRole('button', { name: '2026' }).click();
+    await page.getByRole('menuitem', { name: '2025' }).click();
+    await page.waitForURL('/team/254/2025');
+
+    await expect(
+      page.getByRole('button', { name: 'Go to slide 1', exact: true }),
+    ).toHaveAttribute('aria-current', 'true');
+  });
+
   test('displays media gallery links', async ({ page }) => {
     await expect(
       page
@@ -476,19 +619,60 @@ test.describe('/team/254/2026', () => {
   test('requests resized Imgur images for the media gallery', async ({
     page,
   }) => {
-    await page
+    const imgurRequestUrls = () =>
+      page.evaluate(() =>
+        performance
+          .getEntriesByType('resource')
+          .map((entry) => entry.name)
+          .filter((url) => url.includes('i.imgur.com')),
+      );
+    await page.getByTestId('team-media-gallery').scrollIntoViewIfNeeded();
+    await expect
+      .poll(async () => (await imgurRequestUrls()).length)
+      .toBeGreaterThan(3);
+
+    expect(
+      (await imgurRequestUrls()).every((url) => !isImgurOriginal(url)),
+    ).toBe(true);
+  });
+
+  test('waits to request media gallery images until the gallery nears the viewport', async ({
+    page,
+  }) => {
+    await page.waitForLoadState('networkidle');
+
+    const galleryImageRequested = await page
       .getByTestId('team-media-gallery')
       .locator('img')
-      .first()
-      .waitFor();
-    const requestUrls = await page.evaluate(() =>
-      performance.getEntriesByType('resource').map((entry) => entry.name),
-    );
-    const imgurRequestUrls = requestUrls.filter((url) =>
-      url.includes('i.imgur.com'),
-    );
+      .last()
+      .evaluate(
+        (img: HTMLImageElement) =>
+          performance.getEntriesByName(img.currentSrc || img.src).length > 0,
+      );
 
-    expect(imgurRequestUrls.length).toBeGreaterThan(3);
-    expect(imgurRequestUrls.every((url) => !isImgurOriginal(url))).toBe(true);
+    expect(galleryImageRequested).toBe(false);
+  });
+});
+
+test.describe('/team/604/2025', () => {
+  test('links the regional pool ranking to the regional rankings page', async ({
+    page,
+  }) => {
+    await gotoHydrated(page, '/team/604/2025');
+
+    await expect(
+      page.getByRole('link', { name: 'regional pool', exact: true }),
+    ).toHaveAttribute('href', '/events/regional/2025');
+  });
+});
+
+[
+  ['shows', '/team/254/2024', 1],
+  ['hides', '/team/1002/2017', 0],
+].forEach(([verb, path, count]) => {
+  test(`${verb} the blue banners section on ${path}`, async ({ page }) => {
+    await gotoHydrated(page, String(path));
+
+    await expect(page.getByTestId('blue-banners')).toHaveCount(Number(count));
   });
 });

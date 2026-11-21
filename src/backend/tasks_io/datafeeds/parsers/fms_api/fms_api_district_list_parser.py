@@ -2,6 +2,7 @@ from typing import List
 
 from pyre_extensions import none_throws
 
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.types import (
     SeasonDistrictListModelV2,
@@ -19,7 +20,9 @@ class FMSAPIDistrictListParser(ParserBase[SeasonDistrictListModelV2, List[Distri
 
         api_districts: list[SeasonDistrictModelV2] = response["districts"] or []
         for district in api_districts:
-            district_code = none_throws(district["code"]).lower()
+            district_code = RenamedDistricts.get_code_for_year(
+                none_throws(district["code"]).lower(), self.season
+            )
             district_key = District.render_key_name(self.season, district_code)
             districts.append(
                 District(

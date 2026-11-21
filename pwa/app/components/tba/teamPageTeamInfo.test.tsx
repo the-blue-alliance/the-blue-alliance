@@ -1,26 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import type { District, Media, MediaAvatar, Team } from '~/api/tba/read';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    search,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    to: string;
-    search: Record<string, string>;
-  }) => (
-    <a href={`${to}?${new URLSearchParams(search).toString()}`} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
 
 vi.mock('~/components/tba/links', () => ({
   TeamLocationLink: ({ team }: { team: Team }) => (
@@ -84,7 +69,7 @@ describe('TeamPageTeamInfo', () => {
       screen.getByRole('heading', { name: 'Team 254 - The Cheesy Poofs' }),
     ).toBeTruthy();
     expect(screen.getByRole('img', { name: 'Team Avatar' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Favorite' })).toBeTruthy();
+    expect(screen.getAllByRole('button', { name: 'Favorite' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'San Jose' })).toBeTruthy();
     expect(
       screen.getByRole('link', { name: 'California' }).getAttribute('href'),
@@ -122,12 +107,53 @@ describe('TeamPageTeamInfo', () => {
     expect(screen.queryByText(/sponsor/)).toBeNull();
   });
 
+  test('shows no sponsors when the school name contains a slash', () => {
+    render(
+      <TeamPageTeamInfo
+        team={{
+          ...team,
+          name: 'Centreville Jr/Sr High School',
+          school_name: 'Centreville Jr/Sr High School',
+        }}
+        maybeAvatar={undefined}
+        socials={[]}
+      />,
+    );
+    expect(screen.queryByText(/sponsor/)).toBeNull();
+  });
+
   test('shows the default avatar for a team without one', () => {
     render(
       <TeamPageTeamInfo team={team} maybeAvatar={undefined} socials={[]} />,
     );
     expect(
       screen.getByRole('img', { name: 'Default Team Avatar' }),
+    ).toBeTruthy();
+  });
+
+  test('shows an avatar placeholder while the avatar loads', () => {
+    render(
+      <TeamPageTeamInfo
+        team={team}
+        maybeAvatar={undefined}
+        socials={[]}
+        avatarLoading
+      />,
+    );
+    expect(screen.getByRole('status', { name: 'Loading avatar' })).toBeTruthy();
+  });
+
+  test('shows a social media placeholder while socials load', () => {
+    render(
+      <TeamPageTeamInfo
+        team={team}
+        maybeAvatar={undefined}
+        socials={[]}
+        socialsLoading
+      />,
+    );
+    expect(
+      screen.getByRole('status', { name: 'Loading social media' }),
     ).toBeTruthy();
   });
 

@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Set
 
 from pyre_extensions import none_throws
 
+from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.nexus_match_status import NexusMatchStatus
 from backend.common.environment import Environment
 from backend.common.firebase import app as get_firebase_app
@@ -138,7 +139,7 @@ class FirebasePusher:
         """
         Updates a match in an event and event/team
         """
-        if match.year < 2017:
+        if match.year < 2017 or match.comp_level == CompLevel.PM:
             return
 
         if "predicted_time" in updated_attrs:

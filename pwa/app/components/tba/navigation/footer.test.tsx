@@ -1,25 +1,11 @@
 import { render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { renderToString } from 'react-dom/server';
 import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test, vi } from 'vitest';
 
 import { Footer } from '~/components/tba/navigation/footer';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    to: string;
-  }) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
 
 describe('Footer', () => {
   test('links to internal pages and external sites', () => {
@@ -37,8 +23,14 @@ describe('Footer', () => {
     expect(
       screen.getByRole('link', { name: 'Blog' }).getAttribute('href'),
     ).toBe('https://blog.thebluealliance.com');
-    // A separator between each of the nine links.
-    expect(screen.getAllByText('/')).toHaveLength(8);
+    expect(screen.getByRole('link', { name: 'FAQ' }).getAttribute('href')).toBe(
+      '/faq',
+    );
+    expect(
+      screen.getByRole('link', { name: 'Brand' }).getAttribute('href'),
+    ).toBe('/brand');
+    // A separator between each of the eleven links.
+    expect(screen.getAllByText('/')).toHaveLength(10);
     expect(screen.getByAltText('AndyMark')).toBeTruthy();
   });
 

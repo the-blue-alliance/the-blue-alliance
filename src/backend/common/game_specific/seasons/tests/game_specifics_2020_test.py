@@ -139,3 +139,20 @@ def test_insights_with_some_breakdowns(test_data_importer) -> None:
     test_data_importer.import_match_list(HELPERS_TESTS, "data/2020scmb_matches.json")
     matches = Match.query(Match.event == ndb.Key(Event, "2020scmb")).fetch()
     assert_partial_breakdowns_split_counters(GameSpecifics2020(), matches)
+
+
+def test_get_per_robot_coprs() -> None:
+    coprs = GameSpecifics2020().get_per_robot_coprs()
+    breakdown = {
+        "initLineRobot1": "Exited",
+        "initLineRobot2": "None",
+        "initLineRobot3": "None",
+        "endgameRobot1": "Hang",
+        "endgameRobot2": "Hang",
+        "endgameRobot3": "Park",
+        "endgameRungIsLevel": "IsLevel",
+    }
+    assert coprs["autoInitLinePoints"](breakdown) == [5, 0, 0]
+    assert coprs["endgamePoints"](breakdown) == [32.5, 32.5, 5]
+    breakdown["endgameRungIsLevel"] = "NotLevel"
+    assert coprs["endgamePoints"](breakdown) == [25, 25, 5]

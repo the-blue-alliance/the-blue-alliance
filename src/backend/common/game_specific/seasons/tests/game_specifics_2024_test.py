@@ -231,3 +231,18 @@ def test_rp_sweep_requires_melody_and_ensemble() -> None:
     qual = none_throws(_insights(matches)["qual"])
     assert qual["four_rp_count"] == [1, 2, 50.0]
     assert qual["six_rp_count"] == [0, 2, 0.0]
+
+
+def test_get_per_robot_coprs() -> None:
+    coprs = GameSpecifics2024().get_per_robot_coprs()
+    breakdown = {
+        "autoLineRobot1": "Yes",
+        "autoLineRobot2": "No",
+        "autoLineRobot3": "Yes",
+        "endGameRobot1": "Parked",
+        "endGameRobot2": "StageLeft",
+        "endGameRobot3": "None",
+    }
+    assert coprs["autoLeavePoints"](breakdown) == [2, 0, 2]
+    assert coprs["endGameParkPoints"](breakdown) == [1, 0, 0]
+    assert coprs["endGameOnStagePoints"](breakdown) == [0, 3, 0]

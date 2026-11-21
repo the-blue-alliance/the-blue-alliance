@@ -9,7 +9,9 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2017
 from backend.common.game_specific.base import (
+    per_robot_points,
     PredictionStatConfig,
+    RobotPointsAccessor,
     safe_div,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
@@ -365,6 +367,11 @@ class GameSpecifics2017(
         }
 
         return event_insights
+
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
+        return {
+            "autoMobilityPoints": per_robot_points("robot{}Auto", {"Mobility": 5}),
+        }
 
     def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return [

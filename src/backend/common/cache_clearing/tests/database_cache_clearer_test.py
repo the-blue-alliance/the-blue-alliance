@@ -385,6 +385,22 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             media_query.EventTeamsPreferredMediasQuery("2015casj").cache_key,
         }
 
+    def test_eventteam_updated_clears_remapped_team_queries(self) -> None:
+        affected_refs = {
+            "event": set(),
+            "team": set(),
+            "year": {2025, 2026},
+            "remapped_team": {"frc1678", None},
+        }
+        cache_keys = {
+            q[0] for q in get_affected_queries.eventteam_updated(affected_refs)
+        }
+
+        assert cache_keys == {
+            event_query.TeamYearRemappedEventTeamsQuery("frc1678", 2025).cache_key,
+            event_query.TeamYearRemappedEventTeamsQuery("frc1678", 2026).cache_key,
+        }
+
     def test_districtteam_updated(self) -> None:
         affected_refs = {
             "district_key": {

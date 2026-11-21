@@ -1,7 +1,8 @@
 import datetime
 from typing import cast, List
 
-from flask import abort, Blueprint, make_response, redirect, request
+from flask import abort, Blueprint, make_response, redirect, request, url_for
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from markupsafe import Markup
 from pyre_extensions import none_throws
@@ -9,15 +10,10 @@ from werkzeug.wrappers import Response
 
 from backend.common.consts.auth_type import WRITE_TYPE_NAMES
 from backend.common.helpers.event_remapteams_helper import EventRemapTeamsHelper
-from backend.common.manipulators.award_manipulator import AwardManipulator
-from backend.common.manipulators.event_details_manipulator import (
-    EventDetailsManipulator,
-)
-from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey, TeamKey
+from backend.common.models.keys import EventKey, TeamKey, Year
 from backend.common.models.team import Team
 from backend.common.sitevars.website_blocklist import WebsiteBlocklist
 
@@ -47,33 +43,28 @@ def remap_teams(event_key: EventKey) -> str:
     if not event:
         abort(404)
 
-    if not event.remap_teams:
-        return ""
-
-    event.prep_awards()
-    event.prep_matches()
-    event.prep_teams()
-
-    # Remap matches
-    EventRemapTeamsHelper.remapteams_matches(event.matches, event.remap_teams)
-    MatchManipulator.createOrUpdate(event.matches)
-
-    # Remap alliance selections
-    if event.alliance_selections:
-        EventRemapTeamsHelper.remapteams_alliances(
-            event.alliance_selections, event.remap_teams
-        )
-    if event.details and event.details.rankings2:
-        EventRemapTeamsHelper.remapteams_rankings2(
-            event.details.rankings2, event.remap_teams
-        )
-    if event.details:
-        EventDetailsManipulator.createOrUpdate(event.details)
-
-    # Remap awards
-    EventRemapTeamsHelper.remapteams_awards(event.awards, event.remap_teams)
-    AwardManipulator.createOrUpdate(event.awards, auto_union=False)
+    EventRemapTeamsHelper.remap_teams(event_key)
     return ""
+
+
+@blueprint.route("/tasks/enqueue/remap_teams/<int:year>")
+def enqueue_remap_teams(year: Year) -> Response:
+    event_keys = [
+        event.key_name
+        for event in Event.query(Event.year == year).fetch()
+        if event.remap_teams
+    ]
+    for event_key in event_keys:
+        taskqueue.add(
+            url=url_for("tasks.remap_teams", event_key=event_key),
+            method="GET",
+            target="py3-tasks-io",
+        )
+
+    if "X-Appengine-Taskname" not in request.headers:
+        return make_response(f"Enqueued for: {event_keys}")
+
+    return make_response("")
 
 
 @blueprint.route("/tasks/do/archive_api_keys")

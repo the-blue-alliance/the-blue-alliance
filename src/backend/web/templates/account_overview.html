@@ -5,357 +5,349 @@
 {% block meta_description %}Overview of your TBA account.{% endblock %}
 
 {% block content %}
-<div class="container">
-  {% if status %}
+<div class="container account-overview">
+{% macro account_alert(success, message) %}
+      <div class="alert alert-{{ 'success' if success else 'danger' }} account-alert">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <span class="glyphicon glyphicon-{{ 'ok' if success else 'exclamation-sign' }}" aria-hidden="true"></span>
+        <span class="account-alert-message">{{ message }}</span>
+      </div>
+{%- endmacro %}
+{% macro secret_field(value, masked=True) %}
+<span class="account-secret-field{{ ' is-masked' if masked }}">
+  <code class="account-secret account-secret-value">{{ value }}</code>
+  {%- if masked %}
+  <code class="account-secret account-secret-dots" aria-hidden="true">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</code>
+  <button type="button" class="btn btn-default btn-xs js-secret-toggle">Show</button>
+  {%- endif %}
+  <button type="button" class="btn btn-default btn-xs js-secret-copy">Copy</button>
+</span>
+{%- endmacro %}
+  {% set status_alerts = {
+    'account_edit_success': (True, 'Profile updated.'),
+    'read_key_add_success': (True, 'New read API key added.'),
+    'read_key_add_failure': (False, "Couldn't add a read API key. If this keeps happening, please contact us."),
+    'read_key_add_no_description': (False, 'Add a description to create a read API key.'),
+    'read_key_delete_success': (True, 'Read API key deleted.'),
+    'read_key_delete_failure': (False, "Couldn't delete that read API key. If this keeps happening, please contact us."),
+  } %}
+  {% if status in status_alerts %}
   <div id="status-row" class="row">
-    <div class="col-md-10 col-md-offset-1">
-      {% if status == 'account_edit_success' %}
-        <div class="alert alert-success">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <h4>Success!</h4>
-          <p>Your profile has been updated.</p>
-        </div>
-      {% elif status == 'read_key_add_success' %}
-        <div class="alert alert-success">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <h4>Success!</h4>
-          <p>A new read API key has been successfully added.</p>
-        </div>
-      {% elif status == 'read_key_add_failure' %}
-        <div class="alert alert-danger">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <h4>Oops!</h4>
-          <p>Unable to add a read API key. If this problem persists, please contact us.</p>
-        </div>
-      {% elif status == 'read_key_add_no_description' %}
-      <div class="alert alert-danger">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <h4>Oops!</h4>
-        <p>You must specify a description when adding a read API key. Please try again.</p>
-      </div>
-      {% elif status == 'read_key_delete_success' %}
-        <div class="alert alert-success">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <h4>Success!</h4>
-          <p>The selected read API key has been deleted.</p>
-        </div>
-      {% elif status == 'read_key_delete_failure' %}
-      <div class="alert alert-danger">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <h4>Oops!</h4>
-        <p>Unable to delete the specified read API key. If this problem persists, please contact us.</p>
-      </div>
-      {% endif %}
-    </div>
+    <div class="col-xs-12">{{ account_alert(*status_alerts[status]) }}</div>
   </div>
   {% endif %}
-
   {% if webhook_verification_success %}
   <div id="webhook-row" class="row">
-    <div class="col-md-10 col-md-offset-1">
-      <div class="alert alert-success">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <h4>Success!</h4>
-        <p>The webhook has been properly verified!</p>
-      </div>
-    </div>
+    <div class="col-xs-12">{{ account_alert(True, 'Webhook verified.') }}</div>
   </div>
   {% endif %}
-  {% if ping_sent %}
+  {% if ping_sent in ['1', '0'] %}
   <div id="ping-row" class="row">
-    <div class="col-md-10 col-md-offset-1">
-      {% if ping_sent == '1' %}
-      <div class="alert alert-success">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <h4>Success!</h4>
-        <p>Ping was sent.</p>
-      </div>
-      {% elif ping_sent == '0' %}
-      <div class="alert alert-danger">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <h4>Failure</h4>
-        <p>Failed to send ping.</p>
-      </div>
-      {% endif %}
-    </div>
+    <div class="col-xs-12">{{ account_alert(ping_sent == '1', 'Ping sent.' if ping_sent == '1' else "Couldn't send the ping.") }}</div>
   </div>
   {% endif %}
-  <div class="row">
-    <div class="col-md-10 col-md-offset-1">
-      <p class="pull-right">
-        <a class="btn btn-warning" href="{{ url_for('account.logout') }}"><span class="glyphicon glyphicon-remove"></span> Logout</a>
-      </p>
-      <h1>Welcome Back, {{ user.display_name }}!</h1>
+
+  <div class="account-header">
+    <div>
+      <h1>Welcome back, {{ user.display_name }}</h1>
+      <p class="text-muted">{{ user.email }}</p>
     </div>
+    <a class="btn btn-default" href="{{ url_for('account.logout') }}"><span class="glyphicon glyphicon-log-out"></span> Log out</a>
   </div>
 
-  <div class="row">
-    <div class="col-md-10 col-md-offset-1">
-      <h2>Profile</h2>
+  <div class="row account-summary">
+    <div class="col-sm-4">
+      <div class="panel panel-default">
+        <div class="panel-heading"><h2 class="panel-title">Profile</h2></div>
+        <table class="table account-stats">
+          <tbody>
+            <tr>
+              <th>Public name</th>
+              <td>{{ user.display_name }}</td>
+            </tr>
+            <tr>
+              <th>Email</th>
+              <td>{{ user.email }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="panel-footer">
+          <a class="btn btn-primary btn-sm" href="{{ url_for('account.edit') }}"><span class="glyphicon glyphicon-pencil"></span> Edit Profile</a>
+        </div>
+      </div>
     </div>
-    <div class="col-md-6 col-md-offset-3">
-      <table class="table table-striped">
-        <tbody>
-          <tr>
-            <td>Name (Public): </td>
-            <td>{{ user.display_name }}</td>
-          </tr>
-          <tr>
-            <td>Email: </td>
-            <td>{{ user.email }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="row">
-        <a class="btn btn-primary" href="{{ url_for('account.edit') }}"><span class="glyphicon glyphicon-pencil"></span> Edit Profile</a>
-        <a class="btn btn-danger" href="{{ url_for('account.delete') }}"><span class="glyphicon glyphicon-remove"></span> Delete Account</a>
+
+    <div class="col-sm-4">
+      <div class="panel panel-default">
+        <div class="panel-heading"><h2 class="panel-title">myTBA</h2></div>
+        <table class="table account-stats">
+          <tbody>
+            <tr id="mytba-favorites-count-row">
+              <th>Favorites</th>
+              <td>{{ user.favorites_count }}</td>
+            </tr>
+            <tr id="mytba-subscriptions-count-row">
+              <th>Subscriptions</th>
+              <td>{{ user.subscriptions_count }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="panel-footer">
+          <a href="{{ url_for('account.mytba') }}">myTBA &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-4">
+      <div class="panel panel-default">
+        <div class="panel-heading"><h2 class="panel-title">Suggestions</h2></div>
+        <table class="table account-stats">
+          <tbody>
+            <tr id="submissions-pending-count-row">
+              <th>Pending</th>
+              <td>{{ user.submissions_pending_count }}</td>
+            </tr>
+            <tr id="submissions-accepted-count-row">
+              <th>Accepted</th>
+              <td>{{ user.submissions_accepted_count }}</td>
+            </tr>
+            {% if user.has_review_permissions %}
+            <tr id="submissions-reviewed-count-row">
+              <th>Reviewed</th>
+              <td>{{ user.submissions_reviewed_count }}</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+        {% if user.has_review_permissions %}
+        <div id="review-permissions-row" class="panel-footer">
+          <a id="review-pending-suggestions-link" href="{{ pwa_suggestion_review_url }}" title="Your account has permission to help review suggestion submissions">Pending suggestions &rarr;</a>
+        </div>
+        {% else %}
+        <div class="panel-footer">
+          <a href="/add-data">How to add data &rarr;</a>
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
-  <hr>
 
-  <div class="row">
-    <div class="col-md-10 col-md-offset-1">
-      <h2>myTBA</h2>
-    </div>
-    <div class="col-md-6 col-md-offset-3">
-      <table class="table table-striped">
-        <tbody>
-          <tr id="mytba-favorites-count-row">
-            <td>Favorites:</td>
-            <td>{{ user.favorites_count }}</td>
-          </tr>
-          <tr id="mytba-subscriptions-count-row">
-            <td>Subscriptions:</td>
-            <td>{{ user.subscriptions_count }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p><a class="btn btn-primary" href="{{ url_for('account.mytba') }}"><span class="glyphicon glyphicon-bookmark"></span> Manage myTBA</a></p>
-    </div>
-  </div>
-  <hr>
-
-  <div class="row">
-    <div class="col-md-10 col-md-offset-1">
-      <h2>Suggestion Submissions</h2>
-      <p>Statistics for videos, pictures, webcasts, etc. you have submitted for review. Thanks for your contributions!</p>
-    </div>
-    <div class="col-md-6 col-md-offset-3">
-      <table class="table table-striped">
-        <tbody>
-          <tr id="submissions-pending-count-row">
-            <td>Pending:</td>
-            <td>{{ user.submissions_pending_count }}</td>
-          </tr>
-          <tr id="submissions-accepted-count-row">
-            <td>Accepted:</td>
-            <td>{{ user.submissions_accepted_count }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <hr>
-
-  <div class="row">
-    <div class="col-md-10 col-md-offset-1">
-      <h2>Read API Keys</h2>
-
-      <form id="api-read-key-add" class="form-inline pull-right" action="{{ url_for('account.read_key_add') }}" method="POST">
-        <div class="form-group">
-          <label for="form-description">Description</label>
-          <input type="text" class="form-control" id="form-description" name="description" placeholder="My Scouting App v1">
-        </div>
+  <div id="api-read-keys-row" class="panel panel-default">
+    <div class="panel-heading account-section-heading">
+      <h2 class="panel-title">Read API Keys</h2>
+      <form id="api-read-key-add" class="account-inline-form" action="{{ url_for('account.read_key_add') }}" method="POST">
+        <label for="form-description" class="sr-only">Description</label>
+        <input type="text" class="form-control input-sm" id="form-description" name="description" placeholder="Description, e.g. My Scouting App v1" required>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Add New Key</button>
+        <button type="submit" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New Key</button>
       </form>
-
-      <p>These keys allow you to access TBA's read APIv3.</p>
     </div>
-    <div class="col-md-10 col-md-offset-1">
-      <table id="api-read-keys" class="table table-striped">
-        <tr>
-          <th>X-TBA-Auth-Key</th>
-          <th>Created</th>
-          <th>Description</th>
-          <th></th>
-        </tr>
+    <div class="panel-body text-muted small">Use these to read TBA data from your own apps and scripts. Send one in the <code class="account-secret account-secret-short">X-TBA-Auth-Key</code> header. See the <a href="/apidocs">API documentation</a> for more info.</div>
+    {% if user.api_read_keys %}
+      <table id="api-read-keys" class="table account-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>X-TBA-Auth-Key</th>
+            <th>Created</th>
+            <th></th>
+          </tr>
+        </thead>
         <tbody>
           {% for key in user.api_read_keys %}
             <tr class="api-read-key">
-              <td>
-                {{ key.key.id() }}
-              </td>
-              <td>
-                {{ key.created.strftime('%Y-%m-%d') }}
-              </td>
-              <td>
-                {{ key.description }}
-              </td>
-              <td>
-                <form class="form-inline" action="{{ url_for('account.read_key_delete') }}" method="POST">
+              <td data-label="Description">{{ key.description }}</td>
+              <td data-label="X-TBA-Auth-Key">{{ secret_field(key.key.id(), masked=False) }}</td>
+              <td data-label="Created" class="text-nowrap">{{ key.created.strftime('%Y-%m-%d') }}</td>
+              <td class="account-row-actions">
+                <form action="{{ url_for('account.read_key_delete') }}" method="POST" data-confirm="Delete the &ldquo;{{ key.description }}&rdquo; key? Apps using it will stop working.">
                   <input type="hidden" name="key_id" value="{{ key.key.id() }}">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                  <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                  <button type="submit" class="btn btn-default btn-sm account-danger-button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
                 </form>
               </td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
-    </div>
+    {% else %}
+    <div class="panel-body account-empty">You don't have any read API keys yet.</div>
+    {% endif %}
   </div>
-  <hr>
 
-  <div id="api-write-keys-row" class="row">
-    <div class="col-md-10 col-md-offset-1">
-      <h2>Write API Keys</h2>
-      <p>These keys grant volunteers planning events and working at the scoring table the ability to import offseason event data to TBA. <a href="/request/apiwrite" class="btn btn-success pull-right"><span class="glyphicon glyphicon-plus-sign"></span> Request Tokens</a></p>
+  <div id="api-write-keys-row" class="panel panel-default">
+    <div class="panel-heading account-section-heading">
+      <h2 class="panel-title">Write API Keys</h2>
+      <a href="/request/apiwrite" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-plus-sign"></span> Request a Write Key</a>
     </div>
-    <div class="col-md-10 col-md-offset-1">
-      <table id="api-write-keys" class="table table-striped">
-        <tr>
-          <th>
-            <a id="api-write-keys-sort"
-               href="{{ url_for('account.overview', api_write_keys_sort=api_write_keys_next_sort) }}"
-               class="api-write-keys-sort"
-               title="Sort by event ({{ 'oldest' if api_write_keys_next_sort == 'asc' else 'newest' }} first)"
-               aria-label="Sort write API keys by event, {{ 'oldest' if api_write_keys_next_sort == 'asc' else 'newest' }} first">
-              Event{% if api_write_keys_sort_explicit %} <span class="glyphicon glyphicon-triangle-{{ 'top' if api_write_keys_sort_direction == 'asc' else 'bottom' }}" aria-hidden="true"></span>{% endif %}
-            </a>
-          </th>
-          <th>Permissions</th>
-          <th>Expires</th>
-          <th>Auth ID</th>
-          <th>Auth Secret</th>
-        </tr>
+    <div class="panel-body text-muted small">For offseason event organizers: lets you upload teams, matches and results for your event.</div>
+    {% if api_write_keys %}
+      <table id="api-write-keys" class="table account-table">
+        <thead>
+          <tr>
+            <th>
+              <a id="api-write-keys-sort"
+                 href="{{ url_for('account.overview', api_write_keys_sort=api_write_keys_next_sort) }}"
+                 class="api-write-keys-sort"
+                 title="Sort by event ({{ 'oldest' if api_write_keys_next_sort == 'asc' else 'newest' }} first)"
+                 aria-label="Sort write API keys by event, {{ 'oldest' if api_write_keys_next_sort == 'asc' else 'newest' }} first">
+                Event{% if api_write_keys_sort_explicit %} <span class="glyphicon glyphicon-triangle-{{ 'top' if api_write_keys_sort_direction == 'asc' else 'bottom' }}" aria-hidden="true"></span>{% endif %}
+              </a>
+            </th>
+            <th>Permissions</th>
+            <th>Expires</th>
+            <th>Auth ID</th>
+            <th>Auth Secret</th>
+          </tr>
+        </thead>
         <tbody>
           {% for key in api_write_keys %}
-            <tr class="api-write-key">
-              <td>
+            {% set expired = key.expiration and key.expiration < now %}
+            <tr class="api-write-key{{ ' account-key-expired' if expired }}">
+              <td data-label="Event">
               {% for event in key.event_list %}
-                <a href="/event/{{ event.id() }}">{{ event.id() }}</a>
-                <a href="/eventwizard?event={{ event.id() }}" class="btn btn-default">EventWizard</a>
+                <div class="account-write-key-event">
+                  <a href="/event/{{ event.id() }}">{{ api_write_key_event_names.get(event.id(), event.id()) }}</a>
+                  <div class="account-event-meta">
+                    {% if event.id() in api_write_key_event_names %}<span class="account-event-key text-muted">{{ event.id() }}</span> &middot; {% endif %}<a href="/eventwizard?event={{ event.id() }}">EventWizard</a>
+                  </div>
+                </div>
               {% endfor %}
               </td>
-              <td>
-                <ul>
+              <td data-label="Permissions">
+                <ul class="account-permissions">
                 {% for auth_type in key.auth_types_enum %}
-                  <li>{{ auth_write_type_names[auth_type] }}</li>
+                  <li>{{ auth_write_type_labels[auth_type] }}</li>
                 {% endfor %}
                 </ul>
               </td>
-              <td>
+              <td data-label="Expires" class="text-nowrap">
                 {% if key.expiration %}
-                  {{ key.expiration.strftime('%Y-%m-%d') }}
+                  {{ key.expiration.strftime('%Y-%m-%d') }}{% if expired %} <span class="label label-default">Expired</span>{% endif %}
                 {% else %}
-                  --
+                  Never
                 {% endif %}
               </td>
-              <td>
-                {{ key.key.id() }}
-              </td>
-              <td>
-                {{ key.secret }}
-              </td>
+              <td data-label="Auth ID"><code class="account-secret account-auth-id">{{ key.key.id() }}</code></td>
+              <td data-label="Auth Secret">{{ secret_field(key.secret) }}</td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
-    </div>
+    {% else %}
+    <div class="panel-body account-empty">You don't have any write API keys.</div>
+    {% endif %}
   </div>
-  <hr>
 
-  {% if user.has_review_permissions %}
-  <div id="review-permissions-row" class="row">
-    <div class="col-md-10 col-md-offset-1">
-      <h2>Suggestion Reviews</h2>
-      <p>Your account has permission to help review Suggestion submissions!</p>
+  <div id="connected-devices-row" class="panel panel-default">
+    <div class="panel-heading account-section-heading">
+      <h2 class="panel-title">Devices &amp; Webhooks</h2>
+      <a class="btn btn-default btn-sm" href="/webhooks/add"><span class="glyphicon glyphicon-plus"></span> Add Webhook</a>
     </div>
-    <div class="col-md-6 col-md-offset-3">
-      <table class="table table-striped">
-        <tbody>
-          <tr id="submissions-reviewed-count-row">
-            <td>Reviewed:</td>
-            <td>{{ user.submissions_reviewed_count }}</td>
+    <div class="panel-body text-muted small">Apps and webhooks that receive your myTBA notifications. Use Ping to send a test notification. See the <a href="/apidocs/webhooks">Webhooks documentation</a> for more info.</div>
+    {% if user.mobile_clients %}
+      <table class="table account-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>ID</th>
+            <th></th>
           </tr>
-        </tbody>
-      </table>
-      <p><a class="btn btn-primary" id="review-pending-suggestions-link" href="{{ pwa_suggestion_review_url }}"><span class="glyphicon glyphicon-ok"></span> Review Pending Suggestions</a></p>
-    </div>
-  </div>
-  <hr>
-  {% endif %}
-
-  <div class="row">
-    <div class="col-md-10 col-md-offset-1">
-      <h2>Connected Devices</h2>
-    </div>
-    <div class="col-md-10 col-md-offset-1">
-      <!-- <p class="notifications-disabled-visible">Push notifications (beta) for this device are <strong>disabled</strong>! <a class="btn btn-success" role="button" onclick="setupMessaging(true, {{csrf_token()}})">Enable</a></p>
-      <p class="notifications-enabled-visible">Push notifications (beta) for this device are <strong>enabled</strong>! <a class="btn btn-danger" role="button" onclick="disableMessaging()">Disable</a></p> -->
-      {% if user.mobile_clients %}
-      <p>All devices will appear below, whether or not push notifications are enabled or disabled for a specific device.</p>
-      <table class="table table-striped">
-        <tr>
-          <th>Type</th>
-          <th>Name</th>
-          <th>ID</th>
-          <th></th>
-          <th></th>
-          <th></th>
-        </tr>
+        </thead>
+        <tbody>
           {% for client in user.mobile_clients %}
             <tr>
-              <td>{{ client.type_string }}</td>
-              <td>{{ client.display_name }}</td>
-              <td>
-                {% if client.is_webhook %}
-                  URL: {{ client.messaging_id }}
-                  <br/>
-                  Secret: {{ client.secret }}
-                {% else %}
-                  {{ client.short_id }}
-                {% endif %}
-              </td>
-              <td><form action="{{ url_for('account.ping') }}" method="post">
-                <input name="mobile_client_id" type="hidden" value="{{ client.key.id() }}" />
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="ping btn btn-default" {{ '' if ping_enabled else 'disabled' }}><span class="glyphicon glyphicon-cloud"></span> Ping</button>
-              </form></td>
-              <td>
-                {% if client.is_webhook %}
-                <form action="/webhooks/delete" method="post">
-                  <input name="client_id" type="hidden" value="{{ client.key.id() }}" />
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                  <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span> Delete</button>
-                </form>
-                {% endif %}
-              </td>
-              <td>
+              <td data-label="Type" class="text-nowrap">{{ client.type_string }}</td>
+              <td data-label="Name">
+                {{ client.display_name }}
                 {% if client.is_webhook %}
                   {% if client.verified %}
-                    <p><span class="glyphicon glyphicon-check"></span> Verified</p>
+                  <div class="account-webhook-status account-webhook-verified"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Verified</div>
                   {% else %}
-                    <a href="/webhooks/verify/{{client.key.id()}}"><button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span> Verify</button></a>
-                    <form action="/webhooks/send_verification" method="post">
-                    <input name="client_id" type="hidden" value="{{ client.key.id() }}" />
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-send"></span> Resend Code</button>
-                    </form>
+                  <div class="account-webhook-status account-webhook-unverified">Not verified</div>
                   {% endif %}
                 {% endif %}
               </td>
+              <td data-label="ID">
+                {% if client.is_webhook %}
+                  <div class="account-webhook-detail"><span class="text-muted">URL</span> <code class="account-secret">{{ client.messaging_id }}</code></div>
+                  <div class="account-webhook-detail"><span class="text-muted">Secret</span> {{ secret_field(client.secret) }}</div>
+                {% else %}
+                  <code class="account-secret account-secret-short">{{ client.short_id }}</code>
+                {% endif %}
+              </td>
+              <td class="account-row-actions">
+                {% if client.is_webhook %}
+                  {% if not client.verified %}
+                    <a href="/webhooks/verify/{{client.key.id()}}" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-edit"></span> Enter Code</a>
+                    <form action="/webhooks/send_verification" method="post">
+                      <input name="client_id" type="hidden" value="{{ client.key.id() }}" />
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                      <button type="submit" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-send"></span> Resend Code</button>
+                    </form>
+                  {% endif %}
+                {% endif %}
+                <form action="{{ url_for('account.ping') }}" method="post"{% if not ping_enabled %} title="Notifications are turned off site-wide right now, so pings can't be sent."{% endif %}>
+                  <input name="mobile_client_id" type="hidden" value="{{ client.key.id() }}" />
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                  <button type="submit" class="ping btn btn-default btn-sm" {{ '' if ping_enabled else 'disabled' }}><span class="glyphicon glyphicon-cloud"></span> Ping</button>
+                </form>
+                {% if client.is_webhook %}
+                <form action="/webhooks/delete" method="post" data-confirm="Delete the &ldquo;{{ client.display_name }}&rdquo; webhook? It will stop receiving notifications.">
+                  <input name="client_id" type="hidden" value="{{ client.key.id() }}" />
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                  <button type="submit" class="btn btn-default btn-sm account-danger-button"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                </form>
+                {% endif %}
+              </td>
             </tr>
           {% endfor %}
-     {% else %}
-        <p>No devices found.</p>
-     {% endif %}
+        </tbody>
       </table>
-      <p><a class="btn btn-default" href="/webhooks/add"><span class="glyphicon glyphicon-plus"></span> Add Webhook</a></p>
-      <p>Check out our <a href="/apidocs/webhooks">Webhooks API documentation</a> for more info.</p>
+    {% else %}
+    <div class="panel-body account-empty">No devices found.</div>
+    {% endif %}
+  </div>
+
+  <div id="delete-account-row" class="account-delete">
+    <div>
+      <h2>Delete Account</h2>
+      <p class="text-muted small">Permanently deletes your myTBA favorites and subscriptions, connected devices and API keys. This can't be undone.</p>
     </div>
+    <a class="btn btn-default btn-sm account-danger-button" href="{{ url_for('account.delete') }}"><span class="glyphicon glyphicon-trash"></span> Delete Account</a>
   </div>
 </div>
+{% endblock %}
+
+{% block inline_javascript %}
+<script>
+  (function () {
+    document.addEventListener('submit', function (e) {
+      var message = e.target.getAttribute('data-confirm');
+      if (message && !window.confirm(message)) {
+        e.preventDefault();
+      }
+    });
+    document.addEventListener('click', function (e) {
+      var button = e.target.closest('.js-secret-toggle, .js-secret-copy');
+      if (!button) {
+        return;
+      }
+      var field = button.closest('.account-secret-field');
+      if (button.classList.contains('js-secret-toggle')) {
+        var masked = field.classList.toggle('is-masked');
+        button.textContent = masked ? 'Show' : 'Hide';
+        return;
+      }
+      var value = field.querySelector('.account-secret-value').textContent.trim();
+      navigator.clipboard.writeText(value).then(function () {
+        button.textContent = 'Copied';
+        setTimeout(function () { button.textContent = 'Copy'; }, 1500);
+      }, function () {
+        field.classList.remove('is-masked');
+      });
+    });
+  })();
+</script>
 {% endblock %}

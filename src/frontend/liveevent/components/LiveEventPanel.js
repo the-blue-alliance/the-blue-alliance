@@ -41,6 +41,7 @@ class LiveEventPanel extends React.PureComponent {
       if (val) {
         Object.keys(val).forEach((shortKey) => {
           const match = val[shortKey];
+          if (match.c === "pm") return;
           match.key = `${this.props.eventKey}_${shortKey}`;
           match.shortKey = shortKey;
           matches.push(match);

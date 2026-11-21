@@ -3,6 +3,7 @@ import { Temporal } from 'temporal-polyfill';
 import {
   AllianceColor,
   CompLevel,
+  EliminationAlliance,
   Event,
   Match,
   MatchAlliance,
@@ -98,6 +99,75 @@ export function matchTitleShort(
 
 export function matchHasBeenPlayed(match: Match) {
   return match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
+}
+
+/**
+ * Finds the finals winner and finalists from the finals matches, without
+ * knowing the finals format. Most events play first to 2 wins, but some give
+ * the upper bracket alliance a 1-0 head start, which the match data does not
+ * show.
+ *
+ * - An alliance with 2 finals match wins is the winner in both formats. With a
+ *   head start, the upper bracket alliance stops at 1 real win, so only the
+ *   lower bracket alliance can reach 2.
+ * - Once the finals are over, the winner of the last finals match is the
+ *   winner in both formats. We can only be sure the finals are over once the
+ *   event's last day has passed, so before then a 1-0 or 1-1 series shows no
+ *   winner.
+ */
+export function getFinalsResult(
+  alliances: EliminationAlliance[],
+  matches: Match[],
+  eventOver: boolean,
+): { winner?: EliminationAlliance; finalists: EliminationAlliance[] } {
+  const allianceOf = (teamKeys: string[]) =>
+    alliances.find((a) => a.picks.some((p) => teamKeys.includes(p)));
+  const finals = matches
+    .filter((m) => m.comp_level === CompLevel.F)
+    .sort(sortMatchComparator);
+
+  const finalists = [
+    ...new Set(
+      finals.flatMap((m) => [
+        allianceOf(m.alliances.red.team_keys),
+        allianceOf(m.alliances.blue.team_keys),
+      ]),
+    ),
+  ].filter((a) => a !== undefined);
+  const matchWinners = finals.flatMap((m) =>
+    m.winning_alliance === AllianceColor.RED ||
+    m.winning_alliance === AllianceColor.BLUE
+      ? [allianceOf(m.alliances[m.winning_alliance].team_keys)]
+      : [],
+  );
+
+  const twoTimeWinner = finalists.find(
+    (a) => matchWinners.filter((w) => w === a).length >= 2,
+  );
+
+  return {
+    winner: twoTimeWinner ?? (eventOver ? matchWinners.at(-1) : undefined),
+    finalists,
+  };
+}
+
+export function allianceRobots(alliance: EliminationAlliance): string[] {
+  return alliance.backup
+    ? [...alliance.picks, alliance.backup.in]
+    : alliance.picks;
+}
+
+export function findAllianceNumber(
+  teamKeys: string[],
+  alliances: EliminationAlliance[],
+): number | null {
+  if (teamKeys.length === 0) {
+    return null;
+  }
+  const index = alliances.findIndex((alliance) =>
+    teamKeys.every((key) => allianceRobots(alliance).includes(key)),
+  );
+  return index === -1 ? null : index + 1;
 }
 
 function getMaybeUnpenalizedScores(m: Match): { blue: number; red: number } {
@@ -260,6 +330,78 @@ export function calculateTeamRecordsFromMatches(
   };
 
   return { quals: qualsRecord, playoff: playoffRecord };
+}
+
+export interface TeamAvgScore {
+  qualAvg: number | null;
+  playoffAvg: number | null;
+}
+
+/**
+ * Average alliance score for a team across played matches, split into
+ * qualification and playoff. Matches Recycle Rush (2015) Jinja pages, where
+ * W-L-T is not meaningful for most of the season.
+ */
+export function calculateTeamAvgScore(
+  teamKey: string,
+  matches: Match[],
+): TeamAvgScore {
+  const qualScores: number[] = [];
+  const playoffScores: number[] = [];
+
+  for (const match of matches) {
+    if (!matchHasBeenPlayed(match)) {
+      continue;
+    }
+
+    for (const alliance of [match.alliances.red, match.alliances.blue]) {
+      if (!alliance.team_keys.includes(teamKey)) {
+        continue;
+      }
+      if (
+        match.comp_level === CompLevel.QM ||
+        match.comp_level === CompLevel.PM
+      ) {
+        qualScores.push(alliance.score);
+      } else {
+        playoffScores.push(alliance.score);
+      }
+      break;
+    }
+  }
+
+  return {
+    qualAvg:
+      qualScores.length > 0
+        ? qualScores.reduce((sum, score) => sum + score, 0) / qualScores.length
+        : null,
+    playoffAvg:
+      playoffScores.length > 0
+        ? playoffScores.reduce((sum, score) => sum + score, 0) /
+          playoffScores.length
+        : null,
+  };
+}
+
+export function formatAvgScore(value: number): string {
+  return value.toFixed(2);
+}
+
+export function calculateRobotsRecord(
+  robots: { robotKey: string; matches: Match[] }[],
+): WltRecord {
+  return robots
+    .flatMap((r) =>
+      Object.values(calculateTeamRecordsFromMatches(r.robotKey, r.matches)),
+    )
+    .reduce(
+      (total, record) => ({
+        wins: total.wins + record.wins,
+        losses: total.losses + record.losses,
+        ties: total.ties + record.ties,
+      }),
+      { wins: 0, losses: 0, ties: 0 },
+    );
 }
 
 export function getTeamsUnpenalizedHighScore(

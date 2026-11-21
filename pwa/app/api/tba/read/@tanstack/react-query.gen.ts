@@ -60,6 +60,7 @@ import {
   getRegionalChampsPoolPoints,
   getRegionalRankings,
   getSearchIndex,
+  getSponsors,
   getStatus,
   getTeam,
   getTeamAwards,
@@ -264,6 +265,9 @@ import type {
   GetSearchIndexData,
   GetSearchIndexError,
   GetSearchIndexResponse,
+  GetSponsorsData,
+  GetSponsorsError,
+  GetSponsorsResponse,
   GetStatusData,
   GetStatusError,
   GetStatusResponse,
@@ -1185,7 +1189,7 @@ export const getEventNexusInfoQueryKey = (
 ) => createQueryKey('getEventNexusInfo', options);
 
 /**
- * Gets live match-queuing info for an event from Nexus (https://frc.nexus/), or `null` if no data is currently available for this event.
+ * Gets live match-queuing info and the pit map for an event from Nexus (https://frc.nexus/), or `null` if neither is currently available for this event.
  */
 export const getEventNexusInfoOptions = (
   options: Options<GetEventNexusInfoData>,
@@ -1966,6 +1970,31 @@ export const getStatusOptions = (options?: Options<GetStatusData>) =>
       return data;
     },
     queryKey: getStatusQueryKey(options),
+  });
+
+export const getSponsorsQueryKey = (options?: Options<GetSponsorsData>) =>
+  createQueryKey('getSponsors', options);
+
+/**
+ * Returns TBA's platinum sponsors in display order (0 to 3 entries), for clients to credit. Separate from /status so a malformed sponsor entry can never break the status call.
+ */
+export const getSponsorsOptions = (options?: Options<GetSponsorsData>) =>
+  queryOptions<
+    GetSponsorsResponse,
+    GetSponsorsError,
+    GetSponsorsResponse,
+    ReturnType<typeof getSponsorsQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getSponsors({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getSponsorsQueryKey(options),
   });
 
 export const getTeamQueryKey = (options: Options<GetTeamData>) =>

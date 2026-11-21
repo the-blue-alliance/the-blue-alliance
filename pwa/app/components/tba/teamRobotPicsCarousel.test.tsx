@@ -16,6 +16,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 function imgur(key: string): Media {
@@ -55,20 +56,28 @@ describe('TeamRobotPicsCarousel', () => {
     expect(loadedSlides()).toEqual([true, true, false, false, false]);
   });
 
-  test('loads the first image eagerly at high priority', () => {
+  test('loads the first image eagerly at the default priority', () => {
     render(<TeamRobotPicsCarousel media={fiveRobots} />);
 
     expect([
       images()[0].getAttribute('loading'),
       images()[0].getAttribute('fetchpriority'),
-    ]).toEqual(['eager', 'high']);
+    ]).toEqual(['eager', 'auto']);
   });
 
-  test('uses resized imgur thumbnails for the first image', () => {
+  test('shows the medium imgur thumbnail for the first image', () => {
     render(<TeamRobotPicsCarousel media={fiveRobots} />);
 
-    expect(images()[0].getAttribute('srcset')).toBe(
-      'https://i.imgur.com/aaaaaaal.jpg 1x, https://i.imgur.com/aaaaaaah.jpg 2x',
+    expect(images()[0].getAttribute('src')).toBe(
+      'https://i.imgur.com/aaaaaaam.jpg',
+    );
+  });
+
+  test('links the first image to the huge imgur thumbnail', () => {
+    render(<TeamRobotPicsCarousel media={fiveRobots} />);
+
+    expect(images()[0].closest('a')?.getAttribute('href')).toBe(
+      'https://i.imgur.com/aaaaaaah.jpg',
     );
   });
 
@@ -137,5 +146,33 @@ describe('TeamRobotPicsCarousel', () => {
     );
 
     expect(loadedSlides()).toEqual([true]);
+  });
+
+  test('drops a slide whose image fails to load', () => {
+    render(
+      <TeamRobotPicsCarousel media={[imgur('aaaaaaa'), imgur('bbbbbbb')]} />,
+    );
+
+    fireEvent.error(images()[0]);
+
+    expect(loadedSlides()).toEqual([true]);
+  });
+
+  test('hides the carousel when every image fails to load', () => {
+    render(<TeamRobotPicsCarousel media={[imgur('aaaaaaa')]} />);
+
+    fireEvent.error(images()[0]);
+
+    expect(screen.queryByRole('region', { name: 'Robot pictures' })).toBeNull();
+  });
+
+  test('hides the carousel when the image failed before mounting', () => {
+    vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(
+      true,
+    );
+
+    render(<TeamRobotPicsCarousel media={[imgur('aaaaaaa')]} />);
+
+    expect(screen.queryByRole('region', { name: 'Robot pictures' })).toBeNull();
   });
 });

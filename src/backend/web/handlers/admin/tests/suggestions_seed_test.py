@@ -27,6 +27,7 @@ def test_seed_page_renders(web_client: Client, login_gae_admin) -> None:
     resp = web_client.get("/admin/suggestions/seed")
     assert resp.status_code == 200
     assert b"Seed Suggestions" in resp.data
+    assert b"API Write Key Requests (<code>api_auth_access</code>)" in resp.data
 
 
 def test_seed_all_types(

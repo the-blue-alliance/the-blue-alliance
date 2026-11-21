@@ -1,16 +1,16 @@
 import { expect, test } from '@playwright/test';
 
+import { gotoHydrated, hangRequests, recordRequests } from './helpers';
+
 test('past-year district championship tab stops polling', async ({ page }) => {
   await page.clock.install();
 
-  const requestUrls: string[] = [];
-  page.on('request', (request) => requestUrls.push(request.url()));
+  const requestUrls = recordRequests(page);
   const firstEventsRequest = page.waitForRequest((request) =>
     request.url().includes('/api/v3/events/2019'),
   );
 
-  await page.goto('/district/fim/2019');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/district/fim/2019');
   await page.getByRole('tab', { name: 'Champs' }).click();
   await firstEventsRequest;
 
@@ -27,8 +27,7 @@ test('past-year district championship tab stops polling', async ({ page }) => {
 
 test.describe('/district/fim/2024 header', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/district/fim/2024');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/district/fim/2024');
   });
 
   [['Rankings'], ['Events'], ['Teams'], ['Champs'], ['Insights']].forEach(
@@ -72,8 +71,7 @@ test.describe('/district/fim/2024 header', () => {
 
 test.describe('/district/fim/2024 rankings', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/district/fim/2024');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/district/fim/2024');
   });
 
   test('shows the Advancement column', async ({ page }) => {
@@ -104,17 +102,44 @@ test.describe('/district/fim/2024 rankings', () => {
   });
 });
 
+test.describe('/district/fim/2024 teams tab', () => {
+  test('does not request the full team list on page load', async ({ page }) => {
+    const requestUrls = recordRequests(page);
+
+    await gotoHydrated(page, '/district/fim/2024');
+    await page.waitForLoadState('networkidle');
+
+    expect(
+      requestUrls.filter((url) => /\/district\/2024fim\/teams(\?|$)/.test(url)),
+    ).toHaveLength(0);
+  });
+
+  test('shows a placeholder while the teams load', async ({ page }) => {
+    await hangRequests(page, /\/api\/v3\/district\/2024fim\/teams(\?|$)/);
+
+    await gotoHydrated(page, '/district/fim/2024#teams');
+
+    await expect(
+      page.getByRole('status', { name: 'Loading teams' }),
+    ).toBeVisible();
+  });
+
+  test('lists district teams once they load', async ({ page }) => {
+    await gotoHydrated(page, '/district/fim/2024#teams');
+
+    await expect(page.getByRole('link', { name: /^33 - / })).toBeVisible();
+  });
+});
+
 test.describe('district page tabs and the URL hash', () => {
   test('clicking a tab puts it in the hash', async ({ page }) => {
-    await page.goto('/district/fim/2024');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/district/fim/2024');
     await page.getByRole('tab', { name: 'Teams' }).click();
     await expect(page).toHaveURL(/#teams$/);
   });
 
   test('opens the tab named by the hash on load', async ({ page }) => {
-    await page.goto('/district/fim/2024#events');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/district/fim/2024#events');
     await expect(page.getByRole('tab', { name: 'Events' })).toHaveAttribute(
       'aria-selected',
       'true',
@@ -123,9 +148,26 @@ test.describe('district page tabs and the URL hash', () => {
 });
 
 test('insights tab shows district leaderboards', async ({ page }) => {
-  await page.goto('/district/fim/2024#insights');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/district/fim/2024#insights');
   await expect(
     page.getByRole('heading', { name: 'Leaderboards' }),
+  ).toBeVisible();
+});
+
+test('events tab labels 2016 weeks the way the events list does', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/district/fim/2016#events');
+
+  await expect(
+    page.getByRole('row').filter({ hasText: 'Southfield' }),
+  ).toContainText('Week 1');
+});
+
+test('events tab total leaves out championship divisions', async ({ page }) => {
+  await gotoHydrated(page, '/district/fim/2024#events');
+
+  await expect(
+    page.getByRole('row', { name: 'Total 27 Events' }),
   ).toBeVisible();
 });

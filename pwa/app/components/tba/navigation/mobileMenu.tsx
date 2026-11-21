@@ -12,7 +12,7 @@ import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
 
 export function MobileMenu() {
   return (
-    <NavigationMenuItem className="md:hidden">
+    <NavigationMenuItem className="min-[60rem]:hidden">
       <NavigationMenuTrigger aria-label="Toggle Menu">
         <MenuIcon className="size-5 group-data-popup-open:hidden" />
         <XIcon className="hidden size-5 group-data-popup-open:block" />
@@ -33,7 +33,7 @@ export function MobileMenu() {
               activeProps={{ className: 'bg-white/15 rounded-md' }}
               style={{ animationDelay: `${index * 50}ms` }}
             >
-              <Icon className="size-5 text-white/50" />
+              <Icon className="size-5 text-white" />
               <p className="font-medium text-white">{title}</p>
             </Link>
           ))}

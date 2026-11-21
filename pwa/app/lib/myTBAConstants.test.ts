@@ -10,9 +10,11 @@ describe('SUBSCRIPTION_TYPES', () => {
     expect(SUBSCRIPTION_TYPES).toEqual([
       'upcoming_match',
       'match_score',
+      'starting_comp_level',
       'alliance_selection',
       'awards_posted',
-      'match_video_added',
+      'schedule_updated',
+      'match_video',
     ]);
   });
 

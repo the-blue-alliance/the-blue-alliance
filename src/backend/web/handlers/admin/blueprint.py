@@ -1,3 +1,5 @@
+from typing import Dict, Optional
+
 from flask import abort, Blueprint
 from google.appengine.api import users as gae_login
 
@@ -31,9 +33,7 @@ from backend.web.handlers.admin.cache import (
     cached_query_info,
     cached_query_key_lookup_post,
     cached_query_list,
-    cached_query_purge_class_global_version,
-    cached_query_purge_global_version,
-    cached_query_purge_version,
+    cached_query_purge_orphans,
     clear_model_cache,
 )
 from backend.web.handlers.admin.districts import (
@@ -148,6 +148,16 @@ def require_gae_admin() -> None:
         abort(401)
 
 
+@admin_routes.context_processor
+def admin_identity() -> Dict[str, Optional[str]]:
+    """
+    The Google account App Engine admitted as an admin. It is separate from the
+    TBA account (`user`), which may be signed out or have no display name.
+    """
+    google_user = gae_login.get_current_user()
+    return {"admin_email": google_user.email() if google_user else None}
+
+
 @admin_routes.route("/")
 def admin_home() -> str:
     suggestions_count = (
@@ -237,6 +247,9 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule("/cache", view_func=cached_query_list)
 admin_routes.add_url_rule(
+    "/cache/purge_orphans", methods=["POST"], view_func=cached_query_purge_orphans
+)
+admin_routes.add_url_rule(
     "/cache/<query_class_name>", methods=["GET"], view_func=cached_query_detail
 )
 admin_routes.add_url_rule(
@@ -249,21 +262,6 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule(
     "/cache/<query_class_name>/<cache_key>/delete", view_func=cached_query_delete
-)
-admin_routes.add_url_rule(
-    "/cache/<query_class_name>/purge/<db_version>/<int:query_version>",
-    methods=["POST"],
-    view_func=cached_query_purge_version,
-)
-admin_routes.add_url_rule(
-    "/cache/<query_class_name>/purge_global/<int:db_version>",
-    methods=["POST"],
-    view_func=cached_query_purge_class_global_version,
-)
-admin_routes.add_url_rule(
-    "/cache/purge_global/<int:db_version>",
-    methods=["POST"],
-    view_func=cached_query_purge_global_version,
 )
 admin_routes.add_url_rule(
     "/cache/clear/<model_type>/<model_key>",

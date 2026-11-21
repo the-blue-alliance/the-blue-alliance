@@ -10,7 +10,9 @@ from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2016
 from backend.common.game_specific.base import (
     BonusRpBreakdownSeasonGameConfig,
+    per_robot_points,
     PredictionStatConfig,
+    RobotPointsAccessor,
     safe_div,
     TCriteria,
 )
@@ -281,6 +283,12 @@ class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig[ScoreDetailModelAllianc
             ]  # [# damaged, # opportunities, %]
 
         return event_insights
+
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
+        return {
+            "autoReachPoints": per_robot_points("robot{}Auto", {"Reached": 2}),
+            "autoCrossingPoints": per_robot_points("robot{}Auto", {"Crossed": 10}),
+        }
 
     def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return [

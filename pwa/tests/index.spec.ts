@@ -1,8 +1,9 @@
 import { Page, expect, test } from '@playwright/test';
 
+import { gotoHydrated, recordRequests } from './helpers';
+
 test.beforeEach(async ({ page }) => {
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 });
 
 // Navbar
@@ -30,6 +31,18 @@ test('navbar search button is visible', async ({ page }) => {
   await expect(
     page.getByRole('button', { name: 'Search teams and events...' }),
   ).toBeVisible();
+});
+
+[700, 960, 1165].forEach((width) => {
+  test.describe(`navbar at ${width}px wide`, () => {
+    test.use({ viewport: { width, height: 800 } });
+
+    test('keeps the account menu button fully on screen', async ({ page }) => {
+      await expect(
+        page.getByRole('button', { name: 'Account menu' }),
+      ).toBeInViewport({ ratio: 1 });
+    });
+  });
 });
 
 // (mobile) Navbar
@@ -119,8 +132,7 @@ test.describe('hamburger menu (narrow viewport)', () => {
   test.use({ viewport: { width: 500, height: 800 } });
 
   test('does not open on hover', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/');
 
     const trigger = page.getByRole('button', { name: 'Toggle Menu' });
     await trigger.hover();
@@ -134,8 +146,7 @@ test.describe('hamburger menu (narrow viewport)', () => {
   test('opens on click and fully unmounts on second click', async ({
     page,
   }) => {
-    await page.goto('/');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/');
 
     const trigger = page.getByRole('button', { name: 'Toggle Menu' });
     await trigger.click();
@@ -173,8 +184,7 @@ test('search dialog opens while search_index is still loading', async ({
     });
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 
   const searchButton = page.getByRole('button', {
     name: 'Search teams and events...',
@@ -214,14 +224,45 @@ test('search trigger stays enabled while search_index is pending', async ({
     });
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 
   const searchButton = page.getByRole('button', {
     name: 'Search teams and events...',
   });
   await expect(searchButton).toBeEnabled();
   releaseSearchIndex();
+});
+
+test('(mobile) loads the page without downloading the search index', async ({
+  page,
+}) => {
+  const requestUrls = recordRequests(page);
+
+  await page.reload();
+  await page.locator('body[data-hydrated]').waitFor();
+  await page.waitForLoadState('networkidle');
+
+  expect(
+    requestUrls.filter((url) => url.includes('/api/v3/search_index')),
+  ).toHaveLength(0);
+});
+
+test('requests the search index when the pointer reaches search', async ({
+  page,
+}) => {
+  // Keep the cursor off the search control so a remount under the pointer
+  // cannot intend search before this test does.
+  await page.mouse.move(0, 0);
+
+  const searchIndexUrls = recordRequests(page, 'search_index');
+
+  await gotoHydrated(page, '/');
+  expect(searchIndexUrls).toEqual([]);
+
+  await page.getByRole('button', { name: /Search teams and events/ }).hover();
+
+  await expect.poll(() => searchIndexUrls.length).toBe(1);
+  expect(searchIndexUrls[0]).toContain('search_index');
 });
 
 test('(mobile) opening search focuses the input', async ({ page }) => {
@@ -233,8 +274,7 @@ test('(mobile) opening search focuses the input', async ({ page }) => {
     });
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 
   const searchButton = page.getByRole('button', { name: 'Search' });
   await searchButton.click();

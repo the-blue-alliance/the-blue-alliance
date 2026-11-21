@@ -36,7 +36,24 @@ Two things follow from there being no expiry, and both matter:
 
 **Entries are only written on a miss.** `CachedDatabaseQuery` writes a `CachedQueryResult` only when the lookup returned nothing (`src/backend/common/queries/database_query.py`); a cache *hit* returns the stored result without writing. So the model's `updated` field never advances past `created`, and there is no record of when an entry was last *read*. Do not treat age as a proxy for coldness — the oldest entries tend to be queries over long-finished seasons, which are both the most stable and the most expensive to recompute.
 
-**Cache keys are versioned, and bumping a version orphans data.** The key is `{query key}:{CACHE_VERSION}:{DATABASE_QUERY_VERSION}`. Bumping either number changes every affected key, so the previous generation becomes permanently unreachable — it is not deleted, just stranded, and it keeps costing storage. If you bump a version, plan to purge the old generation by key prefix. `/admin/cache` shows the breakdown per version.
+**Cache keys are versioned, and bumping a version orphans data.** The key is `{query key}:{CACHE_VERSION}:{DATABASE_QUERY_VERSION}`, with a `~dictv{major}.{subversion}` suffix for API dicts. Bumping any of those numbers changes every affected key, so the previous generation becomes permanently unreachable. It is not deleted, just stranded, and it keeps costing storage and backup space until it is purged. Left alone, old generations grew to 8.8M entries (86% of the kind) before the November 2026 purge.
+
+### After bumping a cache version
+
+This applies to `CachedDatabaseQuery.DATABASE_QUERY_VERSION` (every query), a query class's `CACHE_VERSION`, and a converter's `SUBVERSIONS`.
+
+1. **Deploy the bump and confirm it is good.** The purge deletes every generation older than current, with no rollback buffer. Rolling back after a purge is safe, but the rolled-back code misses the cache until it refills.
+2. **Dry run.** On `/admin/cache`, under Orphaned Entries, click **Dry Run**. Reload the page first if it has been open for more than an hour, because its CSRF token expires and the POST fails with a 400.
+3. **Read the result** in the py3-tasks-io logs: search for `Orphaned CachedQueryResult dry run`. Each task logs running totals, and the last line says `finished`. Check that the `orphaned:*` counts match the generation you bumped:
+   - `orphaned:db_version` for a `DATABASE_QUERY_VERSION` bump.
+   - `orphaned:cache_version` or `orphaned:dict_subversion` for a per-class bump.
+
+   `kept:undecodable` counts legacy keys whose names aren't valid UTF-8; they are always kept.
+4. **Purge.** Click **Purge Orphans**. It runs the same scan and deletes as it goes.
+
+**How long it takes:** the scan is keys-only, in a chain of tasks of 50,000 keys each on the `cache-clearing` queue. A dry run takes about 30 seconds per task. A purge takes 80–120 seconds per task, depending on how much it deletes. Over the 2.9M keys left after the 2026 cleanup, a dry run takes about 25 minutes and a purge about 1.5 hours. Failing tasks retry five times and then stop; click the button again to start over. Datastore statistics (`__Stat_Kind__`) refresh about daily.
+
+The classifier is in `src/backend/common/queries/cached_query_orphans.py`. It never deletes a key it cannot parse or attribute to a known query class, and it matches classes on their full key format, because prefixes overlap (`event_{event_key}` also matches `event_awards_2024casj`).
 
 ## Flask Page Caching
 

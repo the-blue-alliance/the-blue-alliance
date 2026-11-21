@@ -13,7 +13,9 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2018
 from backend.common.game_specific.base import (
+    per_robot_points,
     PredictionStatConfig,
+    RobotPointsAccessor,
     safe_div,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
@@ -21,6 +23,15 @@ from backend.common.game_specific.base import (
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
+
+
+def _endgame_points(breakdown: Dict[str, Any]) -> List[float]:
+    states = [breakdown.get(f"endgameRobot{robot}") for robot in (1, 2, 3)]
+    levitate_share = 30.0 * states.count("Levitate") / 3
+    return [
+        {"Parking": 5.0, "Climbing": 30.0}.get(state, 0.0) + levitate_share
+        for state in states
+    ]
 
 
 class GameSpecifics2018(
@@ -401,6 +412,12 @@ class GameSpecifics2018(
         }
 
         return event_insights
+
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
+        return {
+            "autoRunPoints": per_robot_points("autoRobot{}", {"AutoRun": 5}),
+            "endgamePoints": _endgame_points,
+        }
 
     def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return [

@@ -54,6 +54,8 @@ def test_static_asset_traversal_404s(web_client: FlaskClient, build_dir: Path) -
     (build_dir / "secret.txt").write_text("nope")
     resp = web_client.get("/py3_static/0123456789abcdef/css/..%2Fsecret.txt")
     assert resp.status_code == 404
+    resp = web_client.get("/py3_static/0123456789abcdef/css/.")
+    assert resp.status_code == 404
 
 
 def test_page_links_hashed_css(web_client: FlaskClient, build_dir: Path) -> None:

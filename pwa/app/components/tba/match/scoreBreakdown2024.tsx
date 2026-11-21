@@ -15,6 +15,7 @@ import {
 } from '~/components/tba/match/common';
 import { Badge } from '~/components/ui/badge';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
+import { getRobotPoints } from '~/lib/robotScoring';
 
 export default function ScoreBreakdown2024({
   scoreBreakdown,
@@ -195,6 +196,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot1}
+              points={getRobotPoints(2024, scoreBreakdown.red, 1, 'endgame')}
               teamKey={match.alliances.red.team_keys[0]}
               micCenterStage={scoreBreakdown.red.micCenterStage ?? false}
               micStageLeft={scoreBreakdown.red.micStageLeft ?? false}
@@ -205,6 +207,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-blue-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot1}
+              points={getRobotPoints(2024, scoreBreakdown.blue, 1, 'endgame')}
               teamKey={match.alliances.blue.team_keys[0]}
               micCenterStage={scoreBreakdown.blue.micCenterStage ?? false}
               micStageLeft={scoreBreakdown.blue.micStageLeft ?? false}
@@ -218,6 +221,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot2}
+              points={getRobotPoints(2024, scoreBreakdown.red, 2, 'endgame')}
               teamKey={match.alliances.red.team_keys[1]}
               micCenterStage={scoreBreakdown.red.micCenterStage ?? false}
               micStageLeft={scoreBreakdown.red.micStageLeft ?? false}
@@ -228,6 +232,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-blue-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot2}
+              points={getRobotPoints(2024, scoreBreakdown.blue, 2, 'endgame')}
               teamKey={match.alliances.blue.team_keys[1]}
               micCenterStage={scoreBreakdown.blue.micCenterStage ?? false}
               micStageLeft={scoreBreakdown.blue.micStageLeft ?? false}
@@ -241,6 +246,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-red-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot3}
+              points={getRobotPoints(2024, scoreBreakdown.red, 3, 'endgame')}
               teamKey={match.alliances.red.team_keys[2]}
               micCenterStage={scoreBreakdown.red.micCenterStage ?? false}
               micStageLeft={scoreBreakdown.red.micStageLeft ?? false}
@@ -251,6 +257,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-alliance-blue-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot3}
+              points={getRobotPoints(2024, scoreBreakdown.blue, 3, 'endgame')}
               teamKey={match.alliances.blue.team_keys[2]}
               micCenterStage={scoreBreakdown.blue.micCenterStage ?? false}
               micStageLeft={scoreBreakdown.blue.micStageLeft ?? false}
@@ -399,8 +406,10 @@ function EndgameRobotCell({
   micCenterStage,
   micStageLeft,
   micStageRight,
+  points: basePoints,
 }: {
   endgame: MatchScoreBreakdown2024['red']['endGameRobot1'];
+  points: number;
   micCenterStage: boolean;
   micStageLeft: boolean;
   micStageRight: boolean;
@@ -418,19 +427,8 @@ function EndgameRobotCell({
     (endgame === EndGameRobot2024.STAGE_RIGHT && micStageRight)
   ) {
     display = 'Spotlit';
-    points = 4;
+    points = basePoints + 1;
   } else {
-    const pointMap: Record<
-      NonNullable<MatchScoreBreakdown2024['red']['endGameRobot1']>,
-      number
-    > = {
-      StageLeft: 3,
-      StageRight: 3,
-      CenterStage: 3,
-      Parked: 1,
-      None: 0,
-    };
-
     const displayMap: Record<
       NonNullable<MatchScoreBreakdown2024['red']['endGameRobot1']>,
       string
@@ -443,7 +441,7 @@ function EndgameRobotCell({
     };
 
     display = displayMap[endgame ?? 'None'];
-    points = pointMap[endgame ?? 'None'];
+    points = basePoints;
   }
 
   return (

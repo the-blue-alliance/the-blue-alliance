@@ -1,6 +1,7 @@
 from typing import List, Optional, TypedDict
 
 from backend.common.consts.model_type import ModelType
+from backend.common.helpers.youtube_video_helper import YouTubePlaylistItem
 
 
 class VoidRequest(TypedDict):
@@ -14,6 +15,8 @@ class BaseResponse(TypedDict):
 
 class _RegistrationRequestNotRequired(TypedDict, total=False):
     name: str
+    # A `messaging_id_type` name ("token" or "fid"); omitted means "token"
+    mobile_id_type: str
 
 
 class RegistrationRequest(_RegistrationRequestNotRequired):
@@ -22,7 +25,12 @@ class RegistrationRequest(_RegistrationRequestNotRequired):
     device_uuid: str
 
 
-class RegisteredMobileClient(TypedDict):
+class _RegisteredMobileClientNotRequired(TypedDict, total=False):
+    # Omitted for webhooks, whose `mobile_id` is a URL
+    mobile_id_type: str
+
+
+class RegisteredMobileClient(_RegisteredMobileClientNotRequired):
     name: str
     operating_system: str
     mobile_id: str
@@ -61,6 +69,38 @@ class TeamSocialMediaSuggestionMessage(TypedDict):
 
 class TeamSocialMediaSuggestionResponse(BaseResponse):
     status: str
+
+
+class MatchVideoSuggestionMessage(TypedDict):
+    match_key: str
+    youtube_url: str
+
+
+class MatchVideoSuggestionResponse(BaseResponse):
+    status: str
+
+
+class VideoPlaylistMessage(TypedDict):
+    playlist_id: str
+
+
+class VideoPlaylistResponse(BaseResponse):
+    videos: List[YouTubePlaylistItem]
+
+
+class EventMatchVideo(TypedDict):
+    video_id: str
+    match_partial: str
+
+
+class EventMatchVideosSuggestionMessage(TypedDict):
+    event_key: str
+    videos: List[EventMatchVideo]
+
+
+class EventMatchVideosSuggestionResponse(BaseResponse):
+    status: str
+    num_added: int
 
 
 class FavoriteMessage(TypedDict):
@@ -134,3 +174,56 @@ class AddApiReadKeyResponse(BaseResponse, _AddApiReadKeyResponseOptional):
 
 class DeleteApiReadKeyMessage(TypedDict):
     key_id: str
+
+
+class ApiWriteKeyRequestMessage(TypedDict):
+    event_key: str
+    affiliation: str
+    auth_types: List[int]
+
+
+class ApiWriteKeyRequestResponse(BaseResponse):
+    status: str
+
+
+class WebhookMessage(TypedDict):
+    webhook_id: str
+    name: str
+    url: str
+    secret: str
+    verified: bool
+
+
+class ListWebhooksResponse(BaseResponse):
+    webhooks: List[WebhookMessage]
+
+
+class AddWebhookMessage(TypedDict):
+    name: str
+    url: str
+
+
+class _AddWebhookResponseOptional(TypedDict, total=False):
+    webhook: WebhookMessage
+
+
+class AddWebhookResponse(BaseResponse, _AddWebhookResponseOptional):
+    pass
+
+
+class WebhookIdMessage(TypedDict):
+    webhook_id: str
+
+
+class VerifyWebhookMessage(WebhookIdMessage):
+    code: str
+
+
+class _WebhookTestMessageOptional(TypedDict, total=False):
+    event_key: str
+    match_key: str
+    district_key: str
+
+
+class WebhookTestMessage(WebhookIdMessage, _WebhookTestMessageOptional):
+    notification_type: str

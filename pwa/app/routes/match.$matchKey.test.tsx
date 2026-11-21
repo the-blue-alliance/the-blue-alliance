@@ -87,6 +87,29 @@ describe('match route head', () => {
     });
   });
 
+  test('describes a match at an event with no city without printing null', () => {
+    expect(head({ event: { ...event, city: null }, match })?.meta?.[1]).toEqual(
+      {
+        name: 'description',
+        content:
+          'Quals 1 at the 2024 Silicon Valley Regional FIRST Robotics Competition in CA, USA',
+      },
+    );
+  });
+
+  test('omits the location for an event with no location', () => {
+    expect(
+      head({
+        event: { ...event, city: null, state_prov: null, country: null },
+        match,
+      })?.meta?.[1],
+    ).toEqual({
+      name: 'description',
+      content:
+        'Quals 1 at the 2024 Silicon Valley Regional FIRST Robotics Competition',
+    });
+  });
+
   test('falls back to a generic title without loader data', () => {
     expect(runHead(Route)?.meta?.[0]).toEqual({
       title: 'Match Information - The Blue Alliance',

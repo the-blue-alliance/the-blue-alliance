@@ -754,7 +754,7 @@ function MatchSuggestion(): JSX.Element {
   );
 
   return (
-    <div className="w-full px-4 py-8">
+    <div className="w-full px-4">
       <h1 className="text-3xl font-medium">Match Suggestions</h1>
       <Badge
         className="ml-2 cursor-pointer"

@@ -40,11 +40,14 @@ def test_static_asset_url_falls_back_when_not_built(build_dir: Path) -> None:
 def test_asset_content_hash_rejects_traversal(build_dir: Path) -> None:
     (build_dir / "secret.txt").write_text("nope")
     assert asset_content_hash("css/../secret.txt") is None
+    assert asset_content_hash("css/.") is None
     assert asset_content_hash("other/secret.txt") is None
 
 
 def test_templates_use_static_asset_url() -> None:
-    templates = Path("src/backend/web/templates").rglob("*.html")
+    templates_dir = Path(__file__).resolve().parents[1] / "templates"
+    templates = list(templates_dir.rglob("*.html"))
+    assert templates
     offenders = [
         t
         for t in templates

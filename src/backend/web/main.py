@@ -8,6 +8,7 @@ from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
 from backend.web.context_processors import (
+    platinum_sponsors_context_processor,
     pwa_url_context_processor,
     render_time_context_processor,
     static_asset_url_context_processor,
@@ -84,6 +85,7 @@ from backend.web.handlers.webcasts import webcast_list
 from backend.web.handlers.webhooks import blueprint as webhooks
 from backend.web.jinja2_filters import register_template_filters
 from backend.web.local.blueprint import maybe_register as maybe_install_local_routes
+from backend.web.signed_in_cookie import sync_signed_in_cookie
 
 configure_logging()
 
@@ -222,7 +224,7 @@ app.add_url_rule("/avatar/<int:year>/<team_key>.png", view_func=avatar_png)
 
 # Short routes: /<team_number> and /<event_or_district_key>
 app.add_url_rule(
-    '/<regex("[0-9]{1,5}"):team_number>',
+    '/<regex("(?:frc)?[0-9]{1,5}"):team_number>',
     view_func=short_team,
 )
 app.add_url_rule(
@@ -245,7 +247,9 @@ app.register_error_handler(500, handle_500)
 app.context_processor(_user_context_processor)
 app.context_processor(render_time_context_processor)
 app.context_processor(pwa_url_context_processor)
+app.context_processor(platinum_sponsors_context_processor)
 app.context_processor(static_asset_url_context_processor)
+app.after_request(sync_signed_in_cookie)
 
 register_template_filters(app)
 maybe_install_local_routes(app, csrf)

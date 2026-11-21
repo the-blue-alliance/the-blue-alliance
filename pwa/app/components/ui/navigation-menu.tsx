@@ -71,7 +71,7 @@ function NavigationMenuContent({
   return (
     <NavigationMenuPrimitive.Content
       data-slot="navigation-menu-content"
-      className={cn('top-0 left-0 w-full p-2 pr-2.5 md:w-auto', className)}
+      className={cn('top-0 left-0 w-full p-2 pr-2.5', className)}
       {...props}
     />
   );
@@ -88,7 +88,7 @@ function NavigationMenuViewport({
       >
         <NavigationMenuPrimitive.Popup
           className="relative h-(--popup-height) w-full rounded-b-xl bg-brand
-            text-white md:w-(--popup-width)"
+            text-white"
         >
           <NavigationMenuPrimitive.Viewport
             data-slot="navigation-menu-viewport"

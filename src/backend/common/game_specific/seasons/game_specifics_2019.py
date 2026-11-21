@@ -13,6 +13,7 @@ from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2019
 from backend.common.game_specific.base import (
     PredictionStatConfig,
+    RobotPointsAccessor,
     safe_div,
     StatAccessor,
     TCriteria,
@@ -21,6 +22,18 @@ from backend.common.game_specific.base import (
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
+
+
+def _sandstorm_bonus_points(breakdown: Dict[str, Any]) -> List[float]:
+    level_points = {"HabLevel1": 3.0, "HabLevel2": 6.0}
+    return [
+        (
+            level_points.get(breakdown.get(f"preMatchLevelRobot{robot}"), 0.0)
+            if breakdown.get(f"habLineRobot{robot}") == "CrossedHabLineInSandstorm"
+            else 0.0
+        )
+        for robot in (1, 2, 3)
+    ]
 
 
 class GameSpecifics2019(
@@ -432,6 +445,11 @@ class GameSpecifics2019(
                 match.score_breakdown[color].get("cargoPoints", 0)
                 + match.score_breakdown[color].get("hatchPanelPoints", 0)
             )
+        }
+
+    def get_per_robot_coprs(self) -> Dict[str, RobotPointsAccessor]:
+        return {
+            "sandStormBonusPoints": _sandstorm_bonus_points,
         }
 
     def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:

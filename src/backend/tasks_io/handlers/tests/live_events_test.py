@@ -179,6 +179,34 @@ def test_do_eventteam_status(
     assert et.status == status
 
 
+@mock.patch.object(EventTeamStatusHelper, "generate_team_at_event_status")
+def test_do_eventteam_status_uses_remapped_team_key(
+    status_mock: mock.Mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    Event(
+        id="2026nhmm",
+        year=2026,
+        event_short="nhmm",
+        event_type_enum=EventType.OFFSEASON,
+        remap_teams={"frc9997": "frc3467B"},
+    ).put()
+    EventTeam(
+        id="2026nhmm_frc9997",
+        year=2026,
+        event=ndb.Key(Event, "2026nhmm"),
+        team=ndb.Key(Team, "frc9997"),
+        remapped_to="frc3467B",
+        remapped_team="frc3467",
+    ).put()
+    status_mock.return_value = None
+
+    tasks_client.get("/tasks/math/do/event_team_status/2026nhmm")
+
+    assert status_mock.call_args.args[0] == "frc3467B"
+
+
 def test_enqueue_playoff_advancement_all(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
 ) -> None:

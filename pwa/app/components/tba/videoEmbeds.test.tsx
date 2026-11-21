@@ -1,7 +1,7 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
-import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
+import { TwitchEmbed, YoutubeEmbed } from '~/components/tba/videoEmbeds';
 
 function setDocumentReadyState(state: DocumentReadyState) {
   vi.spyOn(document, 'readyState', 'get').mockReturnValue(state);
@@ -15,13 +15,11 @@ function stubIdleCallback() {
       return 42;
     },
   );
-  const cancelIdleCallback = vi.fn<typeof window.cancelIdleCallback>();
 
   vi.stubGlobal('requestIdleCallback', requestIdleCallback);
-  vi.stubGlobal('cancelIdleCallback', cancelIdleCallback);
+  vi.stubGlobal('cancelIdleCallback', vi.fn());
 
   return {
-    cancelIdleCallback,
     requestIdleCallback,
     runCallback: () => {
       if (!callback) {
@@ -43,11 +41,9 @@ describe('YoutubeEmbed', () => {
     const iframe = screen.getByTitle('Qualification 1') as HTMLIFrameElement;
     expect({
       allowFullscreen: iframe.allowFullscreen,
-      loading: iframe.getAttribute('loading'),
       src: iframe.getAttribute('src'),
     }).toEqual({
       allowFullscreen: true,
-      loading: 'lazy',
       src: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     });
   });
@@ -108,23 +104,6 @@ describe('YoutubeEmbed', () => {
     expect(screen.getByTitle('Qualification 1')).toBeTruthy();
   });
 
-  test('sets a two-second deadline when scheduling idle work', () => {
-    setDocumentReadyState('complete');
-    const { requestIdleCallback } = stubIdleCallback();
-
-    render(
-      <YoutubeEmbed
-        videoId="dQw4w9WgXcQ"
-        title="Qualification 1"
-        deferUntilIdle
-      />,
-    );
-
-    expect(requestIdleCallback).toHaveBeenCalledWith(expect.any(Function), {
-      timeout: 2_000,
-    });
-  });
-
   test('loads the deferred video after the fallback timeout', () => {
     vi.useFakeTimers();
     setDocumentReadyState('complete');
@@ -144,40 +123,6 @@ describe('YoutubeEmbed', () => {
     expect(screen.getByTitle('Qualification 1')).toBeTruthy();
   });
 
-  test('cancels scheduled idle work when unmounted', () => {
-    setDocumentReadyState('complete');
-    const { cancelIdleCallback } = stubIdleCallback();
-    const { unmount } = render(
-      <YoutubeEmbed
-        videoId="dQw4w9WgXcQ"
-        title="Qualification 1"
-        deferUntilIdle
-      />,
-    );
-
-    unmount();
-
-    expect(cancelIdleCallback).toHaveBeenCalledWith(42);
-  });
-
-  test('clears the fallback timeout when unmounted', () => {
-    vi.useFakeTimers();
-    setDocumentReadyState('complete');
-    vi.stubGlobal('requestIdleCallback', undefined);
-    const clearTimeout = vi.spyOn(window, 'clearTimeout');
-    const { unmount } = render(
-      <YoutubeEmbed
-        videoId="dQw4w9WgXcQ"
-        title="Qualification 1"
-        deferUntilIdle
-      />,
-    );
-
-    unmount();
-
-    expect(clearTimeout).toHaveBeenCalledOnce();
-  });
-
   test('removes the pending load listener when unmounted', () => {
     setDocumentReadyState('loading');
     const { requestIdleCallback } = stubIdleCallback();
@@ -193,5 +138,41 @@ describe('YoutubeEmbed', () => {
     window.dispatchEvent(new Event('load'));
 
     expect(requestIdleCallback).not.toHaveBeenCalled();
+  });
+});
+
+describe('YoutubeEmbed click to play', () => {
+  test('waits for a click before loading the player', () => {
+    render(<YoutubeEmbed videoId="V4lDQSlvi7Q" title="Webcast" clickToPlay />);
+
+    expect(screen.queryByTitle('Webcast')).toBeNull();
+  });
+
+  test('plays the video when clicked', () => {
+    render(<YoutubeEmbed videoId="V4lDQSlvi7Q" title="Webcast" clickToPlay />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Play Webcast' }));
+
+    expect(screen.getByTitle('Webcast').getAttribute('src')).toBe(
+      'https://www.youtube.com/embed/V4lDQSlvi7Q?autoplay=1',
+    );
+  });
+});
+
+describe('TwitchEmbed', () => {
+  test('waits for a click before loading the player', () => {
+    render(<TwitchEmbed channel="firstinspires" title="Webcast" />);
+
+    expect(screen.queryByTitle('Webcast')).toBeNull();
+  });
+
+  test('plays the channel when clicked', () => {
+    render(<TwitchEmbed channel="firstinspires" title="Webcast" />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Play Webcast' }));
+
+    expect(screen.getByTitle('Webcast').getAttribute('src')).toBe(
+      'https://player.twitch.tv/?channel=firstinspires&parent=localhost',
+    );
   });
 });

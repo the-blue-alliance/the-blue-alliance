@@ -1,9 +1,8 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, renderHook, waitFor } from '@testing-library/react';
-import { type PropsWithChildren, Suspense } from 'react';
+import { render, waitFor } from '@testing-library/react';
 import { describe, expect, test, vi } from 'vitest';
 
 import { RequestResult } from '~/api/tba/read/client';
+import { getStatus } from '~/api/tba/read/sdk.gen';
 import { ApiError } from '~/lib/apiError';
 import {
   STATE_TO_ABBREVIATION,
@@ -33,13 +32,8 @@ import {
   winrateFromRecord,
   zip,
 } from '~/lib/utils';
-
-vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
-  getStatusOptions: () => ({
-    queryKey: ['status'],
-    queryFn: () => Promise.resolve({ max_season: 1995 }),
-  }),
-}));
+import { mockTbaApi } from '~/test/msw';
+import { renderHookWithClient } from '~/test/render';
 
 describe('queryFromAPI', () => {
   test('resolves with the response data on success', async () => {
@@ -154,23 +148,21 @@ describe('hasAnyMatches', () => {
 });
 
 describe('useValidYears', () => {
-  function createWrapper() {
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false } },
-    });
-    return function Wrapper({ children }: PropsWithChildren) {
-      return (
-        <QueryClientProvider client={queryClient}>
-          <Suspense fallback={null}>{children}</Suspense>
-        </QueryClientProvider>
-      );
-    };
-  }
-
   test('lists every season from the latest back to 1992', async () => {
-    const { result } = renderHook(() => useValidYears(), {
-      wrapper: createWrapper(),
-    });
+    mockTbaApi(
+      getStatus,
+      {},
+      {
+        current_season: 1995,
+        max_season: 1995,
+        is_datafeed_down: false,
+        down_events: [],
+        ios: { min_app_version: 1, latest_app_version: 1 },
+        android: { min_app_version: 1, latest_app_version: 1 },
+        max_team_page: 20,
+      },
+    );
+    const { result } = renderHookWithClient(() => useValidYears());
 
     await waitFor(() =>
       expect(result.current).toEqual([1995, 1994, 1993, 1992]),

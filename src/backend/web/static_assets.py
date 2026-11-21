@@ -1,6 +1,7 @@
 import functools
 import hashlib
 import os
+import stat
 from pathlib import Path
 from typing import Optional
 
@@ -39,10 +40,12 @@ def asset_content_hash(asset: str) -> Optional[str]:
     if path is None:
         return None
     try:
-        stat = os.stat(path)
+        st = os.stat(path)
     except OSError:
         return None
-    return _hash_file(path, stat.st_mtime_ns, stat.st_size)
+    if not stat.S_ISREG(st.st_mode):
+        return None
+    return _hash_file(path, st.st_mtime_ns, st.st_size)
 
 
 def static_asset_url(asset: str) -> str:

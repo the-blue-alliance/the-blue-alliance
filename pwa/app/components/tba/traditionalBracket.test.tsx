@@ -1,9 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { type AnchorHTMLAttributes, type ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
-  AllianceColor,
   CompLevel,
   type EliminationAlliance,
   type Event,
@@ -12,31 +10,16 @@ import {
   PlayoffType,
 } from '~/api/tba/read';
 import TraditionalBracket from '~/components/tba/traditionalBracket';
+import {
+  makeEvent as baseEvent,
+  makeMatch as baseMatch,
+  makeAlliance,
+  winningAlliance,
+} from '~/test/factories';
 
-vi.mock('~/components/tba/teamTooltip', () => ({
-  TeamLinkWithTooltip: ({
-    teamKey,
-    year,
-    ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
-    teamKey: string;
-    year: number;
-  }) => (
-    <a href={`/team/${teamKey.substring(3)}/${year}`} {...props}>
-      {teamKey.substring(3)}
-    </a>
-  ),
-}));
+vi.mock('~/components/tba/teamTooltip', () => import('~/test/linkMocks'));
 
-vi.mock('~/components/tba/links', () => ({
-  MatchLink: ({
-    children,
-    matchOrKey,
-  }: {
-    children: ReactNode;
-    matchOrKey: Match;
-  }) => <a href={`/match/${matchOrKey.key}`}>{children}</a>,
-}));
+vi.mock('~/components/tba/links', () => import('~/test/linkMocks'));
 
 /** Alliance n is teams n01, n02, n03 (alliance 1 also carries backup 104). */
 const alliances: EliminationAlliance[] = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({
@@ -54,40 +37,14 @@ function allianceTeams(n: number): string[] {
 }
 
 function makeEvent(overrides: Partial<Event> = {}): Event {
-  return {
+  return baseEvent({
     key: '2022test',
-    name: 'Test Event',
-    event_code: 'test',
-    event_type: EventType.REGIONAL,
-    district: null,
-    city: null,
-    state_prov: null,
-    country: null,
     start_date: '2022-03-01',
     end_date: '2022-03-03',
     year: 2022,
-    short_name: null,
-    event_type_string: 'Regional',
-    week: 0,
-    address: null,
-    postal_code: null,
-    gmaps_place_id: null,
-    gmaps_url: null,
-    lat: null,
-    lng: null,
-    location_name: null,
-    timezone: 'America/New_York',
-    website: null,
-    first_event_id: null,
-    first_event_code: null,
-    webcasts: [],
-    division_keys: [],
-    parent_event_key: null,
     playoff_type: PlayoffType.BRACKET_8_TEAM,
-    playoff_type_string: null,
-    remap_teams: null,
     ...overrides,
-  };
+  });
 }
 
 function makeMatch(
@@ -99,40 +56,18 @@ function makeMatch(
   redScore: number,
   blueScore: number,
 ): Match {
-  const winning_alliance =
-    redScore > blueScore
-      ? AllianceColor.RED
-      : blueScore > redScore
-        ? AllianceColor.BLUE
-        : AllianceColor.NO_ALLIANCE;
-  return {
+  return baseMatch({
     key: `2022test_${compLevel}${compLevel === CompLevel.QM ? '' : `${setNumber}m`}${matchNumber}`,
     comp_level: compLevel,
     set_number: setNumber,
     match_number: matchNumber,
     alliances: {
-      red: {
-        score: redScore,
-        team_keys: red,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: blueScore,
-        team_keys: blue,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
+      red: makeAlliance(redScore, red),
+      blue: makeAlliance(blueScore, blue),
     },
-    winning_alliance,
+    winning_alliance: winningAlliance(redScore, blueScore),
     event_key: '2022test',
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
-  };
+  });
 }
 
 const eightTeamMatches: Match[] = [
@@ -237,6 +172,21 @@ describe('TraditionalBracket', () => {
     expect(qf1.querySelector('a[href="/match/2022test_qf1m2"]')).toBeTruthy();
   });
 
+  test('does not label a series with no teams assigned as alliance 1', () => {
+    const { container } = render(
+      <TraditionalBracket
+        alliances={alliances}
+        matches={[
+          ...eightTeamMatches,
+          makeMatch(CompLevel.F, 1, 1, [], [], -1, -1),
+        ]}
+        event={makeEvent()}
+      />,
+    );
+
+    expect(container.textContent).not.toContain('#1 vs #1');
+  });
+
   test('decides the series by the last match', () => {
     render(
       <TraditionalBracket
@@ -262,6 +212,60 @@ describe('TraditionalBracket', () => {
     const row = rowFor('701');
     expect(row.textContent).toContain('-');
     expect(row.getAttribute('data-winner')).toBe('false');
+  });
+
+  test('labels a series in which a backup robot played', () => {
+    const withBackup = alliances.map((alliance, index) =>
+      index === 7
+        ? { ...alliance, backup: { in: 'frc899', out: 'frc803' } }
+        : alliance,
+    );
+    render(
+      <TraditionalBracket
+        alliances={withBackup}
+        matches={[
+          makeMatch(
+            CompLevel.QF,
+            1,
+            1,
+            allianceTeams(1),
+            ['frc801', 'frc802', 'frc899'],
+            50,
+            40,
+          ),
+        ]}
+        event={makeEvent()}
+      />,
+    );
+
+    expect(cardFor('801').textContent).toContain('#1 vs #8');
+  });
+
+  test('shows the backup robot that played in a series', () => {
+    const withBackup = alliances.map((alliance, index) =>
+      index === 7
+        ? { ...alliance, backup: { in: 'frc899', out: 'frc803' } }
+        : alliance,
+    );
+    render(
+      <TraditionalBracket
+        alliances={withBackup}
+        matches={[
+          makeMatch(
+            CompLevel.QF,
+            1,
+            1,
+            allianceTeams(1),
+            ['frc801', 'frc802', 'frc899'],
+            50,
+            40,
+          ),
+        ]}
+        event={makeEvent()}
+      />,
+    );
+
+    expect(screen.getByRole('link', { name: '899' })).toBeTruthy();
   });
 
   test('hides alliance members who did not play in the series', () => {

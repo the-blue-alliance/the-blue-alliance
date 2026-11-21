@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import {
   ColumnVisibilityMenu,
@@ -136,5 +136,32 @@ describe('ColumnVisibilityMenu', () => {
 
     fireEvent.click(score);
     expect(onVisibilityChange).toHaveBeenCalledWith({ score: true });
+  });
+});
+
+describe('DataTable virtualized', () => {
+  const manyRows: Row[] = Array.from({ length: 500 }, (_, i) => ({
+    team: `frc${i + 1}`,
+    score: i + 1,
+  }));
+
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(41);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test('renders the first row', () => {
+    render(<DataTable columns={columns} data={manyRows} virtualized />);
+
+    expect(screen.getByRole('row', { name: 'frc1 1' })).toBeTruthy();
+  });
+
+  test('omits rows far below the viewport', () => {
+    render(<DataTable columns={columns} data={manyRows} virtualized />);
+
+    expect(screen.queryByRole('row', { name: 'frc500 500' })).toBeNull();
   });
 });

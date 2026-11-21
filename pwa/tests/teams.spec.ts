@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { gotoHydrated } from './helpers';
+
 test.describe('/teams/2', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/teams/2');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/teams/2');
   });
 
   test('labels the selected page by team number range', async ({ page }) => {
@@ -19,8 +20,7 @@ test.describe('/teams/2', () => {
 
 test.describe('/teams', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/teams');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/teams');
   });
 
   test('labels the first page by team number range', async ({ page }) => {

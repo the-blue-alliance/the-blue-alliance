@@ -301,6 +301,33 @@ describe('Network Cache Middleware', () => {
     expect(fresh).toBe('v2');
   });
 
+  it('waits for the origin when an entry is stale past the grace period', async () => {
+    let body = 'v1';
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
+      Promise.resolve(
+        new Response(body, {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'public, max-age=1',
+          },
+        }),
+      ),
+    );
+    vi.stubGlobal('fetch', mockFetch);
+    mockServerEnvironment();
+
+    const cachedFetch = createCachedFetch();
+    const url = 'https://api.example.com/long-stale';
+
+    await cachedFetch(url);
+    body = 'v2';
+    await advanceTime(63_000);
+
+    const response = await (await cachedFetch(url)).text();
+    expect(response).toBe('v2');
+  });
+
   it('should only cache successful responses (2xx)', async () => {
     const mockFetch = vi
       .fn<typeof fetch>()
@@ -583,6 +610,31 @@ describe('Network Cache Middleware', () => {
         revalidatedModified: 0,
         notModifiedRate: 1,
       });
+    });
+
+    it('serves the cached body on a 304 when revalidating past the grace period', async () => {
+      let isNotModified = false;
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(
+            isNotModified
+              ? notModified()
+              : respond('body-v1', { etag: '"v1"' }),
+          ),
+        );
+      vi.stubGlobal('fetch', mockFetch);
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/long-stale-not-modified';
+
+      await cachedFetch(url);
+      await advanceTime(63_000);
+      isNotModified = true;
+
+      const response = await (await cachedFetch(url)).text();
+      expect(response).toBe('body-v1');
     });
 
     it('tracks the not-modified rate across mixed revalidations', async () => {

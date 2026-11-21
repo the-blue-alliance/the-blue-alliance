@@ -41,7 +41,7 @@ interface TeamListSubgridProps
   dq: string[];
   surrogate: string[];
   year: number;
-  focusTeamKey?: string;
+  focusTeamKeys?: string[];
   favoriteTeamKeys?: string[];
   teamCellClassName?: string;
 }
@@ -54,7 +54,7 @@ export default function TeamListSubgrid({
   dq,
   surrogate,
   year,
-  focusTeamKey,
+  focusTeamKeys,
   favoriteTeamKeys,
   teamCellClassName,
   ...props
@@ -68,7 +68,7 @@ export default function TeamListSubgrid({
           year={year}
           dq={dq.includes(teamKey)}
           surrogate={surrogate.includes(teamKey)}
-          focus={focusTeamKey === teamKey}
+          focus={focusTeamKeys?.includes(teamKey) ?? false}
           favorite={favoriteTeamKeys?.includes(teamKey) ?? false}
           className={cn(
             teamListSubgridVariants({
@@ -100,6 +100,13 @@ const teamCellVariants = cva(
         false: '',
       },
     },
+    compoundVariants: [
+      {
+        dq: true,
+        focus: true,
+        className: '[text-decoration-line:underline_line-through]!',
+      },
+    ],
     defaultVariants: {
       dq: false,
       surrogate: false,

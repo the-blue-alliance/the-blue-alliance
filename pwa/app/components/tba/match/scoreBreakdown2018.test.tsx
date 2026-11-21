@@ -1,61 +1,23 @@
 import { render, screen, within } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import {
-  AllianceColor,
   AutoRobot2018,
-  CompLevel,
   EndgameRobot2018,
-  Match,
   MatchScoreBreakdown2018,
   MatchScoreBreakdown2018Alliance,
 } from '~/api/tba/read';
 import ScoreBreakdown2018 from '~/components/tba/match/scoreBreakdown2018';
+import { makeMatch, makeAlliance as makeMatchAlliance } from '~/test/factories';
 
-vi.mock('~icons/mdi/check', () => ({
-  default: () => <img alt="Achieved" />,
-}));
-
-vi.mock('~icons/mdi/close', () => ({
-  default: () => <img alt="Not achieved" />,
-}));
-
-vi.mock('~icons/mdi/arrow-left', () => ({
-  default: () => <img alt="Red leads" />,
-}));
-
-vi.mock('~icons/mdi/arrow-right', () => ({
-  default: () => <img alt="Blue leads" />,
-}));
-
-const match: Match = {
+const match = makeMatch({
   key: '2018nytr_qm1',
-  comp_level: CompLevel.QM,
-  set_number: 1,
-  match_number: 1,
   alliances: {
-    red: {
-      score: 420,
-      team_keys: ['frc254', 'frc1678', 'frc971'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
-    blue: {
-      score: 300,
-      team_keys: ['frc148', 'frc2056', 'frc118'],
-      surrogate_team_keys: [],
-      dq_team_keys: [],
-    },
+    red: makeMatchAlliance(420, ['frc254', 'frc1678', 'frc971']),
+    blue: makeMatchAlliance(300, ['frc148', 'frc2056', 'frc118']),
   },
-  winning_alliance: AllianceColor.RED,
   event_key: '2018nytr',
-  time: null,
-  actual_time: null,
-  predicted_time: null,
-  post_result_time: null,
-  score_breakdown: null,
-  videos: [],
-};
+});
 
 function makeAlliance(
   overrides: Partial<MatchScoreBreakdown2018Alliance> = {},

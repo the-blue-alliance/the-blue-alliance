@@ -17,17 +17,10 @@ import {
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
 import { Badge } from '~/components/ui/badge';
+import { getRobotPoints } from '~/lib/robotScoring';
 
 // HAB Climb Bonus per robot. 2019 Game Manual, Section 5.3 Scoring,
 // Table 5-1 (page 38, Section 5 V8): Level 1 = 3, Level 2 = 6, Level 3 = 12.
-const ENDGAME_2019_POINTS: Record<string, number> = {
-  HabLevel3: 12,
-  HabLevel2: 6,
-  HabLevel1: 3,
-  None: 0,
-  Unknown: 0,
-};
-
 function countPanels(...bays: Bay2019[]): number {
   return bays.filter(
     (b) => b === Bay2019.PANEL || b === Bay2019.PANEL_AND_CARGO,
@@ -276,6 +269,7 @@ export default function ScoreBreakdown2019({
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.red.endgameRobot1}
+            points={getRobotPoints(2019, scoreBreakdown.red, 1, 'endgame')}
             teamKey={match.alliances.red.team_keys[0]}
           />
         </ScoreBreakdownAllianceCell>
@@ -285,6 +279,7 @@ export default function ScoreBreakdown2019({
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.blue.endgameRobot1}
+            points={getRobotPoints(2019, scoreBreakdown.blue, 1, 'endgame')}
             teamKey={match.alliances.blue.team_keys[0]}
           />
         </ScoreBreakdownAllianceCell>
@@ -295,6 +290,7 @@ export default function ScoreBreakdown2019({
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.red.endgameRobot2}
+            points={getRobotPoints(2019, scoreBreakdown.red, 2, 'endgame')}
             teamKey={match.alliances.red.team_keys[1]}
           />
         </ScoreBreakdownAllianceCell>
@@ -304,6 +300,7 @@ export default function ScoreBreakdown2019({
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.blue.endgameRobot2}
+            points={getRobotPoints(2019, scoreBreakdown.blue, 2, 'endgame')}
             teamKey={match.alliances.blue.team_keys[1]}
           />
         </ScoreBreakdownAllianceCell>
@@ -314,6 +311,7 @@ export default function ScoreBreakdown2019({
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.red.endgameRobot3}
+            points={getRobotPoints(2019, scoreBreakdown.red, 3, 'endgame')}
             teamKey={match.alliances.red.team_keys[2]}
           />
         </ScoreBreakdownAllianceCell>
@@ -323,6 +321,7 @@ export default function ScoreBreakdown2019({
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.blue.endgameRobot3}
+            points={getRobotPoints(2019, scoreBreakdown.blue, 3, 'endgame')}
             teamKey={match.alliances.blue.team_keys[2]}
           />
         </ScoreBreakdownAllianceCell>
@@ -477,12 +476,13 @@ export default function ScoreBreakdown2019({
 
 function EndgameRobotCell({
   endgame,
+  points,
   teamKey,
 }: {
   endgame: MatchScoreBreakdown2019['red']['endgameRobot1'];
+  points: number;
   teamKey: string;
 }) {
-  const points = ENDGAME_2019_POINTS[endgame] ?? 0;
   const displayMap: Record<string, string> = {
     HabLevel3: 'HAB 3',
     HabLevel2: 'HAB 2',

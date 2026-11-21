@@ -181,11 +181,11 @@ export function ScoreBreakdownLabelCell({
     >
       <div className="flex items-center justify-between">
         <div className="flex w-6 items-center justify-center">
-          {redWon && <MdiArrowLeft />}
+          {redWon && <MdiArrowLeft role="img" aria-label="Red leads" />}
         </div>
         <div className="w-[80%] text-center">{children}</div>
         <div className="flex w-6 items-center justify-center">
-          {blueWon && <MdiArrowRight />}
+          {blueWon && <MdiArrowRight role="img" aria-label="Blue leads" />}
         </div>
       </div>
     </TableCell>

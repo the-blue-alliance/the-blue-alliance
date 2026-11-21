@@ -10,7 +10,7 @@ import {
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
 import { Badge } from '~/components/ui/badge';
-import { ENDGAME_2018_POINTS } from '~/lib/pointValues';
+import { getRobotPoints } from '~/lib/robotScoring';
 
 export default function ScoreBreakdown2018({
   scoreBreakdown,
@@ -300,8 +300,7 @@ export default function ScoreBreakdown2018({
           </Badge>
           <span>
             {scoreBreakdown.red.endgameRobot1} (+
-            {ENDGAME_2018_POINTS[scoreBreakdown.red.endgameRobot1 ?? 'Unknown']}
-            )
+            {getRobotPoints(2018, scoreBreakdown.red, 1, 'endgame')})
           </span>
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
@@ -318,12 +317,7 @@ export default function ScoreBreakdown2018({
           </Badge>
           <span>
             {scoreBreakdown.blue.endgameRobot1} (+
-            {
-              ENDGAME_2018_POINTS[
-                scoreBreakdown.blue.endgameRobot1 ?? 'Unknown'
-              ]
-            }
-            )
+            {getRobotPoints(2018, scoreBreakdown.blue, 1, 'endgame')})
           </span>
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
@@ -340,8 +334,7 @@ export default function ScoreBreakdown2018({
           </Badge>
           <span>
             {scoreBreakdown.red.endgameRobot2} (+
-            {ENDGAME_2018_POINTS[scoreBreakdown.red.endgameRobot2 ?? 'Unknown']}
-            )
+            {getRobotPoints(2018, scoreBreakdown.red, 2, 'endgame')})
           </span>
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
@@ -358,12 +351,7 @@ export default function ScoreBreakdown2018({
           </Badge>
           <span>
             {scoreBreakdown.blue.endgameRobot2} (+
-            {
-              ENDGAME_2018_POINTS[
-                scoreBreakdown.blue.endgameRobot2 ?? 'Unknown'
-              ]
-            }
-            )
+            {getRobotPoints(2018, scoreBreakdown.blue, 2, 'endgame')})
           </span>
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
@@ -380,8 +368,7 @@ export default function ScoreBreakdown2018({
           </Badge>
           <span>
             {scoreBreakdown.red.endgameRobot3} (+
-            {ENDGAME_2018_POINTS[scoreBreakdown.red.endgameRobot3 ?? 'Unknown']}
-            )
+            {getRobotPoints(2018, scoreBreakdown.red, 3, 'endgame')})
           </span>
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
@@ -398,12 +385,7 @@ export default function ScoreBreakdown2018({
           </Badge>
           <span>
             {scoreBreakdown.blue.endgameRobot3} (+
-            {
-              ENDGAME_2018_POINTS[
-                scoreBreakdown.blue.endgameRobot3 ?? 'Unknown'
-              ]
-            }
-            )
+            {getRobotPoints(2018, scoreBreakdown.blue, 3, 'endgame')})
           </span>
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>

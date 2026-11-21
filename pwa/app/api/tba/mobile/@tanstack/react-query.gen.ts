@@ -4,34 +4,76 @@ import type { DefaultError, UseMutationOptions } from '@tanstack/react-query';
 import {
   type Options,
   addApiReadKey,
+  addWebhook,
   deleteApiReadKey,
+  deleteWebhook,
   listApiKeys,
   listFavorites,
+  listMobileClients,
   listSubscriptions,
+  listWebhooks,
+  pingMobileClient,
+  registerMobileClient,
+  requestApiWriteKey,
+  resolveVideoPlaylist,
+  sendWebhookTest,
+  sendWebhookVerification,
   setModelPreferences,
+  suggestEventMatchVideos,
   suggestEventMedia,
+  suggestMatchVideo,
   suggestTeamMedia,
   suggestTeamSocialMedia,
+  unregisterMobileClient,
+  verifyWebhook,
 } from '../sdk.gen';
 import type {
   AddApiReadKeyData,
   AddApiReadKeyResponse2,
+  AddWebhookData,
+  AddWebhookResponse2,
   DeleteApiReadKeyData,
   DeleteApiReadKeyResponse,
+  DeleteWebhookData,
+  DeleteWebhookResponse,
   ListApiKeysData,
   ListApiKeysResponse,
   ListFavoritesData,
   ListFavoritesResponse,
+  ListMobileClientsData,
+  ListMobileClientsResponse,
   ListSubscriptionsData,
   ListSubscriptionsResponse,
+  ListWebhooksData,
+  ListWebhooksResponse2,
+  PingMobileClientData,
+  PingMobileClientResponse,
+  RegisterMobileClientData,
+  RegisterMobileClientResponse,
+  RequestApiWriteKeyData,
+  RequestApiWriteKeyResponse,
+  ResolveVideoPlaylistData,
+  ResolveVideoPlaylistResponse,
+  SendWebhookTestData,
+  SendWebhookTestResponse,
+  SendWebhookVerificationData,
+  SendWebhookVerificationResponse,
   SetModelPreferencesData,
   SetModelPreferencesResponse,
+  SuggestEventMatchVideosData,
+  SuggestEventMatchVideosResponse,
   SuggestEventMediaData,
   SuggestEventMediaResponse,
+  SuggestMatchVideoData,
+  SuggestMatchVideoResponse,
   SuggestTeamMediaData,
   SuggestTeamMediaResponse,
   SuggestTeamSocialMediaData,
   SuggestTeamSocialMediaResponse,
+  UnregisterMobileClientData,
+  UnregisterMobileClientResponse,
+  VerifyWebhookData,
+  VerifyWebhookResponse,
 } from '../types.gen';
 
 /**
@@ -63,6 +105,8 @@ export const listFavoritesMutation = (
 
 /**
  * Set model preferences
+ *
+ * Sets whether the model is a favorite and which notifications it sends. `code` is 401 when not signed in and 400 for an unknown notification type, and nothing is changed. Otherwise `code` is 0 and `message` is a JSON-encoded object with `favorite` and `subscription`, each a `BaseResponse` whose `code` is 200 when changed, 304 when already set, or 404 when there was nothing to remove.
  */
 export const setModelPreferencesMutation = (
   options?: Partial<Options<SetModelPreferencesData>>,
@@ -117,6 +161,8 @@ export const suggestEventMediaMutation = (
 
 /**
  * Suggest team media
+ *
+ * `code` is 200 when the suggestion is added, 304 if it already exists, 400 for a bad `reference_type`, year or URL, and 401 when not signed in.
  */
 export const suggestTeamMediaMutation = (
   options?: Partial<Options<SuggestTeamMediaData>>,
@@ -159,6 +205,87 @@ export const suggestTeamSocialMediaMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await suggestTeamSocialMedia({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Suggest a YouTube video for a match
+ */
+export const suggestMatchVideoMutation = (
+  options?: Partial<Options<SuggestMatchVideoData>>,
+): UseMutationOptions<
+  SuggestMatchVideoResponse,
+  DefaultError,
+  Options<SuggestMatchVideoData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SuggestMatchVideoResponse,
+    DefaultError,
+    Options<SuggestMatchVideoData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await suggestMatchVideo({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * List the videos in a YouTube playlist, with a guessed match for each
+ */
+export const resolveVideoPlaylistMutation = (
+  options?: Partial<Options<ResolveVideoPlaylistData>>,
+): UseMutationOptions<
+  ResolveVideoPlaylistResponse,
+  DefaultError,
+  Options<ResolveVideoPlaylistData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ResolveVideoPlaylistResponse,
+    DefaultError,
+    Options<ResolveVideoPlaylistData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await resolveVideoPlaylist({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Suggest YouTube videos for several matches at an event
+ */
+export const suggestEventMatchVideosMutation = (
+  options?: Partial<Options<SuggestEventMatchVideosData>>,
+): UseMutationOptions<
+  SuggestEventMatchVideosResponse,
+  DefaultError,
+  Options<SuggestEventMatchVideosData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SuggestEventMatchVideosResponse,
+    DefaultError,
+    Options<SuggestEventMatchVideosData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await suggestEventMatchVideos({
         ...options,
         ...fnOptions,
         throwOnError: true,
@@ -267,6 +394,321 @@ export const deleteApiReadKeyMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await deleteApiReadKey({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Request write API keys for an event
+ */
+export const requestApiWriteKeyMutation = (
+  options?: Partial<Options<RequestApiWriteKeyData>>,
+): UseMutationOptions<
+  RequestApiWriteKeyResponse,
+  DefaultError,
+  Options<RequestApiWriteKeyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RequestApiWriteKeyResponse,
+    DefaultError,
+    Options<RequestApiWriteKeyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await requestApiWriteKey({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Register a device for notifications
+ *
+ * Registers the device for the signed-in account, or updates it if this account already has `mobile_id`. `code` is 200 for a new device, 304 for an existing one, 400 for an unknown `mobile_id_type` or a `fid` from a platform other than `ios` or `android-fcm`, and 401 when not signed in. Registering a FID also deletes this account's FCM registration token for the same installation (`<fid>:...`), so the device isn't notified twice.
+ */
+export const registerMobileClientMutation = (
+  options?: Partial<Options<RegisterMobileClientData>>,
+): UseMutationOptions<
+  RegisterMobileClientResponse,
+  DefaultError,
+  Options<RegisterMobileClientData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    RegisterMobileClientResponse,
+    DefaultError,
+    Options<RegisterMobileClientData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await registerMobileClient({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Unregister a device
+ *
+ * Deletes the signed-in account's device with `mobile_id`. With `mobile_id_type: fid`, also deletes this account's FCM registration token for the same installation (`<fid>:...`), which is all TBA has for a device whose FID registration hasn't reached it yet. `code` is 200 when anything was deleted, 404 if nothing matched, 400 for an unknown `mobile_id_type`, and 401 when not signed in.
+ */
+export const unregisterMobileClientMutation = (
+  options?: Partial<Options<UnregisterMobileClientData>>,
+): UseMutationOptions<
+  UnregisterMobileClientResponse,
+  DefaultError,
+  Options<UnregisterMobileClientData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    UnregisterMobileClientResponse,
+    DefaultError,
+    Options<UnregisterMobileClientData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await unregisterMobileClient({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * List registered devices
+ */
+export const listMobileClientsMutation = (
+  options?: Partial<Options<ListMobileClientsData>>,
+): UseMutationOptions<
+  ListMobileClientsResponse,
+  DefaultError,
+  Options<ListMobileClientsData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ListMobileClientsResponse,
+    DefaultError,
+    Options<ListMobileClientsData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await listMobileClients({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Send a test notification to a device
+ *
+ * `code` is 200 when sent, 404 if the account has no such device, 500 if the send failed, and 401 when not signed in.
+ */
+export const pingMobileClientMutation = (
+  options?: Partial<Options<PingMobileClientData>>,
+): UseMutationOptions<
+  PingMobileClientResponse,
+  DefaultError,
+  Options<PingMobileClientData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    PingMobileClientResponse,
+    DefaultError,
+    Options<PingMobileClientData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await pingMobileClient({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * List the signed-in account's webhooks
+ *
+ * `code` is 401 when not signed in.
+ */
+export const listWebhooksMutation = (
+  options?: Partial<Options<ListWebhooksData>>,
+): UseMutationOptions<
+  ListWebhooksResponse2,
+  DefaultError,
+  Options<ListWebhooksData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ListWebhooksResponse2,
+    DefaultError,
+    Options<ListWebhooksData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await listWebhooks({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Add a webhook
+ *
+ * Creates a webhook with a new secret and sends a verification code to its URL. If the account already has a webhook with this URL, gives it a new secret and code and marks it unverified. `code` is 400 when the name or URL is blank and 401 when not signed in.
+ */
+export const addWebhookMutation = (
+  options?: Partial<Options<AddWebhookData>>,
+): UseMutationOptions<
+  AddWebhookResponse2,
+  DefaultError,
+  Options<AddWebhookData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddWebhookResponse2,
+    DefaultError,
+    Options<AddWebhookData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addWebhook({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Verify a webhook
+ *
+ * Marks the webhook verified when `code` matches the most recently sent verification code. `code` in the response is 400 for a wrong code, 404 for an unknown webhook and 401 when not signed in.
+ */
+export const verifyWebhookMutation = (
+  options?: Partial<Options<VerifyWebhookData>>,
+): UseMutationOptions<
+  VerifyWebhookResponse,
+  DefaultError,
+  Options<VerifyWebhookData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    VerifyWebhookResponse,
+    DefaultError,
+    Options<VerifyWebhookData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await verifyWebhook({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Send a new verification code to a webhook
+ *
+ * Replaces the verification code and marks the webhook unverified. `code` is 404 for an unknown webhook and 401 when not signed in.
+ */
+export const sendWebhookVerificationMutation = (
+  options?: Partial<Options<SendWebhookVerificationData>>,
+): UseMutationOptions<
+  SendWebhookVerificationResponse,
+  DefaultError,
+  Options<SendWebhookVerificationData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SendWebhookVerificationResponse,
+    DefaultError,
+    Options<SendWebhookVerificationData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await sendWebhookVerification({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete a webhook
+ *
+ * `code` is 404 for an unknown webhook and 401 when not signed in.
+ */
+export const deleteWebhookMutation = (
+  options?: Partial<Options<DeleteWebhookData>>,
+): UseMutationOptions<
+  DeleteWebhookResponse,
+  DefaultError,
+  Options<DeleteWebhookData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteWebhookResponse,
+    DefaultError,
+    Options<DeleteWebhookData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteWebhook({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Send a test notification to a webhook
+ *
+ * Sends one sample notification of the given type to a verified webhook. `code` is 400 for an unknown type, an unverified webhook or keys the type can't use, 404 for an unknown webhook and 401 when not signed in.
+ */
+export const sendWebhookTestMutation = (
+  options?: Partial<Options<SendWebhookTestData>>,
+): UseMutationOptions<
+  SendWebhookTestResponse,
+  DefaultError,
+  Options<SendWebhookTestData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SendWebhookTestResponse,
+    DefaultError,
+    Options<SendWebhookTestData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await sendWebhookTest({
         ...options,
         ...fnOptions,
         throwOnError: true,

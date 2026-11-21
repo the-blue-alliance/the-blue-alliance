@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from flask import (
@@ -11,6 +12,7 @@ from flask import (
     session,
     url_for,
 )
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
@@ -21,9 +23,7 @@ from backend.common.auth import (
     revoke_session_cookie,
     SESSION_COOKIE_LIFETIME,
 )
-from backend.common.consts.auth_type import (
-    WRITE_TYPE_NAMES as AUTH_TYPE_WRITE_TYPE_NAMES,
-)
+from backend.common.consts.auth_type import AuthType
 from backend.common.consts.model_type import ModelType
 from backend.common.consts.notification_type import (
     ENABLED_EVENT_NOTIFICATIONS,
@@ -49,6 +49,20 @@ from backend.web.redirect import is_safe_url, safe_next_redirect
 
 blueprint = Blueprint("account", __name__, url_prefix="/account")
 
+# Labels for write key permissions on the account page only. Every key already
+# belongs to an event, so these drop the "event" prefix that WRITE_TYPE_NAMES
+# (shared with the APIs and notifications) carries.
+ACCOUNT_WRITE_TYPE_LABELS: dict[AuthType, str] = {
+    AuthType.EVENT_INFO: "Event details",
+    AuthType.EVENT_TEAMS: "Teams",
+    AuthType.EVENT_MATCHES: "Matches",
+    AuthType.EVENT_RANKINGS: "Rankings",
+    AuthType.EVENT_ALLIANCES: "Alliances",
+    AuthType.EVENT_AWARDS: "Awards",
+    AuthType.MATCH_VIDEO: "Match videos",
+    AuthType.ZEBRA_MOTIONWORKS: "Zebra MotionWorks",
+}
+
 
 def _api_write_key_sort_key(api_key: ApiAuthAccess) -> tuple[bool, str, str]:
     event_keys = sorted(str(event_key.id()) for event_key in api_key.event_list)
@@ -69,6 +83,18 @@ def _sorted_api_write_keys(
         key=_api_write_key_sort_key,
         reverse=descending,
     ) + sorted(keys_without_events, key=_api_write_key_sort_key)
+
+
+def _event_names(api_write_keys: list[ApiAuthAccess]) -> dict[str, str]:
+    event_keys = {
+        str(event_key.id()) for key in api_write_keys for event_key in key.event_list
+    }
+    events = ndb.get_multi([ndb.Key(Event, event_key) for event_key in event_keys])
+    return {
+        event.key_name: f"{event.year} {event.short_name or event.name}"
+        for event in events
+        if event and (event.short_name or event.name)
+    }
 
 
 @blueprint.route("")
@@ -94,11 +120,13 @@ def overview() -> str:
         ),
         "ping_sent": session.pop("ping_sent", None),
         "ping_enabled": NotificationsEnable.notifications_enabled(),
-        "auth_write_type_names": AUTH_TYPE_WRITE_TYPE_NAMES,
+        "auth_write_type_labels": ACCOUNT_WRITE_TYPE_LABELS,
         "api_write_keys": _sorted_api_write_keys(
             user.api_write_keys,
             descending=api_write_keys_sort_direction == "desc",
         ),
+        "api_write_key_event_names": _event_names(user.api_write_keys),
+        "now": datetime.datetime.now(),
         "api_write_keys_sort_direction": api_write_keys_sort_direction,
         "api_write_keys_sort_explicit": api_write_keys_sort_explicit,
         "api_write_keys_next_sort": api_write_keys_next_sort,

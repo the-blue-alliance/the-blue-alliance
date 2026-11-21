@@ -8,9 +8,7 @@ import {
 import { describe, expect, test } from 'vitest';
 
 import {
-  AllianceColor,
   AutoLineRobot2024,
-  CompLevel,
   type Match,
   type MatchScoreBreakdown2023,
   type MatchScoreBreakdown2024,
@@ -18,36 +16,17 @@ import {
 } from '~/api/tba/read';
 import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
 import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
+import { makeMatch as baseMatch, makeAlliance } from '~/test/factories';
 
 function makeMatch(year: number): Match {
-  return {
+  return baseMatch({
     key: `${year}test_qm1`,
-    comp_level: CompLevel.QM,
-    set_number: 1,
-    match_number: 1,
     alliances: {
-      red: {
-        score: 0,
-        team_keys: ['frc254', 'frc1114', 'frc2056'],
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: 0,
-        team_keys: ['frc148', 'frc217', 'frc33'],
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
+      red: makeAlliance(0, ['frc254', 'frc1114', 'frc2056']),
+      blue: makeAlliance(0, ['frc148', 'frc217', 'frc33']),
     },
-    winning_alliance: AllianceColor.RED,
     event_key: `${year}test`,
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
-  };
+  });
 }
 
 async function hoverFirstCheckmark(row: HTMLElement): Promise<HTMLElement> {

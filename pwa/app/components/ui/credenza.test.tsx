@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { createEvent, fireEvent, render, screen } from '@testing-library/react';
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 
 import {
@@ -148,6 +148,12 @@ describe('Credenza on mobile', () => {
     expect(close.className).toContain('group/close');
 
     fireEvent.click(close);
+    fireEvent(
+      dialog,
+      Object.assign(createEvent.animationEnd(dialog), {
+        animationName: 'slideToBottom',
+      }),
+    );
     await vi.waitFor(() => {
       expect(screen.queryByRole('dialog')).toBeNull();
     });

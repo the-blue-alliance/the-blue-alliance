@@ -1,7 +1,8 @@
 from datetime import datetime, timezone
-from typing import Callable, Dict, Mapping, Optional
+from typing import Callable, Dict, List, Mapping, Optional
 
 from backend.common.helpers.pwa_url_helper import PwaUrlHelper
+from backend.common.sitevars.platinum_sponsors import PlatinumSponsors, Sponsor
 from backend.web.static_assets import static_asset_url
 
 
@@ -23,6 +24,14 @@ def pwa_url_context_processor() -> Dict[str, str]:
         pwa_base_url=PwaUrlHelper.base_url(),
         pwa_suggestion_review_url=PwaUrlHelper.suggestion_review_url(),
     )
+
+
+def platinum_sponsors_context_processor() -> Dict[str, Callable[[], List[Sponsor]]]:
+    """
+    Sponsors credited in the base.html footer. Passed as a callable so the
+    sitevar is only read by templates that render the footer.
+    """
+    return dict(platinum_sponsors=lambda: PlatinumSponsors.sponsors())
 
 
 def static_asset_url_context_processor() -> Mapping[str, Callable[[str], str]]:

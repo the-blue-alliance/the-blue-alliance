@@ -114,7 +114,7 @@ $ make lint-bash ARGS='--fix'
 
 # Python Version Consistency
 
-The project maintains consistent Python versions across all configuration files (`pyproject.toml`, GAE service yamls). Use the provided script to check or update versions:
+The project maintains consistent Python versions across all configuration files (`pyproject.toml`, GAE service yamls, GitHub Actions workflows, the dev container Dockerfile, and `dev_appserver.sh`). Use the provided script to check or update versions:
 
 ```bash
 # Check Python version consistency

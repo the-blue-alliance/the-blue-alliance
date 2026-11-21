@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { useMemo } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
@@ -7,7 +8,7 @@ import { Event } from '~/api/tba/read';
 import { getEventsByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { EventLink, EventLocationLink } from '~/components/tba/links';
 import { WebcastIcon } from '~/components/tba/socialBadges';
-import { Badge } from '~/components/ui/badge';
+import { badgeVariants } from '~/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -16,6 +17,7 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { getEventDateString, getEventWeekString } from '~/lib/eventUtils';
+import { useIsHydrated } from '~/lib/hooks';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/webcasts')({
@@ -24,7 +26,12 @@ export const Route = createFileRoute('/webcasts')({
       getEventsByYearOptions({ path: { year: currentSeason } }),
     );
 
-    return { year: currentSeason };
+    // Rendered with the loader's date first so the server and the hydrating
+    // client agree, then re-sorted by the viewer's own date
+    return {
+      year: currentSeason,
+      today: Temporal.Now.plainDateISO().toString(),
+    };
   },
   headers: publicCacheControlHeaders(),
   head: () => ({
@@ -63,7 +70,7 @@ function groupEventsByWeek(events: Event[]): EventGroup[] {
 }
 
 function WebcastsPage() {
-  const { year } = Route.useLoaderData();
+  const { year, today: loaderToday } = Route.useLoaderData();
   const { data: allEvents } = useSuspenseQuery({
     ...getEventsByYearOptions({ path: { year } }),
   });
@@ -73,7 +80,14 @@ function WebcastsPage() {
     [allEvents],
   );
 
-  const today = useMemo(() => Temporal.Now.plainDateISO(), []);
+  const hydrated = useIsHydrated();
+  const today = useMemo(
+    () =>
+      hydrated
+        ? Temporal.Now.plainDateISO()
+        : Temporal.PlainDate.from(loaderToday),
+    [hydrated, loaderToday],
+  );
 
   const currentEvents = useMemo(
     () =>
@@ -116,7 +130,7 @@ function WebcastsPage() {
   const pastGroups = groupEventsByWeek(pastEvents).reverse();
 
   return (
-    <div className="py-8">
+    <div>
       <h1 className="mb-4 text-3xl font-medium">
         {year} Webcasts{' '}
         <small className="text-xl text-muted-foreground">
@@ -200,10 +214,14 @@ function EventWebcastCard({ event }: { event: Event }) {
         </CardTitle>
         <CardDescription>
           <EventLocationLink event={event} hideUSA hideVenue />
-          {event.week !== null && (
-            <Badge variant="secondary" className="ml-2">
-              Week {event.week + 1}
-            </Badge>
+          {getEventWeekString(event) && (
+            // A span: Badge renders a div, which can't sit inside the
+            // description's <p> without the parser splitting it on hydration
+            <span
+              className={cn(badgeVariants({ variant: 'secondary' }), 'ml-2')}
+            >
+              {getEventWeekString(event)}
+            </span>
           )}
         </CardDescription>
       </CardHeader>

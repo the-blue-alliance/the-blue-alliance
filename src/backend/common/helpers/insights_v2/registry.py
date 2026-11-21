@@ -123,7 +123,7 @@ def _build_team_district_map() -> Dict[str, str]:
             team_district_teams[str(dt.team.id())].append(dt)
 
     return {
-        team_key: RenamedDistricts.get_latest_code(
+        team_key: RenamedDistricts.get_canonical_code(
             str(max(dts, key=lambda dt: dt.year).district_key.id())[4:]
         )
         for team_key, dts in team_district_teams.items()

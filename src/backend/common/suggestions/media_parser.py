@@ -1,7 +1,7 @@
 import json
 import logging
 import re
-from typing import Any, Dict, Generator, List, Optional, Set, Tuple
+from typing import Any, Dict, Generator, List, Optional, Pattern, Set, Tuple, Union
 from urllib.parse import urlencode, urlparse
 
 from google.appengine.ext import ndb
@@ -30,6 +30,13 @@ class MediaParser:
 
     OEMBED_PROVIDERS: Set[MediaType] = set()
 
+    # Posts, reels and IGTV share one shortcode namespace, and /p/<shortcode>/ serves
+    # all of them, so they're all stored as INSTAGRAM_IMAGE. Share links may also put
+    # the username before the path, e.g. instagram.com/<user>/reel/<shortcode>/
+    INSTAGRAM_POST_PATTERN: Pattern[str] = re.compile(
+        r"instagram\.com/(?:[^/?#]+/)?(?:p|reels?|tv)/([^/?#]+)"
+    )
+
     # Dict that maps media types -> list of tuple of regex pattern and group # of foreign key
     FOREIGN_KEY_PATTERNS: Dict[MediaType, List[Tuple[str, int]]] = {
         MediaType.FACEBOOK_PROFILE: [(r".*facebook.com\/(.*)(\/(.*))?", 1)],
@@ -49,18 +56,19 @@ class MediaParser:
             (r".*imgur.com\/(\w+)\/?\Z", 1),
             (r".*imgur.com\/(\w+)\.\w+\Z", 1),
         ],
-        MediaType.INSTAGRAM_PROFILE: [(r".*instagram.com\/(.*)(\/(.*))?", 1)],
+        MediaType.INSTAGRAM_PROFILE: [(r".*instagram.com\/([^\/?#]+)", 1)],
         MediaType.PERISCOPE_PROFILE: [(r".*periscope.tv\/(.*)(\/(.*))?", 1)],
         MediaType.GRABCAD: [(r".*grabcad.com\/library\/(.*)", 1)],
         MediaType.ONSHAPE: [(r".*cad.onshape.com\/documents\/(.*)\/e\/", 1)],
-        MediaType.INSTAGRAM_IMAGE: [(r".*instagram.com/p/([^\/]*)(\/(.*))?", 1)],
+        MediaType.INSTAGRAM_IMAGE: [(r".*" + INSTAGRAM_POST_PATTERN.pattern, 1)],
         MediaType.GITLAB_PROFILE: [(r".*gitlab.com\/(.*)(\/(.*))?", 1)],
         MediaType.CD_THREAD: [(r".*chiefdelphi\.com\/t\/(?:[^/]+\/)?(\d+)", 1)],
     }
 
     # Media URL patterns that map a URL -> Profile type (used to determine which type represents a given url)
-    # This is a list because the order matters
-    URL_PATTERNS: List[Tuple[str, MediaType]] = [
+    # This is a list because the order matters. Strings match as substrings, compiled
+    # patterns with re.search
+    URL_PATTERNS: List[Tuple[Union[str, Pattern[str]], MediaType]] = [
         ("facebook.com/", MediaType.FACEBOOK_PROFILE),
         ("twitter.com/", MediaType.TWITTER_PROFILE),
         ("youtube.com/user", MediaType.YOUTUBE_CHANNEL),
@@ -75,7 +83,7 @@ class MediaParser:
         ("imgur.com/", MediaType.IMGUR),
         ("grabcad.com/library/", MediaType.GRABCAD),
         ("cad.onshape.com/documents/", MediaType.ONSHAPE),
-        ("instagram.com/p/", MediaType.INSTAGRAM_IMAGE),
+        (INSTAGRAM_POST_PATTERN, MediaType.INSTAGRAM_IMAGE),
         # The API resolves photo vs album, so the type here is only a routing hint
         ("smugmug.com/", MediaType.SMUGMUG_PHOTO),
         # Keep these last, so they don't greedy match over other more specific urls
@@ -110,8 +118,12 @@ class MediaParser:
         """
         url = url.strip()
         # Now, we can test for regular media type
-        for s, media_type in cls.URL_PATTERNS:
-            if s in url:
+        for pattern, media_type in cls.URL_PATTERNS:
+            if (
+                pattern in url
+                if isinstance(pattern, str)
+                else pattern.search(url) is not None
+            ):
                 if media_type == MediaType.CD_PHOTO_THREAD:
                     # CD images are special - they need to do an additional urlfetch because the given url
                     # doesn't contain the foreign key

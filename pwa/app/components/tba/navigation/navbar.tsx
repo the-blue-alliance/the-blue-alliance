@@ -72,14 +72,13 @@ export function Navbar() {
                 className="text-xl font-medium tracking-tight whitespace-nowrap
                   text-white"
               >
-                <span className="sm:hidden md:block">The Blue Alliance</span>
-                <span className="hidden sm:block md:hidden">TBA</span>
+                The Blue Alliance
               </div>
             </Link>
             {/* Desktop Menu Items */}
             <ul
               className="flex list-none flex-row items-center gap-1 px-6
-                max-sm:hidden"
+                max-[60rem]:hidden"
             >
               {NAV_ITEMS_LIST.map(({ title, to, params, icon: Icon }) => (
                 <NavigationMenuItem key={title}>
@@ -107,7 +106,7 @@ export function Navbar() {
                 href={`https://www.thebluealliance.com${pathname}`}
                 className="rounded-md px-2.5 py-2 text-xs font-medium
                   whitespace-nowrap text-white hover:bg-black/20
-                  hover:no-underline max-sm:hidden"
+                  hover:no-underline max-lg:hidden"
               >
                 Leave beta
               </a>

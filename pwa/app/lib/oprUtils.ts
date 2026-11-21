@@ -1,6 +1,6 @@
 import type { ColumnVisibilityState } from '@tanstack/react-table';
 
-import type { EventCoprs } from '~/api/tba/read';
+import type { EventCoprs, EventOprs } from '~/api/tba/read';
 
 export function getDefaultTeleopComponentName(year: number): string {
   if (year == 2015) {
@@ -43,6 +43,10 @@ export function getDefaultCoprYAxisComponentName(
   return autoComponentName in coprs
     ? autoComponentName
     : getDefaultTotalComponentName(year);
+}
+
+export function eventOprsToComponents(oprs: EventOprs): EventCoprs {
+  return { opr: oprs.oprs ?? {} };
 }
 
 export interface CoprRow {

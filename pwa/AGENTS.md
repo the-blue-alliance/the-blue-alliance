@@ -7,7 +7,7 @@ Progressive Web App for The Blue Alliance, a data archive site for the FIRST Rob
 ## Tech Stack
 
 - **Framework**: TanStack Start / Router
-- **Styling**: Tailwind CSS v4, Shadcn UI, Radix UI
+- **Styling**: Tailwind CSS v4, Shadcn UI, Base UI (`@base-ui/react`)
 - **API**: Auto-generated OpenAPI clients in `app/api/tba/{read,mobile}/`
 - **Data Fetching**: TanStack Query
 - **Analytics**: Firebase Analytics (via `firebase/analytics`)
@@ -19,7 +19,7 @@ Progressive Web App for The Blue Alliance, a data archive site for the FIRST Rob
 app/
   ├── routes/           # File-based routing
   ├── components/
-  │   ├── ui/          # Shadcn/Radix components
+  │   ├── ui/          # Shadcn/Base UI components
   │   └── tba/         # TBA-specific components
   ├── lib/             # Utilities and helpers
   ├── api/             # Generated API clients
@@ -46,6 +46,22 @@ tests/                 # Playwright E2E tests
 - Components use declarative JSX with minimal curly braces
 - **Use `Temporal` instead of `Date`** - the Temporal polyfill is available; prefer `Temporal.PlainDate`, `Temporal.ZonedDateTime`, etc. over `Date` for all datetime handling
 - **Analytics page views are tracked at the router level** - `router.subscribe('onResolved', ...)` in `app/router.tsx` fires a `page_view` event on every client-side navigation. Do not add duplicate page view tracking elsewhere. Make sure all logged events are tagged with the client platform via `client_platform: 'pwa'`.
+
+## Data Loading and Performance
+
+Design for a phone on a weak or congested mobile connection. The page should show its main content quickly, stay still while the rest loads, and respond to taps as soon as possible.
+
+- **App Engine does not stream SSR responses.** It sends the whole response only when the server is done. With `@tanstack/react-router-ssr-query`, every query started during SSR delays the first byte, awaited or not, and its data is written into the HTML. "Start it now, don't await it" does not help on the server.
+- **Decide which queries block.** A loader should await only the data the user came to see. Today the team page blocks on team, years participated, events, matches, awards, districts and media. The event page blocks on event, matches and alliances.
+- **Keep blocking queries in one parallel round.** A query that needs another query's result (for example, per-event data that needs the event list) adds a full round trip to every page load. Make it non-blocking.
+- **Load non-blocking data in the browser only.** Either let the component's `useQuery` fetch it, or prefetch it in the loader inside `if (!import.meta.env.SSR)` with `queryClient.prefetchQuery`.
+- **Show a skeleton for every pending request.** Use `LoadingSkeleton` from `~/components/tba/loadingSkeleton` with a `label` such as `"Loading rank"`. It renders `<output aria-label>`, so screen readers announce it and tests can find it with `getByRole('status', { name: 'Loading rank' })`.
+  - A disabled query (`enabled: false`) reports `isPending` forever. Check that the query is enabled before showing its skeleton.
+  - A failed query should render as loaded and empty, so a skeleton never stays on screen.
+- **Avoid layout shift.** Size each skeleton like the content it replaces. If a skeleton often collapses to nothing (a 250 px photo placeholder for a team with no photos) or the content's height is hard to predict, and the data is small and fits in the first parallel round, block on it instead. Keep layout shift in the first screen near 0.
+- **Keep hydration fast.** Taps, tabs and menus do nothing until React hydrates, and hydration waits for the JavaScript to download. On Slow 4G, every 100 KB of gzipped JS adds about 0.5 s. Lazy-load anything not needed on the first screen, and avoid adding to the entry chunk.
+- **Images share bandwidth with the JavaScript.** Serve images in the first screen at their display size, not a larger `srcset` option. Use `fetchPriority="high"` only for a small image that is the LCP element.
+- **When you change what a page fetches or when, measure it** against a production build on a throttled phone profile, not the dev server. For example: Slow 4G (150 ms latency, 1.6 Mbps down) with a 4× CPU slowdown.
 
 ## Linting & Formatting
 
@@ -131,9 +147,58 @@ Type-aware rules are enabled via `oxlint-tsgolint`.
 - Prefer user-visible behavior and accessibility contracts in component tests: roles, accessible names, text, links, disabled state, and ARIA attributes.
 - Do not couple functional tests to colors, spacing, typography, Tailwind or CSS classes, DOM nesting, or private component structure.
 - Use browser-level screenshot or visual-regression tests only when appearance itself is the requirement under test.
-- Assert on the actual value, not whether a mock was called, unless the call itself is the behavior.
+- Assert on the actual value, not whether a mock was called, unless the call itself is the behavior. For network and loading behavior, see the section below — mock call lists are almost never the behavior.
 - Do not assert on fields unrelated to the behavior under test.
 - Inline test data where it is used. Prefer literal values over computed ones.
+
+#### Network and loading behavior
+
+- Test what the user can see or do, or what the browser actually requests relative to a user action. Do not test how fetching is wired.
+- Forbidden patterns (examples of bad tests):
+  - "`getTeams` is a blocking call" / "`getImages` is not a blocking call"
+  - "Foo is lazily loaded" / "prefetches X" / "starts `getEventRankings`"
+  - Asserting `ensureQueryData` / `prefetchQuery` / query-fn mock call lists or `_id`s
+  - Asserting `loading="lazy"`, `fetchpriority`, dynamic chunk URLs, or `requestIdleCallback` option values
+- Allowed patterns:
+  - **Loader unit tests**: return shape, redirects, not-found, tolerance of failed secondary fetches — never which queries were started or awaited
+  - **Playwright**: observe real requests or visible content relative to navigation / hover / tab click (mirror `tests/event.spec.ts` `does not request … on page load` / `requests … when …`)
+  - **Component tests**: placeholder then content appears; content withheld until near viewport — not the scheduling API
+
+#### Mocking the TBA API
+
+- **Vitest**: every request goes through MSW, and a request without a handler fails the test. Use `mockTbaApi(sdkFn, options, body)` or `mockTbaApiWith(sdkFn, options, resolver)` from `~/test/msw`, and `renderWithClient` / `renderHookWithClient` from `~/test/render`. Do not `vi.mock` the generated API modules.
+- **Playwright**: import `test` and `expect` from `./fixtures` and call `mockTba(sdkFn, options, body)` before `page.goto`. It mocks the request for both the SSR render and the browser. Requests you don't mock go to production.
+- **Stub any data a test asserts on that production can change**: the current season, live events, rankings, or anything else that is not settled history. Otherwise a season rollover or a data fix breaks CI.
+- Both helpers take the generated SDK function (`getEventsByYear`, `getTeam`, ...), so the URL follows the regenerated client and `pnpm typecheck` checks the body against the endpoint's response type. `mockTba` also validates the body with the endpoint's generated zod schema when it is registered, so a bad fixture fails on that line with a `ZodError` naming the field.
+- **Bodies longer than about 10 lines go in a JSON file named after the API route**, under `tests/mocks/data/`: `/events/2025` → `tests/mocks/data/events/2025.json`, `/team/frc604` → `tests/mocks/data/team/frc604.json`.
+  - Save the full, unmodified production response. Do not trim it by hand: `curl -H "X-TBA-Auth-Key: $VITE_TBA_API_READ_KEY" https://www.thebluealliance.com/api/v3/events/2025`.
+  - To add a variant, put a short note between the route and `.json`: `/event/2026nytr/matches` partway through the event → `tests/mocks/data/event/2026nytr/matches.partial.json`. Start from the production response and change only what the note says. A file without a note is always the unmodified response.
+  - Import it with `with { type: 'json' }`, because Playwright loads specs as native ESM.
+  - Cast it to the generated type (`events2025 as Event[]`). JSON imports widen string-literal unions such as a webcast's `type` to `string`, so they won't typecheck otherwise. The zod check covers what the cast skips.
+
+```ts
+import { type Event, getEventsByYear } from '~/api/tba/read';
+
+import { expect, test } from './fixtures';
+import events2025 from './mocks/data/events/2025.json' with { type: 'json' };
+
+test('drops the parent event name from division rows', async ({
+  page,
+  mockTba,
+}) => {
+  await mockTba(
+    getEventsByYear,
+    { path: { year: 2025 } },
+    events2025 as Event[],
+  );
+
+  await page.goto('/events/2025');
+
+  await expect(
+    page.getByRole('link', { name: 'Mercury Division', exact: true }),
+  ).toBeVisible();
+});
+```
 
 #### Isolation
 
@@ -187,6 +252,8 @@ CI does not capture screenshots. Capture them yourself, for public routes and fo
 4. Capture `main` the same way after `git checkout origin/main -- <changed source files>`, then `git checkout HEAD -- <those files>` to restore the branch.
 5. Diff each pair from the repo root: `uv run --group dev python3 ops/pr_screenshots/diff_screenshots.py /tmp/before-light.png /tmp/after-light.png /tmp/diff-light.png`. It prints the changed-pixel percentage; note it under the diff image in the table.
 6. Copy the PNGs into a worktree of the `ci-screenshots` branch as `pr-<N>-<what>-{before,after,diff}-{light,dark}.png`, commit, push, and reference them in the PR table as `https://github.com/the-blue-alliance/the-blue-alliance/raw/ci-screenshots/<file>`.
+
+Before capturing, check the change at every standard width with worst-case data, as the root `AGENTS.md` describes: no horizontal scroll and nothing past its container from 320 to 1920px (Tailwind breakpoints: 640, 768, 1024, 1280, 1536).
 
 If `pnpm install` leaves Playwright without a browser, run `npx playwright install chromium` once.
 

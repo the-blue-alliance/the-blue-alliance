@@ -4,7 +4,6 @@ import { Temporal } from 'temporal-polyfill';
 
 import { Badge } from '~/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { getCacheEntries, getCacheStats } from '~/lib/middleware/network-cache';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 interface CacheInfo {
@@ -20,7 +19,9 @@ interface CacheInfo {
 const PREVIEW_JSON_LENGTH = 50;
 
 export const Route = createFileRoute('/local/debug')({
-  loader: () => {
+  loader: async () => {
+    const { getCacheEntries, getCacheStats } =
+      await import('~/lib/middleware/network-cache');
     const stats = getCacheStats();
     const entries = getCacheEntries();
     const now = Temporal.Now.instant().epochMilliseconds;
@@ -152,7 +153,7 @@ function LocalDebug(): React.JSX.Element {
   const loadTime = Temporal.Instant.from(timestamp).epochMilliseconds;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <div className="mx-auto max-w-6xl px-4">
       <h1 className="mb-4 text-3xl font-medium">Network Cache Debug</h1>
 
       <Card>

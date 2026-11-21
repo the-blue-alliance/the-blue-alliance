@@ -11,6 +11,7 @@ import {
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
 import { Badge } from '~/components/ui/badge';
+import { getRobotPoints } from '~/lib/robotScoring';
 
 export default function ScoreBreakdown2022({
   scoreBreakdown,
@@ -184,6 +185,7 @@ export default function ScoreBreakdown2022({
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.red.endgameRobot1}
+            points={getRobotPoints(2022, scoreBreakdown.red, 1, 'endgame')}
             teamKey={match.alliances.red.team_keys[0]}
           />
         </ScoreBreakdownAllianceCell>
@@ -193,6 +195,7 @@ export default function ScoreBreakdown2022({
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.blue.endgameRobot1}
+            points={getRobotPoints(2022, scoreBreakdown.blue, 1, 'endgame')}
             teamKey={match.alliances.blue.team_keys[0]}
           />
         </ScoreBreakdownAllianceCell>
@@ -203,6 +206,7 @@ export default function ScoreBreakdown2022({
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.red.endgameRobot2}
+            points={getRobotPoints(2022, scoreBreakdown.red, 2, 'endgame')}
             teamKey={match.alliances.red.team_keys[1]}
           />
         </ScoreBreakdownAllianceCell>
@@ -212,6 +216,7 @@ export default function ScoreBreakdown2022({
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.blue.endgameRobot2}
+            points={getRobotPoints(2022, scoreBreakdown.blue, 2, 'endgame')}
             teamKey={match.alliances.blue.team_keys[1]}
           />
         </ScoreBreakdownAllianceCell>
@@ -222,6 +227,7 @@ export default function ScoreBreakdown2022({
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.red.endgameRobot3}
+            points={getRobotPoints(2022, scoreBreakdown.red, 3, 'endgame')}
             teamKey={match.alliances.red.team_keys[2]}
           />
         </ScoreBreakdownAllianceCell>
@@ -231,6 +237,7 @@ export default function ScoreBreakdown2022({
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <EndgameRobotCell
             endgame={scoreBreakdown.blue.endgameRobot3}
+            points={getRobotPoints(2022, scoreBreakdown.blue, 3, 'endgame')}
             teamKey={match.alliances.blue.team_keys[2]}
           />
         </ScoreBreakdownAllianceCell>
@@ -405,21 +412,14 @@ export default function ScoreBreakdown2022({
 
 function EndgameRobotCell({
   endgame,
+  points,
   teamKey,
 }: {
   endgame: MatchScoreBreakdown2022['red']['endgameRobot1'];
+  points: number;
   teamKey: string;
 }) {
-  const pointMap: Record<string, number> = {
-    Traversal: 15,
-    High: 10,
-    Mid: 6,
-    Low: 4,
-    None: 0,
-  };
-
   const display = endgame ?? 'None';
-  const points = pointMap[display] ?? 0;
 
   return (
     <div className="flex flex-col items-center gap-1">
