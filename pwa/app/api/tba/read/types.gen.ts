@@ -3758,6 +3758,14 @@ export type TeamEventStatusPlayoff = {
    * The average match score during playoffs. Year specific. May be null if not relevant for a given year.
    */
   playoff_average?: null | number;
+  /**
+   * Round robin playoffs only: the alliance's 1-indexed rank in the round robin standings, or null if it could not be determined.
+   */
+  round_robin_rank?: number | null;
+  /**
+   * Round robin playoffs only: whether the alliance advanced from the round robin to the finals.
+   */
+  advanced_to_round_robin_finals?: boolean;
 };
 
 export type TeamEventStatusRank = {

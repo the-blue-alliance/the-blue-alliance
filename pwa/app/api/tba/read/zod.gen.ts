@@ -2184,6 +2184,8 @@ export const zTeamEventStatusPlayoff = z.object({
   record: zWltRecord.nullish(),
   status: z.enum(['won', 'eliminated', 'playing']).optional(),
   playoff_average: z.number().nullish(),
+  round_robin_rank: z.int().nullish(),
+  advanced_to_round_robin_finals: z.boolean().optional(),
 });
 
 export const zTeamEventStatusRank = z.object({
