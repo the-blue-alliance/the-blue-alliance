@@ -113,9 +113,102 @@ test('navbar profile menu button is visible', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('footer displays platinum sponsor AndyMark', async ({ page }) => {
-  await expect(page.getByText('Thanks to our platinum sponsor')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'AndyMark' })).toBeVisible();
+const ANDYMARK_SPONSOR = {
+  name: 'AndyMark',
+  url: 'https://www.andymark.com/',
+  logo_style: 'wordmark',
+  logo_url:
+    'https://www.thebluealliance.com/images/sponsors/andymark-on-light.png',
+  logo_url_dark:
+    'https://www.thebluealliance.com/images/sponsors/andymark-on-dark.png',
+};
+
+// Resolves once this navigation has received the mocked sponsors.
+async function gotoWithSponsors(page: Page, sponsors: object[]) {
+  await page.route('**/api/v3/sponsors**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ sponsors }),
+    }),
+  );
+  const sponsorsResponse = page.waitForResponse('**/api/v3/sponsors**');
+  await page.goto('/');
+  await page.locator('body[data-hydrated]').waitFor();
+  await sponsorsResponse;
+}
+
+test('footer links to the platinum sponsor', async ({ page }) => {
+  await gotoWithSponsors(page, [ANDYMARK_SPONSOR]);
+
+  await expect(
+    page.locator('footer').getByRole('link', { name: 'AndyMark' }),
+  ).toBeVisible();
+});
+
+for (const [colorScheme, logo] of [
+  ['light', ANDYMARK_SPONSOR.logo_url],
+  ['dark', ANDYMARK_SPONSOR.logo_url_dark],
+] as const) {
+  test(`footer shows the ${colorScheme}-mode sponsor logo`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme });
+    await gotoWithSponsors(page, [ANDYMARK_SPONSOR]);
+
+    const visible = page
+      .locator('footer')
+      .getByRole('link', { name: 'AndyMark' })
+      .locator('img:visible');
+    await expect(visible).toHaveCount(1);
+    await expect(visible).toHaveAttribute('src', logo);
+  });
+}
+
+test('footer fits three sponsors on one line above the data credit', async ({
+  page,
+}) => {
+  const nameOnly = {
+    logo_style: 'wordmark',
+    logo_url: null,
+    logo_url_dark: null,
+  };
+  await page.setViewportSize({ width: 1200, height: 800 });
+  await gotoWithSponsors(page, [
+    ANDYMARK_SPONSOR,
+    {
+      ...nameOnly,
+      name: 'Quillfeather Robotics',
+      url: 'https://example.com/q',
+    },
+    { ...nameOnly, name: 'Ironbark Machining', url: 'https://example.com/i' },
+  ]);
+
+  const credit = page
+    .locator('footer span')
+    .filter({ hasText: 'Thanks to our platinum sponsors' });
+  await expect(
+    credit.getByRole('link', { name: 'Ironbark Machining' }),
+  ).toBeVisible();
+  const creditBox = await credit.first().boundingBox();
+  const dataBox = await page
+    .locator('footer p')
+    .filter({ hasText: 'Data from' })
+    .boundingBox();
+  if (!creditBox || !dataBox) {
+    throw new Error('footer credit or data line is not laid out');
+  }
+
+  expect(creditBox.height).toBeLessThan(30);
+  expect(dataBox.y).toBeGreaterThanOrEqual(creditBox.y + creditBox.height);
+});
+
+test('footer omits the sponsor credit when there are no sponsors', async ({
+  page,
+}) => {
+  await gotoWithSponsors(page, []);
+
+  await expect(page.locator('footer')).not.toContainText('platinum sponsor');
 });
 
 test('nav popup portal is not mounted while the menu is closed', async ({
@@ -159,6 +252,32 @@ test.describe('hamburger menu (narrow viewport)', () => {
     await expect(
       page.locator('[data-slot="navigation-menu-viewport"]'),
     ).toHaveCount(0);
+  });
+
+  test('credits the platinum sponsor at the bottom of the menu', async ({
+    page,
+  }) => {
+    await gotoWithSponsors(page, [ANDYMARK_SPONSOR]);
+
+    await page.getByRole('button', { name: 'Toggle Menu' }).click();
+
+    await expect(
+      page
+        .locator('[data-slot="navigation-menu-viewport"]')
+        .getByRole('link', { name: 'AndyMark' }),
+    ).toBeVisible();
+  });
+
+  test('omits the sponsor credit when there are no sponsors', async ({
+    page,
+  }) => {
+    await gotoWithSponsors(page, []);
+
+    await page.getByRole('button', { name: 'Toggle Menu' }).click();
+
+    const viewport = page.locator('[data-slot="navigation-menu-viewport"]');
+    await expect(viewport.getByRole('link').first()).toBeVisible();
+    await expect(viewport).not.toContainText('platinum sponsor');
   });
 });
 

@@ -30,6 +30,9 @@ const queryErrorLogger = createLogger('queryError');
  * by navbar search and team tooltips. It changes rarely (new teams/events), so it
  * is held for a full day to avoid refetching the heavy payload on navigations.
  *
+ * `SPONSORS` is for `/sponsors`, the platinum sponsor credits in the footer and
+ * mobile menu, which change at most a few times a year.
+ *
  * Live data (in-progress matches, rankings) should NOT use any of the above — it
  * should keep a low `staleTime` (or the `DEFAULT`) alongside an explicit
  * `refetchInterval`, which fires independent of `staleTime`.
@@ -43,6 +46,8 @@ export const STALE_TIME = {
   STATUS: 6 * 60 * 60 * 1000,
   /** 1d — for `/search_index`, which changes rarely. */
   SEARCH_INDEX: 24 * 60 * 60 * 1000,
+  /** 1d — for `/sponsors`, which changes rarely. */
+  SPONSORS: 24 * 60 * 60 * 1000,
 } as const;
 
 /**
