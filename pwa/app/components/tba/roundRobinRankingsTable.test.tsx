@@ -116,7 +116,7 @@ describe('RoundRobinRankingsTable', () => {
           type: 'round_robin',
           sort_order_info: [],
           extra_stats_info: [],
-          rankings: null,
+          rankings: [],
         }}
         year={2015}
       />,
