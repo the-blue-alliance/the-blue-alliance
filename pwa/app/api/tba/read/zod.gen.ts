@@ -1403,7 +1403,7 @@ export const zInsightV2TimeseriesData = z.object({
       label: z.string(),
       points: z.array(
         z.object({
-          x: z.union([z.string(), z.int(), z.number()]),
+          x: z.union([z.string(), z.number()]),
           y: z.number(),
           context: z
             .object({
@@ -2166,17 +2166,15 @@ export const zEventRanking = z.object({
 /**
  * Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun.
  */
-export const zTeamEventStatusPlayoff = z
-  .object({
-    playoff_type: zPlayoffType.nullish(),
-    double_elim_round: zDoubleElimRound.optional(),
-    level: zCompLevel.optional(),
-    current_level_record: zWltRecord.nullish(),
-    record: zWltRecord.nullish(),
-    status: z.enum(['won', 'eliminated', 'playing']).optional(),
-    playoff_average: z.number().nullish(),
-  })
-  .nullable();
+export const zTeamEventStatusPlayoff = z.object({
+  playoff_type: zPlayoffType.nullish(),
+  double_elim_round: zDoubleElimRound.optional(),
+  level: zCompLevel.optional(),
+  current_level_record: zWltRecord.nullish(),
+  record: zWltRecord.nullish(),
+  status: z.enum(['won', 'eliminated', 'playing']).optional(),
+  playoff_average: z.number().nullish(),
+});
 
 export const zTeamEventStatusRank = z.object({
   num_teams: z.int().optional(),

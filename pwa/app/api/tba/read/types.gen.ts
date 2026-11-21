@@ -3304,7 +3304,7 @@ export type InsightV2TimeseriesData = {
       /**
        * X-axis value (week string, year integer, event key, or Unix timestamp in seconds when x_type is date).
        */
-      x: string | number | number;
+      x: string | number;
       /**
        * Y-axis value.
        */
@@ -3715,7 +3715,7 @@ export type TeamEventStatusAllianceBackup = null | {
 /**
  * Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun.
  */
-export type TeamEventStatusPlayoff = null | {
+export type TeamEventStatusPlayoff = {
   /**
    * Playoff bracket format, or null if unavailable.
    */
