@@ -1262,6 +1262,7 @@ export const zNexusMapLabel = zNexusMapElement.and(
 export const zNexusMapArrow = zNexusMapElement.and(
   z.object({
     type: z.enum(['single', 'double']).optional(),
+    color: z.string().optional(),
   }),
 );
 

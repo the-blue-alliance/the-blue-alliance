@@ -3088,6 +3088,10 @@ export type NexusMapLabel = NexusMapElement & {
 
 export type NexusMapArrow = NexusMapElement & {
   type?: 'single' | 'double';
+  /**
+   * Arrow color as a color name set in Nexus, such as `blue`, `red`, `purple` or `gray`. Absent when the arrow uses the default color.
+   */
+  color?: string;
 };
 
 /**
