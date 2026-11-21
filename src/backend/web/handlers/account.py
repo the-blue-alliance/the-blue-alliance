@@ -91,9 +91,9 @@ def _event_names(api_write_keys: list[ApiAuthAccess]) -> dict[str, str]:
     }
     events = ndb.get_multi([ndb.Key(Event, event_key) for event_key in event_keys])
     return {
-        event.key_name: f"{event.year} {event.display_name}"
+        event.key_name: f"{event.year} {event.short_name or event.name}"
         for event in events
-        if event
+        if event and (event.short_name or event.name)
     }
 
 

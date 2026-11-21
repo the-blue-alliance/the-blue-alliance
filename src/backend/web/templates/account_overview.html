@@ -17,7 +17,7 @@
 <span class="account-secret-field{{ ' is-masked' if masked }}">
   <code class="account-secret account-secret-value">{{ value }}</code>
   {%- if masked %}
-  <code class="account-secret account-secret-dots" aria-hidden="true">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</code>
+  <code class="account-secret account-secret-dots" aria-hidden="true">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</code>
   <button type="button" class="btn btn-default btn-xs js-secret-toggle">Show</button>
   {%- endif %}
   <button type="button" class="btn btn-default btn-xs js-secret-copy">Copy</button>
@@ -228,7 +228,7 @@
                   Never
                 {% endif %}
               </td>
-              <td data-label="Auth ID"><code class="account-secret account-secret-short">{{ key.key.id() }}</code></td>
+              <td data-label="Auth ID"><code class="account-secret account-auth-id">{{ key.key.id() }}</code></td>
               <td data-label="Auth Secret">{{ secret_field(key.secret) }}</td>
             </tr>
           {% endfor %}
