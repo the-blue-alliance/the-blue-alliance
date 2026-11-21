@@ -77,12 +77,10 @@ class FMSCompanionHelper:
             return None
 
         try:
-            content = storage_read(
+            return storage_read(
                 newest_file,
                 bucket=FMSCompanionHelper.get_bucket(),
             )
-            # storage_read can return str or bytes, but we know this is a binary file
-            return content if isinstance(content, bytes) else None
         except Exception as e:
             logging.exception(f"Error reading file from storage: {e}")
             return None
