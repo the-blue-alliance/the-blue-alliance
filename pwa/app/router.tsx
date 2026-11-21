@@ -9,7 +9,7 @@ import {
   createRouter,
 } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import ClipboardCopyIcon from '~icons/lucide/clipboard-copy';
@@ -152,17 +152,51 @@ async function logPageView(pagePath: string, pageLocation: string) {
   });
 }
 
+function isChunkLoadError(error: unknown): error is TypeError {
+  return (
+    error instanceof TypeError &&
+    /Failed to fetch dynamically imported module|error loading dynamically imported module|Importing a module script failed/.test(
+      error.message,
+    )
+  );
+}
+
+function claimChunkReload(error: TypeError): boolean {
+  try {
+    const key = `chunk-reload:${error.message}`;
+    if (sessionStorage.getItem(key) !== null) {
+      return false;
+    }
+    sessionStorage.setItem(key, '1');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function ErrorComponent({ error }: ErrorComponentProps) {
   routerLogger.error(error, 'Router error');
 
+  const [reloading] = useState(
+    () => isChunkLoadError(error) && claimChunkReload(error),
+  );
+
   useEffect(() => {
+    if (reloading) {
+      window.location.reload();
+      return;
+    }
     // ApiErrors that bubble up here already went through the QueryCache's
     // onError handler (see ~/lib/queryClient.ts), which reports them to
     // Sentry — avoid double-reporting the same failure.
     if (!(error instanceof ApiError)) {
       captureException(error);
     }
-  }, [error]);
+  }, [error, reloading]);
+
+  if (reloading) {
+    return null;
+  }
 
   const normalizedError =
     error instanceof Error ? error : new Error(String(error));

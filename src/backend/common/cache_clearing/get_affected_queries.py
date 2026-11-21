@@ -256,6 +256,12 @@ def eventteam_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQu
             queries.append(event_query.TeamYearEventTeamsQuery(team_key.id(), year))
             queries.append(team_query.TeamListYearQuery(year, page_num))
 
+    for remapped_team_key in _filter(affected_refs.get("remapped_team", set())):
+        for year in years:
+            queries.append(
+                event_query.TeamYearRemappedEventTeamsQuery(remapped_team_key, year)
+            )
+
     for event_key in event_keys:
         queries.append(team_query.EventTeamsQuery(event_key.id()))
         queries.append(team_query.EventEventTeamsQuery(event_key.id()))

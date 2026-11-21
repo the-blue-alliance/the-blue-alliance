@@ -1,8 +1,9 @@
-import { expect, test } from '@playwright/test';
+import { Page, expect, test } from '@playwright/test';
+
+import { gotoHydrated, recordRequests } from './helpers';
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 });
 
 // Navbar
@@ -30,6 +31,18 @@ test('navbar search button is visible', async ({ page }) => {
   await expect(
     page.getByRole('button', { name: 'Search teams and events...' }),
   ).toBeVisible();
+});
+
+[700, 960, 1165].forEach((width) => {
+  test.describe(`navbar at ${width}px wide`, () => {
+    test.use({ viewport: { width, height: 800 } });
+
+    test('keeps the account menu button fully on screen', async ({ page }) => {
+      await expect(
+        page.getByRole('button', { name: 'Account menu' }),
+      ).toBeInViewport({ ratio: 1 });
+    });
+  });
 });
 
 // (mobile) Navbar
@@ -94,9 +107,9 @@ test('footer links are present', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('footer toggle theme button is visible', async ({ page }) => {
+test('navbar profile menu button is visible', async ({ page }) => {
   await expect(
-    page.getByRole('button', { name: 'Toggle Theme' }),
+    page.getByRole('button', { name: 'Account menu' }),
   ).toBeVisible();
 });
 
@@ -119,8 +132,7 @@ test.describe('hamburger menu (narrow viewport)', () => {
   test.use({ viewport: { width: 500, height: 800 } });
 
   test('does not open on hover', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/');
 
     const trigger = page.getByRole('button', { name: 'Toggle Menu' });
     await trigger.hover();
@@ -134,8 +146,7 @@ test.describe('hamburger menu (narrow viewport)', () => {
   test('opens on click and fully unmounts on second click', async ({
     page,
   }) => {
-    await page.goto('/');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/');
 
     const trigger = page.getByRole('button', { name: 'Toggle Menu' });
     await trigger.click();
@@ -173,8 +184,7 @@ test('search dialog opens while search_index is still loading', async ({
     });
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 
   const searchButton = page.getByRole('button', {
     name: 'Search teams and events...',
@@ -214,14 +224,45 @@ test('search trigger stays enabled while search_index is pending', async ({
     });
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 
   const searchButton = page.getByRole('button', {
     name: 'Search teams and events...',
   });
   await expect(searchButton).toBeEnabled();
   releaseSearchIndex();
+});
+
+test('(mobile) loads the page without downloading the search index', async ({
+  page,
+}) => {
+  const requestUrls = recordRequests(page);
+
+  await page.reload();
+  await page.locator('body[data-hydrated]').waitFor();
+  await page.waitForLoadState('networkidle');
+
+  expect(
+    requestUrls.filter((url) => url.includes('/api/v3/search_index')),
+  ).toHaveLength(0);
+});
+
+test('requests the search index when the pointer reaches search', async ({
+  page,
+}) => {
+  // Keep the cursor off the search control so a remount under the pointer
+  // cannot intend search before this test does.
+  await page.mouse.move(0, 0);
+
+  const searchIndexUrls = recordRequests(page, 'search_index');
+
+  await gotoHydrated(page, '/');
+  expect(searchIndexUrls).toEqual([]);
+
+  await page.getByRole('button', { name: /Search teams and events/ }).hover();
+
+  await expect.poll(() => searchIndexUrls.length).toBe(1);
+  expect(searchIndexUrls[0]).toContain('search_index');
 });
 
 test('(mobile) opening search focuses the input', async ({ page }) => {
@@ -233,8 +274,7 @@ test('(mobile) opening search focuses the input', async ({ page }) => {
     });
   });
 
-  await page.goto('/');
-  await page.locator('body[data-hydrated]').waitFor();
+  await gotoHydrated(page, '/');
 
   const searchButton = page.getByRole('button', { name: 'Search' });
   await searchButton.click();
@@ -246,36 +286,41 @@ test('(mobile) opening search focuses the input', async ({ page }) => {
   await expect(input).toBeFocused();
 });
 
-test.describe('Dark mode toggle', () => {
+// The theme selector lives in the navbar profile menu as a
+// light/dark/system radio group.
+async function selectTheme(page: Page, name: 'Light' | 'Dark' | 'System') {
+  await page.getByRole('button', { name: 'Account menu' }).click();
+  await page.getByRole('menuitemradio', { name }).click();
+  // Radio selection keeps the menu open; close it before interacting
+  // with the page underneath
+  await page.keyboard.press('Escape');
+}
+
+test.describe('Theme selection', () => {
   test.beforeEach(async ({ page }) => {
     await page.evaluate(() => localStorage.removeItem('theme'));
     await page.reload();
-    await page.locator('footer').scrollIntoViewIfNeeded();
-    await page.waitForSelector(
-      '[aria-label="Toggle Theme"][data-mounted="true"]',
-    );
+    await page.locator('body[data-hydrated]').waitFor();
   });
 
-  test('toggle changes theme to dark mode', async ({ page }) => {
+  test('selecting Dark applies dark mode', async ({ page }) => {
     const html = page.locator('html');
-    await page.getByRole('button', { name: 'Toggle Theme' }).click();
+    await selectTheme(page, 'Dark');
     await expect(html).toHaveClass(/dark/);
   });
 
-  test('toggle changes theme to light mode', async ({ page }) => {
+  test('selecting Light switches back from dark mode', async ({ page }) => {
     const html = page.locator('html');
-    const toggleButton = page.getByRole('button', { name: 'Toggle Theme' });
-
-    await toggleButton.click();
+    await selectTheme(page, 'Dark');
     await expect(html).toHaveClass(/dark/);
-    await toggleButton.click();
 
+    await selectTheme(page, 'Light');
     await expect(html).not.toHaveClass(/dark/);
   });
 
   test('theme persists across page reload', async ({ page }) => {
     const html = page.locator('html');
-    await page.getByRole('button', { name: 'Toggle Theme' }).click();
+    await selectTheme(page, 'Dark');
     await expect(html).toHaveClass(/dark/);
 
     await page.reload();
@@ -285,7 +330,7 @@ test.describe('Dark mode toggle', () => {
 
   test('theme persists after navigation', async ({ page }) => {
     const html = page.locator('html');
-    await page.getByRole('button', { name: 'Toggle Theme' }).click();
+    await selectTheme(page, 'Dark');
     await expect(html).toHaveClass(/dark/);
 
     await page

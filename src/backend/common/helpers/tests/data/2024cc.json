@@ -1,0 +1,45 @@
+{
+  "address": "Bellarmine College Preparatory\r\n960 W. Hedding St.\r\nSan Jose, CA, USA",
+  "city": "San Jose",
+  "country": "USA",
+  "district": null,
+  "division_keys": [],
+  "end_date": "2024-09-29",
+  "event_code": "cc",
+  "event_type": 99,
+  "event_type_string": "Offseason",
+  "first_event_code": null,
+  "first_event_id": null,
+  "gmaps_place_id": null,
+  "gmaps_url": null,
+  "key": "2024cc",
+  "lat": null,
+  "lng": null,
+  "location_name": "Bellarmine College Preparatory",
+  "name": "Chezy Champs",
+  "parent_event_key": null,
+  "playoff_type": 10,
+  "playoff_type_string": null,
+  "postal_code": null,
+  "short_name": "",
+  "start_date": "2024-09-27",
+  "state_prov": "CA",
+  "timezone": "America/Los_Angeles",
+  "webcasts": [
+    {
+      "channel": "",
+      "type": "livestream"
+    },
+    {
+      "channel": "",
+      "type": "youtube"
+    },
+    {
+      "channel": "robosportsnetwork",
+      "type": "twitch"
+    }
+  ],
+  "website": "https://chezychamps.com",
+  "week": null,
+  "year": 2024
+}

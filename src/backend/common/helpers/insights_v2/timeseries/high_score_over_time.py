@@ -61,7 +61,7 @@ class HighScoreOverTimeV2Calculator(TimeseriesV2Calculator):
     def on_event(self, event: Event) -> None:
         district_abbrev: Optional[str] = event.event_district_abbrev
         if district_abbrev:
-            canonical_district = RenamedDistricts.get_latest_code(district_abbrev)
+            canonical_district = RenamedDistricts.get_canonical_code(district_abbrev)
         else:
             canonical_district = None
 

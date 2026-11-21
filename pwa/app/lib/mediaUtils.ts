@@ -12,6 +12,8 @@ const EMBED_MEDIA_TYPE_LIST = [
   'imgur',
   'instagram-image',
   'cd-thread',
+  'grabcad',
+  'onshape',
 ] as const;
 
 /** Media types that represent embeddable images (shown in the media gallery). */
@@ -44,7 +46,7 @@ export function getMediaImageUrl(media: Media): string | undefined {
 
 function imgurThumbUrl(
   directUrl: string | undefined,
-  size: 'l' | 'h',
+  size: 'm' | 'l' | 'h',
 ): string | undefined {
   if (!directUrl) return undefined;
   let parsed: URL;
@@ -77,16 +79,21 @@ export function getMediaThumbUrl(media: Media): string | undefined {
   return getMediaImageUrl(media);
 }
 
-/** Returns a `srcset` string for providers that expose multiple thumbnail sizes, or undefined when only a single URL is available. */
-export function getMediaThumbSrcSet(media: Media): string | undefined {
-  if (media.type !== 'imgur') return undefined;
-  const medium = imgurThumbUrl(media.direct_url, 'l');
-  const large = imgurThumbUrl(media.direct_url, 'h');
-  if (!medium || !large) return undefined;
-  return `${medium} 1x, ${large} 2x`;
+export function getRobotPicUrl(media: Media): string | undefined {
+  if (media.type === 'imgur') {
+    return imgurThumbUrl(media.direct_url, 'm') ?? getMediaImageUrl(media);
+  }
+  return getMediaThumbUrl(media);
 }
 
-/** Returns all embeddable image media (imgur, instagram-image, cd-thread). */
+export function getRobotPicLinkUrl(media: Media): string | undefined {
+  if (media.type === 'imgur') {
+    return imgurThumbUrl(media.direct_url, 'h') ?? getMediaLinkUrl(media);
+  }
+  return getMediaLinkUrl(media);
+}
+
+/** Returns all embeddable image media (imgur, instagram-image, cd-thread, grabcad, onshape). */
 export function getEmbedMedia(media: Media[]): EmbedMedia[] {
   return media.filter(isEmbedMedia);
 }

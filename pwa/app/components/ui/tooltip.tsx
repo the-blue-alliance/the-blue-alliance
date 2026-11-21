@@ -54,11 +54,13 @@ function TooltipContent({
           className={cn(
             `z-50 w-fit max-w-xs origin-(--transform-origin) animate-in
             rounded-md border bg-popover text-xs text-popover-foreground
-            fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2
-            data-[side=left]:slide-in-from-right-2
-            data-[side=right]:slide-in-from-left-2
-            data-[side=top]:slide-in-from-bottom-2 data-closed:animate-out
-            data-closed:fade-out-0 data-closed:zoom-out-95`,
+            fade-in-0 motion-safe:zoom-in-95
+            motion-safe:data-[side=bottom]:slide-in-from-top-2
+            motion-safe:data-[side=left]:slide-in-from-right-2
+            motion-safe:data-[side=right]:slide-in-from-left-2
+            motion-safe:data-[side=top]:slide-in-from-bottom-2
+            data-closed:animate-out data-closed:fade-out-0
+            motion-safe:data-closed:zoom-out-95`,
             className,
           )}
           style={{
@@ -69,8 +71,9 @@ function TooltipContent({
         >
           <div
             className={cn(
-              `relative z-10 max-h-60 overflow-x-hidden overflow-y-auto px-3
-              py-1.5 text-center text-balance [&::-webkit-scrollbar]:w-2
+              `relative z-10 max-h-60 overflow-x-hidden overflow-y-auto
+              overscroll-contain px-3 py-1.5 text-center text-balance
+              [&::-webkit-scrollbar]:w-2
               [&::-webkit-scrollbar-thumb]:rounded-full
               [&::-webkit-scrollbar-thumb]:bg-muted-foreground/30
               [&::-webkit-scrollbar-track]:bg-transparent`,

@@ -179,7 +179,9 @@ def test_do_prediction_insights_for_events_scopes_to_district() -> None:
 @mock.patch("backend.common.helpers.insights_helper.DistrictEventsQuery")
 @mock.patch("backend.common.helpers.insights_helper.DistrictHistoryQuery")
 @mock.patch("backend.common.helpers.insights_helper.InsightsDistrictsHelper")
-@mock.patch("backend.common.helpers.insights_helper.RenamedDistricts.get_latest_codes")
+@mock.patch(
+    "backend.common.helpers.insights_helper.RenamedDistricts.get_canonical_codes"
+)
 @mock.patch.object(InsightsHelper, "_doPredictionInsightsForEvents")
 @mock.patch.object(InsightsHelper, "_doAwardInsightsForEvents")
 @mock.patch.object(InsightsHelper, "_doMatchInsightsForEvents")
@@ -654,6 +656,8 @@ def test_do_match_insights_computes_all_match_stats(ndb_stub) -> None:
     qm1_data = next(m for m in highscore["qual"] if m["key_name"] == "2014wk2_qm1")
     assert qm1_data == {
         "key_name": "2014wk2_qm1",
+        "year": 2014,
+        "comp_level": "qm",
         "verbose_name": "Quals 1",
         "event_name": "Week Two Regional",
         "alliances": {

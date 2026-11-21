@@ -1106,3 +1106,23 @@ def test_parse_event_sync_disabled_is_skipped() -> None:
     )
 
     assert [e.key_name for e in events] == ["2010testreg2"]
+
+
+def test_parse_stale_district_code_uses_that_years_code() -> None:
+    api_event = {**_api_event("txcle", "DistrictEvent"), "districtCode": "FIT"}
+
+    _, districts = FMSAPIEventListParser(2026).parse(
+        cast(SeasonEventListModelV33, {"Events": [api_event]})
+    )
+
+    assert [d.key_name for d in districts] == ["2026tx"]
+
+
+def test_parse_stale_district_code_points_event_at_that_years_district() -> None:
+    api_event = {**_api_event("txcle", "DistrictEvent"), "districtCode": "FIT"}
+
+    events, _ = FMSAPIEventListParser(2026).parse(
+        cast(SeasonEventListModelV33, {"Events": [api_event]})
+    )
+
+    assert events[0].event_district_abbrev == "tx"

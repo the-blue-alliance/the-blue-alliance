@@ -1,11 +1,9 @@
 import { describe, expect, test } from 'vitest';
 
 import {
-  AllianceColor,
   CompLevel,
   type EventCoprs,
   type Match,
-  type MatchAlliance,
   type Media,
   type Team,
 } from '~/api/tba/read';
@@ -14,9 +12,11 @@ import {
   formatTime,
   transformCoprsToTable,
   transformMatchesToFlatSchedule,
+  transformMatchesToRobotBreakdown,
   transformMatchesToSchedule,
   transformTeamsToTeamList,
 } from '~/lib/scoutingUtils';
+import { makeMatch as baseMatch, makeAlliance } from '~/test/factories';
 
 function makeTeam(overrides: Partial<Team>): Team {
   return {
@@ -30,34 +30,16 @@ function makeTeam(overrides: Partial<Team>): Team {
   } as Team;
 }
 
-function alliance(score: number, teamKeys: string[]): MatchAlliance {
-  return {
-    score,
-    team_keys: teamKeys,
-    surrogate_team_keys: [],
-    dq_team_keys: [],
-  };
-}
-
 function makeMatch(overrides: Partial<Match> & { key: string }): Match {
-  return {
-    comp_level: CompLevel.QM,
-    set_number: 1,
-    match_number: 1,
+  return baseMatch({
     alliances: {
-      red: alliance(100, ['frc254', 'frc1678', 'frc2056']),
-      blue: alliance(80, ['frc1323', 'frc2910', 'frc604']),
+      red: makeAlliance(100, ['frc254', 'frc1678', 'frc2056']),
+      blue: makeAlliance(80, ['frc1323', 'frc2910', 'frc604']),
     },
-    winning_alliance: AllianceColor.RED,
     event_key: overrides.key.split('_')[0],
     time: 1704067200,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
     ...overrides,
-  };
+  });
 }
 
 describe('formatDate', () => {
@@ -171,8 +153,8 @@ describe('transformMatchesToSchedule', () => {
     const match = makeMatch({
       key: '2024test_qm1',
       alliances: {
-        red: alliance(-1, ['frc254']),
-        blue: alliance(-1, ['frc1323', 'frc2910']),
+        red: makeAlliance(-1, ['frc254']),
+        blue: makeAlliance(-1, ['frc1323', 'frc2910']),
       },
     });
 
@@ -196,6 +178,20 @@ describe('transformMatchesToFlatSchedule', () => {
       ['2024test_qm1', '2024-01-01', '00:00:00', 'qm', 1, 1, 'blue', 2910],
       ['2024test_qm1', '2024-01-01', '00:00:00', 'qm', 1, 1, 'blue', 604],
     ]);
+  });
+
+  test('keeps the letter of a second robot', () => {
+    const rows = transformMatchesToFlatSchedule([
+      makeMatch({
+        key: '2024test_qm1',
+        alliances: {
+          red: makeAlliance(100, ['frc971B']),
+          blue: makeAlliance(80, ['frc971']),
+        },
+      }),
+    ]);
+
+    expect(rows.map((row) => row[7])).toEqual(['971B', 971]);
   });
 
   test('orders rows by match order', () => {
@@ -238,6 +234,18 @@ describe('transformCoprsToTable', () => {
     });
   });
 
+  test('lists a second robot with its letter after its team', () => {
+    const coprs: EventCoprs = {
+      totalPoints: { frc971B: 5, frc1678: 12, frc971: 10 },
+    };
+
+    expect(transformCoprsToTable(coprs).data).toEqual([
+      [971, 10],
+      ['971B', 5],
+      [1678, 12],
+    ]);
+  });
+
   test('drops components that are zero for every team', () => {
     const coprs: EventCoprs = {
       totalPoints: { frc254: 10 },
@@ -269,5 +277,105 @@ describe('transformCoprsToTable', () => {
       [1, 1, 3],
       [2, 2, 0],
     ]);
+  });
+});
+
+describe('transformMatchesToRobotBreakdown', () => {
+  const towerBreakdown = {
+    red: {
+      autoTowerRobot1: 'Level1',
+      autoTowerRobot2: 'None',
+      autoTowerRobot3: 'None',
+      endGameTowerRobot1: 'Level3',
+      endGameTowerRobot2: 'None',
+      endGameTowerRobot3: 'None',
+    },
+    blue: {},
+  } as unknown as Match['score_breakdown'];
+
+  test('uses the scored actions of the year as columns', () => {
+    const matches = [
+      makeMatch({ key: '2026miket_qm1', score_breakdown: towerBreakdown }),
+    ];
+
+    expect(transformMatchesToRobotBreakdown(matches).columns).toEqual([
+      'match_key',
+      'comp_level',
+      'set_number',
+      'match_number',
+      'color',
+      'station',
+      'team',
+      'auto_climb',
+      'auto_climb_points',
+      'endgame',
+      'endgame_points',
+    ]);
+  });
+
+  test('writes a row for each robot with its results and points', () => {
+    const matches = [
+      makeMatch({ key: '2026miket_qm1', score_breakdown: towerBreakdown }),
+    ];
+
+    expect(transformMatchesToRobotBreakdown(matches).data[0]).toEqual([
+      '2026miket_qm1',
+      'qm',
+      1,
+      1,
+      'red',
+      1,
+      254,
+      'Level1',
+      15,
+      'Level3',
+      30,
+    ]);
+  });
+
+  test('skips matches without a score breakdown', () => {
+    const matches = [
+      makeMatch({ key: '2026miket_qm1', score_breakdown: towerBreakdown }),
+      makeMatch({ key: '2026miket_qm2', match_number: 2 }),
+    ];
+
+    expect(transformMatchesToRobotBreakdown(matches).data).toHaveLength(6);
+  });
+
+  test('lists per-robot fields for a year without scoring', () => {
+    const matches = [
+      makeMatch({
+        key: '2027miket_qm1',
+        score_breakdown: {
+          red: { climbRobot1: 'High' },
+          blue: {},
+        } as unknown as Match['score_breakdown'],
+      }),
+    ];
+
+    expect(transformMatchesToRobotBreakdown(matches).data[0]).toEqual([
+      '2027miket_qm1',
+      'qm',
+      1,
+      1,
+      'red',
+      1,
+      254,
+      'High',
+    ]);
+  });
+
+  test('returns no rows when no robot has per-robot data', () => {
+    const matches = [
+      makeMatch({
+        key: '2015miket_qm1',
+        score_breakdown: {
+          red: { totalPoints: 10 },
+          blue: { totalPoints: 20 },
+        } as unknown as Match['score_breakdown'],
+      }),
+    ];
+
+    expect(transformMatchesToRobotBreakdown(matches).data).toEqual([]);
   });
 });

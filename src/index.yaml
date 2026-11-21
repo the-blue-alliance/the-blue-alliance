@@ -113,6 +113,11 @@ indexes:
       - name: year
       - name: event
 
+  - kind: EventTeam
+    properties:
+      - name: remapped_team
+      - name: year
+
   - kind: Insight
     properties:
       - name: name

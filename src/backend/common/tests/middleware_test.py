@@ -137,6 +137,77 @@ def test_AppspotRedirectMiddleware_no_redirect_ah_path(app: Flask) -> None:
     assert location_header is None
 
 
+@pytest.mark.parametrize(
+    "host",
+    [
+        "tbatv-prod.appspot.com",
+        "www.tbatv-prod.appspot.com",
+        "www2.tbatv-prod.appspot.com",
+        "default.tbatv-prod-hrd.appspot.com",
+        "TBATV-PROD.APPSPOT.COM",
+        "tbatv-prod.appspot.com:443",
+    ],
+)
+def test_AppspotRedirectMiddleware_redirect_prod_appspot_hosts(
+    app: Flask, host: str
+) -> None:
+    middleware = cast(WSGIApplication, AppspotRedirectMiddleware(app))
+
+    environ = create_environ(path="/match/2026mimid1_qm12", base_url=f"https://{host}")
+    _, status, headers = run_wsgi_app(middleware, environ, buffered=True)
+
+    assert status == "301 MOVED PERMANENTLY"
+    location_header = next((v for k, v in headers if k == "Location"), None)
+    assert location_header == "https://www.thebluealliance.com/match/2026mimid1_qm12"
+
+
+@pytest.mark.parametrize(
+    "host",
+    [
+        "1-dot-py3-web-dot-tbatv-prod-hrd.appspot.com",
+        "py3-web-dot-tbatv-prod-hrd.appspot.com",
+        "tbatv-dev.appspot.com",
+        "nottbatv-prod.appspot.com",
+        "www.thebluealliance.com",
+    ],
+)
+def test_AppspotRedirectMiddleware_no_redirect_other_hosts(
+    app: Flask, host: str
+) -> None:
+    middleware = cast(WSGIApplication, AppspotRedirectMiddleware(app))
+
+    @app.route("/test")
+    def test_handler():
+        return "Hello!"
+
+    environ = create_environ(path="/test", base_url=f"https://{host}")
+    _, status, headers = run_wsgi_app(middleware, environ, buffered=True)
+
+    assert status == "200 OK"
+    location_header = next((v for k, v in headers if k == "Location"), None)
+    assert location_header is None
+
+
+@pytest.mark.parametrize("header", ["X-Appengine-Cron", "X-AppEngine-QueueName"])
+def test_AppspotRedirectMiddleware_no_redirect_internal_requests(
+    app: Flask, header: str
+) -> None:
+    middleware = cast(WSGIApplication, AppspotRedirectMiddleware(app))
+
+    @app.route("/test")
+    def test_handler():
+        return "Hello!"
+
+    environ = create_environ(
+        path="/test",
+        base_url="https://tbatv-prod-hrd.appspot.com",
+        headers={header: "true"},
+    )
+    _, status, headers = run_wsgi_app(middleware, environ, buffered=True)
+
+    assert status == "200 OK"
+
+
 def test_TraceRequestMiddleware_init(app: Flask) -> None:
     middleware = TraceRequestMiddleware(app)
     assert middleware.app is app

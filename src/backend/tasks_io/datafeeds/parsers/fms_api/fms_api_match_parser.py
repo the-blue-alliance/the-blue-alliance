@@ -28,6 +28,35 @@ from backend.common.suggestions.media_parser import MediaParser
 
 TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
 
+# FRC API returns camelCase alliance keys for 2015; TBA historically stores snake_case.
+# Remap on ingest so regrabs restore the documented APIv3 / Jinja / PWA shape.
+_SCORE_BREAKDOWN_2015_KEY_MAP = {
+    "robotSet": "robot_set",
+    "containerSet": "container_set",
+    "toteSet": "tote_set",
+    "toteStack": "tote_stack",
+    "toteCountFar": "tote_count_far",
+    "toteCountNear": "tote_count_near",
+    "containerCountLevel1": "container_count_level1",
+    "containerCountLevel2": "container_count_level2",
+    "containerCountLevel3": "container_count_level3",
+    "containerCountLevel4": "container_count_level4",
+    "containerCountLevel5": "container_count_level5",
+    "containerCountLevel6": "container_count_level6",
+    "litterCountLandfill": "litter_count_landfill",
+    "litterCountContainer": "litter_count_container",
+    "litterCountUnprocessed": "litter_count_unprocessed",
+    "foulCount": "foul_count",
+    "autoPoints": "auto_points",
+    "totePoints": "tote_points",
+    "containerPoints": "container_points",
+    "litterPoints": "litter_points",
+    "teleopPoints": "teleop_points",
+    "adjustPoints": "adjust_points",
+    "foulPoints": "foul_points",
+    "totalPoints": "total_points",
+}
+
 
 class FMSAPIHybridScheduleParser(
     ParserBase[EventScheduleHybridModelV2, Tuple[List[Match], Dict[MatchKey, MatchKey]]]
@@ -473,8 +502,11 @@ class FMSAPIMatchDetailsParser(
             for alliance in api_alliances:
                 color = alliance["alliance"].lower()
                 for key, value in alliance.items():
-                    if key != "alliance":
-                        breakdown[color][key] = value
+                    if key == "alliance":
+                        continue
+                    if self.year == 2015:
+                        key = _SCORE_BREAKDOWN_2015_KEY_MAP.get(key, key)
+                    breakdown[color][key] = value
 
                 if game_data is not None:
                     breakdown[color]["tba_gameData"] = game_data

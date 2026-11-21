@@ -138,7 +138,7 @@ const EventScheduleTab: React.FC<EventScheduleTabProps> = ({
 
     try {
       await makeTrustedRequest(
-        `event/${selectedEvent}/matches/update`,
+        `/api/trusted/v1/event/${selectedEvent}/matches/update`,
         JSON.stringify(matchData)
       );
       

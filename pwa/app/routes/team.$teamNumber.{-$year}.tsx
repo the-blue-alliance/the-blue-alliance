@@ -6,7 +6,7 @@ import {
   notFound,
   redirect,
 } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
 import {
@@ -20,16 +20,20 @@ import {
   RegionalAdvancement,
   RegionalRanking,
   Team,
+  TeamEventStatus,
 } from '~/api/tba/read';
 import {
   getDistrictRankingsOptions,
   getEventAlliancesOptions,
+  getEventAwardsOptions,
   getEventDistrictPointsOptions,
+  getEventMatchesOptions,
   getRegionalAdvancementOptions,
   getRegionalChampsPoolPointsOptions,
   getRegionalRankingsOptions,
   getTeamAwardsByYearOptions,
   getTeamDistrictsOptions,
+  getTeamEventStatusOptions,
   getTeamEventsByYearOptions,
   getTeamEventsStatusesByYearOptions,
   getTeamMatchesByYearOptions,
@@ -41,11 +45,14 @@ import {
 import { AwardBanner } from '~/components/tba/banner';
 import FavoriteButton from '~/components/tba/favoriteButton';
 import { DistrictLink } from '~/components/tba/links';
+import LoadingSkeleton from '~/components/tba/loadingSkeleton';
 import {
   TableOfContents,
   TableOfContentsSection,
 } from '~/components/tba/tableOfContents';
-import TeamEventAppearance from '~/components/tba/teamEventAppearance';
+import TeamEventAppearance, {
+  RobotAppearance,
+} from '~/components/tba/teamEventAppearance';
 import TeamMediaGallery from '~/components/tba/teamMediaGallery';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
@@ -54,10 +61,16 @@ import { Separator } from '~/components/ui/separator';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
-import { sortEventsComparator } from '~/lib/eventUtils';
-import { calculateTeamRecordsFromMatches } from '~/lib/matchUtils';
+import { getRemappedRobots, sortEventsComparator } from '~/lib/eventUtils';
+import {
+  calculateRobotsRecord,
+  calculateTeamAvgScore,
+  calculateTeamRecordsFromMatches,
+  formatAvgScore,
+} from '~/lib/matchUtils';
 import { getEmbedMedia, getImageMedia } from '~/lib/mediaUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
+import { avatarYearForTeamPage } from '~/lib/teamUtils';
 import {
   MODEL_TYPE,
   addRecords,
@@ -67,7 +80,29 @@ import {
   publicCacheControlHeaders,
 } from '~/lib/utils';
 
+const FIRST_REGIONAL_POOL_YEAR = 2025;
+
+function settledData<T, F>(
+  result: { isPending: boolean; data: T | undefined },
+  fallback: F,
+): T | F | undefined {
+  return result.isPending ? undefined : (result.data ?? fallback);
+}
+
 export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
+  staticData: {
+    // Drawn in the server-rendered TOC placeholder; mirrors the real bar below.
+    tocPreview: ({ year }) => ({
+      activeLabel: 'Team Info',
+      action: (
+        <YearSelector
+          currentLabel={String(year)}
+          triggerClassName="w-[180px]"
+          options={[]}
+        />
+      ),
+    }),
+  },
   loader: async ({ params, context: { queryClient, currentSeason } }) => {
     const startTime = Temporal.Now.instant().epochMilliseconds;
     const teamKey = `frc${params.teamNumber}`;
@@ -83,47 +118,47 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
 
     const yearStaleTime = staleTimeForYear(year);
 
-    // spawn these now, we don't need to await them yet though
-    const teamMediaQuery = queryClient
-      .ensureQueryData({
-        ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
-        staleTime: yearStaleTime,
-      })
-      .catch(() => []);
-    const teamSocialsQuery = queryClient
-      .ensureQueryData(
-        getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
-      )
-      .catch(() => ({}));
-    const teamMatchesQuery = queryClient
-      .ensureQueryData({
-        ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
-        staleTime: yearStaleTime,
-      })
-      .catch(() => []);
-    const teamStatusesQuery = queryClient
-      .ensureQueryData({
-        ...getTeamEventsStatusesByYearOptions({
-          path: { team_key: teamKey, year },
-        }),
-        staleTime: yearStaleTime,
-      })
-      .catch(() => ({}));
-    const teamAwardsQuery = queryClient
-      .ensureQueryData({
-        ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
-        staleTime: yearStaleTime,
-      })
-      .catch(() => []);
     const teamEventsQuery = queryClient
       .ensureQueryData({
         ...getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
         staleTime: yearStaleTime,
       })
       .catch(() => []);
+    const teamMatchesQuery = queryClient
+      .ensureQueryData({
+        ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
+      .catch(() => []);
+    const teamAwardsQuery = queryClient
+      .ensureQueryData({
+        ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
+      .catch(() => []);
     const teamDistrictsQuery = queryClient
       .ensureQueryData(getTeamDistrictsOptions({ path: { team_key: teamKey } }))
       .catch(() => []);
+    const teamMediaQuery = queryClient
+      .ensureQueryData({
+        ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
+      .catch(() => []);
+
+    // App Engine buffers SSR responses, so anything fetched on the server
+    // delays the first byte. Non-blocking data loads in the browser only.
+    if (!import.meta.env.SSR) {
+      void queryClient.prefetchQuery(
+        getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+      );
+      void queryClient.prefetchQuery({
+        ...getTeamEventsStatusesByYearOptions({
+          path: { team_key: teamKey, year },
+        }),
+        staleTime: yearStaleTime,
+      });
+    }
 
     // these need to be awaited so we can validate the year
     const [team, yearsParticipated] = await Promise.all([
@@ -151,15 +186,26 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       throw notFound();
     }
 
+    const avatarYear = avatarYearForTeamPage(
+      year,
+      yearsParticipated,
+      currentSeason,
+    );
+    if (!import.meta.env.SSR) {
+      void queryClient.prefetchQuery({
+        ...getTeamMediaByYearOptions({
+          path: { team_key: teamKey, year: avatarYear },
+        }),
+        staleTime: staleTimeForYear(avatarYear),
+      });
+    }
+
     await Promise.all([
-      // await the earlier queries
-      teamMediaQuery,
-      teamSocialsQuery,
-      teamMatchesQuery,
-      teamStatusesQuery,
-      teamAwardsQuery,
       teamEventsQuery,
+      teamMatchesQuery,
+      teamAwardsQuery,
       teamDistrictsQuery,
+      teamMediaQuery,
     ]);
 
     const endTime = Temporal.Now.instant().epochMilliseconds;
@@ -172,6 +218,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     return {
       teamKey,
       year,
+      avatarYear,
       team,
     };
   },
@@ -190,6 +237,13 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     }
 
     const { team } = loaderData;
+    const location = [
+      team.city,
+      [team.state_prov, team.postal_code].filter(Boolean).join(' '),
+      team.country,
+    ]
+      .filter(Boolean)
+      .join(', ');
     const jsonLd = {
       '@context': 'https://schema.org',
       '@type': 'SportsTeam',
@@ -219,9 +273,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
         },
         {
           name: 'description',
-          content:
-            `From ${team.city}, ${team.state_prov} ${team.postal_code}, ${team.country}.` +
-            ' Team information, match results, and match videos from the FIRST Robotics Competition.',
+          content: `${location ? `From ${location}. ` : ''}Team information, match results, and match videos from the FIRST Robotics Competition.`,
         },
       ],
       scripts: [
@@ -237,147 +289,27 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
 // v8 ignore stop
 
 function TeamPage(): React.JSX.Element {
-  const { teamKey, year } = Route.useLoaderData();
-  const yearStaleTime = staleTimeForYear(year);
+  const { teamKey, year, avatarYear } = Route.useLoaderData();
 
   const { data: team } = useSuspenseQuery(
     getTeamOptions({ path: { team_key: teamKey } }),
   );
-  const mediaQuery = useQuery({
-    ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
-    staleTime: yearStaleTime,
-  });
-  const media = useMemo(() => mediaQuery.data ?? [], [mediaQuery.data]);
-  const socialsQuery = useQuery(
-    getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
-  );
-  const socials = socialsQuery.data ?? [];
   const yearsParticipatedQuery = useQuery(
     getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
   );
-  const yearsParticipated = yearsParticipatedQuery.data ?? [];
+  const yearsParticipated = (yearsParticipatedQuery.data ?? []).toSorted(
+    (a, b) => b - a,
+  );
   const eventsQuery = useQuery({
     ...getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
-    staleTime: yearStaleTime,
+    staleTime: staleTimeForYear(year),
   });
-  const events = useMemo(() => eventsQuery.data ?? [], [eventsQuery.data]);
-  const matchesQuery = useQuery({
-    ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
-    staleTime: yearStaleTime,
-  });
-  const matches = matchesQuery.data ?? [];
-  const statusesQuery = useQuery({
-    ...getTeamEventsStatusesByYearOptions({
-      path: { team_key: teamKey, year },
-    }),
-    staleTime: yearStaleTime,
-  });
-  const statuses = statusesQuery.data ?? {};
-  const awardsQuery = useQuery({
-    ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
-    staleTime: yearStaleTime,
-  });
-  const awards = awardsQuery.data ?? [];
-  const districtsQuery = useQuery(
-    getTeamDistrictsOptions({ path: { team_key: teamKey } }),
-  );
-  const districts = districtsQuery.data ?? [];
-
-  const currentDistrict = districts.find((d) => d.year === year);
-
-  const { data: districtRankings } = useQuery({
-    ...getDistrictRankingsOptions({
-      path: { district_key: currentDistrict?.key ?? '' },
-    }),
-    staleTime: yearStaleTime,
-    enabled: !!currentDistrict,
-  });
-
-  const teamDistrictRanking = districtRankings?.find(
-    (r) => r.team_key === teamKey,
-  );
-
-  const { data: regionalRankings } = useQuery({
-    ...getRegionalRankingsOptions({ path: { year } }),
-    staleTime: yearStaleTime,
-    enabled: !currentDistrict,
-  });
-
-  const teamRegionalRanking = regionalRankings?.find(
-    (r) => r.team_key === teamKey,
-  );
-
-  const hasRegionalEvents = events.some(
-    (e) => e.event_type === EventType.REGIONAL,
-  );
-
-  const { data: regionalAdvancement } = useQuery({
-    ...getRegionalAdvancementOptions({ path: { year } }),
-    staleTime: yearStaleTime,
-    enabled: hasRegionalEvents,
-  });
-
-  const teamRegionalAdvancement: RegionalAdvancement | undefined =
-    regionalAdvancement?.[teamKey];
-
-  // sort BEFORE launching queries that depend on it
   const sortedEvents = useMemo(
-    () => events.sort(sortEventsComparator),
-    [events],
+    () => (eventsQuery.data ?? []).toSorted(sortEventsComparator),
+    [eventsQuery.data],
   );
 
-  const eventDistrictPtsQueries = useQueries({
-    queries: sortedEvents.map((e) => ({
-      ...getEventDistrictPointsOptions({ path: { event_key: e.key } }),
-      staleTime: yearStaleTime,
-      enabled: DISTRICT_EVENT_TYPES.has(e.event_type),
-    })),
-    combine: (results) =>
-      Object.fromEntries(
-        results.map((result, index) => [
-          sortedEvents[index].key,
-          result.data ?? null,
-        ]),
-      ),
-  });
-  const regionalPoolPtsQueries = useQueries({
-    queries: sortedEvents.map((e) => ({
-      ...getRegionalChampsPoolPointsOptions({ path: { event_key: e.key } }),
-      staleTime: yearStaleTime,
-      enabled: e.event_type === EventType.REGIONAL,
-    })),
-    combine: (results) =>
-      Object.fromEntries(
-        results.map((result, index) => [
-          sortedEvents[index].key,
-          result.data ?? null,
-        ]),
-      ),
-  });
-  const eventAlliancesQueries = useQueries({
-    queries: sortedEvents.map((e) => ({
-      ...getEventAlliancesOptions({ path: { event_key: e.key } }),
-      staleTime: yearStaleTime,
-    })),
-    combine: (results) =>
-      Object.fromEntries(
-        results.map((result, index) => [
-          sortedEvents[index].key,
-          result.data ?? null,
-        ]),
-      ),
-  });
   const [inView, setInView] = useState(new Set<string>());
-
-  yearsParticipated.sort((a, b) => b - a);
-
-  const robotPics = useMemo(() => getImageMedia(media), [media]);
-  const embedMedia = useMemo(() => getEmbedMedia(media), [media]);
-
-  const maybeAvatar = useMemo(
-    () => media.find((m): m is MediaAvatar => m.type === 'avatar'),
-    [media],
-  );
 
   const tocItems = useMemo(
     () => [
@@ -414,109 +346,339 @@ function TeamPage(): React.JSX.Element {
         />
       </TableOfContents>
 
-      <div className="mt-8 w-full">
-        <TableOfContentsSection id="team-info" setInView={setInView}>
-          <div
-            className="flex flex-wrap justify-center sm:flex-nowrap
-              sm:justify-between"
-          >
-            <div className="flex flex-col justify-between">
-              <div>
-                <TeamPageTeamInfo
-                  team={team}
-                  socials={socials}
-                  maybeAvatar={maybeAvatar}
-                  district={districts.find((d) => d.year === year)}
-                  favoriteButton={
-                    <FavoriteButton
-                      modelKey={teamKey}
-                      modelType={MODEL_TYPE.TEAM}
-                    />
-                  }
-                />
-              </div>
-            </div>
-            <div className="flex-none">
-              <TeamRobotPicsCarousel media={robotPics} />
-            </div>
-          </div>
-
-          <StatsSection
-            events={sortedEvents}
-            team={team}
-            matches={matches}
-            year={year}
-            district={currentDistrict}
-            districtRanking={teamDistrictRanking}
-            regionalRanking={teamRegionalRanking}
-          />
-
-          {awards.filter((a) => BLUE_BANNER_AWARDS.has(a.award_type)).length >
-            0 && (
-            <>
-              <Separator className="my-4" />
-              <div className="flex flex-row justify-around">
-                <BlueBanners
-                  awards={awards
-                    .filter((a) => BLUE_BANNER_AWARDS.has(a.award_type))
-                    .filter((a) => {
-                      const event = sortedEvents.find(
-                        (e) => e.key === a.event_key,
-                      );
-                      return event && SEASON_EVENT_TYPES.has(event.event_type);
-                    })}
-                  events={sortedEvents}
-                />
-              </div>
-            </>
-          )}
-        </TableOfContentsSection>
-
-        <div>
-          <Separator className="mt-4 mb-8" />
-
-          {sortedEvents.map((e) => (
-            <TableOfContentsSection
-              key={e.key}
-              id={e.key}
-              setInView={setInView}
-            >
-              <TeamEventAppearance
-                event={e}
-                matches={matches.filter((m) => m.event_key === e.key)}
-                status={statuses[e.key]}
-                team={team}
-                awards={awards.filter((a) => a.event_key === e.key)}
-                maybeDistrictPoints={eventDistrictPtsQueries[e.key]}
-                maybeRegionalPoolPoints={regionalPoolPtsQueries[e.key]}
-                maybeAlliances={eventAlliancesQueries[e.key]}
-                teamRegionalAdvancement={teamRegionalAdvancement}
-              />
-              <Separator className="my-4" />
-            </TableOfContentsSection>
-          ))}
-
-          <div>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Media</h2>
-              <Link
-                to="/suggest/team/media"
-                search={{ team_key: teamKey, year }}
-                className="text-sm text-muted-foreground underline-offset-4
-                  hover:underline"
-              >
-                Add Media
-              </Link>
-            </div>
-            {embedMedia.length > 0 && <TeamMediaGallery media={media} />}
-          </div>
-        </div>
-      </div>
+      <TeamPageContent
+        team={team}
+        teamKey={teamKey}
+        year={year}
+        avatarYear={avatarYear}
+        sortedEvents={sortedEvents}
+        setInView={setInView}
+      />
     </div>
   );
 }
 
-function StatsSection({
+const TeamPageContent = memo(function TeamPageContent({
+  team,
+  teamKey,
+  year,
+  avatarYear,
+  sortedEvents,
+  setInView,
+}: {
+  team: Team;
+  teamKey: string;
+  year: number;
+  avatarYear: number;
+  sortedEvents: Event[];
+  setInView: React.Dispatch<React.SetStateAction<Set<string>>>;
+}): React.JSX.Element {
+  const yearStaleTime = staleTimeForYear(year);
+
+  const mediaQuery = useQuery({
+    ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
+    staleTime: yearStaleTime,
+  });
+  const media = useMemo(() => mediaQuery.data ?? [], [mediaQuery.data]);
+  const avatarMediaQuery = useQuery({
+    ...getTeamMediaByYearOptions({
+      path: { team_key: teamKey, year: avatarYear },
+    }),
+    staleTime: staleTimeForYear(avatarYear),
+  });
+  const socialsQuery = useQuery(
+    getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+  );
+  const socials = socialsQuery.data ?? [];
+  const matchesQuery = useQuery({
+    ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
+    staleTime: yearStaleTime,
+  });
+  const matches = matchesQuery.data ?? [];
+  const statusesQuery = useQuery({
+    ...getTeamEventsStatusesByYearOptions({
+      path: { team_key: teamKey, year },
+    }),
+    staleTime: yearStaleTime,
+  });
+  const statuses: Record<string, TeamEventStatus | null> | undefined =
+    settledData(statusesQuery, {});
+  const awardsQuery = useQuery({
+    ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
+    staleTime: yearStaleTime,
+  });
+  const awards = awardsQuery.data ?? [];
+  const districtsQuery = useQuery(
+    getTeamDistrictsOptions({ path: { team_key: teamKey } }),
+  );
+  const districts = districtsQuery.data ?? [];
+
+  const currentDistrict = districts.find((d) => d.year === year);
+
+  const districtRankingsQuery = useQuery({
+    ...getDistrictRankingsOptions({
+      path: { district_key: currentDistrict?.key ?? '' },
+    }),
+    staleTime: yearStaleTime,
+    enabled: !!currentDistrict,
+  });
+
+  const teamDistrictRanking = districtRankingsQuery.data?.find(
+    (r) => r.team_key === teamKey,
+  );
+
+  const regionalRankingsEnabled =
+    !currentDistrict && year >= FIRST_REGIONAL_POOL_YEAR;
+  const regionalRankingsQuery = useQuery({
+    ...getRegionalRankingsOptions({ path: { year } }),
+    staleTime: yearStaleTime,
+    enabled: regionalRankingsEnabled,
+  });
+
+  const teamRegionalRanking = regionalRankingsQuery.data?.find(
+    (r) => r.team_key === teamKey,
+  );
+
+  const rankingLoading = currentDistrict
+    ? districtRankingsQuery.isPending
+    : regionalRankingsEnabled && regionalRankingsQuery.isPending;
+
+  const hasRegionalEvents = sortedEvents.some(
+    (e) => e.event_type === EventType.REGIONAL,
+  );
+
+  const { data: regionalAdvancement } = useQuery({
+    ...getRegionalAdvancementOptions({ path: { year } }),
+    staleTime: yearStaleTime,
+    enabled: hasRegionalEvents && year >= FIRST_REGIONAL_POOL_YEAR,
+  });
+
+  const teamRegionalAdvancement: RegionalAdvancement | undefined =
+    regionalAdvancement?.[teamKey];
+
+  const hasDistrictPoints = (e: Event) =>
+    DISTRICT_EVENT_TYPES.has(e.event_type);
+  const eventDistrictPtsQueries = useQueries({
+    queries: sortedEvents.map((e) => ({
+      ...getEventDistrictPointsOptions({ path: { event_key: e.key } }),
+      staleTime: yearStaleTime,
+      enabled: hasDistrictPoints(e),
+    })),
+    combine: (results) =>
+      Object.fromEntries(
+        results.map((result, index) => [
+          sortedEvents[index].key,
+          hasDistrictPoints(sortedEvents[index])
+            ? settledData(result, null)
+            : null,
+        ]),
+      ),
+  });
+  const hasRegionalPoolPoints = (e: Event) =>
+    e.event_type === EventType.REGIONAL && year >= FIRST_REGIONAL_POOL_YEAR;
+  const regionalPoolPtsQueries = useQueries({
+    queries: sortedEvents.map((e) => ({
+      ...getRegionalChampsPoolPointsOptions({ path: { event_key: e.key } }),
+      staleTime: yearStaleTime,
+      enabled: hasRegionalPoolPoints(e),
+    })),
+    combine: (results) =>
+      Object.fromEntries(
+        results.map((result, index) => [
+          sortedEvents[index].key,
+          hasRegionalPoolPoints(sortedEvents[index])
+            ? settledData(result, null)
+            : null,
+        ]),
+      ),
+  });
+  const eventAlliancesQueries = useQueries({
+    queries: sortedEvents.map((e) => ({
+      ...getEventAlliancesOptions({ path: { event_key: e.key } }),
+      staleTime: yearStaleTime,
+    })),
+    combine: (results) =>
+      Object.fromEntries(
+        results.map((result, index) => [
+          sortedEvents[index].key,
+          settledData(result, null),
+        ]),
+      ),
+  });
+  const remappedRobotKeys = sortedEvents.flatMap((e) =>
+    getRemappedRobots(e, teamKey).map((r) => ({ eventKey: e.key, ...r })),
+  );
+  const remappedEventKeys = [
+    ...new Set(remappedRobotKeys.map((r) => r.eventKey)),
+  ];
+  const remappedEventMatches = useQueries({
+    queries: remappedEventKeys.map((eventKey) => ({
+      ...getEventMatchesOptions({ path: { event_key: eventKey } }),
+      staleTime: yearStaleTime,
+    })),
+    combine: (results) =>
+      Object.fromEntries(
+        results.map((result, index) => [
+          remappedEventKeys[index],
+          settledData(result, []),
+        ]),
+      ),
+  });
+  const remappedEventAwards = useQueries({
+    queries: remappedEventKeys.map((eventKey) => ({
+      ...getEventAwardsOptions({ path: { event_key: eventKey } }),
+      staleTime: yearStaleTime,
+    })),
+    combine: (results) =>
+      Object.fromEntries(
+        results.map((result, index) => [
+          remappedEventKeys[index],
+          settledData(result, []),
+        ]),
+      ),
+  });
+  const remappedStatuses = useQueries({
+    queries: remappedRobotKeys.map((r) => ({
+      ...getTeamEventStatusOptions({
+        path: { team_key: r.sourceTeamKey, event_key: r.eventKey },
+      }),
+      staleTime: yearStaleTime,
+    })),
+    combine: (results) => results.map((result) => settledData(result, null)),
+  });
+  const remappedRobotsByEvent: Record<string, RobotAppearance[]> = {};
+  remappedRobotKeys.forEach((r, index) => {
+    (remappedRobotsByEvent[r.eventKey] ??= []).push({
+      robotKey: r.robotKey,
+      sourceTeamKey: r.sourceTeamKey,
+      status: remappedStatuses[index],
+      matches: remappedEventMatches[r.eventKey]?.filter((m) =>
+        [...m.alliances.red.team_keys, ...m.alliances.blue.team_keys].includes(
+          r.robotKey,
+        ),
+      ),
+      awards: remappedEventAwards[r.eventKey]?.filter((a) =>
+        a.recipient_list.some((recipient) => recipient.team_key === r.robotKey),
+      ),
+    });
+  });
+
+  const robotPics = useMemo(() => getImageMedia(media), [media]);
+  const embedMedia = useMemo(() => getEmbedMedia(media), [media]);
+
+  const maybeAvatar = useMemo(
+    () =>
+      avatarMediaQuery.data?.find((m): m is MediaAvatar => m.type === 'avatar'),
+    [avatarMediaQuery.data],
+  );
+
+  const blueBannerAwards = awards.filter(
+    (a) =>
+      BLUE_BANNER_AWARDS.has(a.award_type) &&
+      sortedEvents.some(
+        (e) => e.key === a.event_key && SEASON_EVENT_TYPES.has(e.event_type),
+      ),
+  );
+
+  return (
+    <div className="w-full">
+      <TableOfContentsSection id="team-info" setInView={setInView}>
+        <div
+          className="flex flex-wrap justify-center sm:flex-nowrap
+            sm:justify-between"
+        >
+          <div className="flex flex-col justify-between">
+            <div>
+              <TeamPageTeamInfo
+                team={team}
+                socials={socials}
+                maybeAvatar={maybeAvatar}
+                district={currentDistrict}
+                avatarLoading={avatarMediaQuery.isPending}
+                socialsLoading={socialsQuery.isPending}
+                favoriteButton={
+                  <FavoriteButton
+                    modelKey={teamKey}
+                    modelType={MODEL_TYPE.TEAM}
+                  />
+                }
+              />
+            </div>
+          </div>
+          <div className="flex-none">
+            <TeamRobotPicsCarousel
+              key={`${teamKey}-${year}`}
+              media={robotPics}
+            />
+          </div>
+        </div>
+
+        <StatsSection
+          events={sortedEvents}
+          team={team}
+          matches={matches}
+          year={year}
+          district={currentDistrict}
+          districtRanking={teamDistrictRanking}
+          regionalRanking={teamRegionalRanking}
+          rankingLoading={rankingLoading}
+          remappedRobots={Object.values(remappedRobotsByEvent).flat()}
+        />
+
+        {blueBannerAwards.length > 0 && (
+          <>
+            <Separator className="my-4" />
+            <div
+              data-testid="blue-banners"
+              className="flex flex-row justify-around"
+            >
+              <BlueBanners awards={blueBannerAwards} events={sortedEvents} />
+            </div>
+          </>
+        )}
+      </TableOfContentsSection>
+
+      <div>
+        <Separator className="mt-4 mb-8" />
+
+        {sortedEvents.map((e) => (
+          <TableOfContentsSection key={e.key} id={e.key} setInView={setInView}>
+            <TeamEventAppearance
+              event={e}
+              matches={matches.filter((m) => m.event_key === e.key)}
+              status={statuses && (statuses[e.key] ?? null)}
+              team={team}
+              awards={awards.filter((a) => a.event_key === e.key)}
+              maybeDistrictPoints={eventDistrictPtsQueries[e.key]}
+              maybeRegionalPoolPoints={regionalPoolPtsQueries[e.key]}
+              maybeAlliances={eventAlliancesQueries[e.key]}
+              teamRegionalAdvancement={teamRegionalAdvancement}
+              remappedRobots={remappedRobotsByEvent[e.key]}
+            />
+            <Separator className="my-4" />
+          </TableOfContentsSection>
+        ))}
+
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Media</h2>
+            <Link
+              to="/suggest/team/media"
+              search={{ team_key: teamKey, year }}
+              className="text-sm text-muted-foreground underline-offset-4
+                hover:underline"
+            >
+              Add Media
+            </Link>
+          </div>
+          {embedMedia.length > 0 && <TeamMediaGallery media={media} />}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+export function StatsSection({
   events,
   team,
   matches,
@@ -524,6 +686,8 @@ function StatsSection({
   district,
   districtRanking,
   regionalRanking,
+  rankingLoading = false,
+  remappedRobots,
 }: {
   events: Event[];
   team: Team;
@@ -532,6 +696,8 @@ function StatsSection({
   district?: District;
   districtRanking?: DistrictRanking;
   regionalRanking?: RegionalRanking;
+  rankingLoading?: boolean;
+  remappedRobots: RobotAppearance[];
 }) {
   const officialEvents = events.filter((e) =>
     SEASON_EVENT_TYPES.has(e.event_type),
@@ -571,10 +737,34 @@ function StatsSection({
   const unofficialPlayoff = unofficialRecords.playoff;
 
   const officialRecord = addRecords(officialQuals, officialPlayoff);
-  const unofficialRecord = addRecords(unofficialQuals, unofficialPlayoff);
-  const hasUnofficialMatches = hasAnyMatches(unofficialRecord);
+  const unofficialRecord = addRecords(
+    addRecords(unofficialQuals, unofficialPlayoff),
+    calculateRobotsRecord(
+      remappedRobots.map((r) => ({
+        robotKey: r.robotKey,
+        matches: r.matches ?? [],
+      })),
+    ),
+  );
+  const remappedLoading = remappedRobots.some((r) => r.matches === undefined);
+  const hasUnofficialMatches =
+    remappedLoading || hasAnyMatches(unofficialRecord);
+
+  const yearAvgScore = useMemo(
+    () => (year === 2015 ? calculateTeamAvgScore(team.key, matches) : null),
+    [year, team.key, matches],
+  );
 
   if (matches.length === 0) {
+    return null;
+  }
+
+  if (
+    year === 2015 &&
+    yearAvgScore &&
+    yearAvgScore.qualAvg === null &&
+    yearAvgScore.playoffAvg === null
+  ) {
     return null;
   }
 
@@ -582,25 +772,61 @@ function StatsSection({
     <>
       <Separator className="my-4" />
       <div className="">
-        Team {team.team_number} was{' '}
-        <span className="font-semibold">
-          {officialRecord.wins}-{officialRecord.losses}
-          {officialRecord.ties > 0 ? `-${officialRecord.ties}` : ''}
-        </span>{' '}
-        {hasUnofficialMatches ? (
+        {year === 2015 && yearAvgScore ? (
           <>
-            in official play and{' '}
-            <span className="font-semibold">
-              {officialRecord.wins + unofficialRecord.wins}-
-              {officialRecord.losses + unofficialRecord.losses}
-              {officialRecord.ties + unofficialRecord.ties > 0
-                ? `-${officialRecord.ties + unofficialRecord.ties}`
-                : ''}
-            </span>{' '}
-            overall in {year}.
+            Overall, Team {team.team_number} had
+            {yearAvgScore.qualAvg !== null && (
+              <>
+                {' '}
+                an average qual score of{' '}
+                <span className="font-semibold">
+                  {formatAvgScore(yearAvgScore.qualAvg)}
+                </span>
+              </>
+            )}
+            {yearAvgScore.qualAvg !== null &&
+              yearAvgScore.playoffAvg !== null && <> and</>}
+            {yearAvgScore.playoffAvg !== null && (
+              <>
+                {' '}
+                an average playoff score of{' '}
+                <span className="font-semibold">
+                  {formatAvgScore(yearAvgScore.playoffAvg)}
+                </span>
+              </>
+            )}{' '}
+            in {year}.
           </>
         ) : (
-          <>overall in {year}.</>
+          <>
+            Team {team.team_number} was{' '}
+            <span className="font-semibold">
+              {officialRecord.wins}-{officialRecord.losses}
+              {officialRecord.ties > 0 ? `-${officialRecord.ties}` : ''}
+            </span>{' '}
+            {hasUnofficialMatches ? (
+              <>
+                in official play and{' '}
+                {remappedLoading ? (
+                  <LoadingSkeleton
+                    label="Loading overall record"
+                    className="inline-block h-4 w-12 align-middle"
+                  />
+                ) : (
+                  <span className="font-semibold">
+                    {officialRecord.wins + unofficialRecord.wins}-
+                    {officialRecord.losses + unofficialRecord.losses}
+                    {officialRecord.ties + unofficialRecord.ties > 0
+                      ? `-${officialRecord.ties + unofficialRecord.ties}`
+                      : ''}
+                  </span>
+                )}{' '}
+                overall in {year}.
+              </>
+            ) : (
+              <>overall in {year}.</>
+            )}
+          </>
         )}
         {district && districtRanking && (
           <>
@@ -622,12 +848,27 @@ function StatsSection({
         {!district && regionalRanking && (
           <>
             {' '}
-            In the regional pool, they ranked{' '}
-            <span className="font-semibold">
-              #{regionalRanking.rank}
-            </span> with{' '}
+            In the{' '}
+            <Link
+              to="/events/regional/{-$year}"
+              params={{ year: String(year) }}
+              className="underline"
+            >
+              regional pool
+            </Link>
+            , they ranked{' '}
+            <span className="font-semibold">#{regionalRanking.rank}</span> with{' '}
             <span className="font-semibold">{regionalRanking.point_total}</span>{' '}
             points.
+          </>
+        )}
+        {rankingLoading && (
+          <>
+            {' '}
+            <LoadingSkeleton
+              label="Loading ranking"
+              className="inline-block h-4 w-64 max-w-full align-middle"
+            />
           </>
         )}
       </div>

@@ -59,7 +59,6 @@ vi.mock('~/api/colors/client.gen', () => ({
 
 vi.mock('~/api/tba/read/@tanstack/react-query.gen', () => ({
   getStatusOptions: () => ({ queryKey: ['status'] }),
-  getSearchIndexOptions: () => ({ queryKey: ['searchIndex'] }),
 }));
 
 vi.mock('~/lib/logger', () => ({
@@ -135,17 +134,57 @@ describe('root route module setup', () => {
     vi.stubEnv('VITE_TBA_MODERATION_API_BASE_URL', '');
   });
 
-  test('adds the read key to every TBA API request', async () => {
+  test('puts the read key in the URL for browser requests', async () => {
     await loadRoot();
     const onRequest = registered<(request: Request) => Request>(
       clients.read.interceptors.request.use,
     );
-    const request = new Request(
-      'https://www.thebluealliance.com/api/v3/status',
+
+    const sent = onRequest(
+      new Request('https://www.thebluealliance.com/api/v3/team/frc254'),
     );
 
-    expect(onRequest(request)).toBe(request);
-    expect(request.headers.get('X-TBA-Auth-Key')).toBe('read-key');
+    expect(sent.url).toBe(
+      'https://www.thebluealliance.com/api/v3/team/frc254?X-TBA-Auth-Key=read-key',
+    );
+  });
+
+  test('sends no auth header from the browser so CORS skips the preflight', async () => {
+    await loadRoot();
+    const onRequest = registered<(request: Request) => Request>(
+      clients.read.interceptors.request.use,
+    );
+
+    const sent = onRequest(
+      new Request('https://www.thebluealliance.com/api/v3/team/frc254'),
+    );
+
+    expect(sent.headers.get('X-TBA-Auth-Key')).toBeNull();
+  });
+
+  test('sends the read key as a header when rendering on the server', async () => {
+    vi.stubEnv('SSR', true);
+    await loadRoot();
+    const onRequest = registered<(request: Request) => Request>(
+      clients.read.interceptors.request.use,
+    );
+
+    const sent = onRequest(
+      new Request('https://www.thebluealliance.com/api/v3/team/frc254'),
+    );
+
+    expect(sent.headers.get('X-TBA-Auth-Key')).toBe('read-key');
+    expect(sent.url).toBe('https://www.thebluealliance.com/api/v3/team/frc254');
+  });
+
+  test('logs each TBA API request without the read key', async () => {
+    await loadRoot();
+    const onRequest = registered<(request: Request) => Request>(
+      clients.read.interceptors.request.use,
+    );
+
+    onRequest(new Request('https://www.thebluealliance.com/api/v3/status'));
+
     expect(mocks.loggerDebug).toHaveBeenCalledWith(
       {
         method: 'GET',
@@ -195,7 +234,7 @@ describe('root route module setup', () => {
   test('installs the network cache when rendering on the server', async () => {
     const cachedFetch = vi.fn<typeof fetch>();
     mocks.createCachedFetch.mockReturnValue(cachedFetch);
-    vi.stubGlobal('window', undefined);
+    vi.stubEnv('SSR', true);
 
     await loadRoot();
 
@@ -218,44 +257,28 @@ describe('root route options', () => {
     expect(validateSearch.parse({})).toEqual({});
   });
 
-  test('loads status once and prefetches the search index', async () => {
+  test('loads status once and exposes the current season', async () => {
     const { beforeLoad } = await loadRoot();
     const queryClient = new QueryClient();
     const status = { current_season: 2026, max_season: 2026 };
-    const ensureQueryData = vi
-      .spyOn(queryClient, 'ensureQueryData')
-      .mockResolvedValue(status);
-    const prefetchQuery = vi
-      .spyOn(queryClient, 'prefetchQuery')
-      .mockResolvedValue();
+    vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue(status);
 
     await expect(beforeLoad({ context: { queryClient } })).resolves.toEqual({
       status,
       currentSeason: 2026,
     });
-    expect(ensureQueryData).toHaveBeenCalledWith({
-      queryKey: ['status'],
-      staleTime: expect.any(Number),
-    });
-    expect(prefetchQuery).toHaveBeenCalledWith({
-      queryKey: ['searchIndex'],
-      staleTime: expect.any(Number),
-    });
   });
 
   test('falls back to the calendar year without a current season', async () => {
-    vi.stubEnv('SSR', true);
     const { beforeLoad } = await loadRoot();
     const queryClient = new QueryClient();
     vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue({
       current_season: null,
     });
-    const prefetchQuery = vi.spyOn(queryClient, 'prefetchQuery');
 
     const context = await beforeLoad({ context: { queryClient } });
 
     expect(context.currentSeason).toBe(new Date().getFullYear());
-    expect(prefetchQuery).not.toHaveBeenCalled();
   });
 
   test('builds head tags with a canonical link for the deepest match', async () => {
@@ -273,6 +296,18 @@ describe('root route options', () => {
     expect(tags.links).toContainEqual({
       rel: 'manifest',
       href: '/manifest.webmanifest',
+    });
+  });
+
+  test('preconnects to the TBA API origin for CORS fetches', async () => {
+    const { head } = await loadRoot();
+
+    const tags = head({ matches: [{ pathname: '/' }] });
+
+    expect(tags.links).toContainEqual({
+      rel: 'preconnect',
+      href: 'https://www.thebluealliance.com',
+      crossOrigin: 'anonymous',
     });
   });
 });

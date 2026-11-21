@@ -117,7 +117,8 @@ function MatchStatsLoadingState({
       </div>
       <div className="h-2 w-64 overflow-hidden rounded-full bg-neutral-200">
         <div
-          className="h-full bg-blue-500 transition-all duration-300 ease-out"
+          className="h-full bg-blue-500 duration-300 ease-out
+            motion-safe:transition-[width]"
           style={{ width: `${progress}%` }}
         />
       </div>

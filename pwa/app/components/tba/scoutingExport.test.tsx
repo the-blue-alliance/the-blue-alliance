@@ -10,7 +10,8 @@ const {
   toastSuccessMock,
 } = vi.hoisted(() => ({
   copyCsvToClipboardMock: vi.fn<(csv: string) => Promise<void>>(),
-  downloadCsvMock: vi.fn<(csv: string, filename: string) => void>(),
+  downloadCsvMock:
+    vi.fn<(csv: string, filename: string, format: string) => void>(),
   toastErrorMock: vi.fn<(message: string) => void>(),
   toastSuccessMock: vi.fn<(message: string) => void>(),
 }));
@@ -29,12 +30,15 @@ vi.mock('sonner', () => ({
 
 const csvData = 'Team,Score\r\n254,100';
 
-function renderScoutingExport() {
+function renderScoutingExport(rowCount = 1) {
   render(
     <ScoutingExport
       title="Scouting Data"
+      description="One row per team"
+      rowCount={rowCount}
       csvData={csvData}
-      filename="scouting.csv"
+      filename="scouting.tsv"
+      format="tsv"
     />,
   );
 }
@@ -50,14 +54,45 @@ describe('ScoutingExport', () => {
     expect(screen.getByRole('heading', { name: 'Scouting Data' })).toBeTruthy();
   });
 
-  test('shows the CSV data in a disabled textarea', () => {
+  test.each([
+    { rowCount: 1, expected: 'One row per team · 1 row' },
+    { rowCount: 42, expected: 'One row per team · 42 rows' },
+  ])('describes an export with $rowCount rows', ({ rowCount, expected }) => {
+    renderScoutingExport(rowCount);
+
+    expect(screen.getByText(expected)).toBeTruthy();
+  });
+
+  test('hides the preview by default', () => {
     renderScoutingExport();
 
-    const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
-    expect({ disabled: textarea.disabled, value: textarea.value }).toEqual({
-      disabled: true,
+    expect(screen.queryByRole('textbox')).toBeNull();
+  });
+
+  test('shows the data in a read-only preview when Preview is clicked', () => {
+    renderScoutingExport();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Preview' }));
+
+    const textarea = screen.getByRole('textbox', {
+      name: 'Scouting Data preview',
+    }) as HTMLTextAreaElement;
+    expect({ readOnly: textarea.readOnly, value: textarea.value }).toEqual({
+      readOnly: true,
       value: 'Team,Score\n254,100',
     });
+  });
+
+  test('marks Preview as expanded when Preview is clicked', () => {
+    renderScoutingExport();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Preview' }));
+
+    expect(
+      screen
+        .getByRole('button', { name: 'Preview' })
+        .getAttribute('aria-expanded'),
+    ).toBe('true');
   });
 
   test('copies the CSV data when Copy is clicked', async () => {
@@ -115,12 +150,16 @@ describe('ScoutingExport', () => {
     );
   });
 
-  test('downloads the CSV data when Download is clicked', () => {
+  test('downloads the data in its format when Download is clicked', () => {
     renderScoutingExport();
 
     fireEvent.click(screen.getByRole('button', { name: 'Download' }));
 
-    expect(downloadCsvMock).toHaveBeenCalledWith(csvData, 'scouting.csv');
+    expect(downloadCsvMock).toHaveBeenCalledWith(
+      csvData,
+      'scouting.tsv',
+      'tsv',
+    );
     expect(toastSuccessMock).toHaveBeenCalledWith('Download started!');
   });
 
@@ -132,6 +171,6 @@ describe('ScoutingExport', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Download' }));
 
-    expect(toastErrorMock).toHaveBeenCalledWith('Failed to download CSV.');
+    expect(toastErrorMock).toHaveBeenCalledWith('Failed to download file.');
   });
 });

@@ -1,5 +1,8 @@
 import { CompLevel, Event, Match, PlayoffType } from '~/api/tba/read';
-import { DOUBLE_ELIM_ROUND_MAPPING } from '~/lib/api/PlayoffType';
+import {
+  DOUBLE_ELIM_4_ROUND_MAPPING,
+  DOUBLE_ELIM_ROUND_MAPPING,
+} from '~/lib/api/PlayoffType';
 import { COMP_LEVEL_LONG_STRINGS } from '~/lib/matchUtils';
 import { timestampsAreOnDifferentDays } from '~/lib/utils';
 
@@ -49,6 +52,18 @@ export const START_OF_QUALS_BREAKER: ShouldInsertBreakCallback = ({
   };
 };
 
+const PLAYOFF_START_LABELS = new Map<PlayoffType | null, string>([
+  [PlayoffType.DOUBLE_ELIM_8_TEAM, 'Round 1'],
+  [PlayoffType.DOUBLE_ELIM_4_TEAM, 'Round 1'],
+  [PlayoffType.ROUND_ROBIN_6_TEAM, 'Round Robin'],
+  [PlayoffType.CUSTOM, 'Playoffs'],
+]);
+
+const DOUBLE_ELIM_ROUNDS = new Map<PlayoffType | null, Map<number, number>>([
+  [PlayoffType.DOUBLE_ELIM_8_TEAM, DOUBLE_ELIM_ROUND_MAPPING],
+  [PlayoffType.DOUBLE_ELIM_4_TEAM, DOUBLE_ELIM_4_ROUND_MAPPING],
+]);
+
 export const START_OF_ELIMS_BREAKER: ShouldInsertBreakCallback = ({
   match,
   matchIndex,
@@ -56,14 +71,9 @@ export const START_OF_ELIMS_BREAKER: ShouldInsertBreakCallback = ({
 }) => {
   return {
     shouldBreak: matchIndex === 0 && match.comp_level !== CompLevel.QM,
-    text: (
-      {
-        [PlayoffType.DOUBLE_ELIM_8_TEAM]: 'Round 1',
-        [PlayoffType.AVG_SCORE_8_TEAM]: COMP_LEVEL_LONG_STRINGS[CompLevel.QF],
-        [PlayoffType.BRACKET_8_TEAM]: COMP_LEVEL_LONG_STRINGS[CompLevel.QF],
-        [PlayoffType.CUSTOM]: 'Playoffs',
-      } as Partial<Record<PlayoffType, string>>
-    )[event.playoff_type ?? PlayoffType.BRACKET_8_TEAM],
+    text:
+      PLAYOFF_START_LABELS.get(event.playoff_type) ??
+      COMP_LEVEL_LONG_STRINGS[match.comp_level],
     whereToInsertBreak: 'before',
   };
 };
@@ -97,17 +107,18 @@ export const CHANGE_IN_COMP_LEVEL_BREAKER: ShouldInsertBreakCallback = ({
 export const CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER: ShouldInsertBreakCallback = ({
   match,
   nextMatch,
+  event,
 }) => {
-  if (!nextMatch) {
+  const rounds = DOUBLE_ELIM_ROUNDS.get(event.playoff_type);
+  if (!nextMatch || !rounds) {
     return { shouldBreak: false };
   }
 
   return {
     shouldBreak:
-      DOUBLE_ELIM_ROUND_MAPPING.get(match.set_number) !==
-        DOUBLE_ELIM_ROUND_MAPPING.get(nextMatch.set_number) &&
+      rounds.get(match.set_number) !== rounds.get(nextMatch.set_number) &&
       nextMatch.comp_level !== CompLevel.F,
-    text: `Round ${DOUBLE_ELIM_ROUND_MAPPING.get(nextMatch.set_number)}`,
+    text: `Round ${rounds.get(nextMatch.set_number)}`,
     whereToInsertBreak: 'after',
   };
 };

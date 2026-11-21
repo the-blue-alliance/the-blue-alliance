@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 
+import { gotoHydrated } from './helpers';
+
 test.describe('/suggest/team/social_media', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/suggest/team/social_media?team_key=frc1124');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/suggest/team/social_media?team_key=frc1124');
   });
 
   test('shows the selected team', async ({ page }) => {

@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRouter, useSearch } from '@tanstack/react-router';
-import { Suspense, useState } from 'react';
+import { Component, type PropsWithChildren, Suspense, useState } from 'react';
 
 import { PlayoffType } from '~/api/tba/read';
 import {
@@ -53,9 +53,11 @@ export function MatchModal() {
       {/* Focus the content area and not the first element */}
       <CredenzaContent className="max-w-5xl sm:max-w-5xl" focusContentOnOpen>
         {displayMatchKey && (
-          <Suspense fallback={<MatchModalSpinner />}>
-            <MatchModalContent matchKey={displayMatchKey} />
-          </Suspense>
+          <MatchNotFoundBoundary key={displayMatchKey}>
+            <Suspense fallback={<MatchModalSpinner />}>
+              <MatchModalContent matchKey={displayMatchKey} />
+            </Suspense>
+          </MatchNotFoundBoundary>
         )}
       </CredenzaContent>
     </Credenza>
@@ -72,19 +74,6 @@ function MatchModalContent({ matchKey }: { matchKey: string }) {
   const eventQuery = useSuspenseQuery(
     getEventOptions({ path: { event_key: eventKey } }),
   );
-
-  if (!matchQuery.data || !eventQuery.data) {
-    return (
-      <>
-        <CredenzaHeader>
-          <CredenzaTitle>Match not found</CredenzaTitle>
-        </CredenzaHeader>
-        <CredenzaBody>
-          <p>The requested match could not be found.</p>
-        </CredenzaBody>
-      </>
-    );
-  }
 
   const match = matchQuery.data;
   const event = eventQuery.data;
@@ -105,6 +94,31 @@ function MatchModalContent({ matchKey }: { matchKey: string }) {
       </CredenzaBody>
     </>
   );
+}
+
+class MatchNotFoundBoundary extends Component<
+  PropsWithChildren,
+  { failed: boolean }
+> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <>
+        <CredenzaHeader>
+          <CredenzaTitle>Match not found</CredenzaTitle>
+        </CredenzaHeader>
+        <CredenzaBody>
+          <p>The requested match could not be found.</p>
+        </CredenzaBody>
+      </>
+    );
+  }
 }
 
 function MatchModalSpinner() {

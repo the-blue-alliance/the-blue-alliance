@@ -1,5 +1,5 @@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { Link, createFileRoute, notFound } from '@tanstack/react-router';
 import { type JSX, useState } from 'react';
 import { z } from 'zod';
 
@@ -104,7 +104,7 @@ function SuggestEventMedia(): JSX.Element {
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 py-8">
+    <div className="mx-auto max-w-3xl space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Add Event Media</h1>
         <p className="text-lg text-muted-foreground">
@@ -154,7 +154,10 @@ function SuggestEventMedia(): JSX.Element {
         </ul>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div
+        className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))]
+          gap-4"
+      >
         <Guidance title="Please submit" tone="success">
           <li>Videos of award ceremonies</li>
           <li>Opening or closing ceremony speeches</li>
@@ -164,12 +167,13 @@ function SuggestEventMedia(): JSX.Element {
         <Guidance title="Please do not submit" tone="error">
           <li>
             Full match videos; submit those through the{' '}
-            <a
-              href={`https://www.thebluealliance.com/suggest/event/video?event_key=${event_key}`}
+            <Link
+              to="/suggest/event/video"
+              search={{ event_key }}
               className="underline underline-offset-4"
             >
               match video form
-            </a>
+            </Link>
           </li>
           <li>Videos of people dancing</li>
           <li>Long videos with little event-related content</li>
@@ -197,7 +201,10 @@ function SuggestEventMedia(): JSX.Element {
             Existing Media ({media.length})
           </h2>
           {videos.length > 0 && (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div
+              className="grid
+                grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))] gap-4"
+            >
               {videos.map((video) => (
                 <YoutubeEmbed
                   key={video.foreign_key}

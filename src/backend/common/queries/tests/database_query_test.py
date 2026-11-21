@@ -822,13 +822,3 @@ def test_get_query_class_by_name() -> None:
         is CachedDummyModelPointQuery
     )
     assert CachedDatabaseQuery.get_query_class_by_name("NotARealQuery") is None
-
-
-def test_validate_db_version_for_deletion() -> None:
-    current = CachedDatabaseQuery.DATABASE_QUERY_VERSION
-    CachedDatabaseQuery.validate_db_version_for_deletion(current - 2)
-
-    with pytest.raises(ValueError, match="must be a positive integer"):
-        CachedDatabaseQuery.validate_db_version_for_deletion(0)
-    with pytest.raises(ValueError, match="must be less than"):
-        CachedDatabaseQuery.validate_db_version_for_deletion(current - 1)

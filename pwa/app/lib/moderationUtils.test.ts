@@ -14,6 +14,7 @@ import {
   isNotModeratorResponse,
   matchVideoDurationWarning,
   matchVideoTitleWarning,
+  pastYearsWithEventKeys,
   resolveUserMessage,
   socialProfileWarning,
   suggestionTypeOrderComparator,
@@ -285,6 +286,39 @@ describe('formatAuthorReputation', () => {
   test('undefined when counts are unavailable', () => {
     expect(formatAuthorReputation({})).toBeUndefined();
   });
+
+  test('includes the account creation date', () => {
+    expect(
+      formatAuthorReputation({
+        accepted_count: 3,
+        rejected_count: 0,
+        created: '2019-03-02T18:04:11.123456',
+      }),
+    ).toBe('3 accepted · 0 rejected · account since 2019-03-02');
+  });
+});
+
+describe('pastYearsWithEventKeys', () => {
+  test('lists earlier years with keys for the same event code', () => {
+    expect(
+      pastYearsWithEventKeys(
+        [
+          { event_keys: ['2025pahor'] },
+          { event_keys: ['2024paca', '2024pahor'] },
+        ],
+        '2026pahor',
+      ),
+    ).toEqual([2024, 2025]);
+  });
+
+  test('ignores other events and the requested year itself', () => {
+    expect(
+      pastYearsWithEventKeys(
+        [{ event_keys: ['2025paca', '2026pahor'] }],
+        '2026pahor',
+      ),
+    ).toEqual([]);
+  });
 });
 
 describe('matchVideoTitleWarning', () => {
@@ -468,5 +502,37 @@ describe('matchVideoTitleWarning for early playoff rounds', () => {
     expect(
       matchVideoTitleWarning('2016necmp Quarterfinal 2', '2016necmp_qf2m1'),
     ).toBeUndefined();
+  });
+});
+
+describe('matchVideoTitleWarning spacing and abbreviations', () => {
+  const event = { name: 'New England District Championship', year: 2016 };
+
+  test.each([
+    ['2016 NECMP QM10', '2016necmp_qm10'],
+    ['2016 NECMP QM 10', '2016necmp_qm10'],
+    ['2016 NECMP Q10', '2016necmp_qm10'],
+    ['2016 NECMP Q 10', '2016necmp_qm10'],
+    ['2016 NECMP Qual 10', '2016necmp_qm10'],
+    ['2016necmp_qm10', '2016necmp_qm10'],
+    ['NECMP SF 1 M 1', '2016necmp_sf1m1'],
+    ['NECMP SF1-1', '2016necmp_sf1m1'],
+    ['NECMP QF2-1', '2016necmp_qf2m1'],
+    ['NECMP EF3-1', '2016necmp_ef3m1'],
+    ['NECMP F1-2', '2016necmp_f1m2'],
+  ])('no warning for %s', (title, key) => {
+    expect(matchVideoTitleWarning(title, key, event)).toBeUndefined();
+  });
+
+  test.each([
+    ['2016 NECMP QM10', '2016necmp_qm1'],
+    ['2016 NECMP QM 12', '2016necmp_qm1'],
+    ['2016 NECMP Q100', '2016necmp_qm10'],
+    ['2016 NECMP SF1M1', '2016necmp_f1m1'],
+    ['2016 NECMP SF 11', '2016necmp_sf1m1'],
+  ])('warns for %s on %s', (title, key) => {
+    expect(matchVideoTitleWarning(title, key, event)).toMatch(
+      /doesn't mention/,
+    );
   });
 });

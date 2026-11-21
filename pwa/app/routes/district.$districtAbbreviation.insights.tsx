@@ -23,6 +23,7 @@ import { Spinner } from '~/components/ui/spinner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { getDistrictColorBorderClass } from '~/lib/districtUtils';
+import { useHashTab } from '~/lib/useHashTab';
 import { doThrowNotFound, publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute(
@@ -742,6 +743,10 @@ function computeTeamupLeaderboard(
 }
 
 function DistrictInsightsPage() {
+  const tabs = useHashTab({
+    values: ['championships', 'events', 'awards'] as const,
+    defaultValue: 'championships',
+  });
   const { abbreviation } = Route.useLoaderData();
 
   const { data: history } = useSuspenseQuery(
@@ -812,7 +817,7 @@ function DistrictInsightsPage() {
   const isLoading = eventsByYear.isPending || awardsByYear.isPending;
 
   return (
-    <div className="py-8">
+    <div>
       <div
         className="flex flex-col gap-4 sm:flex-row sm:items-start
           sm:justify-between"
@@ -840,7 +845,11 @@ function DistrictInsightsPage() {
       {isLoading ? (
         <Spinner className="mx-auto mt-16 size-8" />
       ) : (
-        <Tabs defaultValue="championships" className="mt-6">
+        <Tabs
+          value={tabs.value}
+          onValueChange={(value) => tabs.onValueChange(String(value))}
+          className="mt-6"
+        >
           <TabsList
             className="flex h-auto flex-wrap items-center justify-evenly
               *:basis-1/2 lg:*:basis-1"
@@ -851,7 +860,10 @@ function DistrictInsightsPage() {
           </TabsList>
 
           <TabsContent value="championships">
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div
+              className="grid
+                grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-6"
+            >
               <Leaderboard
                 leaderboard={{
                   data: {
@@ -927,7 +939,10 @@ function DistrictInsightsPage() {
           </TabsContent>
 
           <TabsContent value="events">
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div
+              className="grid
+                grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-6"
+            >
               <Leaderboard
                 leaderboard={{
                   data: {
@@ -1008,7 +1023,10 @@ function DistrictInsightsPage() {
           </TabsContent>
 
           <TabsContent value="awards">
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div
+              className="grid
+                grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-6"
+            >
               <Leaderboard
                 leaderboard={{
                   data: {

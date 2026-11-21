@@ -384,6 +384,107 @@ describe('router error components', () => {
     expect(prompt).toContain(`\`\`\`\n${error.stack}\n\`\`\``);
   });
 
+  describe('chunk load errors', () => {
+    const chunkError = new TypeError(
+      'error loading dynamically imported module: https://beta.thebluealliance.com/assets/apidocs_.v3-CT9513oi.js',
+    );
+    const reload = vi.fn<() => void>();
+
+    beforeEach(() => {
+      sessionStorage.clear();
+      reload.mockReset();
+      vi.stubGlobal('location', {
+        href: 'https://beta.thebluealliance.com/apidocs/v3',
+        reload,
+      });
+    });
+
+    test.each([
+      ['Chrome', 'Failed to fetch dynamically imported module: /assets/a.js'],
+      ['Firefox', 'error loading dynamically imported module: /assets/a.js'],
+      ['Safari', 'Importing a module script failed.'],
+    ])('reloads the page when %s fails to load a chunk', (_, message) => {
+      const ErrorComponent = errorComponent();
+
+      render(
+        <ErrorComponent
+          error={new TypeError(message)}
+          reset={vi.fn<() => void>()}
+        />,
+      );
+
+      expect(reload).toHaveBeenCalledTimes(1);
+    });
+
+    test('does not report a chunk error to Sentry while reloading', () => {
+      const ErrorComponent = errorComponent();
+
+      render(<ErrorComponent error={chunkError} reset={vi.fn<() => void>()} />);
+
+      expect(mocks.captureException).not.toHaveBeenCalled();
+    });
+
+    test('shows the error page when the chunk fails again after reloading', () => {
+      const ErrorComponent = errorComponent();
+      render(
+        <ErrorComponent error={chunkError} reset={vi.fn<() => void>()} />,
+      ).unmount();
+
+      render(<ErrorComponent error={chunkError} reset={vi.fn<() => void>()} />);
+
+      expect(
+        screen.getByRole('heading', { name: 'An error occurred.' }),
+      ).toBeTruthy();
+    });
+
+    test('reloads again when a different chunk fails after a later deploy', () => {
+      const ErrorComponent = errorComponent();
+      render(
+        <ErrorComponent error={chunkError} reset={vi.fn<() => void>()} />,
+      ).unmount();
+      reload.mockReset();
+
+      render(
+        <ErrorComponent
+          error={
+            new TypeError(
+              'error loading dynamically imported module: https://beta.thebluealliance.com/assets/apidocs_.v3-BnelGFuX.js',
+            )
+          }
+          reset={vi.fn<() => void>()}
+        />,
+      );
+
+      expect(reload).toHaveBeenCalledTimes(1);
+    });
+
+    test('does not reload for errors other than chunk loads', () => {
+      const ErrorComponent = errorComponent();
+
+      render(
+        <ErrorComponent
+          error={new TypeError('Cannot read properties of undefined')}
+          reset={vi.fn<() => void>()}
+        />,
+      );
+
+      expect(reload).not.toHaveBeenCalled();
+    });
+
+    test('shows the error page when session storage is unavailable', () => {
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new DOMException('denied', 'SecurityError');
+      });
+      const ErrorComponent = errorComponent();
+
+      render(<ErrorComponent error={chunkError} reset={vi.fn<() => void>()} />);
+
+      expect(
+        screen.getByRole('heading', { name: 'An error occurred.' }),
+      ).toBeTruthy();
+    });
+  });
+
   test('reports clipboard failures', async () => {
     const writeText = vi.fn<(text: string) => Promise<void>>();
     writeText.mockRejectedValue(new Error('denied'));

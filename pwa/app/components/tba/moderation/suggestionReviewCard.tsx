@@ -10,7 +10,7 @@ import type {
 } from '~/api/tba/moderation/types.gen';
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
 import { EventType } from '~/api/tba/read';
-import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
+import { TwitchEmbed, YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Card, CardHeader, CardTitle } from '~/components/ui/card';
@@ -24,6 +24,7 @@ import {
   formatEventDateRange,
   matchVideoDurationWarning,
   matchVideoTitleWarning,
+  pastYearsWithEventKeys,
   resolveUserMessage,
   socialProfileWarning,
 } from '~/lib/moderationUtils';
@@ -776,6 +777,33 @@ function EventMediaDetails({
   );
 }
 
+// Previews whatever the moderator is about to accept, so a corrected
+// type or channel updates the player.
+function webcastPreview(
+  type: string,
+  channel: string,
+  eventName: string,
+): JSX.Element | null {
+  const title = `Suggested webcast for ${eventName}`;
+  if (!channel) {
+    return null;
+  }
+  if (type === 'youtube') {
+    return (
+      <YoutubeEmbed
+        videoId={channel}
+        title={title}
+        className="max-w-sm"
+        clickToPlay
+      />
+    );
+  }
+  if (type === 'twitch') {
+    return <TwitchEmbed channel={channel} title={title} className="max-w-sm" />;
+  }
+  return null;
+}
+
 function WebcastDetails({
   suggestion,
   overrides,
@@ -790,8 +818,16 @@ function WebcastDetails({
     suggestion.event?.start_date,
     suggestion.event?.end_date,
   );
-  return (
-    <div className="flex flex-col gap-3">
+  const webcastType = overrides.webcast_type ?? webcastDict?.type ?? '';
+  const webcastChannel =
+    overrides.webcast_channel ?? webcastDict?.channel ?? '';
+  const preview = webcastPreview(
+    webcastType,
+    webcastChannel,
+    suggestion.event?.name ?? suggestion.target_key ?? '',
+  );
+  const fields = (
+    <>
       {!hideEventContext && (
         <>
           <FieldRow label="Event">
@@ -821,13 +857,16 @@ function WebcastDetails({
           District uses the Official Webcast Unit
         </Badge>
       )}
-      <div className="grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
+      <div
+        className="grid max-w-2xl
+          grid-cols-[repeat(auto-fill,minmax(min(100%,9rem),1fr))] gap-3"
+      >
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium text-muted-foreground">Type</span>
           <select
             className="h-9 rounded-md border border-input bg-transparent px-3
               text-sm"
-            value={overrides.webcast_type ?? webcastDict?.type ?? ''}
+            value={webcastType}
             onChange={(e) =>
               onOverridesChange({ ...overrides, webcast_type: e.target.value })
             }
@@ -842,7 +881,7 @@ function WebcastDetails({
         </label>
         <LabeledInput
           label="Channel"
-          value={overrides.webcast_channel ?? webcastDict?.channel ?? ''}
+          value={webcastChannel}
           onChange={(value) =>
             onOverridesChange({ ...overrides, webcast_channel: value })
           }
@@ -865,7 +904,14 @@ function WebcastDetails({
           }
         />
       </div>
-    </div>
+    </>
+  );
+  return preview ? (
+    <PreviewLayout previewSide="right" preview={preview}>
+      {fields}
+    </PreviewLayout>
+  ) : (
+    <div className="flex flex-col gap-3">{fields}</div>
   );
 }
 
@@ -921,7 +967,10 @@ function OffseasonEventDetails({
             </div>
           ),
       )}
-      <div className="grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
+      <div
+        className="grid max-w-3xl
+          grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-3"
+      >
         <LabeledInput
           label="Event short (required, e.g. 'cc')"
           value={overrides.event_short ?? ''}
@@ -1029,6 +1078,68 @@ function OffseasonEventDetails({
   );
 }
 
+// How many of the requester's past write keys to list before summarizing
+const MAX_LISTED_WRITE_KEYS = 5;
+
+// The requester's write-key history: anyone already trusted with keys,
+// especially for this same event in earlier years, is a low-risk grant.
+function AuthorWriteKeys({
+  suggestion,
+}: {
+  suggestion: ModerationSuggestion;
+}): JSX.Element {
+  const writeKeys = suggestion.author_write_keys ?? [];
+  const pastYears = pastYearsWithEventKeys(
+    writeKeys,
+    contentsString(suggestion, 'event_key'),
+  );
+  const hidden = writeKeys.length - MAX_LISTED_WRITE_KEYS;
+  return (
+    <>
+      {pastYears.length > 0 && (
+        <Badge variant="success" className="w-fit">
+          Had write keys for this event in {pastYears.join(', ')}
+        </Badge>
+      )}
+      {writeKeys.length === 0 ? (
+        <FieldRow label="Past write keys">None</FieldRow>
+      ) : (
+        <div className="flex flex-col gap-1 text-sm">
+          <span className="font-medium text-muted-foreground">
+            Past write keys:
+          </span>
+          <ul className="list-inside list-disc" aria-label="Past write keys">
+            {writeKeys.slice(0, MAX_LISTED_WRITE_KEYS).map((key, i) => (
+              <li key={i}>
+                {(key.event_keys ?? []).map((eventKey, j) => (
+                  <span key={eventKey}>
+                    {j > 0 && ', '}
+                    <Link
+                      to="/event/$eventKey"
+                      params={{ eventKey }}
+                      className="text-primary underline underline-offset-2"
+                    >
+                      {eventKey}
+                    </Link>
+                  </span>
+                ))}
+                {` (${(key.auth_types ?? []).map((t) => t.name).join(', ')})`}
+                {key.created ? ` · granted ${key.created.slice(0, 10)}` : ''}
+                {key.expiration
+                  ? ` · until ${key.expiration.slice(0, 10)}`
+                  : ' · no expiration'}
+              </li>
+            ))}
+          </ul>
+          {hidden > 0 && (
+            <span className="text-muted-foreground">and {hidden} more</span>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
 function ApiWriteDetails({
   suggestion,
   overrides,
@@ -1082,6 +1193,7 @@ function ApiWriteDetails({
       <FieldRow label="Affiliation">
         {contentsString(suggestion, 'affiliation')}
       </FieldRow>
+      <AuthorWriteKeys suggestion={suggestion} />
       {(suggestion.existing_auth ?? []).length > 0 && (
         <div
           className="rounded-lg border border-yellow-500 bg-yellow-500/10 p-2
@@ -1194,7 +1306,7 @@ export function SuggestionReviewCard(
   return (
     <Card
       className={cn(
-        'flex scroll-mt-24 flex-col gap-3 p-4',
+        'flex flex-col gap-3 p-4',
         // Keyboard-focus glow, distinct from the browser focus ring
         focused &&
           `shadow-lg ring-2 shadow-primary/25 ring-primary/70 ring-offset-2

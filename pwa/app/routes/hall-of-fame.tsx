@@ -51,7 +51,7 @@ function HallOfFamePage() {
 
   if (!hofNotable) {
     return (
-      <div className="py-8">
+      <div>
         <h1 className="mb-4 text-3xl font-medium">Hall of Fame</h1>
         <p className="text-muted-foreground">
           Hall of Fame data is not available.
@@ -71,7 +71,7 @@ function HallOfFamePage() {
   });
 
   return (
-    <div className="py-8">
+    <div>
       <h1 className="mb-2 text-3xl font-medium">Hall of Fame</h1>
       <p className="mb-6 text-muted-foreground">
         Teams inducted into the FIRST Robotics Competition Hall of Fame by

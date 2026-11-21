@@ -27,6 +27,13 @@ export interface TeamTooltipProps {
   isCaptain?: boolean;
 }
 
+function deviceCanHover(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches
+  );
+}
+
 export function TeamLinkWithTooltip({
   teamKey,
   year,
@@ -40,6 +47,7 @@ export function TeamLinkWithTooltip({
   const { data: searchIndex } = useQuery({
     ...getSearchIndexOptions({}),
     staleTime: STALE_TIME.SEARCH_INDEX,
+    enabled: deviceCanHover(),
   });
   const teamName = useMemo(
     () => searchIndex?.teams.find((t) => t.key === teamKey)?.nickname,

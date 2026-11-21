@@ -10,11 +10,7 @@ const { useMediaQueryMock } = vi.hoisted(() => ({
 
 vi.mock('~/lib/hooks', () => ({ useMediaQuery: useMediaQueryMock }));
 
-vi.mock('~/components/tba/teamTooltip', () => ({
-  TeamLinkWithTooltip: ({ teamKey }: { teamKey: string }) => (
-    <a href={`/team/${teamKey}`}>{teamKey}</a>
-  ),
-}));
+vi.mock('~/components/tba/teamTooltip', () => import('~/test/linkMocks'));
 
 const coprs: EventCoprs = {
   totalPoints: { frc254: 50.123, frc604: 70 },
@@ -34,7 +30,9 @@ describe('ComponentOprsTable', () => {
   });
 
   test('shows the preferred components on desktop, sorted by total', () => {
-    render(<ComponentOprsTable coprs={coprs} year={2025} />);
+    render(
+      <ComponentOprsTable title="Component OPRs" coprs={coprs} year={2025} />,
+    );
     expect(headers()).toEqual([
       '#',
       'Team',
@@ -47,16 +45,18 @@ describe('ComponentOprsTable', () => {
       within(rows[0])
         .getAllByRole('cell')
         .map((c) => c.textContent),
-    ).toEqual(['1', 'frc604', '70.00', '12.00', '—']);
+    ).toEqual(['1', '604', '70.00', '12.00', '—']);
     expect(
       within(rows[1])
         .getAllByRole('cell')
         .map((c) => c.textContent),
-    ).toEqual(['2', 'frc254', '50.12', '10.00', '40.00']);
+    ).toEqual(['2', '254', '50.12', '10.00', '40.00']);
   });
 
   test('ranks teams by the selected component', () => {
-    render(<ComponentOprsTable coprs={coprs} year={2025} />);
+    render(
+      <ComponentOprsTable title="Component OPRs" coprs={coprs} year={2025} />,
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'Teleop Points' }));
 
@@ -65,11 +65,13 @@ describe('ComponentOprsTable', () => {
     ).toBe('1');
     expect(
       within(screen.getAllByRole('row')[1]).getByRole('link').textContent,
-    ).toBe('frc254');
+    ).toBe('254');
   });
 
   test('inverts ranks when the component is sorted ascending', () => {
-    render(<ComponentOprsTable coprs={coprs} year={2025} />);
+    render(
+      <ComponentOprsTable title="Component OPRs" coprs={coprs} year={2025} />,
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'Total Points ↓' }));
 
@@ -82,7 +84,9 @@ describe('ComponentOprsTable', () => {
   });
 
   test('returns to descending sorting instead of clearing the sort', () => {
-    render(<ComponentOprsTable coprs={coprs} year={2025} />);
+    render(
+      <ComponentOprsTable title="Component OPRs" coprs={coprs} year={2025} />,
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Total Points ↓' }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Total Points ↑' }));
@@ -90,12 +94,14 @@ describe('ComponentOprsTable', () => {
     expect(screen.getByRole('button', { name: 'Total Points ↓' })).toBeTruthy();
     expect(
       within(screen.getAllByRole('row')[1]).getByRole('link').textContent,
-    ).toBe('frc604');
+    ).toBe('604');
   });
 
   test('shows only the sort component on mobile and lets the user pick', async () => {
     useMediaQueryMock.mockReturnValue(false);
-    render(<ComponentOprsTable coprs={coprs} year={2025} />);
+    render(
+      <ComponentOprsTable title="Component OPRs" coprs={coprs} year={2025} />,
+    );
     expect(headers()).toEqual(['#', 'Team', 'Total Points ↓']);
 
     fireEvent.click(screen.getByRole('button', { name: 'Columns' }));
@@ -111,7 +117,9 @@ describe('ComponentOprsTable', () => {
   });
 
   test('does not sort without components', () => {
-    render(<ComponentOprsTable coprs={{}} year={2025} />);
+    render(
+      <ComponentOprsTable title="Component OPRs" coprs={{}} year={2025} />,
+    );
     expect(headers()).toEqual(['#', 'Team']);
     expect(screen.getByText('No results.')).toBeTruthy();
   });

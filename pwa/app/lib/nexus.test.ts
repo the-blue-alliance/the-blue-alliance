@@ -16,7 +16,7 @@ function match(
 }
 
 function eventInfo(matches: NexusEventInfo['matches']): NexusEventInfo {
-  return { data_as_of_ms: 0, now_queueing: null, matches };
+  return { data_as_of_ms: 0, now_queueing: null, matches, pit_map: null };
 }
 
 describe('buildNexusStatusMap', () => {

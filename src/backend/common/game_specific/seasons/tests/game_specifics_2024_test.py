@@ -12,6 +12,8 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2024
 from backend.common.game_specific.seasons.game_specifics_2024 import GameSpecifics2024
 from backend.common.game_specific.seasons.tests.conftest import (
+    assert_partial_breakdowns_split_counters,
+    assert_score_stats_without_breakdowns,
     build_match,
     HELPERS_TESTS,
     tiebreak_winner,
@@ -204,6 +206,16 @@ def test_calculate_event_insights_without_finished_matches() -> None:
     assert _insights([unplayed]) == {"qual": None, "playoff": None}
 
 
+def test_insights_without_any_breakdowns() -> None:
+    assert_score_stats_without_breakdowns(GameSpecifics2024(), "2024test")
+
+
+def test_insights_with_some_breakdowns(test_data_importer) -> None:
+    test_data_importer.import_match_list(HELPERS_TESTS, "data/2024nytr_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, "2024nytr")).fetch()
+    assert_partial_breakdowns_split_counters(GameSpecifics2024(), matches)
+
+
 def test_rp_sweep_requires_melody_and_ensemble() -> None:
     """A 4 RP sweep is WIN + MELODY + ENSEMBLE (2024 manual, Table 6-2)."""
     melody_only = {"melodyBonusAchieved": True, "ensembleBonusAchieved": False}
@@ -219,3 +231,18 @@ def test_rp_sweep_requires_melody_and_ensemble() -> None:
     qual = none_throws(_insights(matches)["qual"])
     assert qual["four_rp_count"] == [1, 2, 50.0]
     assert qual["six_rp_count"] == [0, 2, 0.0]
+
+
+def test_get_per_robot_coprs() -> None:
+    coprs = GameSpecifics2024().get_per_robot_coprs()
+    breakdown = {
+        "autoLineRobot1": "Yes",
+        "autoLineRobot2": "No",
+        "autoLineRobot3": "Yes",
+        "endGameRobot1": "Parked",
+        "endGameRobot2": "StageLeft",
+        "endGameRobot3": "None",
+    }
+    assert coprs["autoLeavePoints"](breakdown) == [2, 0, 2]
+    assert coprs["endGameParkPoints"](breakdown) == [1, 0, 0]
+    assert coprs["endGameOnStagePoints"](breakdown) == [0, 3, 0]

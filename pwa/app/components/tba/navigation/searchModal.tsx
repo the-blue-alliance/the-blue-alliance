@@ -1,5 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { ClientOnly, useNavigate } from '@tanstack/react-router';
+import {
+  ClientOnly,
+  useNavigate,
+  useRouteContext,
+} from '@tanstack/react-router';
 import { cn } from 'cn';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
@@ -27,19 +31,21 @@ import { Kbd, KbdGroup } from '~/components/ui/kbd';
 import { Spinner } from '~/components/ui/spinner';
 import defaultAvatar from '~/images/default-avatar.png';
 import { STALE_TIME } from '~/lib/queryClient';
-import FuzzysortFilterer, {
-  SearchResult,
-} from '~/lib/search/fuzzysortFilterer';
+import { SearchResult, siteSearch } from '~/lib/search/siteSearch';
 
 export function SearchModal() {
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>('');
+  const [searchIntended, setSearchIntended] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const keyboardProxyRef = useRef<HTMLInputElement>(null);
   const searchIndexQuery = useQuery({
     ...getSearchIndexOptions({}),
     staleTime: STALE_TIME.SEARCH_INDEX,
+    enabled: open || searchIntended,
   });
-  const filterer = useMemo(() => new FuzzysortFilterer(), []);
+  const intendSearch = () => setSearchIntended(true);
+  const { currentSeason } = useRouteContext({ from: '__root__' });
   const navigate = useNavigate();
   const isMacintosh =
     typeof navigator !== 'undefined'
@@ -47,11 +53,11 @@ export function SearchModal() {
       : false;
 
   const searchResults: SearchResult[] | null = useMemo(() => {
-    if (!searchIndexQuery.data) {
+    if (!open || !searchIndexQuery.data) {
       return null;
     }
-    return filterer.filter(searchIndexQuery.data, query);
-  }, [query, searchIndexQuery.data, filterer]);
+    return siteSearch(searchIndexQuery.data, query, currentSeason);
+  }, [open, query, searchIndexQuery.data, currentSeason]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -76,18 +82,21 @@ export function SearchModal() {
   }, []);
 
   const isIndexPending = searchIndexQuery.isPending && !searchIndexQuery.data;
-  const hasNoResults = searchResults !== null && searchResults.length === 0;
+  const hasNoResults =
+    query.trim() !== '' && searchResults !== null && searchResults.length === 0;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
+        onPointerEnter={intendSearch}
+        onFocus={intendSearch}
         render={
           <Button
             variant="secondary"
             className={cn(
               `relative h-9 w-full justify-start rounded-lg bg-white pl-4
               font-normal text-muted-foreground shadow-none hover:bg-white
-              max-lg:hidden sm:pr-12 md:w-32 lg:w-56 xl:w-64 dark:bg-card`,
+              max-xl:hidden sm:pr-12 md:w-32 xl:w-64 dark:bg-card`,
             )}
           />
         }
@@ -106,10 +115,20 @@ export function SearchModal() {
         </ClientOnly>
       </DialogTrigger>
 
+      <input
+        ref={keyboardProxyRef}
+        aria-hidden
+        tabIndex={-1}
+        inputMode="search"
+        className="pointer-events-none fixed top-0 left-0 size-px opacity-0"
+      />
       <DialogTrigger
+        onPointerEnter={intendSearch}
+        onFocus={intendSearch}
+        onClick={() => keyboardProxyRef.current?.focus()}
         aria-label="Search"
         className="z-30 cursor-pointer rounded-full p-2 text-white
-          transition-colors duration-200 hover:bg-black/20 lg:hidden"
+          transition-colors duration-200 hover:bg-black/20 xl:hidden"
       >
         <SearchIcon className="size-5" />
       </DialogTrigger>
@@ -136,7 +155,10 @@ export function SearchModal() {
         >
           <div className="relative">
             <CommandInput
-              ref={inputRef}
+              ref={(node) => {
+                inputRef.current = node;
+                node?.focus();
+              }}
               placeholder="Search teams and events..."
               value={query}
               onValueChange={setQuery}

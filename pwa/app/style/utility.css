@@ -1,19 +1,7 @@
 @utility container {
   margin-inline: auto;
   padding-inline: 15px;
-
-  @media (width >= --theme(--breakpoint-sm)) {
-    max-width: none;
-  }
-  @media (width >= 768px) {
-    max-width: 768px;
-  }
-  @media (width >= 992px) {
-    max-width: 992px;
-  }
-  @media (width >= 1200px) {
-    max-width: 1200px;
-  }
+  max-width: 1200px;
 }
 
 /*

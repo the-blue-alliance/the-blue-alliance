@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import pytest
 
 from backend.web.context_processors import (
+    platinum_sponsors_context_processor,
     pwa_url_context_processor,
     render_time_context_processor,
 )
@@ -32,3 +33,8 @@ def test_pwa_url_context_processor_local_dev(monkeypatch: pytest.MonkeyPatch) ->
     assert (
         context["pwa_suggestion_review_url"] == "http://localhost:5173/suggest/review"
     )
+
+
+def test_platinum_sponsors_context_processor(ndb_stub) -> None:
+    sponsors = platinum_sponsors_context_processor()["platinum_sponsors"]()
+    assert [s["name"] for s in sponsors] == ["AndyMark"]

@@ -5,7 +5,6 @@ import {
   screen,
   within,
 } from '@testing-library/react';
-import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test, vi } from 'vitest';
 
@@ -22,32 +21,16 @@ import {
 } from '~/components/tba/moderation/suggestionReviewCard';
 import { formatEventDateRange } from '~/lib/moderationUtils';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    params,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children: ReactNode;
-    params?: Record<string, string>;
-    to: string;
-  }) => (
-    <a
-      href={Object.entries(params ?? {}).reduce(
-        (href, [key, value]) => href.replace(`$${key}`, value),
-        to,
-      )}
-      {...props}
-    >
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
 
 vi.mock('~/components/tba/videoEmbeds', () => ({
   YoutubeEmbed: ({ videoId, title }: { videoId: string; title: string }) => (
     <div data-testid="youtube-embed" data-video-id={videoId}>
+      {title}
+    </div>
+  ),
+  TwitchEmbed: ({ channel, title }: { channel: string; title: string }) => (
+    <div data-testid="twitch-embed" data-channel={channel}>
       {title}
     </div>
   ),
@@ -357,7 +340,7 @@ describe('SuggestionReviewCard reference header', () => {
     const link = screen.getByRole('link', {
       name: 'Team 254 - The Cheesy Poofs (2026)',
     });
-    expect(link.getAttribute('href')).toBe('/team/254/{-2026}');
+    expect(link.getAttribute('href')).toBe('/team/254/2026');
   });
 
   test('links a team without a year', () => {
@@ -1154,6 +1137,47 @@ describe('SuggestionReviewCard webcast', () => {
   });
 });
 
+describe('SuggestionReviewCard webcast preview', () => {
+  const webcastOf = (dict: Record<string, string>) =>
+    suggestionOf({
+      target_model: SuggestionType.EVENT,
+      event: EVENT_REFERENCE,
+      contents: { webcast_dict: dict },
+    });
+
+  test('previews a suggested YouTube webcast', () => {
+    renderWith(webcastOf({ type: 'youtube', channel: 'V4lDQSlvi7Q' }));
+
+    expect(
+      screen.getByTestId('youtube-embed').getAttribute('data-video-id'),
+    ).toBe('V4lDQSlvi7Q');
+  });
+
+  test('previews the moderator-corrected channel', () => {
+    renderWith(webcastOf({ type: 'youtube', channel: 'wrong' }), {
+      overrides: { webcast_channel: 'V4lDQSlvi7Q' },
+    });
+
+    expect(
+      screen.getByTestId('youtube-embed').getAttribute('data-video-id'),
+    ).toBe('V4lDQSlvi7Q');
+  });
+
+  test('previews a suggested Twitch webcast', () => {
+    renderWith(webcastOf({ type: 'twitch', channel: 'firstinspires' }));
+
+    expect(
+      screen.getByTestId('twitch-embed').getAttribute('data-channel'),
+    ).toBe('firstinspires');
+  });
+
+  test('shows no preview for webcast types without a player', () => {
+    renderWith(webcastOf({ type: 'iframe', channel: '<iframe>' }));
+
+    expect(screen.queryByText(/Suggested webcast for/)).toBeNull();
+  });
+});
+
 describe('SuggestionReviewCard offseason event fields', () => {
   test('lists similar events from this year and last', () => {
     renderWith(
@@ -1307,6 +1331,79 @@ describe('SuggestionReviewCard api write details', () => {
       'owner@example.com (event matches)',
       'unknown owner ()',
     ]);
+  });
+
+  test("lists the requester's past write keys", () => {
+    renderWith(
+      apiWrite({
+        author_write_keys: [
+          {
+            event_keys: ['2025casj'],
+            auth_types: [
+              { type: 3, name: 'event matches' },
+              { type: 5, name: 'match video' },
+            ],
+            created: '2025-03-01T10:00:00',
+            expiration: '2025-03-15T00:00:00',
+          },
+          {
+            event_keys: ['2024cc', '2024casf'],
+            auth_types: [{ type: 3, name: 'event matches' }],
+            created: '2024-10-01T10:00:00',
+            expiration: null,
+          },
+        ],
+      }),
+    );
+
+    const list = screen.getByRole('list', { name: 'Past write keys' });
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map((li) => li.textContent),
+    ).toEqual([
+      '2025casj (event matches, match video) · granted 2025-03-01 · until 2025-03-15',
+      '2024cc, 2024casf (event matches) · granted 2024-10-01 · no expiration',
+    ]);
+  });
+
+  test('says when the requester has no past write keys', () => {
+    renderWith(apiWrite({ author_write_keys: [] }));
+
+    expect(fieldValue('Past write keys')).toBe('None');
+  });
+
+  test('badges earlier years the requester had keys for this event', () => {
+    renderWith(
+      apiWrite({
+        author_write_keys: [
+          { event_keys: ['2025casj'] },
+          { event_keys: ['2024casj'] },
+        ],
+      }),
+    );
+
+    expect(
+      screen.getByText('Had write keys for this event in 2024, 2025'),
+    ).toBeTruthy();
+  });
+
+  test('summarizes past write keys beyond the first five', () => {
+    renderWith(
+      apiWrite({
+        author_write_keys: [
+          { event_keys: ['2025a'] },
+          { event_keys: ['2025b'] },
+          { event_keys: ['2025c'] },
+          { event_keys: ['2025d'] },
+          { event_keys: ['2025e'] },
+          { event_keys: ['2025f'] },
+          { event_keys: ['2025g'] },
+        ],
+      }),
+    );
+
+    expect(screen.getByText('and 2 more')).toBeTruthy();
   });
 
   test('shows an unknown requester', () => {

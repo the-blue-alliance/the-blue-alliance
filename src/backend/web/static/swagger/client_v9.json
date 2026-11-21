@@ -2,8 +2,9 @@
   "openapi": "3.1.0",
   "info": {
     "title": "TBA Mobile API",
-    "version": "v9",
-    "description": "API for TBA Mobile clients"
+    "version": "9.1.0",
+    "description": "API for TBA Mobile clients",
+    "x-changes": "9.1.0: Fix NotificationType to the names the server accepts and returns (`match_video`, not `match_video_added`) and add `starting_comp_level` and `schedule_updated`. /model/setPreferences now returns code 400 for an unknown notification type instead of failing, and its description documents the JSON-encoded `message`. /unregister takes UnregistrationRequest, which only requires `mobile_id`. FavoriteCollection, SubscriptionCollection, ApiKeysResponse and AddApiReadKeyResponse now include the `code` and `message` the server always sent. Mark always-present list fields required and drop the never-returned `device_key` from FavoriteMessage and SubscriptionMessage. Document MediaSuggestionMessage's `reference_type` and `details_json`. Add WebhookTestNotificationType for /webhooks/test. Remove the unused ApiKey security scheme."
   },
   "servers": [
     {
@@ -43,22 +44,48 @@
         "enum": [
           "upcoming_match",
           "match_score",
+          "starting_comp_level",
           "alliance_selection",
           "awards_posted",
-          "match_video_added"
+          "schedule_updated",
+          "match_video"
         ],
-        "description": "Notification type (upcoming_match=Upcoming Match, match_score=Match Score, alliance_selection=Alliance Selection, awards_posted=Awards Posted, match_video_added=Match Video Added)"
+        "description": "Notification type (upcoming_match=Upcoming Match, match_score=Match Score, starting_comp_level=Competition Level Starting, alliance_selection=Alliance Selection, awards_posted=Awards Posted, schedule_updated=Event Schedule Updated, match_video=Match Video Added)"
+      },
+      "WebhookTestNotificationType": {
+        "type": "string",
+        "enum": [
+          "upcoming_match",
+          "match_score",
+          "starting_comp_level",
+          "alliance_selection",
+          "awards_posted",
+          "schedule_updated",
+          "match_video",
+          "district_points_updated"
+        ],
+        "description": "A notification type `/webhooks/test` can send. `alliance_selection`, `awards_posted` and `schedule_updated` need `event_key`; `upcoming_match`, `match_score`, `starting_comp_level` and `match_video` need `match_key`; `district_points_updated` needs `district_key`."
       },
       "FavoriteCollection": {
-        "type": "object",
-        "properties": {
-          "favorites": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FavoriteMessage"
-            }
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "favorites": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FavoriteMessage"
+                }
+              }
+            },
+            "required": [
+              "favorites"
+            ]
           }
-        }
+        ]
       },
       "FavoriteMessage": {
         "type": "object",
@@ -67,9 +94,6 @@
           "model_type"
         ],
         "properties": {
-          "device_key": {
-            "type": "string"
-          },
           "model_key": {
             "type": "string"
           },
@@ -79,15 +103,25 @@
         }
       },
       "SubscriptionCollection": {
-        "type": "object",
-        "properties": {
-          "subscriptions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SubscriptionMessage"
-            }
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "subscriptions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SubscriptionMessage"
+                }
+              }
+            },
+            "required": [
+              "subscriptions"
+            ]
           }
-        }
+        ]
       },
       "MediaSuggestionMessage": {
         "type": "object",
@@ -105,7 +139,10 @@
           },
           "reference_type": {
             "type": "string",
-            "description": "The type of model the suggestion is for (currently only 'team' is supported)"
+            "enum": [
+              "team"
+            ],
+            "description": "The type of model the suggestion is for"
           },
           "year": {
             "type": "integer",
@@ -117,7 +154,7 @@
           },
           "details_json": {
             "type": "string",
-            "description": "Optional JSON-encoded details about the media"
+            "description": "JSON-encoded details about the media, or an empty string for none"
           }
         }
       },
@@ -211,16 +248,180 @@
           }
         }
       },
+      "MatchVideoSuggestionMessage": {
+        "type": "object",
+        "required": [
+          "match_key",
+          "youtube_url"
+        ],
+        "properties": {
+          "match_key": {
+            "type": "string",
+            "description": "The match receiving the suggested video"
+          },
+          "youtube_url": {
+            "type": "string",
+            "description": "The URL of the YouTube video being suggested"
+          }
+        }
+      },
+      "MatchVideoSuggestionResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "status"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "suggestion_exists",
+              "video_exists",
+              "bad_url",
+              "bad_match",
+              "unauthorized"
+            ]
+          }
+        }
+      },
+      "VideoPlaylistMessage": {
+        "type": "object",
+        "required": [
+          "playlist_id"
+        ],
+        "properties": {
+          "playlist_id": {
+            "type": "string",
+            "description": "The ID of the YouTube playlist to list"
+          }
+        }
+      },
+      "VideoPlaylistItem": {
+        "type": "object",
+        "required": [
+          "video_id",
+          "video_title",
+          "guessed_match_partial"
+        ],
+        "properties": {
+          "video_id": {
+            "type": "string"
+          },
+          "video_title": {
+            "type": "string"
+          },
+          "guessed_match_partial": {
+            "type": "string",
+            "description": "The match ID guessed from the video title, like qm3 or sf1m1, or an empty string"
+          }
+        }
+      },
+      "VideoPlaylistResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "videos"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VideoPlaylistItem"
+            }
+          }
+        }
+      },
+      "EventMatchVideo": {
+        "type": "object",
+        "required": [
+          "video_id",
+          "match_partial"
+        ],
+        "properties": {
+          "video_id": {
+            "type": "string",
+            "description": "The YouTube video ID"
+          },
+          "match_partial": {
+            "type": "string",
+            "description": "The match ID within the event, like qm3 or sf1m1"
+          }
+        }
+      },
+      "EventMatchVideosSuggestionMessage": {
+        "type": "object",
+        "required": [
+          "event_key",
+          "videos"
+        ],
+        "properties": {
+          "event_key": {
+            "type": "string",
+            "description": "The event whose matches receive the suggested videos"
+          },
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventMatchVideo"
+            }
+          }
+        }
+      },
+      "EventMatchVideosSuggestionResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "status",
+          "num_added"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "bad_event",
+              "unauthorized"
+            ]
+          },
+          "num_added": {
+            "type": "integer",
+            "description": "How many new suggestions were created"
+          }
+        }
+      },
       "SubscriptionMessage": {
         "type": "object",
         "required": [
           "model_key",
-          "model_type"
+          "model_type",
+          "notifications"
         ],
         "properties": {
-          "device_key": {
-            "type": "string"
-          },
           "model_key": {
             "type": "string"
           },
@@ -300,29 +501,285 @@
         }
       },
       "ApiKeysResponse": {
-        "type": "object",
-        "properties": {
-          "read_keys": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ApiReadKeyMessage"
-            }
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
           },
-          "write_keys": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ApiWriteKeyMessage"
+          {
+            "type": "object",
+            "properties": {
+              "read_keys": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ApiReadKeyMessage"
+                }
+              },
+              "write_keys": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ApiWriteKeyMessage"
+                }
+              }
+            },
+            "required": [
+              "read_keys",
+              "write_keys"
+            ]
+          }
+        ]
+      },
+      "AddApiReadKeyResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "read_key": {
+                "$ref": "#/components/schemas/ApiReadKeyMessage"
+              }
             }
+          }
+        ]
+      },
+      "OperatingSystem": {
+        "type": "string",
+        "enum": [
+          "ios",
+          "android-fcm",
+          "web",
+          "webhook"
+        ],
+        "description": "The client platform. With `webhook`, `mobile_id` is the URL to send to."
+      },
+      "MobileIdType": {
+        "type": "string",
+        "enum": [
+          "token",
+          "fid"
+        ],
+        "default": "token",
+        "description": "The kind of ID in `mobile_id` (token=legacy FCM registration token, fid=Firebase Installation ID)"
+      },
+      "RegistrationRequest": {
+        "type": "object",
+        "required": [
+          "operating_system",
+          "mobile_id",
+          "device_uuid"
+        ],
+        "properties": {
+          "operating_system": {
+            "$ref": "#/components/schemas/OperatingSystem"
+          },
+          "mobile_id": {
+            "type": "string",
+            "description": "The FCM registration token, Firebase Installation ID, or webhook URL to send to"
+          },
+          "mobile_id_type": {
+            "$ref": "#/components/schemas/MobileIdType"
+          },
+          "device_uuid": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the device. Defaults to \"Unnamed Device\"."
           }
         }
       },
-      "AddApiReadKeyResponse": {
+      "UnregistrationRequest": {
         "type": "object",
+        "required": [
+          "mobile_id"
+        ],
         "properties": {
-          "read_key": {
-            "$ref": "#/components/schemas/ApiReadKeyMessage"
+          "mobile_id": {
+            "type": "string",
+            "description": "The FCM registration token, Firebase Installation ID, or webhook URL to remove"
+          },
+          "mobile_id_type": {
+            "$ref": "#/components/schemas/MobileIdType"
           }
         }
+      },
+      "RegisteredMobileClient": {
+        "type": "object",
+        "required": [
+          "name",
+          "operating_system",
+          "mobile_id",
+          "device_uuid"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "operating_system": {
+            "type": "string",
+            "description": "The platform the device registered as. Usually an `OperatingSystem` value, but older registrations can report others."
+          },
+          "mobile_id": {
+            "type": "string"
+          },
+          "device_uuid": {
+            "type": "string"
+          },
+          "mobile_id_type": {
+            "$ref": "#/components/schemas/MobileIdType",
+            "description": "Omitted for webhooks, whose `mobile_id` is a URL"
+          }
+        }
+      },
+      "ListDevicesResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          },
+          {
+            "type": "object",
+            "required": [
+              "devices"
+            ],
+            "properties": {
+              "devices": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/RegisteredMobileClient"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PingRequest": {
+        "type": "object",
+        "required": [
+          "mobile_id"
+        ],
+        "properties": {
+          "mobile_id": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiWriteKeyRequestMessage": {
+        "type": "object",
+        "required": [
+          "event_key",
+          "affiliation",
+          "auth_types"
+        ],
+        "properties": {
+          "event_key": {
+            "type": "string",
+            "description": "The event the write keys are for"
+          },
+          "affiliation": {
+            "type": "string",
+            "description": "The requester's role at the event"
+          },
+          "auth_types": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Requested write types (1=match video, 2=event teams, 3=event matches, 4=event rankings, 5=event alliances, 6=event awards, 7=event info, 8=zebra motionworks). Official events only receive match video."
+          }
+        }
+      },
+      "ApiWriteKeyRequestResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "status"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "no_affiliation",
+              "bad_event",
+              "unauthorized"
+            ]
+          }
+        }
+      },
+      "Webhook": {
+        "type": "object",
+        "required": [
+          "webhook_id",
+          "name",
+          "url",
+          "secret",
+          "verified"
+        ],
+        "properties": {
+          "webhook_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL notifications are sent to"
+          },
+          "secret": {
+            "type": "string",
+            "description": "The key used to sign each request in the `X-TBA-HMAC` header"
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "Only verified webhooks receive notifications other than pings"
+          }
+        }
+      },
+      "ListWebhooksResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          },
+          {
+            "type": "object",
+            "required": [
+              "webhooks"
+            ],
+            "properties": {
+              "webhooks": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Webhook"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "AddWebhookResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "webhook": {
+                "$ref": "#/components/schemas/Webhook"
+              }
+            }
+          }
+        ]
       }
     },
     "securitySchemes": {
@@ -330,20 +787,12 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
-      },
-      "ApiKey": {
-        "type": "apiKey",
-        "in": "query",
-        "name": "key"
       }
     }
   },
   "security": [
     {
       "BearerAuth": []
-    },
-    {
-      "ApiKey": []
     }
   ],
   "paths": {
@@ -373,6 +822,7 @@
     "/model/setPreferences": {
       "post": {
         "summary": "Set model preferences",
+        "description": "Sets whether the model is a favorite and which notifications it sends. `code` is 401 when not signed in and 400 for an unknown notification type, and nothing is changed. Otherwise `code` is 0 and `message` is a JSON-encoded object with `favorite` and `subscription`, each a `BaseResponse` whose `code` is 200 when changed, 304 when already set, or 404 when there was nothing to remove.",
         "operationId": "setModelPreferences",
         "security": [
           {
@@ -473,6 +923,7 @@
     "/team/media/suggest": {
       "post": {
         "summary": "Suggest team media",
+        "description": "`code` is 200 when the suggestion is added, 304 if it already exists, 400 for a bad `reference_type`, year or URL, and 401 when not signed in.",
         "operationId": "suggestTeamMedia",
         "security": [
           {
@@ -529,6 +980,105 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TeamSocialMediaSuggestionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/match/video/suggest": {
+      "post": {
+        "summary": "Suggest a YouTube video for a match",
+        "operationId": "suggestMatchVideo",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MatchVideoSuggestionMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchVideoSuggestionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/event/video_playlist/resolve": {
+      "post": {
+        "summary": "List the videos in a YouTube playlist, with a guessed match for each",
+        "operationId": "resolveVideoPlaylist",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VideoPlaylistMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoPlaylistResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/event/match_videos/suggest": {
+      "post": {
+        "summary": "Suggest YouTube videos for several matches at an event",
+        "operationId": "suggestEventMatchVideos",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventMatchVideosSuggestionMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventMatchVideosSuggestionResponse"
                 }
               }
             }
@@ -659,6 +1209,424 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api_keys/write/request": {
+      "post": {
+        "summary": "Request write API keys for an event",
+        "operationId": "requestApiWriteKey",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiWriteKeyRequestMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiWriteKeyRequestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "summary": "Register a device for notifications",
+        "description": "Registers the device for the signed-in account, or updates it if this account already has `mobile_id`. `code` is 200 for a new device, 304 for an existing one, 400 for an unknown `mobile_id_type` or a `fid` from a platform other than `ios` or `android-fcm`, and 401 when not signed in. Registering a FID also deletes this account's FCM registration token for the same installation (`<fid>:...`), so the device isn't notified twice.",
+        "operationId": "registerMobileClient",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/unregister": {
+      "post": {
+        "summary": "Unregister a device",
+        "description": "Deletes the signed-in account's device with `mobile_id`. With `mobile_id_type: fid`, also deletes this account's FCM registration token for the same installation (`<fid>:...`), which is all TBA has for a device whose FID registration hasn't reached it yet. `code` is 200 when anything was deleted, 404 if nothing matched, 400 for an unknown `mobile_id_type`, and 401 when not signed in.",
+        "operationId": "unregisterMobileClient",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnregistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/list_clients": {
+      "post": {
+        "summary": "List registered devices",
+        "operationId": "listMobileClients",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListDevicesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ping": {
+      "post": {
+        "summary": "Send a test notification to a device",
+        "description": "`code` is 200 when sent, 404 if the account has no such device, 500 if the send failed, and 401 when not signed in.",
+        "operationId": "pingMobileClient",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/list": {
+      "post": {
+        "summary": "List the signed-in account's webhooks",
+        "description": "`code` is 401 when not signed in.",
+        "operationId": "listWebhooks",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListWebhooksResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/add": {
+      "post": {
+        "summary": "Add a webhook",
+        "description": "Creates a webhook with a new secret and sends a verification code to its URL. If the account already has a webhook with this URL, gives it a new secret and code and marks it unverified. `code` is 400 when the name or URL is blank and 401 when not signed in.",
+        "operationId": "addWebhook",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddWebhookResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "url"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/verify": {
+      "post": {
+        "summary": "Verify a webhook",
+        "description": "Marks the webhook verified when `code` matches the most recently sent verification code. `code` in the response is 400 for a wrong code, 404 for an unknown webhook and 401 when not signed in.",
+        "operationId": "verifyWebhook",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "webhook_id",
+                  "code"
+                ],
+                "properties": {
+                  "webhook_id": {
+                    "type": "string",
+                    "description": "The webhook's ID, from `/webhooks/list`"
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "The `verification_key` the webhook received"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/send_verification": {
+      "post": {
+        "summary": "Send a new verification code to a webhook",
+        "description": "Replaces the verification code and marks the webhook unverified. `code` is 404 for an unknown webhook and 401 when not signed in.",
+        "operationId": "sendWebhookVerification",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "webhook_id"
+                ],
+                "properties": {
+                  "webhook_id": {
+                    "type": "string",
+                    "description": "The webhook's ID, from `/webhooks/list`"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/delete": {
+      "post": {
+        "summary": "Delete a webhook",
+        "description": "`code` is 404 for an unknown webhook and 401 when not signed in.",
+        "operationId": "deleteWebhook",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "webhook_id"
+                ],
+                "properties": {
+                  "webhook_id": {
+                    "type": "string",
+                    "description": "The webhook's ID, from `/webhooks/list`"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/test": {
+      "post": {
+        "summary": "Send a test notification to a webhook",
+        "description": "Sends one sample notification of the given type to a verified webhook. `code` is 400 for an unknown type, an unverified webhook or keys the type can't use, 404 for an unknown webhook and 401 when not signed in.",
+        "operationId": "sendWebhookTest",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "webhook_id",
+                  "notification_type"
+                ],
+                "properties": {
+                  "webhook_id": {
+                    "type": "string",
+                    "description": "The webhook's ID, from `/webhooks/list`"
+                  },
+                  "notification_type": {
+                    "$ref": "#/components/schemas/WebhookTestNotificationType"
+                  },
+                  "event_key": {
+                    "type": "string"
+                  },
+                  "match_key": {
+                    "type": "string"
+                  },
+                  "district_key": {
+                    "type": "string"
+                  }
                 }
               }
             }

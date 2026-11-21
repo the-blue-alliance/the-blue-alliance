@@ -147,6 +147,24 @@ export function getEventDateString(event: Event, month: 'long' | 'short') {
   return `${startDateString} to ${endDateString}`;
 }
 
+export function getEventCompactDateString(event: Event) {
+  const startDate = Temporal.PlainDate.from(event.start_date);
+  const endDate = Temporal.PlainDate.from(event.end_date);
+  const monthDay = { month: 'short', day: 'numeric' } as const;
+
+  if (Temporal.PlainDate.compare(startDate, endDate) === 0) {
+    return endDate.toLocaleString('default', monthDay);
+  }
+
+  const startDateString = startDate.toLocaleString('default', monthDay);
+
+  if (startDate.month === endDate.month && startDate.year === endDate.year) {
+    return `${startDateString}–${endDate.day}`;
+  }
+
+  return `${startDateString} – ${endDate.toLocaleString('default', monthDay)}`;
+}
+
 export function getEventWeekString(event: Event) {
   if (event.week === null) {
     return null;
@@ -331,7 +349,7 @@ export function isEventActive(event: Event): boolean {
 }
 
 export function sortEvents(events: Event[]) {
-  return events.sort((a, b) => sortEventsComparator(a, b));
+  return events.toSorted(sortEventsComparator);
 }
 
 /**
@@ -405,8 +423,8 @@ export function getDivisionShortform(divisionName: string): string {
 
 export function isEventWithinDays(
   event: Event,
-  negativeDaysBefore: number,
-  positiveDaysAfter: number,
+  daysBefore: number,
+  daysAfter: number,
 ): boolean {
   const days = getEventDays(event);
   if (!days) return false;
@@ -415,17 +433,17 @@ export function isEventWithinDays(
   const eventTimeZone = getEventTz(event);
   const { start: startDate, end: endDate } = days;
 
-  // Window opens negativeDaysBefore days before midnight of start_date in the
+  // Window opens daysBefore days before midnight of start_date in the
   // event's timezone.
   const windowStart = startDate
-    .subtract({ days: negativeDaysBefore })
+    .subtract({ days: daysBefore })
     .toZonedDateTime(eventTimeZone)
     .toInstant();
 
   // endDate is the last calendar day. +1 moves to the next midnight (end of
-  // the last day), then positiveDaysAfter extends further.
+  // the last day), then daysAfter extends further.
   const windowEnd = endDate
-    .add({ days: 1 + positiveDaysAfter })
+    .add({ days: 1 + daysAfter })
     .toZonedDateTime(eventTimeZone)
     .toInstant();
 
@@ -437,7 +455,7 @@ export function isEventWithinDays(
 }
 
 export function isEventWithinADay(event: Event): boolean {
-  return isEventWithinDays(event, -1, 1);
+  return isEventWithinDays(event, 1, 1);
 }
 
 /**
@@ -483,6 +501,22 @@ export function stripParentPrefix(
   return name;
 }
 
+export interface RemappedRobot {
+  sourceTeamKey: string;
+  robotKey: string;
+}
+
+export function getRemappedRobots(
+  event: Event,
+  teamKey: string,
+): RemappedRobot[] {
+  const robotKeyPattern = new RegExp(`^${teamKey}[B-Z]$`);
+  return Object.entries(event.remap_teams ?? {})
+    .filter(([, robotKey]) => robotKeyPattern.test(robotKey))
+    .map(([sourceTeamKey, robotKey]) => ({ sourceTeamKey, robotKey }))
+    .sort((a, b) => a.robotKey.localeCompare(b.robotKey));
+}
+
 export function hasEventEnded(event: Event): boolean {
   const days = getEventDays(event);
   if (!days) return false;
@@ -493,6 +527,13 @@ export function hasEventEnded(event: Event): boolean {
   const userTz = Temporal.Now.timeZoneId();
   const todayInUserTz = Temporal.Now.plainDateISO(userTz);
   return Temporal.PlainDate.compare(endDate, todayInUserTz) <= 0;
+}
+
+export function isAfterEventEndDate(event: Event): boolean {
+  const days = getEventDays(event);
+  if (!days) return false;
+  const todayInEventTz = Temporal.Now.plainDateISO(getEventTz(event));
+  return Temporal.PlainDate.compare(days.end, todayInEventTz) < 0;
 }
 
 export const EVENT_SSR_TTL_SECONDS = {

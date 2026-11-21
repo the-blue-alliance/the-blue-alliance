@@ -1,0 +1,335 @@
+// Account overview (/account)
+
+.account-overview {
+  max-width: 1000px;
+
+  .account-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 24px 0 20px;
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 30px;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .panel {
+    margin-bottom: 24px;
+  }
+
+  .panel-title {
+    font-size: 17px;
+    font-weight: 500;
+  }
+
+  .account-section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+  }
+
+  .account-inline-form {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+
+    .form-control {
+      width: 280px;
+    }
+  }
+
+  // The three summary cards share one height so their footers line up.
+  @media (min-width: 768px) {
+    .account-summary {
+      display: flex;
+
+      > [class*="col-"] {
+        display: flex;
+      }
+
+      .panel {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .panel-footer {
+        margin-top: auto;
+      }
+    }
+  }
+
+  .account-summary .panel-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 51px;
+  }
+
+  // Table cells share the 15px inset of panel headings and bodies, so every
+  // block's text starts on the same left edge.
+  .account-stats,
+  .account-table {
+    > thead > tr,
+    > tbody > tr {
+      > th:first-child,
+      > td:first-child {
+        padding-left: 15px;
+      }
+
+      > th:last-child,
+      > td:last-child {
+        padding-right: 15px;
+      }
+    }
+  }
+
+  .account-stats {
+    margin-bottom: 0;
+
+    th {
+      width: 45%;
+      font-weight: normal;
+      color: #777;
+    }
+
+    td {
+      font-weight: 500;
+      word-break: break-word;
+    }
+  }
+
+  .account-table {
+    margin-bottom: 0;
+
+    > thead > tr > th {
+      border-top: 1px solid #ddd;
+      background: #f9f9f9;
+      font-size: 12px;
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    > tbody > tr > td {
+      vertical-align: middle;
+    }
+
+    form {
+      display: inline-block;
+      margin: 0;
+    }
+  }
+
+  .account-secret {
+    display: inline-block;
+    max-width: 100%;
+    color: #333;
+    background: #f5f5f5;
+    font-size: 12px;
+    word-break: break-all;
+    white-space: normal;
+  }
+
+  .account-permissions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-width: 160px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      padding: 1px 7px;
+      border-radius: 10px;
+      background: #e8eaf6;
+      color: #283593;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+  }
+
+  .account-write-key-event {
+    white-space: nowrap;
+
+    & + & {
+      margin-top: 8px;
+    }
+  }
+
+  .account-event-meta {
+    font-size: 12px;
+  }
+
+  .account-webhook-status {
+    font-size: 12px;
+
+    .glyphicon {
+      font-size: 10px;
+    }
+  }
+
+  .account-webhook-verified {
+    color: #2e7d32;
+  }
+
+  .account-webhook-unverified {
+    color: #b26a00;
+  }
+
+  .account-webhook-detail + .account-webhook-detail {
+    margin-top: 4px;
+  }
+
+  .account-row-actions {
+    text-align: right;
+    white-space: nowrap;
+
+    > * {
+      margin-left: 4px;
+    }
+  }
+
+  .account-secret-field {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+
+    .account-secret-dots {
+      letter-spacing: 1px;
+    }
+
+    &.is-masked .account-secret-value,
+    &:not(.is-masked) .account-secret-dots {
+      display: none;
+    }
+  }
+
+  .account-key-expired > td {
+    opacity: 0.55;
+  }
+
+  // Disabled buttons swallow hover, so let the wrapping form show its title.
+  .btn[disabled] {
+    pointer-events: none;
+  }
+
+  .account-alert {
+    padding: 10px 15px;
+
+    .glyphicon {
+      margin-right: 4px;
+    }
+  }
+
+  .account-secret-short {
+    white-space: nowrap;
+    word-break: normal;
+  }
+
+  .account-danger-button {
+    color: #c62828;
+  }
+
+  .account-delete {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    margin-bottom: 24px;
+    padding: 16px 15px;
+    border: 1px solid #ebccd1;
+    border-radius: 4px;
+
+    h2 {
+      margin: 0 0 4px;
+      font-size: 17px;
+      font-weight: 500;
+      color: #c62828;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .account-empty {
+    border-top: 1px solid #ddd;
+    color: #777;
+    font-style: italic;
+  }
+
+  // On phones, each table row becomes a stacked card with its own labels.
+  @media (max-width: 767px) {
+    .account-table {
+      > thead {
+        display: none;
+      }
+
+      > tbody,
+      > tbody > tr,
+      > tbody > tr > td {
+        display: block;
+        width: 100%;
+      }
+
+      > tbody > tr {
+        padding: 8px 0;
+        border-top: 1px solid #ddd;
+      }
+
+      > tbody > tr > td {
+        padding: 3px 15px;
+        border-top: 0;
+      }
+
+      > tbody > tr > td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: #777;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+    }
+
+    .account-row-actions {
+      padding-top: 6px;
+      text-align: left;
+      white-space: normal;
+
+      > * {
+        margin: 0 4px 4px 0;
+      }
+    }
+
+    .account-header h1 {
+      font-size: 24px;
+    }
+
+    .account-inline-form {
+      width: 100%;
+
+      .form-control {
+        flex: 1;
+        width: auto;
+      }
+    }
+  }
+}

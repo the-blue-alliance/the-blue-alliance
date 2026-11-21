@@ -2,14 +2,13 @@
   "openapi": "3.0.0",
   "info": {
     "title": "The Blue Alliance Trusted APIv1",
-    "description": "# Overview\nImport FIRST Robotics Competition Data to The Blue Alliance. The API is accessed through POST requests made to the endpoints described below. To simplify the removal of incorrect data, most endpoints must be called with the full dataset. For example, there is no endpoint to add a single award-- only to update all awards. It must be called with all awards, and the ones that are no longer present will be deleted. **The exception to this is the matches endpoint**, where there are separate endpoints to update and delete matches. Also, the **match videos endpoint** only allows the addition (and not the removal) of videos.\n# Authentication\nThe X-TBA-Auth-Id and X-TBA-Auth-Sig must be included as request headers in all requests.\n\n*auth_id*: ``  *auth_secret*: ``\n\n*X-TBA-Auth-Id*: `auth_id`  *X-TBA-Auth-Sig*: `md5_hexdigest()`\n\nFor example, an X-TBA-Auth-Sig may look like `md5_hexdigest(ExqeZK3Gbo9v95YnqmsiADzESo9HNgyhIOYSMyRpqJqYv13EazNRaDIPPJuOXrQp/api/trusted/v1/event/2014casj/matches/delete[\"qm1\"])`\n\nWhich, after hashing, becomes: `ca5c3e5c1b0e7132e4af13f805eca0be`",
-    "version": "3.1"
+    "description": "# Overview\nImport FIRST Robotics Competition Data to The Blue Alliance. The API is accessed through POST requests made to the endpoints described below. To simplify the removal of incorrect data, most endpoints must be called with the full dataset. For example, there is no endpoint to add a single award-- only to update all awards. It must be called with all awards, and the ones that are no longer present will be deleted. **The exceptions are the matches, match videos, and webcasts endpoints**, which have separate endpoints to add and to delete individual items. The **event media endpoint** only allows the addition (and not the removal) of videos.\n# Authentication\nThe X-TBA-Auth-Id and X-TBA-Auth-Sig must be included as request headers in all requests. Request an auth ID and secret for your event at https://www.thebluealliance.com/request/apiwrite.\n\n*X-TBA-Auth-Id*: your auth ID\n\n*X-TBA-Auth-Sig*: `md5_hexdigest(auth_secret + request_path + request_body)`, where `request_path` is the full path starting with `/api/trusted/v1` and `request_body` is the exact body sent (empty for GET requests)\n\nFor example, an X-TBA-Auth-Sig may look like `md5_hexdigest(ExqeZK3Gbo9v95YnqmsiADzESo9HNgyhIOYSMyRpqJqYv13EazNRaDIPPJuOXrQp/api/trusted/v1/event/2014casj/matches/delete[\"qm1\"])`\n\nWhich, after hashing, becomes: `ca5c3e5c1b0e7132e4af13f805eca0be`",
+    "version": "3.2.0",
+    "x-changes": "3.2.0: Bring the spec in line with the server. Rename EventInfo `first_code` to `first_event_code`, which is the field the server reads; `first_code` was silently ignored. Type Match `score_breakdown` as a red/blue object instead of a string. Require both X-TBA-Auth-Id and X-TBA-Auth-Sig instead of either. Document the /event/{eventKey}/matches/delete_all and /event/{eventKey}/zebra_motionworks/add endpoints and the ZebraMotionWorks and ZebraTeam schemas. GET /event/{eventKey}/info returns the new EventInfoResponse schema, with `sync_disabled_flags` and full webcast objects. Document 400/401/404 causes and the Success and Error response bodies, and the `keys_deleted` response of /matches/delete. Tighten request schemas to match server validation (nullable fields, webcast type enum, `pm` comp level, required ranking fields, `qual_average`). Rename the match video and event media add operations to addMatchVideos and addEventMedia. Fix stale overview and authentication text."
   },
   "security": [
     {
-      "authId": []
-    },
-    {
+      "authId": [],
       "authSig": []
     }
   ],
@@ -33,16 +32,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EventInfo"
+                  "$ref": "#/components/schemas/EventInfoResponse"
                 }
               }
             }
           },
-          "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
-          },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -76,10 +75,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -113,10 +115,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -145,7 +150,7 @@
               }
             }
           },
-          "description": "List of awards. An award is a dict of:\n\n*name_str*: String of award name. ex: \"Tournament Winner\" or \"Dean's List Finalist\"  *team_key*: String in the format `frcXXX` for the team that won the award. Can be null.  *awardee*: String corresponding to the name of an individual that won the award. Can be null.",
+          "description": "List of awards. An award is a dict of:\n\n*name_str*: String of award name. ex: \"Tournament Winner\" or \"Dean's List Finalist\"  *type_enum*: Integer award type. Can be null, in which case it is determined from name_str.  *team_key*: String in the format `frcXXX` for the team that won the award. Can be null.  *awardee*: String corresponding to the name of an individual that won the award. Can be null. At least one of team_key or awardee must be set.",
           "required": true
         },
         "responses": {
@@ -153,10 +158,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -193,10 +201,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -232,13 +243,73 @@
         },
         "responses": {
           "200": {
+            "description": "The keys of the matches that were deleted. Keys that are not valid match keys are skipped",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "keys_deleted": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "example": "qm1"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequestResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/matches/delete_all": {
+      "post": {
+        "tags": [
+          "Event Matches"
+        ],
+        "summary": "Delete all matches at an event",
+        "description": "Delete every match at an event. As a safeguard, the request body must be exactly the event key.",
+        "operationId": "deleteAllMatches",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": "2014casj"
+              }
+            }
+          },
+          "description": "The event key, matching the `eventKey` path parameter",
+          "required": true
+        },
+        "responses": {
+          "200": {
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -272,7 +343,8 @@
                       "type": "string",
                       "description": "A ranking breakdown title. Breakdowns will be shown in the order given",
                       "example": "Qual Score"
-                    }
+                    },
+                    "description": "Ranking breakdown titles, shown in the order given. `wins`, `losses`, and `ties` are removed from this list because they are already shown as the W-L-T record"
                   },
                   "rankings": {
                     "type": "array",
@@ -309,6 +381,12 @@
                           "description": "Number of non-surrogate ties",
                           "example": 0
                         },
+                        "qual_average": {
+                          "type": "number",
+                          "format": "float",
+                          "description": "Average qualification score, for years that rank by it",
+                          "example": 85.5
+                        },
                         "played": {
                           "type": "integer",
                           "format": "int32",
@@ -321,14 +399,20 @@
                           "description": "Number of non-surrogate DQ'd matches",
                           "example": 0
                         }
-                      }
+                      },
+                      "required": [
+                        "team_key",
+                        "rank",
+                        "played",
+                        "dqs"
+                      ]
                     }
                   }
                 }
               }
             }
           },
-          "description": "A dict of `breakdowns` and `rankings",
+          "description": "A dict of `breakdowns` and `rankings`",
           "required": true
         },
         "responses": {
@@ -336,10 +420,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -350,7 +437,7 @@
           "Team List"
         ],
         "summary": "Update the list of teams attending an event",
-        "description": "Replaces the list of teams attending",
+        "description": "Replaces the list of teams attending. Team keys for teams that do not exist on TBA are skipped",
         "operationId": "updateTeamList",
         "parameters": [
           {
@@ -378,10 +465,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -393,7 +483,7 @@
         ],
         "summary": "Add match videos",
         "description": "Link YouTube videos to a match",
-        "operationId": "updateMatchVideos",
+        "operationId": "addMatchVideos",
         "parameters": [
           {
             "$ref": "#/components/parameters/eventKeyParam"
@@ -423,10 +513,20 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "description": "The event key is malformed, the event does not exist, or one of the matches does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -438,7 +538,7 @@
         ],
         "summary": "Add event videos",
         "description": "Link YouTube videos to an event",
-        "operationId": "updateEventMedia",
+        "operationId": "addEventMedia",
         "parameters": [
           {
             "$ref": "#/components/parameters/eventKeyParam"
@@ -464,10 +564,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -501,10 +604,13 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       },
@@ -513,7 +619,7 @@
           "Event Webcasts"
         ],
         "summary": "Remove webcasts from an event",
-        "description": "Remove specified webcasts from an event's webcast list",
+        "description": "Remove specified webcasts from an event's webcast list. The request body is sent with a DELETE request, which some HTTP clients drop by default, so make sure yours sends it.",
         "operationId": "deleteEventWebcasts",
         "parameters": [
           {
@@ -536,10 +642,56 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/zebra_motionworks/add": {
+      "post": {
+        "tags": [
+          "Zebra MotionWorks"
+        ],
+        "summary": "Add Zebra MotionWorks data",
+        "description": "Add or overwrite Zebra MotionWorks robot tracking data for one or more matches at an event. Each match must already exist, and each alliance's teams may differ from the match's teams by at most one.",
+        "operationId": "addZebraMotionWorks",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ZebraMotionWorks"
+                }
+              }
+            }
+          },
+          "description": "List of Zebra MotionWorks data, one entry per match",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequestResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFoundResponse"
           }
         }
       }
@@ -550,7 +702,7 @@
           "Match Videos"
         ],
         "summary": "Delete match videos",
-        "description": "Remove YouTube videos from a match",
+        "description": "Remove YouTube videos from a match. The request body is sent with a DELETE request, which some HTTP clients drop by default, so make sure yours sends it.",
         "operationId": "deleteMatchVideos",
         "parameters": [
           {
@@ -581,10 +733,20 @@
             "$ref": "#/components/responses/successResponse"
           },
           "400": {
-            "$ref": "#/components/responses/invalidHeadersResponse"
+            "$ref": "#/components/responses/badRequestResponse"
           },
           "401": {
-            "$ref": "#/components/responses/invalidSigResponse"
+            "$ref": "#/components/responses/unauthorizedResponse"
+          },
+          "404": {
+            "description": "The event key is malformed, the event does not exist, or one of the matches does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -600,7 +762,7 @@
       "eventKeyParam": {
         "name": "eventKey",
         "in": "path",
-        "description": "TBA event key to update. For example, 2017cthar",
+        "description": "TBA event key. For example, 2017cthar",
         "required": true,
         "schema": {
           "type": "string"
@@ -609,13 +771,44 @@
     },
     "responses": {
       "successResponse": {
-        "description": "The operation completed successfully"
+        "description": "The operation completed successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Success"
+            }
+          }
+        }
       },
-      "invalidHeadersResponse": {
-        "description": "One or both of `X-TBA-Auth-ID` `X-TBA-Auth-Sig` were missing"
+      "badRequestResponse": {
+        "description": "The request body could not be parsed or failed validation",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
       },
-      "invalidSigResponse": {
-        "description": "One or both of `X-TBA-Auth-ID` `X-TBA-Auth-Sig` were invalid"
+      "unauthorizedResponse": {
+        "description": "The request was not authorized: `X-TBA-Auth-Id` or `X-TBA-Auth-Sig` is missing or invalid, the keys are not allowed to edit this event or lack the permission this endpoint needs, the keys have expired, or the trusted API has been disabled by the TBA admins",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "notFoundResponse": {
+        "description": "The event key is malformed or the event does not exist",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
       }
     },
     "securitySchemes": {
@@ -628,7 +821,7 @@
       "authSig": {
         "type": "apiKey",
         "in": "header",
-        "description": "The MD5 digest computed from the concatenation of",
+        "description": "The MD5 hex digest of the concatenation of your auth secret, the request path (starting with `/api/trusted/v1`), and the request body",
         "name": "X-TBA-Auth-Sig"
       }
     },
@@ -652,8 +845,9 @@
         "properties": {
           "type_enum": {
             "type": "integer",
-            "description": "Type enum of the award. If null, this will be automatically determined from the name_str. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py",
-            "example": "1"
+            "description": "Type enum of the award. If null or unrecognized, this will be automatically determined from the name_str. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py",
+            "example": 1,
+            "nullable": true
           },
           "name_str": {
             "type": "string",
@@ -663,40 +857,72 @@
           "team_key": {
             "type": "string",
             "description": "Key of the team winning this award. Formatted like `frcXXXX` where `XXXX` is the team number. Can be null",
-            "example": "frc254"
+            "example": "frc254",
+            "nullable": true
           },
           "awardee": {
             "type": "string",
             "description": "Name of the individual winning this award. Can be null",
-            "example": "Bob Bobby"
+            "example": "Bob Bobby",
+            "nullable": true
           }
-        }
+        },
+        "description": "At least one of `team_key` or `awardee` must be set. Awards that resolve to the same award type are merged into a single award with multiple recipients"
       },
       "EventInfo": {
         "type": "object",
         "properties": {
-          "first_code": {
+          "first_event_code": {
             "type": "string",
-            "description": "Event code used to sync data with FIRST",
+            "nullable": true,
+            "description": "Event code used to sync data with FIRST. Setting a code marks the event as official so it syncs from FIRST; null or an empty string clears it",
             "example": "IRI"
           },
           "playoff_type": {
             "type": "integer",
             "nullable": true,
             "description": "Integer constant representing the playoff format. References constants defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py#L37",
-            "example": "0"
+            "example": 0
           },
           "webcasts": {
             "type": "array",
-            "description": "A list of webcast URLs to set for this event. This will overwrite the existing webcast list",
+            "description": "A list of webcasts to set for this event. This will overwrite the existing webcast list. Provide either `url`, or `type` and `channel`. YouTube webcasts must set `date`, and the date must fall within the event's dates",
             "items": {
               "type": "object",
               "description": "A webcast object",
               "properties": {
                 "url": {
                   "type": "string",
-                  "description": "A webcast url",
+                  "description": "A webcast url, parsed to extract the webcast type and channel",
                   "example": "https://youtu.be/abc123"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "twitch",
+                    "youtube",
+                    "iframe",
+                    "mms",
+                    "rtmp",
+                    "ustream",
+                    "livestream",
+                    "html5",
+                    "dacast",
+                    "stemtv"
+                  ],
+                  "description": "Type of webcast. Required if url is not provided",
+                  "example": "youtube"
+                },
+                "channel": {
+                  "type": "string",
+                  "description": "Channel identifier for the webcast. Required if url is not provided",
+                  "example": "abc123"
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Date in YYYY-MM-DD format for when the webcast aired. Required for YouTube webcasts",
+                  "example": "2024-01-15"
                 }
               }
             }
@@ -718,7 +944,7 @@
           },
           "disable_sync": {
             "type": "object",
-            "description": "flags controlling disabling certain aspects of sync",
+            "description": "Flags controlling disabling certain aspects of sync. Unknown keys are rejected",
             "properties": {
               "event_alliances": {
                 "type": "boolean"
@@ -735,7 +961,82 @@
               "event_awards": {
                 "type": "boolean"
               }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "EventInfoResponse": {
+        "type": "object",
+        "properties": {
+          "first_event_code": {
+            "type": "string",
+            "nullable": true,
+            "description": "Event code used to sync data with FIRST. Null when the event does not sync from FIRST",
+            "example": "IRI"
+          },
+          "playoff_type": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Integer constant representing the playoff format. References constants defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py",
+            "example": 10
+          },
+          "webcasts": {
+            "type": "array",
+            "description": "The event's current webcasts",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "youtube",
+                  "enum": [
+                    "twitch",
+                    "youtube",
+                    "iframe",
+                    "mms",
+                    "rtmp",
+                    "ustream",
+                    "livestream",
+                    "html5",
+                    "dacast",
+                    "stemtv"
+                  ]
+                },
+                "channel": {
+                  "type": "string",
+                  "example": "abc123"
+                },
+                "file": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "string",
+                  "example": "2024-01-15"
+                }
+              }
             }
+          },
+          "remap_teams": {
+            "type": "object",
+            "description": "A mapping of temp key --> remapped key (including B team keys)",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "frc1337": "frc337B"
+            }
+          },
+          "timezone": {
+            "type": "string",
+            "nullable": true,
+            "description": "Timezone name for the event",
+            "example": "America/New_York"
+          },
+          "sync_disabled_flags": {
+            "type": "integer",
+            "description": "Bitmask of the sync parts disabled via `disable_sync`: event_alliances = 1, event_rankings = 2, event_qual_matches = 4, event_playoff_matches = 8, event_awards = 16",
+            "example": 0
           }
         }
       },
@@ -758,7 +1059,8 @@
             "type": "integer",
             "format": "int32",
             "description": "Score of the match. Null means the match has not been played",
-            "example": 10
+            "example": 10,
+            "nullable": true
           },
           "surrogates": {
             "type": "array",
@@ -790,6 +1092,7 @@
           "comp_level": {
             "type": "string",
             "enum": [
+              "pm",
               "qm",
               "ef",
               "qf",
@@ -803,7 +1106,7 @@
             "type": "integer",
             "format": "int32",
             "minimum": 1,
-            "description": "Set number of the match",
+            "description": "Set number of the match. Ignored for `qm` matches, which always use set 1",
             "example": 1
           },
           "match_number": {
@@ -830,9 +1133,33 @@
             }
           },
           "score_breakdown": {
-            "type": "string",
-            "description": "Dict of {'red': {K1: V1, K2: V2, ...}, 'blue': {...}}. Where Kn are keys and Vn are values for those keys. Valid keys Kn vary by year. For 2014, valid keys are: 'auto', 'assist', 'truss+catch', 'teleop_goal+foul'.",
-            "example": "{ \"red\": { \"auto\": 20, \"assist\": 40, \"truss+catch\": 20, \"teleop_goal+foul\": 20 }, \"blue\": { \"auto\": 40, \"assist\": 60, \"truss+catch\": 10, \"teleop_goal+foul\": 40 } }"
+            "type": "object",
+            "nullable": true,
+            "description": "Score breakdown for each alliance. Valid keys vary by year and match the score breakdown fields in APIv3 (the example uses 2026 keys); a key that is not valid for the event's year is rejected with a 400 that lists the valid keys.",
+            "properties": {
+              "red": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "blue": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "example": {
+              "red": {
+                "totalAutoPoints": 20,
+                "totalTeleopPoints": 40,
+                "foulPoints": 0,
+                "totalPoints": 60
+              },
+              "blue": {
+                "totalAutoPoints": 15,
+                "totalTeleopPoints": 35,
+                "foulPoints": 5,
+                "totalPoints": 55
+              }
+            }
           },
           "time_str": {
             "type": "string",
@@ -842,17 +1169,20 @@
           "time_utc": {
             "type": "string",
             "description": "UTC time of the match's scheduled time in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
-            "example": "2008-01-02T10:30:00.000Z"
+            "example": "2008-01-02T10:30:00.000Z",
+            "format": "date-time"
           },
           "actual_start_time_utc": {
             "type": "string",
             "description": "UTC time of when the match actually started in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
-            "example": "2008-01-02T10:30:00.000Z"
+            "example": "2008-01-02T10:30:00.000Z",
+            "format": "date-time"
           },
           "post_results_time_utc": {
             "type": "string",
             "description": "UTC time of when the match results were shown to the audience in ISO 8601 format (YYYY-MM-DDTHH:MM:SS)",
-            "example": "2008-01-02T10:30:00.000Z"
+            "example": "2008-01-02T10:30:00.000Z",
+            "format": "date-time"
           },
           "display_name": {
             "type": "string",
@@ -871,8 +1201,20 @@
           },
           "type": {
             "type": "string",
-            "description": "Type of webcast (e.g., youtube, twitch, livestream, http_stream). Required if url is not provided",
-            "example": "youtube"
+            "description": "Type of webcast. Required if url is not provided",
+            "example": "youtube",
+            "enum": [
+              "twitch",
+              "youtube",
+              "iframe",
+              "mms",
+              "rtmp",
+              "ustream",
+              "livestream",
+              "html5",
+              "dacast",
+              "stemtv"
+            ]
           },
           "channel": {
             "type": "string",
@@ -903,6 +1245,120 @@
             "items": {
               "$ref": "#/components/schemas/Webcast"
             }
+          }
+        }
+      },
+      "ZebraTeam": {
+        "type": "object",
+        "required": [
+          "team_key",
+          "xs",
+          "ys"
+        ],
+        "properties": {
+          "team_key": {
+            "type": "string",
+            "description": "Team key, like `frcXXXX` where `XXXX` is the team number",
+            "example": "frc254"
+          },
+          "xs": {
+            "type": "array",
+            "description": "X coordinates in feet, one per entry in `times`. Null where no position was recorded; must be null at the same indices as `ys`",
+            "items": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            },
+            "example": [
+              null,
+              1.2,
+              1.3
+            ]
+          },
+          "ys": {
+            "type": "array",
+            "description": "Y coordinates in feet, one per entry in `times`. Null where no position was recorded; must be null at the same indices as `xs`",
+            "items": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            },
+            "example": [
+              null,
+              0.1,
+              0.1
+            ]
+          }
+        }
+      },
+      "ZebraMotionWorks": {
+        "type": "object",
+        "required": [
+          "key",
+          "times",
+          "alliances"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Full match key. Must belong to the event in the path",
+            "example": "2020casj_qm1"
+          },
+          "times": {
+            "type": "array",
+            "description": "Elapsed match time in seconds for each sample. Must be non-empty floats",
+            "items": {
+              "type": "number",
+              "format": "float"
+            },
+            "example": [
+              0.0,
+              0.5,
+              1.0
+            ]
+          },
+          "alliances": {
+            "type": "object",
+            "required": [
+              "red",
+              "blue"
+            ],
+            "properties": {
+              "red": {
+                "type": "array",
+                "description": "Exactly 3 teams",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "$ref": "#/components/schemas/ZebraTeam"
+                }
+              },
+              "blue": {
+                "type": "array",
+                "description": "Exactly 3 teams",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "$ref": "#/components/schemas/ZebraTeam"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Success": {
+        "type": "object",
+        "properties": {
+          "Success": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string"
           }
         }
       }

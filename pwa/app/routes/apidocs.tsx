@@ -41,7 +41,7 @@ function ApiDocs(): React.JSX.Element {
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <TableOfContents tocItems={tocItems} inView={inView} />
-      <div className="basis-full py-8 md:basis-5/6">
+      <div className="basis-full md:basis-5/6">
         <div>
           <section>
             <h1 className="mb-2 text-3xl font-medium">
@@ -224,7 +224,7 @@ function ApiDocs(): React.JSX.Element {
             className="py-4"
           >
             <h2 className="mb-2 text-2xl font-medium">
-              <a href="/apidocs/webhooks">Webhooks</a>
+              <Link to="/apidocs/webhooks">Webhooks</Link>
             </h2>
             <p>
               The TBA API also includes support for{' '}
@@ -234,8 +234,8 @@ function ApiDocs(): React.JSX.Element {
               instantly to the change. This can save both your client and our
               server time and processing power, as it can reduce the need to
               poll the API. See{' '}
-              <a href="/apidocs/webhooks">our webhook documentation page</a> for
-              more information.
+              <Link to="/apidocs/webhooks">our webhook documentation page</Link>{' '}
+              for more information.
             </p>
           </TableOfContentsSection>
 
@@ -253,7 +253,7 @@ function ApiDocs(): React.JSX.Element {
               archival. For example, many offseason events use the Trusted API
               to provide real-time match results to their audience. To get
               started, you need to{' '}
-              <a href="/request/apiwrite">request access tokens</a> for your
+              <Link to="/request/apiwrite">request access tokens</Link> for your
               desired event. These need to be used when constructing each
               request.
             </p>

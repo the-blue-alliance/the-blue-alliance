@@ -8,13 +8,16 @@ import {
   eventSsrTtlSeconds,
   getCurrentWeekEvents,
   getDivisionShortform,
+  getEventCompactDateString,
   getEventDateString,
   getEventNormalizedName,
   getEventWeekString,
   getPublicAgendaUrl,
+  getRemappedRobots,
   groupEventsByParent,
   groupEventsBySections,
   hasEventEnded,
+  isAfterEventEndDate,
   isEventActive,
   isEventWithinADay,
   isEventWithinDays,
@@ -128,6 +131,53 @@ describe('groupEventsByParent', () => {
   });
 });
 
+describe('getRemappedRobots', () => {
+  function makeEvent(remap_teams: Record<string, string> | null): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return { key: '2026bc2', remap_teams };
+  }
+
+  test('returns the robot remapped to the team', () => {
+    expect(
+      getRemappedRobots(makeEvent({ frc9997: 'frc3467B' }), 'frc3467'),
+    ).toEqual([{ sourceTeamKey: 'frc9997', robotKey: 'frc3467B' }]);
+  });
+
+  test('ignores robots remapped to other teams', () => {
+    expect(
+      getRemappedRobots(makeEvent({ frc9990: 'frc190B' }), 'frc3467'),
+    ).toEqual([]);
+  });
+
+  test('ignores robots of a team whose number starts with the team number', () => {
+    expect(
+      getRemappedRobots(makeEvent({ frc9997: 'frc34671B' }), 'frc3467'),
+    ).toEqual([]);
+  });
+
+  test('ignores pre-rookie remaps without a letter suffix', () => {
+    expect(
+      getRemappedRobots(makeEvent({ frc9997: 'frc3467' }), 'frc3467'),
+    ).toEqual([]);
+  });
+
+  test('returns nothing when the event has no remaps', () => {
+    expect(getRemappedRobots(makeEvent(null), 'frc3467')).toEqual([]);
+  });
+
+  test('orders robots by letter', () => {
+    expect(
+      getRemappedRobots(
+        makeEvent({ frc9996: 'frc3467C', frc9997: 'frc3467B' }),
+        'frc3467',
+      ),
+    ).toEqual([
+      { sourceTeamKey: 'frc9997', robotKey: 'frc3467B' },
+      { sourceTeamKey: 'frc9996', robotKey: 'frc3467C' },
+    ]);
+  });
+});
+
 describe('stripParentPrefix', () => {
   test('strips matching prefix and space separator', () => {
     expect(
@@ -221,6 +271,19 @@ describe('getEventDateString', () => {
       end_date: '2024-04-01',
     };
     expect(getEventDateString(event, 'short')).toEqual('Mar 30 to Apr 1, 2024');
+  });
+});
+
+describe('getEventCompactDateString', () => {
+  test.each([
+    ['one-day event', '2024-03-05', '2024-03-05', 'Mar 5'],
+    ['same-month event', '2024-03-05', '2024-03-08', 'Mar 5–8'],
+    ['cross-month event', '2024-03-30', '2024-04-01', 'Mar 30 – Apr 1'],
+  ])('formats a %s', (_name, start_date, end_date, expected) => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = { start_date, end_date };
+
+    expect(getEventCompactDateString(event)).toEqual(expected);
   });
 });
 
@@ -914,6 +977,38 @@ describe('hasEventEnded', () => {
   });
 });
 
+describe('isAfterEventEndDate', () => {
+  function makeEvent(end_date: string, timezone: string): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return { end_date, timezone };
+  }
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test('returns false on the last day of the event', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-13T03:00:00Z'));
+    expect(
+      isAfterEventEndDate(makeEvent('2024-04-12', 'America/New_York')),
+    ).toBe(false);
+  });
+
+  test('returns true the day after the event ends in the event timezone', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-13T05:00:00Z'));
+    expect(
+      isAfterEventEndDate(makeEvent('2024-04-12', 'America/New_York')),
+    ).toBe(true);
+  });
+
+  test('returns false for an event without dates', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    expect(isAfterEventEndDate({})).toBe(false);
+  });
+});
+
 describe('isEventActive', () => {
   function makeEvent(
     start_date: string,
@@ -1338,6 +1433,30 @@ describe('sortEvents', () => {
       'later',
     ]);
   });
+
+  test('leaves the input array in its original order', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const later: Event = {
+      key: 'later',
+      start_date: '2024-04-01',
+      end_date: '2024-04-03',
+      event_type: EventType.REGIONAL,
+      name: 'Later',
+    };
+    // @ts-expect-error: Don't need to fill out all the fields
+    const earlier: Event = {
+      key: 'earlier',
+      start_date: '2024-03-01',
+      end_date: '2024-03-03',
+      event_type: EventType.REGIONAL,
+      name: 'Earlier',
+    };
+    const events = [later, earlier];
+
+    sortEvents(events);
+
+    expect(events.map((e) => e.key)).toEqual(['later', 'earlier']);
+  });
 });
 
 describe('getEventWeekString 2021 challenges', () => {
@@ -1459,6 +1578,28 @@ describe('isEventWithinADay', () => {
         makeEvent(today.subtract({ days: 3 }), today.add({ days: 3 })),
       ),
     ).toBe(true);
+  });
+
+  test('is true on the day of a one-day event', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-20T15:00:00Z'));
+    const event = makeEvent(
+      Temporal.PlainDate.from('2024-04-20'),
+      Temporal.PlainDate.from('2024-04-20'),
+    );
+    expect(isEventWithinADay(event)).toBe(true);
+    vi.useRealTimers();
+  });
+
+  test('is true the day before the event starts', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-17T15:00:00Z'));
+    const event = makeEvent(
+      Temporal.PlainDate.from('2024-04-18'),
+      Temporal.PlainDate.from('2024-04-20'),
+    );
+    expect(isEventWithinADay(event)).toBe(true);
+    vi.useRealTimers();
   });
 
   test('is false for an event that ended years ago', () => {

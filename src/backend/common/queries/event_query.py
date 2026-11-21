@@ -6,6 +6,7 @@ from backend.common.consts.event_type import (
     EventType,
     SEASON_EVENT_TYPES,
 )
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
@@ -55,7 +56,7 @@ class DistrictEventsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
     DICT_CONVERTER = EventConverter
 
     def __init__(self, district_key: DistrictKey) -> None:
-        super().__init__(district_key=district_key)
+        super().__init__(district_key=RenamedDistricts.get_key_for_year(district_key))
 
     @typed_tasklet
     def _query_async(
@@ -188,6 +189,24 @@ class TeamYearEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], None]):
     ) -> Generator[Any, Any, List[EventTeam]]:
         event_teams = yield EventTeam.query(
             EventTeam.team == ndb.Key(Team, team_key), EventTeam.year == year
+        ).fetch_async()
+        return event_teams
+
+
+class TeamYearRemappedEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], None]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "team_year_remapped_eventteams_{team_key}_{year}"
+    DICT_CONVERTER = None
+
+    def __init__(self, team_key: TeamKey, year: Year) -> None:
+        super().__init__(team_key=team_key, year=year)
+
+    @typed_tasklet
+    def _query_async(
+        self, team_key: TeamKey, year: Year
+    ) -> Generator[Any, Any, List[EventTeam]]:
+        event_teams = yield EventTeam.query(
+            EventTeam.remapped_team == team_key, EventTeam.year == year
         ).fetch_async()
         return event_teams
 

@@ -12,6 +12,8 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2026
 from backend.common.game_specific.seasons.game_specifics_2026 import GameSpecifics2026
 from backend.common.game_specific.seasons.tests.conftest import (
+    assert_partial_breakdowns_split_counters,
+    assert_score_stats_without_breakdowns,
     build_match,
     HELPERS_TESTS,
     tiebreak_winner,
@@ -470,6 +472,16 @@ def test_calculate_event_insights_splits_quals_and_playoffs() -> None:
     assert none_throws(insights["playoff"])["high_score"] == (30, "2026casj_f1m1", "F1")
 
 
+def test_insights_without_any_breakdowns() -> None:
+    assert_score_stats_without_breakdowns(GameSpecifics2026(), "2026test")
+
+
+def test_insights_with_some_breakdowns(test_data_importer) -> None:
+    test_data_importer.import_match_list(HELPERS_TESTS, "data/2026marea_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, "2026marea")).fetch()
+    assert_partial_breakdowns_split_counters(GameSpecifics2026(), matches)
+
+
 def test_auto_climb_counters_agree() -> None:
     """A missing AUTO climb key is not a climb; both counters use 4 per match."""
     breakdown = json.loads(
@@ -498,3 +510,17 @@ def test_auto_climbs_capped_at_two_per_alliance() -> None:
     qual = none_throws(_insights([match])["qual"])
     assert qual["auto_climb_count"] == [3, 4, 75.0]
     assert _measure(match)["auto_climb"] == (3, 4)
+
+
+def test_get_per_robot_coprs() -> None:
+    coprs = GameSpecifics2026().get_per_robot_coprs()
+    breakdown = {
+        "autoTowerRobot1": "Level1",
+        "autoTowerRobot2": "None",
+        "autoTowerRobot3": "None",
+        "endGameTowerRobot1": "Level3",
+        "endGameTowerRobot2": "Level1",
+        "endGameTowerRobot3": "Level2",
+    }
+    assert coprs["autoTowerPoints"](breakdown) == [15, 0, 0]
+    assert coprs["endGameTowerPoints"](breakdown) == [30, 10, 20]

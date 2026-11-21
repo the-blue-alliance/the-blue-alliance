@@ -1,5 +1,7 @@
 import re
+from unittest.mock import Mock
 
+from google.appengine.api import users
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
@@ -144,3 +146,36 @@ def test_audit_logs_page_lookup_by_match_key(
     assert b"suggestion_review.suggest_match_video_review" in resp.data
     assert b"Match:2012cmp_qm1" in resp.data
     assert b"auditor@example.com" in resp.data
+
+
+def _google_admin(monkeypatch, email: str) -> None:
+    google_user = Mock()
+    google_user.email.return_value = email
+    monkeypatch.setattr(users, "get_current_user", Mock(return_value=google_user))
+
+
+def test_header_shows_google_admin_email(
+    web_client: Client, login_gae_admin, monkeypatch
+) -> None:
+    _google_admin(monkeypatch, "admin@example.com")
+    resp = web_client.get("/admin/")
+    assert b"admin@example.com" in resp.data
+
+
+def test_header_shows_tba_account_name_when_signed_in(
+    web_client: Client, login_gae_admin, login_user, monkeypatch
+) -> None:
+    _google_admin(monkeypatch, "admin@example.com")
+    login_user.display_name = "Woodie Flowers"
+    resp = web_client.get("/admin/")
+    assert b"(TBA account: Woodie Flowers)" in resp.data
+
+
+def test_header_falls_back_to_tba_account_email(
+    web_client: Client, login_gae_admin, login_user, monkeypatch
+) -> None:
+    _google_admin(monkeypatch, "admin@example.com")
+    login_user.display_name = None
+    login_user.email = "test@tba.com"
+    resp = web_client.get("/admin/")
+    assert b"(TBA account: test@tba.com)" in resp.data

@@ -1,4 +1,4 @@
-runtime: python313
+runtime: python314
 app_engine_apis: true
 entrypoint: gunicorn -b :$PORT backend.default.main:app
 

@@ -108,6 +108,17 @@ describe("LiveEventPanel", () => {
     expect(container.querySelector('[data-testid="current-match"]')).toBeNull();
   });
 
+  it("leaves practice matches out of upcoming matches", () => {
+    const { container, push } = setUp();
+    push("/e/2018casj/m", {
+      pm1: { c: "pm", s: 1, m: 1, r: -1, b: -1 },
+      qm1: qm(1, false),
+      qm2: qm(2, false),
+      qm3: qm(3, false),
+    });
+    expect(text(container, "upcoming-matches")).toBe("qm1,qm2,qm3");
+  });
+
   it("ignores pre-match live states", () => {
     const { container, push } = setUp();
     push("/e/2018casj/m", matches());

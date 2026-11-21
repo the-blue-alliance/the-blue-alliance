@@ -1,4 +1,10 @@
-import { type InsightV2Timeseries } from '~/api/tba/read';
+import {
+  type InsightV2,
+  type InsightV2GameStats,
+  type InsightV2Leaderboard,
+  type InsightV2Streak,
+  type InsightV2Timeseries,
+} from '~/api/tba/read';
 
 /** Number of rows shown before a "top N" table's expand toggle is used. */
 export const PRE_EXPANDED_ROWS = 10;
@@ -109,6 +115,41 @@ export function mergeSeries(data: TimeseriesData): ChartRow[] {
     }
     return row;
   });
+}
+
+export interface GroupedInsights {
+  leaderboards: InsightV2Leaderboard[];
+  streaks: InsightV2Streak[];
+  timeseries: InsightV2Timeseries[];
+  successRates: InsightV2GameStats[];
+}
+
+export function groupInsightsByCategory(
+  insights: InsightV2[],
+): GroupedInsights {
+  const grouped: GroupedInsights = {
+    leaderboards: [],
+    streaks: [],
+    timeseries: [],
+    successRates: [],
+  };
+  for (const insight of insights) {
+    switch (insight.category) {
+      case 'leaderboard':
+        grouped.leaderboards.push(insight);
+        break;
+      case 'streak':
+        grouped.streaks.push(insight);
+        break;
+      case 'timeseries':
+        grouped.timeseries.push(insight);
+        break;
+      case 'game_stats':
+        grouped.successRates.push(insight);
+        break;
+    }
+  }
+  return grouped;
 }
 
 type RankPosition = 1 | 2 | 3;

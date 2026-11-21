@@ -5,7 +5,7 @@ import json
 import re
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from typing import cast, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pytz
 from flask import abort, redirect, request
@@ -42,7 +42,6 @@ from backend.common.models.match import Match
 from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.models.team import Team
-from backend.common.nexus_api.types import PitMap
 from backend.common.queries import (
     district_query,
     event_query,
@@ -548,7 +547,7 @@ def event_pitmap(event_key: EventKey) -> Response:
 
     try:
         template_values = NexusEventDetailsSVGHelper.template_values(
-            cast(PitMap, nexus_event_details.pitmap_json),
+            nexus_event_details.pitmap_json,
             event.nexus_code_for_api,
             highlight_team_keys=highlight_team_keys,
             label_event_keys=_label_event_keys_for(event),

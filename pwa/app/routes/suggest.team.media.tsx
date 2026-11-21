@@ -120,7 +120,7 @@ function SuggestTeamMedia(): JSX.Element {
   };
 
   return (
-    <div className="mx-auto max-w-2xl py-8">
+    <div className="mx-auto max-w-2xl">
       <h1 className="mb-2 text-2xl font-semibold">
         Add Media for Team {team.team_number}
         {team.nickname ? ` \u2014 ${team.nickname}` : ''} ({year})

@@ -16,10 +16,7 @@ import { z } from 'zod';
 import { client as colorsClient } from '~/api/colors/client.gen';
 import { client as mobileClient } from '~/api/tba/mobile/client.gen';
 import { client as moderationClient } from '~/api/tba/moderation/client.gen';
-import {
-  getSearchIndexOptions,
-  getStatusOptions,
-} from '~/api/tba/read/@tanstack/react-query.gen';
+import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { client } from '~/api/tba/read/client.gen';
 import { AuthContextProvider } from '~/components/tba/auth/auth';
 import { MatchModal } from '~/components/tba/match/matchModal';
@@ -31,7 +28,11 @@ import { TooltipProvider } from '~/components/ui/tooltip';
 import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?url&no-inline';
 import { mapClientError } from '~/lib/apiError';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
-import { createCachedFetch } from '~/lib/middleware/network-cache';
+import {
+  LOCAL_API_AUTH_KEY,
+  LOCAL_API_BASE_URL,
+  isLocalDataSource,
+} from '~/lib/dataSource';
 import { STALE_TIME } from '~/lib/queryClient';
 import { THEME_INIT_SCRIPT, ThemeProvider } from '~/lib/theme';
 import { createLogger } from '~/lib/utils';
@@ -59,7 +60,11 @@ const ReactQueryDevtools = import.meta.env.PROD
 
 // Configure request interceptor for auth
 client.interceptors.request.use((request) => {
-  request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);
+  // The prod read key isn't valid against the local dev datastore, which
+  // has its own well-known dev key (seeded by /local/bootstrap)
+  const authKey = isLocalDataSource()
+    ? LOCAL_API_AUTH_KEY
+    : import.meta.env.VITE_TBA_API_READ_KEY;
 
   logger.debug(
     {
@@ -69,8 +74,18 @@ client.interceptors.request.use((request) => {
     'Sending request to TBA API',
   );
 
-  return request;
+  if (import.meta.env.SSR) {
+    request.headers.set('X-TBA-Auth-Key', authKey);
+    return request;
+  }
+  return asSimpleCorsRequest(request, authKey);
 });
+
+function asSimpleCorsRequest(request: Request, authKey: string): Request {
+  const url = new URL(request.url);
+  url.searchParams.set('X-TBA-Auth-Key', authKey);
+  return new Request(url, request);
+}
 
 // Attach the HTTP status code to thrown errors so the QueryClient's retry
 // function can distinguish 4xx "client error" failures from transient ones.
@@ -92,12 +107,20 @@ moderationClient.interceptors.error.use((error, response) => {
 
 // SSR-only network LRU under the API client. Client freshness is owned by
 // React Query staleTime — do not install a second TTL in the browser.
-if (typeof window === 'undefined') {
+if (import.meta.env.SSR && !globalThis.__TBA_E2E_MOCKS__) {
+  const { createCachedFetch } = await import('~/lib/middleware/network-cache');
   client.setConfig({
     fetch: createCachedFetch({
       cacheableMethods: ['GET'],
     }),
   });
+}
+
+// Dev-only: read from the local dev stack instead of prod when toggled via the
+// profile menu. isLocalDataSource() is false without a browser, so server
+// rendering always reads prod.
+if (isLocalDataSource()) {
+  client.setConfig({ baseUrl: LOCAL_API_BASE_URL });
 }
 
 // Point mobile API client at local backend when configured
@@ -134,15 +157,6 @@ export const Route = createRootRouteWithContext<{
       ...getStatusOptions({}),
       staleTime: STALE_TIME.STATUS,
     });
-    // Kick off /search_index on the client without awaiting so navbar search
-    // is usually ready by first open, without blocking navigations or
-    // dehydrating the large payload into every SSR response (see #10254).
-    if (!import.meta.env.SSR) {
-      void queryClient.prefetchQuery({
-        ...getSearchIndexOptions({}),
-        staleTime: STALE_TIME.SEARCH_INDEX,
-      });
-    }
     return {
       status,
       currentSeason: status.current_season ?? Temporal.Now.plainDateISO().year,
@@ -174,6 +188,11 @@ export const Route = createRootRouteWithContext<{
       },
     ],
     links: [
+      {
+        rel: 'preconnect',
+        href: 'https://www.thebluealliance.com',
+        crossOrigin: 'anonymous',
+      },
       {
         rel: 'canonical',
         href: `https://www.thebluealliance.com${matches[matches.length - 1].pathname}`,
@@ -222,13 +241,13 @@ function RootComponent() {
               {isFullscreen ? (
                 <Outlet />
               ) : (
-                <div className="flex min-h-screen flex-col">
+                <div className="flex min-h-svh flex-col">
                   <Navbar />
                   <TOCRendererProvider>
                     <div
                       className={cn(
                         !isFullwidth && 'container',
-                        'flex-1 px-4 text-sm',
+                        'flex-1 px-2 py-2 text-sm md:px-4 md:py-4',
                       )}
                     >
                       <div vaul-drawer-wrapper="" className="bg-background">

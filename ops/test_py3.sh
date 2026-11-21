@@ -68,8 +68,8 @@ elif [ "$#" -ge 1 ]; then
     pytest "$@"
 else
     if [ -n "${CI:-}" ] || [ "${COVERAGE:-}" = "1" ]; then
-        pytest src --cov-report=xml --cov=src
+        pytest src ops/storage --cov-report=xml --cov=src --cov=ops/storage
     else
-        pytest src
+        pytest src ops/storage
     fi
 fi

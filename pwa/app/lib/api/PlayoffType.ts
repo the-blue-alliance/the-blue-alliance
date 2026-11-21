@@ -27,3 +27,11 @@ export const DOUBLE_ELIM_ROUND_MAPPING = new Map<number, number>([
   [12, 4],
   [13, 5],
 ]);
+
+export const DOUBLE_ELIM_4_ROUND_MAPPING = new Map<number, number>([
+  [1, 1],
+  [2, 1],
+  [3, 2],
+  [4, 2],
+  [5, 3],
+]);

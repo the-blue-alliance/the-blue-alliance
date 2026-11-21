@@ -602,7 +602,10 @@ export default function TeamMatchStats({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+      <div
+        className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))]
+          gap-4"
+      >
         <TitledCard
           cardTitle={`${(winrateFromRecord(qualsRecord) * 100).toFixed(1)}%`}
           cardSubtitle={
@@ -702,7 +705,10 @@ export default function TeamMatchStats({
         </label>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div
+        className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,25rem),1fr))]
+          gap-6"
+      >
         <Tabs defaultValue="high-scores" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="high-scores">High Scores</TabsTrigger>

@@ -1,14 +1,28 @@
 import { act, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { useState } from 'react';
+import {
+  mockAllIsIntersecting,
+  setupIntersectionMocking,
+} from 'react-intersection-observer/test-utils';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { Media } from '~/api/tba/read';
 import TeamMediaGallery from '~/components/tba/teamMediaGallery';
 
 vi.mock('react-social-media-embed', () => ({
-  InstagramEmbed: ({ url }: { url: string }) => (
-    <div data-testid="instagram">{url}</div>
-  ),
+  InstagramEmbed: function InstagramEmbed({ url }: { url: string }) {
+    const [embeddedUrl] = useState(url);
+    return <div data-testid="instagram">{embeddedUrl}</div>;
+  },
 }));
+
+function instagram(key: string): Media {
+  return {
+    type: 'instagram-image',
+    foreign_key: key,
+    team_keys: [],
+  } as Media;
+}
 
 function imgur(key: string, directUrl?: string): Media {
   return {
@@ -17,6 +31,25 @@ function imgur(key: string, directUrl?: string): Media {
     team_keys: ['frc254'],
     direct_url: directUrl ?? `https://i.imgur.com/${key}.jpg`,
     view_url: `https://imgur.com/${key}`,
+  } as Media;
+}
+
+function cad(
+  type: 'grabcad' | 'onshape',
+  key: string,
+  directUrl: string,
+): Media {
+  return {
+    type,
+    foreign_key: key,
+    team_keys: ['frc1768'],
+    direct_url: directUrl,
+    details: {
+      model_name: 'Nightshade 2026',
+      model_description: null,
+      model_image: directUrl,
+      model_created: null,
+    },
   } as Media;
 }
 
@@ -35,6 +68,10 @@ function stubImages(state: {
     });
   }
 }
+
+beforeEach(() => {
+  setupIntersectionMocking(vi.fn);
+});
 
 afterEach(() => {
   for (const prop of imageProps) {
@@ -70,22 +107,55 @@ describe('TeamMediaGallery', () => {
     expect(screen.getByTestId('team-media-gallery').innerHTML).toBe('');
   });
 
-  test('waits for in-flight imgur loads', () => {
+  test('shows imgur images while they are still loading', () => {
     stubImages({ complete: false });
-    const { unmount } = render(
-      <TeamMediaGallery media={[imgur('aaaaaaa'), imgur('bbbbbbb')]} />,
-    );
-    const [first, second] = Array.from(
-      screen.getByTestId('team-media-gallery').querySelectorAll('img'),
-    );
-    expect(first.className).toBe('hidden');
+
+    render(<TeamMediaGallery media={[imgur('aaaaaaa')]} />);
+
+    expect(screen.getByRole('img', { name: 'Team media' })).toBeTruthy();
+  });
+
+  test('hides imgur images that fail to load', () => {
+    stubImages({ complete: false });
+    render(<TeamMediaGallery media={[imgur('aaaaaaa')]} />);
 
     act(() => {
-      first.dispatchEvent(new Event('load'));
-      second.dispatchEvent(new Event('error'));
+      screen
+        .getByRole('img', { name: 'Team media' })
+        .dispatchEvent(new Event('error'));
     });
-    expect(screen.getAllByRole('img', { name: 'Team media' })).toHaveLength(1);
-    unmount();
+
+    expect(screen.getByTestId('team-media-gallery').innerHTML).toBe('');
+  });
+
+  test('hides imgur images that finish loading as the removed placeholder', () => {
+    stubImages({ complete: false });
+    render(<TeamMediaGallery media={[imgur('aaaaaaa')]} />);
+    stubImages({ complete: true, naturalWidth: 161, naturalHeight: 81 });
+
+    act(() => {
+      screen
+        .getByRole('img', { name: 'Team media' })
+        .dispatchEvent(new Event('load'));
+    });
+
+    expect(screen.getByTestId('team-media-gallery').innerHTML).toBe('');
+  });
+
+  test('holds instagram embeds until they near the viewport', () => {
+    render(<TeamMediaGallery media={[instagram('xyz')]} />);
+
+    expect(screen.queryByTestId('instagram')).toBeNull();
+  });
+
+  test('embeds instagram posts once they near the viewport', () => {
+    render(<TeamMediaGallery media={[instagram('xyz')]} />);
+
+    act(() => mockAllIsIntersecting(true));
+
+    expect(screen.getByTestId('instagram').textContent).toBe(
+      'https://www.instagram.com/p/xyz/',
+    );
   });
 
   test('skips imgur media without an image url', () => {
@@ -128,6 +198,7 @@ describe('TeamMediaGallery', () => {
         ]}
       />,
     );
+    act(() => mockAllIsIntersecting(true));
     expect(screen.getByTestId('instagram').textContent).toBe(
       'https://www.instagram.com/p/xyz/',
     );
@@ -139,5 +210,100 @@ describe('TeamMediaGallery', () => {
     expect(screen.getByRole('img', { name: 'Robot reveal' })).toBeTruthy();
     expect(untitled.textContent).toBe('');
     expect(untitled.querySelector('img')?.getAttribute('alt')).toBe('');
+  });
+
+  test('links an Onshape model to its document', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('onshape', 'abc/w/def', 'https://cad.example/s.png')]}
+      />,
+    );
+    expect(screen.getByRole('link').getAttribute('href')).toBe(
+      'https://cad.onshape.com/documents/abc/w/def',
+    );
+  });
+
+  test('links a GrabCAD model to its library page', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('grabcad', 'nightshade-1', 'https://cad.example/l.png')]}
+      />,
+    );
+    expect(screen.getByRole('link').getAttribute('href')).toBe(
+      'https://grabcad.com/library/nightshade-1',
+    );
+  });
+
+  test('captions a CAD model with its name', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('onshape', 'abc/w/def', 'https://cad.example/s.png')]}
+      />,
+    );
+    expect(screen.getByRole('link').textContent).toBe('Nightshade 2026');
+  });
+
+  test('shows the CAD thumbnail', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('onshape', 'abc/w/def', 'https://cad.example/s.png')]}
+      />,
+    );
+    expect(
+      screen.getByRole('img', { name: 'Nightshade 2026' }).getAttribute('src'),
+    ).toBe('https://cad.example/s.png');
+  });
+
+  test('marks Onshape models with an Onshape badge', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('onshape', 'abc/w/def', 'https://cad.example/s.png')]}
+      />,
+    );
+    expect(screen.getAllByAltText('Onshape').length).toBeGreaterThan(0);
+  });
+
+  test('leaves the Onshape badge off GrabCAD models', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('grabcad', 'nightshade-1', 'https://cad.example/l.png')]}
+      />,
+    );
+    expect(screen.queryAllByAltText('Onshape')).toHaveLength(0);
+  });
+
+  test('skips CAD media without a thumbnail', () => {
+    render(<TeamMediaGallery media={[cad('onshape', 'abc/w/def', '')]} />);
+    expect(screen.getByTestId('team-media-gallery').innerHTML).toBe('');
+  });
+
+  test('lists instagram posts before imgur images', () => {
+    stubImages({ complete: true, naturalWidth: 640, naturalHeight: 480 });
+    render(<TeamMediaGallery media={[imgur('abcdefg'), instagram('xyz')]} />);
+
+    act(() => mockAllIsIntersecting(true));
+
+    expect(
+      screen
+        .getByTestId('team-media-gallery')
+        .firstElementChild?.querySelector('[data-testid="instagram"]'),
+    ).toBeTruthy();
+  });
+
+  test('replaces instagram embeds when the media list changes', () => {
+    const { rerender } = render(
+      <TeamMediaGallery media={[instagram('old')]} />,
+    );
+    act(() => mockAllIsIntersecting(true));
+    rerender(
+      <TeamMediaGallery media={[instagram('new1'), instagram('new2')]} />,
+    );
+    act(() => mockAllIsIntersecting(true));
+    expect(
+      screen.getAllByTestId('instagram').map((e) => e.textContent),
+    ).toEqual([
+      'https://www.instagram.com/p/new1/',
+      'https://www.instagram.com/p/new2/',
+    ]);
   });
 });

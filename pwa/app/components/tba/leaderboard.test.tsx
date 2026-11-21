@@ -9,22 +9,7 @@ import {
   type LeaderboardShape,
 } from '~/components/tba/leaderboard';
 
-vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    params,
-    to,
-    ...props
-  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-    children?: ReactNode;
-    params: { eventKey: string };
-    to: string;
-  }) => (
-    <a href={to.replace('$eventKey', params.eventKey)} {...props}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
 
 vi.mock('~/components/tba/links', () => ({
   TeamLink: ({
@@ -184,7 +169,7 @@ describe('Leaderboard', () => {
     );
     const row = screen.getAllByRole('row')[1];
     const link = within(row).getByRole('link', {
-      name: 'Silicon Valley Regional Quals 1',
+      name: 'Silicon Valley Quals 1',
     });
     expect(link.dataset.event).toBe('2024casj');
     expect(link.title).toBe('2024casj_qm1');
@@ -193,9 +178,7 @@ describe('Leaderboard', () => {
     ).toBe(undefined);
 
     const tooltip = await hoverTooltip(link);
-    expect(tooltip.textContent).toBe(
-      'Silicon Valley Regional Quals 1 (254, 604)',
-    );
+    expect(tooltip.textContent).toBe('Silicon Valley Quals 1 (254, 604)');
   });
 
   test('renders an empty-alliance match context without teams', async () => {

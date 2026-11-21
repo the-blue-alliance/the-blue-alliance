@@ -12,23 +12,30 @@
 }
 
 :root {
-  --alliance-red-winner: oklch(0.832852 0.085938 29);
-  --alliance-red-loser: oklch(0.910855 0.04375 29);
+  --alliance-red-winner: light-dark(
+    oklch(0.832852 0.085938 29),
+    oklch(0.482064 0.15 29)
+  );
+  --alliance-red-loser: light-dark(
+    oklch(0.910855 0.04375 29),
+    oklch(0.30319 0.077 29)
+  );
 
-  --alliance-blue-winner: oklch(0.824681 0.085938 264);
-  --alliance-blue-loser: oklch(0.906397 0.04375 264);
+  --alliance-blue-winner: light-dark(
+    oklch(0.824681 0.085938 264),
+    oklch(0.477592 0.15 264)
+  );
+  --alliance-blue-loser: light-dark(
+    oklch(0.906397 0.04375 264),
+    oklch(0.302296 0.077 264)
+  );
 
-  --alliance-red-accent: oklch(0.781918 0.126563 29);
-  --alliance-blue-accent: oklch(0.770976 0.114063 264);
-}
-
-.dark {
-  --alliance-red-winner: oklch(0.482064 0.15 29);
-  --alliance-red-loser: oklch(0.30319 0.077 29);
-
-  --alliance-blue-winner: oklch(0.477592 0.15 264);
-  --alliance-blue-loser: oklch(0.302296 0.077 264);
-
-  --alliance-red-accent: oklch(0.663086 0.223438 29);
-  --alliance-blue-accent: oklch(0.650391 0.184375 264);
+  --alliance-red-accent: light-dark(
+    oklch(0.781918 0.126563 29),
+    oklch(0.663086 0.223438 29)
+  );
+  --alliance-blue-accent: light-dark(
+    oklch(0.770976 0.114063 264),
+    oklch(0.650391 0.184375 264)
+  );
 }

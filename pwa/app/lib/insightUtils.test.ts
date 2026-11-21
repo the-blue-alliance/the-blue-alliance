@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'vitest';
 
-import { type InsightV2Timeseries } from '~/api/tba/read';
+import { type InsightV2, type InsightV2Timeseries } from '~/api/tba/read';
 import {
   contextKey,
+  groupInsightsByCategory,
   mergeSeries,
   rankRowClassName,
   rankTextClassName,
@@ -193,5 +194,33 @@ describe('rank accents', () => {
 
   test('text below the podium is not accented', () => {
     expect(rankTextClassName(4)).toBeUndefined();
+  });
+});
+
+describe('groupInsightsByCategory', () => {
+  test('puts each category in its own list', () => {
+    const insights = [
+      { category: 'leaderboard' },
+      { category: 'streak' },
+      { category: 'timeseries' },
+      { category: 'game_stats' },
+    ] as InsightV2[];
+    expect(groupInsightsByCategory(insights)).toEqual({
+      leaderboards: [{ category: 'leaderboard' }],
+      streaks: [{ category: 'streak' }],
+      timeseries: [{ category: 'timeseries' }],
+      successRates: [{ category: 'game_stats' }],
+    });
+  });
+
+  test('drops clubs', () => {
+    expect(
+      groupInsightsByCategory([{ category: 'clubs' }] as InsightV2[]),
+    ).toEqual({
+      leaderboards: [],
+      streaks: [],
+      timeseries: [],
+      successRates: [],
+    });
   });
 });

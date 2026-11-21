@@ -276,7 +276,7 @@ class ContributionCalculator:
                     score -= score_breakdown[color].get("rotorBonusPoints", 0)
                     means[color] = score
                 elif self._stat == "auto_points":
-                    means[color] = score_breakdown[color]["autoPoints"]
+                    means[color] = score_breakdown[color].get("autoPoints", 0)
                 elif self._stat == "boulders":
                     means[color] = (
                         score_breakdown[color].get("autoBouldersLow", 0)
@@ -317,57 +317,61 @@ class ContributionCalculator:
                         num_gears = -1  # Failed to place reserve gear
                     means[color] = num_gears
                 elif self._stat == "endgame_points":
-                    means[color] = score_breakdown[color]["endgamePoints"]
+                    means[color] = score_breakdown[color].get("endgamePoints", 0)
                 elif self._stat == "rocket_pieces_scored":
                     count = 0
                     for side1 in ["Far", "Near"]:
                         for side2 in ["Left", "Right"]:
                             for level in ["low", "mid", "top"]:
-                                position = score_breakdown[color][
-                                    "{}{}Rocket{}".format(level, side2, side1)
-                                ]
+                                position = score_breakdown[color].get(
+                                    "{}{}Rocket{}".format(level, side2, side1), ""
+                                )
                                 if "Cargo" in position:
                                     count += 2
                                 elif "Panel" in position:
                                     count += 1
                     means[color] = count
                 elif self._stat == "hab_climb_points":
-                    means[color] = score_breakdown[color]["habClimbPoints"]
+                    means[color] = score_breakdown[color].get("habClimbPoints", 0)
                 elif self._stat == "power_cells_scored":
                     count = 0
                     for mode in ["auto", "teleop"]:
                         for goal in ["Bottom", "Outer", "Inner"]:
-                            count += score_breakdown[color][
-                                "{}Cells{}".format(mode, goal)
-                            ]
+                            count += score_breakdown[color].get(
+                                "{}Cells{}".format(mode, goal), 0
+                            )
                     means[color] = count
                 elif self._stat == "cargo_scored":
                     auto_count = 0
                     for goal in ["Lower", "Upper"]:
                         for exit in ["Near", "Far", "Red", "Blue"]:
-                            auto_count += score_breakdown[color][
-                                "autoCargo{}{}".format(goal, exit)
-                            ]
+                            auto_count += score_breakdown[color].get(
+                                "autoCargo{}{}".format(goal, exit), 0
+                            )
                     # Approximate Quintet by adding 2 to count
                     count = auto_count + 2 if auto_count >= 5 else auto_count
                     for goal in ["Lower", "Upper"]:
                         for exit in ["Near", "Far", "Red", "Blue"]:
-                            count += score_breakdown[color][
-                                "teleopCargo{}{}".format(goal, exit)
-                            ]
+                            count += score_breakdown[color].get(
+                                "teleopCargo{}{}".format(goal, exit), 0
+                            )
                     means[color] = count
                 elif self._stat == "game_piece_scored":
                     count = 0
                     for mode in ["auto", "teleop"]:
-                        count += score_breakdown[color]["{}GamePieceCount".format(mode)]
+                        count += score_breakdown[color].get(
+                            "{}GamePieceCount".format(mode), 0
+                        )
                     means[color] = count
                 elif self._stat == "links":
                     count = 0
-                    count = math.floor((score_breakdown[color]["linkPoints"]) / 5)
+                    count = math.floor(
+                        (score_breakdown[color].get("linkPoints", 0)) / 5
+                    )
                     means[color] = count
                 elif self._stat == "charge_station_points":
                     count = 0
-                    count = score_breakdown[color]["totalChargeStationPoints"]
+                    count = score_breakdown[color].get("totalChargeStationPoints", 0)
                     means[color] = count
                 elif self._stat == "note_scored":
                     count = 0
@@ -375,27 +379,33 @@ class ContributionCalculator:
                         for position in ["Amp", "Speaker"]:
                             if position == "Speaker" and mode == "teleop":
                                 for type in ["NoteCount", "NoteAmplifiedCount"]:
-                                    count += score_breakdown[color][
-                                        "{}{}{}".format(mode, position, type)
-                                    ]
+                                    count += score_breakdown[color].get(
+                                        "{}{}{}".format(mode, position, type), 0
+                                    )
                             else:
-                                count += score_breakdown[color][
-                                    "{}{}NoteCount".format(mode, position)
-                                ]
+                                count += score_breakdown[color].get(
+                                    "{}{}NoteCount".format(mode, position), 0
+                                )
                     means[color] = count
                 elif self._stat == "stage_points":
                     count = 0
-                    count = score_breakdown[color]["endGameTotalStagePoints"]
+                    count = score_breakdown[color].get("endGameTotalStagePoints", 0)
                     means[color] = count
                 elif self._stat == "robot_on_stage":
                     count = 0
                     for robot in range(1, 4):
                         if (
-                            score_breakdown[color]["endGameRobot{}".format(robot)]
+                            score_breakdown[color].get(
+                                "endGameRobot{}".format(robot), ""
+                            )
                             == "StageLeft"
-                            or score_breakdown[color]["endGameRobot{}".format(robot)]
+                            or score_breakdown[color].get(
+                                "endGameRobot{}".format(robot), ""
+                            )
                             == "StageRight"
-                            or score_breakdown[color]["endGameRobot{}".format(robot)]
+                            or score_breakdown[color].get(
+                                "endGameRobot{}".format(robot), ""
+                            )
                             == "CenterStage"
                         ):
                             count += 1
@@ -406,24 +416,26 @@ class ContributionCalculator:
                     if "wallAlgaeCount" in score_breakdown[color]:
                         # 2025 Game Manual 6.5.3: "at least 2 ALGAE are scored
                         # in each ALLIANCE'S PROCESSOR"
-                        met = score_breakdown[color]["wallAlgaeCount"] >= 2
+                        met = score_breakdown[color].get("wallAlgaeCount", 0) >= 2
                     else:
                         # 2024: FMS sets this when the ALLIANCE uses a NOTE for
                         # Coopertition within the first 45 seconds of TELEOP
-                        met = score_breakdown[color]["coopertitionCriteriaMet"]
+                        met = score_breakdown[color].get(
+                            "coopertitionCriteriaMet", False
+                        )
                     means[color] = 1 if met else 0
                 elif self._stat == "auto_coral_scored":
-                    means[color] = score_breakdown[color]["autoCoralCount"]
+                    means[color] = score_breakdown[color].get("autoCoralCount", 0)
                 elif self._stat == "coral_scored":
-                    means[color] = score_breakdown[color]["teleopCoralCount"]
+                    means[color] = score_breakdown[color].get("teleopCoralCount", 0)
                 elif self._stat == "barge_points":
-                    means[color] = score_breakdown[color]["endGameBargePoints"]
+                    means[color] = score_breakdown[color].get("endGameBargePoints", 0)
                 elif self._stat == "totalAutoPoints":
-                    means[color] = score_breakdown[color]["totalAutoPoints"]
+                    means[color] = score_breakdown[color].get("totalAutoPoints", 0)
                 elif self._stat == "totalTeleopPoints":
-                    means[color] = score_breakdown[color]["totalTeleopPoints"]
+                    means[color] = score_breakdown[color].get("totalTeleopPoints", 0)
                 elif self._stat == "endGameTowerPoints":
-                    means[color] = score_breakdown[color]["endGameTowerPoints"]
+                    means[color] = score_breakdown[color].get("endGameTowerPoints", 0)
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 

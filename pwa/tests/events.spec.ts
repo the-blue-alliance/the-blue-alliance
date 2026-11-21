@@ -1,9 +1,29 @@
-import { expect, test } from '@playwright/test';
+import { type Event, getEventsByYear } from '~/api/tba/read';
+
+import { expect, test } from './fixtures';
+import { gotoHydrated } from './helpers';
+import events2025 from './mocks/data/events/2025.json' with { type: 'json' };
+
+test('/events/2025 drops the parent event name from division rows', async ({
+  page,
+  mockTba,
+}) => {
+  await mockTba(
+    getEventsByYear,
+    { path: { year: 2025 } },
+    events2025 as Event[],
+  );
+
+  await page.goto('/events/2025');
+
+  await expect(
+    page.getByRole('link', { name: 'Mercury Division', exact: true }),
+  ).toBeVisible();
+});
 
 test.describe('/events/2025', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/events/2025');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/events/2025');
   });
 
   test('lists championship divisions immediately after Einstein Field', async ({
@@ -23,9 +43,15 @@ test.describe('/events/2025', () => {
     ).toContainText('Archimedes Division');
   });
 
-  test('drops the parent event name from division rows', async ({ page }) => {
+  test('hides the webcast column (mobile)', async ({ page }) => {
     await expect(
-      page.getByRole('link', { name: 'Mercury Division', exact: true }),
+      page.getByRole('columnheader', { name: 'Webcast' }),
+    ).toHaveCount(0);
+  });
+
+  test('shows the webcast column on desktop', async ({ page }) => {
+    await expect(
+      page.getByRole('columnheader', { name: 'Webcast' }).first(),
     ).toBeVisible();
   });
 
@@ -44,12 +70,31 @@ test.describe('/events/2025', () => {
       '/api/v3/event/2025cmptx/teams',
     );
   });
+
+  test('opens the regional rankings from the district selector', async ({
+    page,
+  }) => {
+    await page.getByRole('combobox').filter({ hasText: 'All Events' }).click();
+    await page.getByRole('option', { name: 'Regional Events' }).click();
+
+    await expect(page).toHaveURL('/events/regional/2025');
+  });
+});
+
+test('/events/2024 leaves Regional Events out of the district selector', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/events/2024');
+  await page.getByRole('combobox').filter({ hasText: 'All Events' }).click();
+
+  await expect(
+    page.getByRole('option', { name: 'Regional Events' }),
+  ).toHaveCount(0);
 });
 
 test.describe('/events', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/events');
-    await page.locator('body[data-hydrated]').waitFor();
+    await gotoHydrated(page, '/events');
   });
 
   test('labels the district selector as All Events', async ({ page }) => {
@@ -57,4 +102,20 @@ test.describe('/events', () => {
       page.getByRole('combobox').filter({ hasText: 'All Events' }),
     ).toBeVisible();
   });
+});
+
+test('/events/pnw redirects to the current-season district page', async ({
+  page,
+}) => {
+  await page.goto('/events/pnw');
+
+  await expect(page).toHaveURL('/district/pnw');
+});
+
+test('/events/pnw/2024 redirects to that year of the district page', async ({
+  page,
+}) => {
+  await page.goto('/events/pnw/2024');
+
+  await expect(page).toHaveURL('/district/pnw/2024');
 });

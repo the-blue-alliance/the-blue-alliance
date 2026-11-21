@@ -1,32 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { AnchorHTMLAttributes } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
-import {
-  AllianceColor,
-  CompLevel,
-  type Event,
-  EventType,
-  type Match,
-  PlayoffType,
-} from '~/api/tba/read';
+import { type Event, type Match, PlayoffType } from '~/api/tba/read';
 import MatchDetails from '~/components/tba/match/matchDetails';
-import type { TeamTooltipProps } from '~/components/tba/teamTooltip';
 import { formatMatchTime } from '~/lib/matchUtils';
+import { makeEvent, makeMatch } from '~/test/factories';
 
-vi.mock('~/components/tba/teamTooltip', () => ({
-  TeamLinkWithTooltip: ({
-    teamKey,
-    year,
-    disqualified: _disqualified,
-    surrogate: _surrogate,
-    ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & TeamTooltipProps) => (
-    <a href={`/team/${teamKey.substring(3)}/${year}`} {...props}>
-      {teamKey.substring(3)}
-    </a>
-  ),
-}));
+vi.mock('~/components/tba/teamTooltip', () => import('~/test/linkMocks'));
+
+vi.mock('@tanstack/react-router', () => import('~/test/linkMocks'));
 
 vi.mock('~/lib/hooks/useFavoriteTeams', () => ({
   useFavoriteTeamKeys: () => ({ teamKeys: [], isLoading: false }),
@@ -84,71 +66,12 @@ const EVENT_TIMEZONE = 'Etc/GMT+12';
 // 2026-03-07T14:30:00Z, which is 2:30 AM on Sat, Mar 7 in Etc/GMT+12.
 const SCHEDULED = 1772893800;
 
-const event: Event = {
-  key: '2026test',
-  name: 'Test Event',
-  event_code: 'test',
-  event_type: EventType.REGIONAL,
-  district: null,
-  city: null,
-  state_prov: null,
-  country: null,
+const event = makeEvent({
   start_date: '2026-03-06',
   end_date: '2026-03-08',
-  year: 2026,
-  short_name: null,
-  event_type_string: 'Regional',
-  week: 0,
-  address: null,
-  postal_code: null,
-  gmaps_place_id: null,
-  gmaps_url: null,
-  lat: null,
-  lng: null,
-  location_name: null,
   timezone: EVENT_TIMEZONE,
-  website: null,
-  first_event_id: null,
-  first_event_code: null,
-  webcasts: [],
-  division_keys: [],
-  parent_event_key: null,
   playoff_type: PlayoffType.DOUBLE_ELIM_8_TEAM,
-  playoff_type_string: null,
-  remap_teams: null,
-};
-
-function makeMatch(overrides: Partial<Match> = {}): Match {
-  return {
-    key: '2026test_qm1',
-    comp_level: CompLevel.QM,
-    set_number: 1,
-    match_number: 1,
-    alliances: {
-      red: {
-        score: 94,
-        team_keys: ['frc254', 'frc1114', 'frc2056'],
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: 43,
-        team_keys: ['frc148', 'frc217', 'frc33'],
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-    },
-    winning_alliance: AllianceColor.RED,
-    event_key: '2026test',
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
-    ...overrides,
-  };
-}
+});
 
 function breakdownWith(
   fields: Record<string, unknown>,
@@ -167,7 +90,10 @@ describe('MatchDetails', () => {
     renderDetails(makeMatch());
 
     expect(
-      screen.getAllByRole('link').map((link) => link.getAttribute('href')),
+      screen
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('href'))
+        .filter((href) => href?.startsWith('/team/')),
     ).toEqual([
       '/team/254/2026',
       '/team/1114/2026',
@@ -246,6 +172,40 @@ describe('MatchDetails', () => {
     renderDetails(makeMatch({ videos: [{ type: 'tba', key: 'internal' }] }));
 
     expect(screen.queryByTitle(/Test Event/)).toBeNull();
+  });
+
+  test('links to the video suggestion form for the match', () => {
+    renderDetails(makeMatch());
+
+    expect(
+      screen.getByRole('link', { name: 'Add Video' }).getAttribute('href'),
+    ).toBe('/suggest/match/video?match_key=2026test_qm1');
+  });
+
+  test('links to a YouTube search for the match', () => {
+    renderDetails(makeMatch());
+
+    expect(
+      screen.getByRole('link', { name: 'Search YouTube' }).getAttribute('href'),
+    ).toBe(
+      'https://www.youtube.com/results?search_query=Quals%201%202026%20Test%20Event',
+    );
+  });
+
+  test('says no videos are known when the match has no YouTube videos', () => {
+    renderDetails(makeMatch({ videos: [{ type: 'tba', key: 'internal' }] }));
+
+    expect(
+      screen.getByText(/don't know about any videos for this match yet/),
+    ).toBeTruthy();
+  });
+
+  test('hides the no-videos message when the match has a YouTube video', () => {
+    renderDetails(makeMatch({ videos: [{ type: 'youtube', key: 'abc123' }] }));
+
+    expect(
+      screen.queryByText(/don't know about any videos for this match yet/),
+    ).toBeNull();
   });
 
   test('shows the match date in the event timezone', () => {

@@ -150,7 +150,10 @@ export function ReviewGuidelines({
       {sets.map((set) => (
         <section key={set.title} className="flex flex-col gap-2">
           <h2 className="text-lg font-medium">{set.title}</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div
+            className="grid
+              grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-3"
+          >
             <div
               className="rounded-lg border border-green-600 bg-green-600/10 p-3
                 text-sm"

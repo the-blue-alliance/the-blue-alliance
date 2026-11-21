@@ -30,3 +30,11 @@ def test_parse_district_list_none(test_data_importer, ndb_stub) -> None:
     districts = FMSAPIDistrictListParser(2018).parse(data)
 
     assert districts == []
+
+
+def test_parse_stale_district_code_uses_that_years_code(ndb_stub) -> None:
+    districts = FMSAPIDistrictListParser(2026).parse(
+        {"districts": [{"code": "FIT", "name": "FIRST In Texas"}], "districtCount": 1}
+    )
+
+    assert [(d.key_name, d.abbreviation) for d in districts] == [("2026tx", "tx")]

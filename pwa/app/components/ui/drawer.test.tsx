@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { createEvent, fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
@@ -91,6 +91,12 @@ describe('Drawer', () => {
     expect(document.querySelector('[data-vaul-overlay]')).not.toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+    fireEvent(
+      dialog,
+      Object.assign(createEvent.animationEnd(dialog), {
+        animationName: 'slideToBottom',
+      }),
+    );
     await vi.waitFor(() => {
       expect(screen.queryByRole('dialog')).toBeNull();
     });

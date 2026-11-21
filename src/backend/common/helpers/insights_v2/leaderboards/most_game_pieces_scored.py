@@ -81,6 +81,7 @@ class HighestCountByMatchV2Calculator(MatchAllianceLeaderboardV2Calculator):
                 match_key=match.key_name,  # type: ignore[union-attr]
                 score=high_count,
                 alliance=list(match.alliances[high_color]["teams"]),  # type: ignore[index]
+                district=event.event_district_abbrev,
             )
 
 

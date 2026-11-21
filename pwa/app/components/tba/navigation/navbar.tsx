@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import GlobalLoadingProgress from '~/components/tba/globalLoadingProgress';
 import { MobileMenu } from '~/components/tba/navigation/mobileMenu';
+import { ProfileMenu } from '~/components/tba/navigation/profileMenu';
 import { SearchModal } from '~/components/tba/navigation/searchModal';
 import {
   NavigationMenu,
@@ -45,13 +46,17 @@ export function Navbar() {
           setSelected((value as string | null) ?? null);
         }}
         render={
-          <header className="sticky top-0 z-50 h-14 w-full bg-brand shadow-md" />
+          <header
+            className="sticky top-0 z-50 h-(--header-height) w-full bg-brand
+              shadow-md"
+          />
         }
       >
         <div className="container">
           <NavigationMenuList
             render={<nav />}
-            className="flex h-14 w-full items-center justify-between"
+            className="flex h-(--header-height) w-full items-center
+              justify-between"
           >
             <Link
               to="/"
@@ -67,14 +72,13 @@ export function Navbar() {
                 className="text-xl font-medium tracking-tight whitespace-nowrap
                   text-white"
               >
-                <span className="sm:hidden md:block">The Blue Alliance</span>
-                <span className="hidden sm:block md:hidden">TBA</span>
+                The Blue Alliance
               </div>
             </Link>
             {/* Desktop Menu Items */}
             <ul
               className="flex list-none flex-row items-center gap-1 px-6
-                max-sm:hidden"
+                max-[60rem]:hidden"
             >
               {NAV_ITEMS_LIST.map(({ title, to, params, icon: Icon }) => (
                 <NavigationMenuItem key={title}>
@@ -100,12 +104,14 @@ export function Navbar() {
             <ul className="flex items-center gap-2">
               <a
                 href={`https://www.thebluealliance.com${pathname}`}
-                className="rounded-md px-2.5 py-2 text-xs font-medium text-white
-                  hover:bg-black/20 hover:no-underline max-sm:hidden"
+                className="rounded-md px-2.5 py-2 text-xs font-medium
+                  whitespace-nowrap text-white hover:bg-black/20
+                  hover:no-underline max-lg:hidden"
               >
                 Leave beta
               </a>
               <SearchModal />
+              <ProfileMenu />
               <MobileMenu />
             </ul>
           </NavigationMenuList>

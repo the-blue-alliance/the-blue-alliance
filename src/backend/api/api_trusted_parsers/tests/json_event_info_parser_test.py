@@ -210,6 +210,12 @@ def test_parse_remap_teams_multiple() -> None:
     assert parsed.get("remap_teams") == {"frc9998": "frc254", "frc9999": "frc971B"}
 
 
+def test_parse_remap_teams_empty() -> None:
+    data = {"remap_teams": {}}
+    parsed = _make_parser().parse(json.dumps(data))
+    assert parsed.get("remap_teams") == {}
+
+
 def test_parse_remap_teams_bad_temp_team_raises_exception() -> None:
     data = {"remap_teams": {"254": "frc254"}}
     with pytest.raises(ParserInputException, match="Bad team"):

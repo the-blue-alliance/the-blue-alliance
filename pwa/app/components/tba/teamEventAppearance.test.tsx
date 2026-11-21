@@ -1,10 +1,11 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { type ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
   type Award,
   AwardType,
+  type CompLevel,
   type EliminationAlliance,
   type Event,
   type EventDistrictPoints,
@@ -18,6 +19,11 @@ import TeamEventAppearance, {
   TeamStatus,
   getTotalRankingPoints,
 } from '~/components/tba/teamEventAppearance';
+import {
+  makeMatch as baseMatch,
+  makeAlliance,
+  makeEvent,
+} from '~/test/factories';
 
 vi.mock('~/components/tba/links', () => ({
   EventLink: ({
@@ -58,12 +64,12 @@ vi.mock('~/components/tba/eventRankTooltip', () => ({
 vi.mock('~/components/tba/match/matchRows', () => ({
   default: ({
     matches,
-    focusTeamKey,
+    focusTeamKeys,
   }: {
     matches: Match[];
-    focusTeamKey: string;
+    focusTeamKeys: string[];
   }) => (
-    <ul data-testid="matches" data-focus={focusTeamKey}>
+    <ul data-testid="matches" data-focus={focusTeamKeys.join(' ')}>
       {matches.map((m) => (
         <li key={m.key}>{m.key}</li>
       ))}
@@ -144,7 +150,7 @@ describe('TeamStatus', () => {
         event={event}
         matches={[makeMatch('2026test_qm1', 'qm', 1, ['frc254'])]}
         status={status}
-        team={{ key: 'frc254' } as Team}
+        teamKey="frc254"
         awards={[]}
         maybeDistrictPoints={null}
         maybeRegionalPoolPoints={null}
@@ -158,39 +164,20 @@ describe('TeamStatus', () => {
 
 const team = { key: 'frc254', team_number: 254 } as Team;
 
-const fullEvent: Event = {
+const fullEvent = makeEvent({
   key: '2026casj',
   name: 'Silicon Valley Regional',
   event_code: 'casj',
-  event_type: EventType.REGIONAL,
-  district: null,
   city: 'San Jose',
   state_prov: 'CA',
   country: 'USA',
   start_date: '2026-03-26',
   end_date: '2026-03-29',
-  year: 2026,
   short_name: 'Silicon Valley',
-  event_type_string: 'Regional',
   week: 4,
-  address: null,
-  postal_code: null,
-  gmaps_place_id: null,
-  gmaps_url: null,
-  lat: null,
-  lng: null,
   location_name: 'San Jose State',
   timezone: 'America/Los_Angeles',
-  website: null,
-  first_event_id: null,
-  first_event_code: null,
-  webcasts: [],
-  division_keys: [],
-  parent_event_key: null,
-  playoff_type: null,
-  playoff_type_string: null,
-  remap_teams: null,
-};
+});
 
 const fullStatus = {
   qual: {
@@ -266,39 +253,22 @@ const points: EventDistrictPoints = {
 
 function makeMatch(
   key: string,
-  compLevel: 'qm' | 'sf',
+  compLevel: 'qm' | 'sf' | 'qf',
   matchNumber: number,
   red: string[] = [],
   blue: string[] = [],
+  scores: { red?: number; blue?: number } = {},
 ) {
-  return {
+  return baseMatch({
     key,
-    comp_level: compLevel,
-    set_number: 1,
+    comp_level: compLevel as CompLevel,
     match_number: matchNumber,
-    event_key: '2026casj',
-    winning_alliance: 'red',
+    event_key: key.split('_')[0],
     alliances: {
-      red: {
-        score: 1,
-        team_keys: red,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
-      blue: {
-        score: 0,
-        team_keys: blue,
-        surrogate_team_keys: [],
-        dq_team_keys: [],
-      },
+      red: makeAlliance(scores.red ?? 1, red),
+      blue: makeAlliance(scores.blue ?? 0, blue),
     },
-    time: null,
-    actual_time: null,
-    predicted_time: null,
-    post_result_time: null,
-    score_breakdown: null,
-    videos: [],
-  } as unknown as Match;
+  });
 }
 
 describe('TeamEventAppearance', () => {
@@ -346,6 +316,23 @@ describe('TeamEventAppearance', () => {
     expect(screen.getByTestId('rank').textContent).toBe('3 of 40');
   });
 
+  test('labels a 2016 week 1 event as Week 1', () => {
+    render(
+      <TeamEventAppearance
+        event={{ ...fullEvent, key: '2016casd', year: 2016, week: 1 }}
+        matches={[]}
+        status={null}
+        team={team}
+        awards={[]}
+        maybeDistrictPoints={null}
+        maybeRegionalPoolPoints={null}
+        maybeAlliances={null}
+      />,
+    );
+
+    expect(screen.getByText('Week 1')).toBeTruthy();
+  });
+
   test('omits the week badge and banners for offseason events', () => {
     render(
       <TeamEventAppearance
@@ -382,6 +369,172 @@ describe('TeamEventAppearance', () => {
   });
 });
 
+describe('TeamEventAppearance with a remapped robot', () => {
+  const robotStatus = {
+    qual: {
+      num_teams: 18,
+      ranking: { rank: 7, matches_played: 1, sort_orders: [] },
+      sort_order_info: [],
+    },
+  } as unknown as TeamEventStatus;
+
+  function renderWithRobot() {
+    render(
+      <TeamEventAppearance
+        event={{ ...fullEvent, event_type: EventType.OFFSEASON, week: null }}
+        matches={[
+          makeMatch('2026casj_qm1', 'qm', 1, ['frc254']),
+          makeMatch('2026casj_qm3', 'qm', 3, ['frc254'], ['frc254B']),
+        ]}
+        status={fullStatus}
+        team={team}
+        awards={[]}
+        maybeDistrictPoints={null}
+        maybeRegionalPoolPoints={null}
+        maybeAlliances={null}
+        remappedRobots={[
+          {
+            robotKey: 'frc254B',
+            sourceTeamKey: 'frc9997',
+            status: robotStatus,
+            matches: [
+              makeMatch('2026casj_qm2', 'qm', 2, ['frc254B']),
+              makeMatch('2026casj_qm3', 'qm', 3, ['frc254'], ['frc254B']),
+            ],
+            awards: [],
+          },
+        ]}
+      />,
+    );
+  }
+
+  function shownMatchKeys() {
+    return within(screen.getByTestId('matches'))
+      .getAllByRole('listitem')
+      .map((li) => li.textContent);
+  }
+
+  test('has no tabs without a remapped robot', () => {
+    render(
+      <TeamEventAppearance
+        event={fullEvent}
+        matches={[]}
+        status={null}
+        team={team}
+        awards={[]}
+        maybeDistrictPoints={null}
+        maybeRegionalPoolPoints={null}
+        maybeAlliances={null}
+      />,
+    );
+
+    expect(screen.queryByRole('tablist')).toBeNull();
+  });
+
+  test('offers a tab for each robot and the combined view', () => {
+    renderWithRobot();
+
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
+      '254',
+      '254B',
+      'Combined',
+    ]);
+  });
+
+  test('shows the main robot by default', () => {
+    renderWithRobot();
+
+    expect(shownMatchKeys()).toEqual(['2026casj_qm1', '2026casj_qm3']);
+  });
+
+  test('lists the remapped robot matches on its tab', () => {
+    renderWithRobot();
+    fireEvent.click(screen.getByRole('tab', { name: '254B' }));
+
+    expect(shownMatchKeys()).toEqual(['2026casj_qm2', '2026casj_qm3']);
+  });
+
+  test('shows the rank of both robots', () => {
+    renderWithRobot();
+
+    expect(
+      screen.getAllByTestId('rank').map((rank) => rank.textContent),
+    ).toEqual(['3 of 40', '7 of 18']);
+  });
+
+  test('labels the main robot status with its team number', () => {
+    renderWithRobot();
+
+    expect(screen.getByRole('heading', { level: 3, name: '254' })).toBeTruthy();
+  });
+
+  test('labels the remapped robot status with its FMS team number', () => {
+    renderWithRobot();
+
+    expect(
+      screen.getByRole('heading', { level: 3, name: '254B (9997)' }),
+    ).toBeTruthy();
+  });
+
+  test('lists each match of both robots once on the combined tab', () => {
+    renderWithRobot();
+    fireEvent.click(screen.getByRole('tab', { name: 'Combined' }));
+
+    expect(shownMatchKeys()).toEqual([
+      '2026casj_qm1',
+      '2026casj_qm2',
+      '2026casj_qm3',
+    ]);
+  });
+
+  test('focuses both robots on the combined tab', () => {
+    renderWithRobot();
+    fireEvent.click(screen.getByRole('tab', { name: 'Combined' }));
+
+    expect(screen.getByTestId('matches').getAttribute('data-focus')).toBe(
+      'frc254 frc254B',
+    );
+  });
+
+  test('shows a matches placeholder on the remapped robot tab while its matches load', () => {
+    render(
+      <TeamEventAppearance
+        event={{ ...fullEvent, event_type: EventType.OFFSEASON, week: null }}
+        matches={[makeMatch('2026casj_qm1', 'qm', 1, ['frc254'])]}
+        status={fullStatus}
+        team={team}
+        awards={[]}
+        maybeDistrictPoints={null}
+        maybeRegionalPoolPoints={null}
+        maybeAlliances={null}
+        remappedRobots={[
+          {
+            robotKey: 'frc254B',
+            sourceTeamKey: 'frc9997',
+            status: robotStatus,
+            matches: undefined,
+            awards: [],
+          },
+        ]}
+      />,
+    );
+    fireEvent.click(screen.getByRole('tab', { name: '254B' }));
+
+    expect(
+      screen.getByRole('status', { name: 'Loading matches' }),
+    ).toBeTruthy();
+  });
+
+  test('keeps the rank of both robots when a robot tab is selected', () => {
+    renderWithRobot();
+    fireEvent.click(screen.getByRole('tab', { name: '254B' }));
+
+    expect(
+      screen.getAllByTestId('rank').map((rank) => rank.textContent),
+    ).toEqual(['3 of 40', '7 of 18']);
+  });
+});
+
 describe('TeamStatus sections', () => {
   function renderStatus(
     overrides: Partial<Parameters<typeof TeamStatus>[0]> = {},
@@ -395,7 +548,7 @@ describe('TeamStatus sections', () => {
           makeMatch('2026casj_sf1m1', 'sf', 1, ['frc254']),
         ]}
         status={fullStatus}
-        team={team}
+        teamKey="frc254"
         awards={awards}
         maybeDistrictPoints={null}
         maybeRegionalPoolPoints={null}
@@ -450,10 +603,21 @@ describe('TeamStatus sections', () => {
     expect(screen.getByText('2-0-0')).toBeTruthy();
   });
 
-  test('omits the record at 2015 events', () => {
-    renderStatus({ event: { ...fullEvent, year: 2015 } });
+  test('shows the average qual score instead of a record at 2015 events', () => {
+    renderStatus({
+      event: { ...fullEvent, key: '2015nytr', year: 2015 },
+      matches: [
+        makeMatch('2015nytr_qm1', 'qm', 1, ['frc254'], [], { red: 44 }),
+        makeMatch('2015nytr_qm2', 'qm', 2, ['frc254'], [], { red: 114 }),
+        makeMatch('2015nytr_qf1m1', 'qf', 1, ['frc254'], [], { red: 49 }),
+        makeMatch('2015nytr_qf1m2', 'qf', 2, ['frc254'], [], { red: 82 }),
+      ],
+    });
 
     expect(screen.queryByText('Record')).toBeNull();
+    expect(screen.getByText('Avg Qual')).toBeTruthy();
+    expect(screen.getByText('79.00')).toBeTruthy();
+    expect(screen.queryByText('Avg Playoff')).toBeNull();
   });
 
   test('lists the alliance with the team itself marked current', () => {
@@ -548,6 +712,64 @@ describe('TeamStatus sections', () => {
     });
 
     expect(screen.queryByText('Regional Pool Points')).toBeNull();
+  });
+
+  test('shows a rank placeholder while the team status loads', () => {
+    renderStatus({ status: undefined });
+
+    expect(screen.getByRole('status', { name: 'Loading rank' })).toBeTruthy();
+  });
+
+  test('shows a record placeholder while the robot matches load', () => {
+    renderStatus({ matches: undefined });
+
+    expect(screen.getByRole('status', { name: 'Loading record' })).toBeTruthy();
+  });
+
+  test('shows an alliance placeholder while alliances load', () => {
+    renderStatus({ maybeAlliances: undefined });
+
+    expect(
+      screen.getByRole('status', { name: 'Loading alliance' }),
+    ).toBeTruthy();
+  });
+
+  test('omits the alliance placeholder once alliances show the team was not picked', () => {
+    renderStatus({
+      status: undefined,
+      maybeAlliances: [
+        { name: 'Alliance 1', picks: ['frc1678'], declines: [] },
+      ],
+    });
+
+    expect(
+      screen.queryByRole('status', { name: 'Loading alliance' }),
+    ).toBeNull();
+  });
+
+  test('shows an awards placeholder while awards load', () => {
+    renderStatus({ awards: undefined });
+
+    expect(screen.getByRole('status', { name: 'Loading awards' })).toBeTruthy();
+  });
+
+  test('shows a district points placeholder while points load at district events', () => {
+    renderStatus({
+      event: { ...fullEvent, event_type: EventType.DISTRICT },
+      maybeDistrictPoints: undefined,
+    });
+
+    expect(
+      screen.getByRole('status', { name: 'Loading district points' }),
+    ).toBeTruthy();
+  });
+
+  test('shows a regional pool points placeholder while points load at regionals', () => {
+    renderStatus({ maybeRegionalPoolPoints: undefined });
+
+    expect(
+      screen.getByRole('status', { name: 'Loading regional pool points' }),
+    ).toBeTruthy();
   });
 
   test('marks the event where the team earned its pool invitation', () => {
