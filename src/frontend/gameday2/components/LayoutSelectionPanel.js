@@ -5,7 +5,6 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 // Replaced react-event-listener with native window event listeners
 import { getLayoutSvgIcon } from "../utils/layoutUtils";
 import {
@@ -65,13 +64,14 @@ export default class LayoutSelectionPanelMaterial extends React.Component {
     for (let i = 0; i < NUM_LAYOUTS; i++) {
       const layoutNum = LAYOUT_DISPLAY_ORDER[i];
       layouts.push(
-        <ListItem key={i.toString()} disablePadding>
+        <ListItem
+          key={i.toString()}
+          disablePadding
+          secondaryAction={getLayoutSvgIcon(layoutNum)}
+        >
           <ListItemButton onClick={() => this.props.setLayout(layoutNum)}>
             <ListItemText primary={NAME_FOR_LAYOUT[layoutNum]} />
           </ListItemButton>
-          <ListItemSecondaryAction>
-            {getLayoutSvgIcon(layoutNum)}
-          </ListItemSecondaryAction>
         </ListItem>
       );
     }
