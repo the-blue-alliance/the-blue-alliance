@@ -18,6 +18,8 @@
     {"site-package": "google/cloud/run_v2"},
     {"site-package": "google/cloud/storage"},
     {"site-package": "jinja2"},
+    {"site-package": "jsonschema"},
+    {"site-package": "jsonschema_specifications"},
     {"site-package": "markupsafe"},
     {"site-package": "numpy"},
     {"site-package": "openpyxl"},
@@ -32,6 +34,7 @@
     {"site-package": "_pytest"},
     {"site-package": "pyre_extensions"},
     {"site-package": "six", "is_toplevel_module": true},
+    {"site-package": "referencing"},
     {"site-package": "requests_mock"},
     {"site-package": "watchdog"},
     {"site-package": "werkzeug"}
