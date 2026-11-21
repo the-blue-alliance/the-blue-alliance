@@ -39,23 +39,23 @@ def test_search_index(ndb_stub, api_client: Client) -> None:
     )
     assert resp.status_code == 200
 
-    assert len(resp.json["events"]) == 2
-    assert len(resp.json["teams"]) == 2
+    assert len(resp.get_json()["events"]) == 2
+    assert len(resp.get_json()["teams"]) == 2
 
-    assert resp.json["events"][0] == {
+    assert resp.get_json()["events"][0] == {
         "key": "2019casj",
         "name": "Silicon Valley Regional",
     }
-    assert resp.json["events"][1] == {
+    assert resp.get_json()["events"][1] == {
         "key": "2024mil",
         "name": "Milstein Division",
     }
 
-    assert resp.json["teams"][0] == {
+    assert resp.get_json()["teams"][0] == {
         "key": "frc604",
         "nickname": "Quixilver",
     }
-    assert resp.json["teams"][1] == {
+    assert resp.get_json()["teams"][1] == {
         "key": "frc5254",
         "nickname": "HYPE",
     }
