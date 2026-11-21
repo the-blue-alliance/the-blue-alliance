@@ -22,6 +22,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as GamedayRouteImport } from './routes/gameday'
 import { Route as HallOfFameRouteImport } from './routes/hall-of-fame'
 import { Route as Match_suggestionRouteImport } from './routes/match_suggestion'
+import { Route as MytbaRouteImport } from './routes/mytba'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SwagRouteImport } from './routes/swag'
@@ -119,6 +120,11 @@ const HallOfFameRoute = HallOfFameRouteImport.update({
 const Match_suggestionRoute = Match_suggestionRouteImport.update({
   id: '/match_suggestion',
   path: '/match_suggestion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MytbaRoute = MytbaRouteImport.update({
+  id: '/mytba',
+  path: '/mytba',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -311,6 +317,7 @@ export interface FileRoutesByFullPath {
   '/gameday': typeof GamedayRouteWithChildren
   '/hall-of-fame': typeof HallOfFameRoute
   '/match_suggestion': typeof Match_suggestionRoute
+  '/mytba': typeof MytbaRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
   '/swag': typeof SwagRoute
@@ -359,6 +366,7 @@ export interface FileRoutesByTo {
   '/gameday': typeof GamedayRouteWithChildren
   '/hall-of-fame': typeof HallOfFameRoute
   '/match_suggestion': typeof Match_suggestionRoute
+  '/mytba': typeof MytbaRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
   '/swag': typeof SwagRoute
@@ -408,6 +416,7 @@ export interface FileRoutesById {
   '/gameday': typeof GamedayRouteWithChildren
   '/hall-of-fame': typeof HallOfFameRoute
   '/match_suggestion': typeof Match_suggestionRoute
+  '/mytba': typeof MytbaRoute
   '/privacy': typeof PrivacyRoute
   '/search': typeof SearchRoute
   '/swag': typeof SwagRoute
@@ -458,6 +467,7 @@ export interface FileRouteTypes {
     | '/gameday'
     | '/hall-of-fame'
     | '/match_suggestion'
+    | '/mytba'
     | '/privacy'
     | '/search'
     | '/swag'
@@ -506,6 +516,7 @@ export interface FileRouteTypes {
     | '/gameday'
     | '/hall-of-fame'
     | '/match_suggestion'
+    | '/mytba'
     | '/privacy'
     | '/search'
     | '/swag'
@@ -554,6 +565,7 @@ export interface FileRouteTypes {
     | '/gameday'
     | '/hall-of-fame'
     | '/match_suggestion'
+    | '/mytba'
     | '/privacy'
     | '/search'
     | '/swag'
@@ -603,6 +615,7 @@ export interface RootRouteChildren {
   GamedayRoute: typeof GamedayRouteWithChildren
   HallOfFameRoute: typeof HallOfFameRoute
   Match_suggestionRoute: typeof Match_suggestionRoute
+  MytbaRoute: typeof MytbaRoute
   PrivacyRoute: typeof PrivacyRoute
   SearchRoute: typeof SearchRoute
   SwagRoute: typeof SwagRoute
@@ -728,6 +741,13 @@ declare module '@tanstack/react-router' {
       path: '/match_suggestion'
       fullPath: '/match_suggestion'
       preLoaderRoute: typeof Match_suggestionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mytba': {
+      id: '/mytba'
+      path: '/mytba'
+      fullPath: '/mytba'
+      preLoaderRoute: typeof MytbaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -989,6 +1009,7 @@ const rootRouteChildren: RootRouteChildren = {
   GamedayRoute: GamedayRouteWithChildren,
   HallOfFameRoute: HallOfFameRoute,
   Match_suggestionRoute: Match_suggestionRoute,
+  MytbaRoute: MytbaRoute,
   PrivacyRoute: PrivacyRoute,
   SearchRoute: SearchRoute,
   SwagRoute: SwagRoute,
