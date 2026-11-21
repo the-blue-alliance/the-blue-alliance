@@ -18,7 +18,7 @@ def profiled_jsonify(obj: Union[T, bytes, bytearray]) -> TypedFlaskResponse[T]:
         if isinstance(obj, (bytes, bytearray)):
             span.set_label("input_type", "bytes")
             span.set_label("response_size_bytes", str(len(obj)))
-            return current_app.response_class(  # pyre-ignore[7]
+            return current_app.response_class(
                 bytes(obj),
                 mimetype="application/json",
             )  # type: ignore[return-value]
@@ -26,7 +26,7 @@ def profiled_jsonify(obj: Union[T, bytes, bytearray]) -> TypedFlaskResponse[T]:
             span.set_label("input_type", type(obj).__name__)
             payload = orjson.dumps(obj)
             span.set_label("response_size_bytes", str(len(payload)))
-            return current_app.response_class(  # pyre-ignore[7]
+            return current_app.response_class(
                 payload,
                 mimetype="application/json",
             )  # type: ignore[return-value]

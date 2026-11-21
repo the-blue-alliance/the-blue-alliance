@@ -87,7 +87,6 @@ def _dedupe_mobile_clients(
     Self-defers the next page until the scan completes. Returns the running
     deletion total (the cumulative total is logged on completion).
     """
-    # pyre-ignore[16]: pyre stubs don't list ndb.Cursor, but it exists at runtime
     cursor = ndb.Cursor(urlsafe=cursor_urlsafe) if cursor_urlsafe else None
     page, next_cursor, more = MobileClient.query().fetch_page(
         page_size, start_cursor=cursor

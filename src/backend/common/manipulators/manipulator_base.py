@@ -58,10 +58,8 @@ class TUpdatedModel(Generic[TModel]):
 
 
 class ManipulatorBase(abc.ABC, Generic[TModel]):
-    _post_delete_hooks: List[Callable[[List[TModel]], None]] = None  # pyre-ignore[8]
-    _post_update_hooks: List[  # pyre-ignore[8]
-        Callable[[List[TUpdatedModel[TModel]]], None]
-    ] = None
+    _post_delete_hooks: List[Callable[[List[TModel]], None]] = None
+    _post_update_hooks: List[Callable[[List[TUpdatedModel[TModel]]], None]] = None
 
     def __init_subclass__(cls, *args, **kwargs):
         """

@@ -431,7 +431,7 @@ def test_mid_chunk_interruption_redoes_that_chunk_only(tmp_path: Any) -> None:
             runner_ref[0].stop.set()
         return result
 
-    first.delete = stop_mid_chunk  # pyre-ignore[8]
+    first.delete = stop_mid_chunk
     info = validate_manifest(path, BUCKET)
     run_dir = RunDir(run)
     run_dir.open()

@@ -147,7 +147,7 @@ def test_delegated_team_admin_cannot_review_suggestion_without_target(
 ) -> None:
     user = make_user([])
     _grant_team_admin(user, 254)
-    suggestion = _pending_suggestion("media", None)  # pyre-ignore[6]
+    suggestion = _pending_suggestion("media", None)
     assert not SuggestionReviewer.user_can_review_suggestion(user, suggestion)
 
 

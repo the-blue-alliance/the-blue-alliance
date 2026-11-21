@@ -108,7 +108,7 @@ def test_past_event_seeds_match_predictions(test_data_importer) -> None:
     first_prediction = match_predictions["qual"][first]
     for color in ALLIANCE_COLORS:
         assert math.isclose(
-            first_prediction[color]["score"],  # pyre-ignore[6]
+            first_prediction[color]["score"],
             3 * qual_stats["score"]["mean"][template],
         )
 
@@ -330,7 +330,7 @@ def test_compute_match_predictions_modern_seasons(
     for level in LEVELS:
         for prediction in match_predictions[level].values():
             for color in ALLIANCE_COLORS:
-                color_prediction = prediction[color]  # pyre-ignore[6]
+                color_prediction = prediction[color]
                 for prob_key in game.ranking_bonus_rp_prediction_fields():
                     assert 0.0 <= color_prediction[prob_key] <= 1.0
             assert 0.5 <= prediction["prob"] <= 1.0
@@ -376,7 +376,7 @@ def test_bonus_predictions_compute_their_secondary_stats(
     assert stat_mean_vars is not None
     assert secondary_stat in stat_mean_vars["qual"]
     probs = [
-        prediction[color][prob_key]  # pyre-ignore[6]
+        prediction[color][prob_key]
         for level in LEVELS
         for prediction in match_predictions[level].values()
         for color in ALLIANCE_COLORS

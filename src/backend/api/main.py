@@ -35,7 +35,7 @@ install_middleware(app, configure_secret_key=True, include_appspot_redirect=True
 install_url_converters(app)
 configure_flask_cache(app)
 
-app.json.compact = True  # pyre-ignore[16]
+app.json.compact = True
 app.url_map.converters["simple_model_type"] = SimpleModelTypeConverter
 app.url_map.converters["model_type"] = ModelTypeConverter
 app.url_map.converters["event_detail_type"] = EventDetailTypeConverter

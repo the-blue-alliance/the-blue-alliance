@@ -185,7 +185,7 @@ def test_flask_cache_with_memcache(app: Flask, memcache_stub) -> None:
         return "Hello!"
 
     assert hasattr(app, "cache")
-    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)
 
     resp = app.test_client().get("/")
     assert resp.status_code == 200
@@ -202,7 +202,7 @@ def test_flask_cache_with_memcache_static_timeout(app: Flask, memcache_stub) -> 
         return "Hello!"
 
     assert hasattr(app, "cache")
-    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)
 
     resp = app.test_client().get("/")
     assert resp.status_code == 200
@@ -222,7 +222,7 @@ def test_flask_cache_with_memcache_dynamic_timeout(app: Flask, memcache_stub) ->
         return CachedResponse(make_response("Hello!"), 2)
 
     assert hasattr(app, "cache")
-    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)
 
     resp = app.test_client().get("/")
     assert resp.status_code == 200
@@ -247,7 +247,7 @@ def test_flask_cache_with_query_string(app: Flask, memcache_stub) -> None:
         return "Hello!"
 
     assert hasattr(app, "cache")
-    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)
 
     resp = app.test_client().get("/")
     assert resp.status_code == 200
@@ -279,7 +279,7 @@ def test_flask_cache_with_memcache_skips_errors(app: Flask, memcache_stub) -> No
         return "Hello!", 500
 
     assert hasattr(app, "cache")
-    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)
 
     resp = app.test_client().get("/")
     assert resp.status_code == 500
@@ -396,7 +396,7 @@ def test_flask_cache_with_memcache_404_overrides_ttl(app: Flask, memcache_stub) 
         return "Not Found", 404
 
     assert hasattr(app, "cache")
-    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)
 
     resp = app.test_client().get("/")
     assert resp.status_code == 404
@@ -427,7 +427,7 @@ def test_flask_cache_with_memcache_abort_404_overrides_ttl(
         abort(404)
 
     assert hasattr(app, "cache")
-    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)
 
     resp = app.test_client().get("/")
     assert resp.status_code == 404
@@ -470,7 +470,7 @@ def test_flask_cache_with_memcache_404_custom_ttl(app: Flask, memcache_stub) -> 
     assert resp.status_code == 404
     assert calls == 1
 
-    cached_entry = app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc")  # pyre-ignore[16]
+    cached_entry = app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc")
     assert isinstance(cached_entry, CachedResponse)
     assert cached_entry.timeout == 86400
 

@@ -24,7 +24,7 @@ def test_dump_load_round_trip(cache: MemcacheFlaskResponseCache) -> None:
 
 
 def test_load_object_none(cache: MemcacheFlaskResponseCache) -> None:
-    assert cache.load_object(None) is None  # pyre-ignore[6]
+    assert cache.load_object(None) is None
 
 
 def test_load_object_unpicklable(cache: MemcacheFlaskResponseCache) -> None:

@@ -258,7 +258,7 @@ def test_template_values_handles_missing_sections() -> None:
 
 
 def test_template_values_rejects_non_numeric_size() -> None:
-    map_data: PitMap = {"size": {"x": "100", "y": 100}}  # pyre-ignore[55]
+    map_data: PitMap = {"size": {"x": "100", "y": 100}}
 
     with pytest.raises(ValueError, match="Expected numeric size.x, got '100'"):
         NexusEventDetailsSVGHelper.template_values(map_data, "2026nyny")

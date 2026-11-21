@@ -59,7 +59,6 @@ class CachedModel(ndb.Model):
         missing_properties: List[str] = []
 
         # Iterate through all properties and check if required ones are set
-        # pyre-ignore[16]: _properties is an NDB internal attribute
         for prop_name, prop in self._properties.items():
             # Check if property is required and value is None
             if hasattr(prop, "_required") and prop._required:
@@ -90,7 +89,6 @@ class CachedModel(ndb.Model):
             return
 
         missing_properties: List[str] = []
-        # pyre-ignore[16]: _properties is an NDB internal attribute
         for prop_name, prop in self._properties.items():
             if hasattr(prop, "_required") and prop._required:
                 value = getattr(self, prop_name, None)

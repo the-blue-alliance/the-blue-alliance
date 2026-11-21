@@ -23,7 +23,7 @@ class FMSAPIEventRankingsParser(
             count = 1
             order_name = "sortOrder{}".format(count)
             while order_name in team:
-                sort_orders.append(team[order_name])  # pyre-ignore[26]
+                sort_orders.append(team[order_name])
                 count += 1
                 order_name = "sortOrder{}".format(count)
 

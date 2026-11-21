@@ -7,10 +7,6 @@ updates:
   cooldown:
     default-days: 7
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: pyre-check
-    versions:
-    - 0.0.62
 - package-ecosystem: npm
   directory: "/"
   schedule:

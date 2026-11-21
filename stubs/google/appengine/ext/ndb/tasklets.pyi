@@ -3,7 +3,6 @@ from typing import Any, Callable, Generic, Generator, TypeVar
 
 from google.appengine.api import apiproxy_stub
 from google.appengine.ext.ndb.context import Context
-from pyre_extensions import ParameterSpecification
 
 class _State(threading.local):
     current_context: Any
