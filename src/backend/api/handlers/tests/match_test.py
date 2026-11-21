@@ -173,7 +173,7 @@ def _get_score_breakdown(
     resp = api_client.get(
         f"/api/v3/match/{match_key}", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
-    return resp.json["score_breakdown"]
+    return resp.get_json()["score_breakdown"]
 
 
 @pytest.mark.parametrize("match_key", SCORE_BREAKDOWN_MATCH_KEYS)
