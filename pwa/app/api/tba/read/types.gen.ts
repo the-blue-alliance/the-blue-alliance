@@ -832,12 +832,15 @@ export type DistrictAdvancementResponse = {
 };
 
 export type DistrictInsight = {
+  /**
+   * District-wide and per-region insight data, or null if the district has no district-data insight.
+   */
   district_data: {
     region_data: {
       [key: string]: DistrictInsightRegionData;
     } | null;
     district_wide_data: DistrictInsightRegionData | null;
-  };
+  } | null;
   team_data: {
     [key: string]: {
       district_seasons: number;
@@ -849,12 +852,24 @@ export type DistrictInsight = {
       individual_awards: number;
       quals_record: WltRecord;
       elims_record: WltRecord;
+      /**
+       * Number of blue banner awards the team has won at this district's events.
+       */
+      blue_banners: number;
       in_district_extra_play_count: number;
       total_matches_played: number;
       dcmp_appearances: number;
       cmp_appearances: number;
     };
   } | null;
+  /**
+   * Per-year district insights, keyed by year (for example `2024`), each mapping an insight name (for example `blue_banners`, `match_highscore`) to that insight's data. The shape of the data depends on the insight. A year with no insights is an empty object.
+   */
+  seasonal_insights: {
+    [key: string]: {
+      [key: string]: unknown;
+    };
+  };
 };
 
 /**
