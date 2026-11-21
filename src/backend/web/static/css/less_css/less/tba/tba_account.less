@@ -286,8 +286,9 @@
     font-style: italic;
   }
 
-  // On phones, each table row becomes a stacked card with its own labels.
-  @media (max-width: 767px) {
+  // Below desktop width, each table row becomes a stacked card with its own
+  // labels; five columns of keys and secrets don't fit side by side.
+  @media (max-width: 991px) {
     .account-table {
       > thead {
         display: none;
@@ -330,7 +331,9 @@
         margin: 0 4px 4px 0;
       }
     }
+  }
 
+  @media (max-width: 767px) {
     .account-header h1 {
       font-size: 24px;
     }
