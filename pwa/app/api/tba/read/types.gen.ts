@@ -1043,6 +1043,10 @@ export type HubScore2026 = {
   totalPoints: number;
   transitionCount: number;
   transitionPoints: number;
+  /**
+   * Hub fuel count the FRC Events API reports as uncounted.
+   */
+  uncounted?: number;
 };
 
 export enum EndgameRobot2018 {
@@ -1917,7 +1921,7 @@ export type Match = {
 export type MatchScoreBreakdown2015 = {
   blue: MatchScoreBreakdown2015Alliance;
   red: MatchScoreBreakdown2015Alliance;
-  coopertition: 'None' | 'Unknown' | 'Stack';
+  coopertition: 'None' | 'Unknown' | 'Set' | 'Stack';
   coopertition_points: number;
 };
 
@@ -2301,9 +2305,14 @@ export type MatchScoreBreakdown2023Alliance = {
   foulCount: number;
   foulPoints: number;
   techFoulCount: number;
+  g405Penalty?: boolean;
+  h111Penalty?: boolean;
   linkPoints?: number;
   links?: Array<{
-    nodes: Array<'None' | 'Cone' | 'Cube'>;
+    /**
+     * Indices (0-8) of the three adjacent nodes in the row that form the link.
+     */
+    nodes: Array<number>;
     row: 'Bottom' | 'Mid' | 'Top';
   }> | null;
   sustainabilityBonusAchieved?: boolean;
@@ -2482,6 +2491,10 @@ export type MatchScoreBreakdown2026Alliance = {
   energizedAchieved: boolean;
   foulPoints: number;
   g206Penalty: boolean;
+  /**
+   * Penalties the FRC Events API reports for the alliance, such as `G206`, or `None`.
+   */
+  penalties?: string;
   hubScore: HubScore2026;
   majorFoulCount: number;
   minorFoulCount: number;
