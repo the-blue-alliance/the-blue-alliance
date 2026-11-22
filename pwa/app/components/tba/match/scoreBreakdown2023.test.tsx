@@ -55,9 +55,9 @@ function makeAlliance(
     endGameChargeStationRobot3: EndGameChargeStationRobot2023.PARK,
     teleopPoints: 78,
     links: [
-      { nodes: ['Cone', 'Cube', 'Cone'], row: 'Top' },
-      { nodes: ['Cone', 'Cube', 'Cone'], row: 'Mid' },
-      { nodes: ['Cube', 'Cube', 'Cube'], row: 'Bottom' },
+      { nodes: [0, 1, 2], row: 'Top' },
+      { nodes: [3, 4, 5], row: 'Mid' },
+      { nodes: [6, 7, 8], row: 'Bottom' },
     ],
     linkPoints: 15,
     coopertitionCriteriaMet: true,

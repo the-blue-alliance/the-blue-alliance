@@ -14,9 +14,14 @@ SWAGGER_DIR = os.path.join(
 
 
 @lru_cache(maxsize=None)
-def _registry(spec_name: str) -> Registry:
+def _spec(spec_name: str) -> Dict[str, Any]:
     with open(os.path.join(SWAGGER_DIR, spec_name)) as f:
-        spec = json.load(f)
+        return json.load(f)
+
+
+@lru_cache(maxsize=None)
+def _registry(spec_name: str) -> Registry:
+    spec = _spec(spec_name)
     resource = DRAFT202012.create_resource(spec)
     return Registry().with_resource(f"urn:tba:{spec_name}", resource)
 
@@ -58,6 +63,20 @@ def response_schema_errors(
             "schema",
         ]
     )
+    return _errors(spec_name, pointer, body)
+
+
+def component_schema_errors(
+    name: str, body: Any, spec_name: str = "api_v3.json"
+) -> List[str]:
+    """
+    Validates |body| against the spec's `#/components/schemas/<name>`, for
+    checking one branch of a union directly.
+    """
+    return _errors(spec_name, f"/components/schemas/{_escape(name)}", body)
+
+
+def _errors(spec_name: str, pointer: str, body: Any) -> List[str]:
     schema: Dict[str, Any] = {"$ref": f"urn:tba:{spec_name}#{pointer}"}
     validator = Draft202012Validator(schema, registry=_registry(spec_name))
     return sorted(
@@ -66,3 +85,46 @@ def response_schema_errors(
             for error in _leaf_errors(validator.iter_errors(body))
         }
     )
+
+
+def undeclared_fields(
+    name: str, body: Any, spec_name: str = "api_v3.json"
+) -> List[str]:
+    """
+    Returns the JSON path of every object key in |body| that the spec's
+    `#/components/schemas/<name>` does not declare. JSON Schema allows
+    undeclared keys unless a schema forbids them, so validation alone does not
+    catch fields the spec omits. Follows `$ref`, `allOf`, `properties`, and
+    `items`; does not descend into `oneOf`/`anyOf`.
+    """
+    spec = _spec(spec_name)
+
+    def resolve(schema: Dict[str, Any]) -> Dict[str, Any]:
+        while "$ref" in schema:
+            schema = spec["components"]["schemas"][schema["$ref"].split("/")[-1]]
+        return schema
+
+    def properties(schema: Dict[str, Any]) -> Dict[str, Any]:
+        schema = resolve(schema)
+        props: Dict[str, Any] = {}
+        for sub in schema.get("allOf", []):
+            props.update(properties(sub))
+        props.update(schema.get("properties", {}))
+        return props
+
+    def walk(path: str, value: Any, schema: Dict[str, Any]) -> List[str]:
+        schema = resolve(schema)
+        found: List[str] = []
+        if isinstance(value, dict):
+            props = properties(schema)
+            for key, child in value.items():
+                if key in props:
+                    found.extend(walk(f"{path}.{key}", child, props[key]))
+                else:
+                    found.append(f"{path}.{key}")
+        elif isinstance(value, list) and "items" in schema:
+            for i, child in enumerate(value):
+                found.extend(walk(f"{path}[{i}]", child, schema["items"]))
+        return found
+
+    return sorted(walk("$", body, {"$ref": f"#/components/schemas/{name}"}))
