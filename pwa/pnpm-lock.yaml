@@ -18,8 +18,8 @@ importers:
         specifier: 0.9.91
         version: 0.9.91(@oxc-project/types@0.156.0)(esbuild@0.28.2)(lightningcss@1.33.0)(oxc-parser@0.152.0)(react@19.3.1)(rolldown@1.2.19)(rollup@4.62.3)(supports-color@10.2.2)(tailwindcss@4.3.5)(typescript@6.0.3)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.15)(yaml@2.9.1))(zod@4.6.7)
       '@scalar/react-renderer':
-        specifier: 0.4.5
-        version: 0.4.5(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vue@3.5.45(typescript@6.0.3))
+        specifier: 0.4.6
+        version: 0.4.6(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vue@3.5.45(typescript@6.0.3))
       '@sentry/tanstackstart-react':
         specifier: 11.13.0
         version: 11.13.0(react@19.3.1)(rollup@4.62.3)
@@ -2946,8 +2946,8 @@ packages:
     resolution: {integrity: sha512-8ZYDl0NojHlqBnNPwkYIIggprlX/l+4CLowmL/ZzyvfXbbgdDDybGEn3TRN8emOE1qlCZcltOtSUWU3jp1UVsA==}
     engines: {node: '>=22'}
 
-  '@scalar/react-renderer@0.4.5':
-    resolution: {integrity: sha512-ED23WUoauRH8yQ6MsK4XA5/U5x5MLOvQ2svpvytAMdYghGp0QjMCyoLZifuqCeDCW08Xz/D0EPcTOY0DleWHdw==}
+  '@scalar/react-renderer@0.4.6':
+    resolution: {integrity: sha512-JCel3WEWKmoFta9t4ph2o3qXWHO44dc6lo+ncwO1eCjrDsZKK6syXXnfjqIwUCQaf7iWVbqSOwsLeIrSDWR//w==}
     engines: {node: '>=22'}
     peerDependencies:
       react: ^19.0.0
@@ -11142,7 +11142,7 @@ snapshots:
       '@scalar/helpers': 0.18.0
       '@scalar/openapi-types': 0.9.9
 
-  '@scalar/react-renderer@0.4.5(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vue@3.5.45(typescript@6.0.3))':
+  '@scalar/react-renderer@0.4.6(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vue@3.5.45(typescript@6.0.3))':
     dependencies:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
@@ -15760,7 +15760,7 @@ snapshots:
   rolldown@1.2.19:
     dependencies:
       '@oxc-project/types': 0.156.0
-      '@rolldown/pluginutils': 1.1.0
+      '@rolldown/pluginutils': 1.1.1
     optionalDependencies:
       '@rolldown/binding-android-arm-eabi': 1.2.19
       '@rolldown/binding-android-arm64': 1.2.19
