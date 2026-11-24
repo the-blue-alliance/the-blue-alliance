@@ -11,3 +11,18 @@ allowBuilds:
   protobufjs: true
   unrs-resolver: true
   vue-demi: true
+
+# Security fixes that the parent packages' own version ranges block. Each key
+# matches only the vulnerable versions. Remove an entry once `pnpm audit` stays
+# clean without it.
+overrides:
+  # @firebase/firestore pins ~1.9.0 (GHSA-m9gg-hp2v-232j, GHSA-f596-whhp-79r4)
+  '@grpc/grpc-js@<1.14.5': ^1.14.7
+  # ajv allows ^3.0.1, but `pnpm update` will not move it (GHSA-w74x-v6f9-j3xg and others)
+  'fast-uri@>=3.0.0 <3.1.9': ^3.1.9
+  # workbox-build ^11, @sentry/bundler-plugins 11.10 ^13 (GHSA-3g3m-2fjr-6pw4)
+  'glob@>=9.0.0 <14.0.2': ^14.0.6
+  # @hey-api/json-schema-ref-parser pins 4.2.0 (GHSA-52cp-r559-cp3m and others)
+  'js-yaml@>=4.0.0 <4.3.2': ^4.3.2
+  # eslint, typescript-estree, ts-morph ^10; prettier-plugin-sort-imports ^9 (GHSA-g3hv-75wg-m249)
+  'minimatch@>=7.0.0 <11.0.1': ^11.0.9
