@@ -72,6 +72,10 @@
     "webpack": "^5.112.2",
     "webpack-cli": "^7.3.1"
   },
+  "overrides": {
+    "dompurify@<3.4.17": "^3.5.0",
+    "js-yaml@>=4.0.0 <4.3.2": "^4.3.2"
+  },
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack --watch",
     "build": "cross-env NODE_ENV=production webpack",
