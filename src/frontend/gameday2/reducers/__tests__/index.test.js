@@ -7,8 +7,8 @@ jest.mock("firebase/compat/app", () => ({
   default: { initializeApp: (...args) => mockInitializeApp(...args) },
 }));
 jest.mock("firebase/compat/database", () => ({}));
-jest.mock("firedux", () =>
-  jest.fn().mockImplementation(function MockFiredux({ ref }) {
+jest.mock("../../firebaseMirror", () =>
+  jest.fn().mockImplementation(function MockFirebaseMirror({ ref }) {
     this.ref = ref;
     this.reducer =
       () =>
@@ -17,22 +17,22 @@ jest.mock("firedux", () =>
   })
 );
 
-const { default: gamedayReducer, firedux } = require("../index");
+const { default: gamedayReducer, firebaseMirror } = require("../index");
 
 describe("gameday root reducer", () => {
-  it("initializes the TBA GameDay Firebase app and wires firedux to its root ref", () => {
+  it("initializes the TBA GameDay Firebase app and wires the Firebase mirror to its root ref", () => {
     expect(mockInitializeApp).toHaveBeenCalledWith({
       apiKey: "AIzaSyDBlFwtAgb2i7hMCQ5vBv44UEKVsA543hs",
       authDomain: "tbatv-prod-hrd.firebaseapp.com",
       databaseURL: "https://tbatv-prod-hrd.firebaseio.com",
     });
-    expect(firedux.ref).toBe(mockRef);
+    expect(firebaseMirror.ref).toBe(mockRef);
   });
 
   it("combines all of the gameday reducers", () => {
     const state = gamedayReducer(undefined, { type: "@@INIT" });
     expect(Object.keys(state)).toEqual([
-      "firedux",
+      "firebaseMirror",
       "webcastsById",
       "specialWebcastIds",
       "visibility",
@@ -40,6 +40,6 @@ describe("gameday root reducer", () => {
       "chats",
       "favoriteTeams",
     ]);
-    expect(state.firedux).toEqual({ data: {} });
+    expect(state.firebaseMirror).toEqual({ data: {} });
   });
 });

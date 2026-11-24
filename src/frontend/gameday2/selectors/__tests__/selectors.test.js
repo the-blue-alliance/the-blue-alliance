@@ -106,26 +106,26 @@ describe("getChatsInDisplayOrder selector", () => {
   });
 });
 
-describe("firedux-backed selectors", () => {
+describe("Firebase mirror selectors", () => {
   const props = { webcast: { key: "2024casj" } };
 
-  it("returns no matches when there is no firedux data for the event", () => {
+  it("returns no matches when there is no mirrored Firebase data for the event", () => {
     expect(
-      selectors.getEventMatches({ firedux: { data: null } }, props)
+      selectors.getEventMatches({ firebaseMirror: { data: null } }, props)
     ).toEqual([]);
     expect(
-      selectors.getEventMatches({ firedux: { data: { e: {} } } }, props)
+      selectors.getEventMatches({ firebaseMirror: { data: { e: {} } } }, props)
     ).toEqual([]);
     expect(
       selectors.getEventMatches(
-        { firedux: { data: { e: { "2024casj": {} } } } },
+        { firebaseMirror: { data: { e: { "2024casj": {} } } } },
         props
       )
     ).toEqual([]);
   });
 
   const state = {
-    firedux: {
+    firebaseMirror: {
       data: {
         e: {
           "2024casj": {
@@ -162,7 +162,7 @@ describe("firedux-backed selectors", () => {
 
   it("returns only unplayed matches when nothing has been played", () => {
     const unplayed = {
-      firedux: {
+      firebaseMirror: {
         data: {
           e: {
             "2024casj": { m: { qm1: { c: "qm", s: 1, m: 1, r: -1, b: -1 } } },
@@ -178,10 +178,10 @@ describe("firedux-backed selectors", () => {
   it("returns the current match state for the event, or null", () => {
     expect(selectors.getCurrentMatchState(state, props)).toEqual({ mk: "qm3" });
     expect(
-      selectors.getCurrentMatchState({ firedux: { data: {} } }, props)
+      selectors.getCurrentMatchState({ firebaseMirror: { data: {} } }, props)
     ).toBeNull();
     expect(
-      selectors.getCurrentMatchState({ firedux: { data: null } }, props)
+      selectors.getCurrentMatchState({ firebaseMirror: { data: null } }, props)
     ).toBeNull();
   });
 });

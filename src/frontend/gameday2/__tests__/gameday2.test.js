@@ -45,8 +45,8 @@ jest.mock("query-string", () => ({
       ).toString(),
   },
 }));
-jest.mock("firedux", () =>
-  jest.fn().mockImplementation(function MockFiredux({ ref }) {
+jest.mock("../firebaseMirror", () =>
+  jest.fn().mockImplementation(function MockFirebaseMirror({ ref }) {
     this.ref = ref;
     this.watching = {};
     this.watch = jest.fn((path) => {
@@ -101,7 +101,7 @@ const setUpPage = ({ hash, defaultChat }) => {
 // honors when present.
 let mockStore;
 const loadGameday = ({ devtools = true } = {}) => {
-  let firedux;
+  let firebaseMirror;
   jest.isolateModules(() => {
     const { compose } = require("redux");
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ =
@@ -113,9 +113,9 @@ const loadGameday = ({ devtools = true } = {}) => {
           return mockStore;
         });
     require("../gameday2");
-    firedux = require("../reducers").firedux;
+    firebaseMirror = require("../reducers").firebaseMirror;
   });
-  return firedux;
+  return firebaseMirror;
 };
 
 const hashParams = () =>
@@ -139,9 +139,9 @@ describe("gameday2 entry point", () => {
       hash: "#layout=3&view_0=2024casj-0&view_1=2024casj-1&view_2=2024nyny-0&view_3=missing-0&livescore_0=true&livescore_2=true&chat=nyc",
       defaultChat: "svr",
     });
-    const firedux = loadGameday();
+    const firebaseMirror = loadGameday();
     const store = mockStore;
-    expect(firedux.dispatch).toBe(store.dispatch);
+    expect(firebaseMirror.dispatch).toBe(store.dispatch);
 
     expect(mockGAInitialize).toHaveBeenCalledWith("UA-1090782-9");
     expect(mockRender).toHaveBeenCalledTimes(1);
@@ -158,12 +158,14 @@ describe("gameday2 entry point", () => {
     mockListeners.live_events({ val: () => liveEvents });
     expect(store.getState().chats.defaultChat).toBe("svr");
     expect(store.getState().chats.currentChat).toBe("nyc");
-    expect(firedux.watch).toHaveBeenCalledWith("e/2024casj/m");
-    expect(firedux.watch).toHaveBeenCalledWith("e/2024nyny/m");
-    expect(firedux.watch).toHaveBeenCalledWith("le/2024casj");
-    expect(firedux.watch).toHaveBeenCalledWith("le/2024nyny");
+    expect(firebaseMirror.watch).toHaveBeenCalledWith("e/2024casj/m");
+    expect(firebaseMirror.watch).toHaveBeenCalledWith("e/2024nyny/m");
+    expect(firebaseMirror.watch).toHaveBeenCalledWith("le/2024casj");
+    expect(firebaseMirror.watch).toHaveBeenCalledWith("le/2024nyny");
     expect(
-      firedux.watch.mock.calls.filter(([path]) => path === "e/2024casj/m")
+      firebaseMirror.watch.mock.calls.filter(
+        ([path]) => path === "e/2024casj/m"
+      )
     ).toHaveLength(1);
 
     expect(hashParams()).toEqual({
@@ -185,8 +187,8 @@ describe("gameday2 entry point", () => {
     store.dispatch(removeWebcast("2024nyny-0"));
     expect(mockOff).toHaveBeenCalledWith("e/2024nyny/m", "value");
     expect(mockOff).toHaveBeenCalledWith("le/2024nyny", "value");
-    expect(firedux.watching["e/2024nyny/m"]).toBe(false);
-    expect(firedux.watching["le/2024nyny"]).toBe(false);
+    expect(firebaseMirror.watching["e/2024nyny/m"]).toBe(false);
+    expect(firebaseMirror.watching["le/2024nyny"]).toBe(false);
 
     // Turning off a livescore unsubscribes from it
     store.dispatch(togglePositionLivescore(0));
@@ -195,10 +197,10 @@ describe("gameday2 entry point", () => {
 
     // Later live event updates don't re-run the hash restoration, and a null
     // snapshot leaves the webcasts alone
-    firedux.watch.mockClear();
+    firebaseMirror.watch.mockClear();
     mockListeners.live_events({ val: () => null });
     mockListeners.live_events({ val: () => liveEvents });
-    expect(firedux.watch).not.toHaveBeenCalled();
+    expect(firebaseMirror.watch).not.toHaveBeenCalled();
 
     await flushPromises();
     expect(mockStore.getState().favoriteTeams).toEqual(new Set(["frc254"]));
