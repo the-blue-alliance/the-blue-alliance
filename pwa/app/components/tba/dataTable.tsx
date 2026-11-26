@@ -119,6 +119,7 @@ function VirtualizedRows<TData extends RowData>({
     setScrollMargin(top + window.scrollY);
   }, []);
 
+  // eslint-disable-next-line react/incompatible-library
   const virtualizer = useWindowVirtualizer({
     count: rows.length,
     estimateSize: () => 41,
