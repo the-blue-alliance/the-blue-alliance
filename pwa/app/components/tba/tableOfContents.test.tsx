@@ -157,7 +157,9 @@ describe('TableOfContents', () => {
   });
 
   test('renders an empty placeholder when the loader threw', () => {
-    const tocPreview = vi.fn(({ year }: { year: number }) => ({
+    const tocPreview = vi.fn<
+      ({ year }: { year: number }) => { activeLabel: string }
+    >(({ year }) => ({
       activeLabel: String(year),
     }));
     router.match = { staticData: { tocPreview }, loaderData: undefined };
