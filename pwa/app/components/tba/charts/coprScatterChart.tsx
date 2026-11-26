@@ -4,6 +4,7 @@ import {
   DefaultTooltipContentProps,
   DefaultZIndexes,
   Label,
+  RechartsFill,
   ReferenceLine,
   Scatter,
   ScatterChart,
@@ -202,7 +203,7 @@ function TeamDot({
   stroke,
   data,
 }: ScatterShapeProps & {
-  fill?: string;
+  fill?: string | RechartsFill;
   stroke?: string;
   data: Datapoint[];
 }) {
@@ -220,7 +221,7 @@ function TeamDot({
         r={Math.sqrt(size / Math.PI)}
         pointerEvents="none"
         data-testid={`dot-${(payload as Datapoint).teamKey}`}
-        style={{ fill, stroke, strokeWidth: 1.5 }}
+        style={{ fill: fill as string, stroke, strokeWidth: 1.5 }}
       />
     </g>
   );
