@@ -60,9 +60,7 @@ describe("LayoutDrawer", () => {
     const { getByText, container } = renderDrawer();
     const layoutList =
       container.ownerDocument.querySelectorAll(".MuiList-root")[0];
-    const items = layoutList.querySelectorAll(
-      ":scope > li.MuiListItem-container"
-    );
+    const items = layoutList.querySelectorAll(":scope > li.MuiListItem-root");
     expect(items).toHaveLength(NUM_LAYOUTS);
     items.forEach((item, i) => {
       expect(item.textContent).toBe(NAME_FOR_LAYOUT[LAYOUT_DISPLAY_ORDER[i]]);
@@ -79,9 +77,7 @@ describe("LayoutDrawer", () => {
     const { queryByText, container } = renderDrawer();
     const layoutList =
       container.ownerDocument.querySelectorAll(".MuiList-root")[0];
-    const items = layoutList.querySelectorAll(
-      ":scope > li.MuiListItem-container"
-    );
+    const items = layoutList.querySelectorAll(":scope > li.MuiListItem-root");
     expect(items).toHaveLength(LAYOUT_DISPLAY_ORDER.length);
     expect(queryByText("Nona-View")).not.toBeNull();
   });
