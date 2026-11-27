@@ -47,16 +47,18 @@ jobs:
         run: |
           sha="$HEAD_SHA"
           for _ in $(seq 1 12); do
-            read -r mergeable merge < <(gh api "repos/$REPO/pulls/$PR" --jq '"\(.mergeable) \(.merge_commit_sha)"')
-            if [ "$mergeable" = "false" ]; then
-              echo "PR conflicts with its base; testing the head commit."
-              break
-            fi
-            if [ "$mergeable" = "true" ] && [ "$merge" != "null" ]; then
-              parent=$(gh api "repos/$REPO/commits/$merge" --jq '.parents[1].sha')
-              if [ "$parent" = "$HEAD_SHA" ]; then
-                sha="$merge"
+            if info=$(gh api "repos/$REPO/pulls/$PR" --jq '"\(.mergeable) \(.merge_commit_sha)"'); then
+              read -r mergeable merge <<< "$info"
+              if [ "$mergeable" = "false" ]; then
+                echo "PR conflicts with its base; testing the head commit."
                 break
+              fi
+              if [ "$mergeable" = "true" ] && [ -n "$merge" ] && [ "$merge" != "null" ]; then
+                parent=$(gh api "repos/$REPO/commits/$merge" --jq '.parents[1].sha' || true)
+                if [ "$parent" = "$HEAD_SHA" ]; then
+                  sha="$merge"
+                  break
+                fi
               fi
             fi
             sleep 5
