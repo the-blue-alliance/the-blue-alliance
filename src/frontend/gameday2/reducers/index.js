@@ -1,7 +1,7 @@
 // TODO(eugene): Don't use compatibility package.
 import firebase from "firebase/compat/app";
 import "firebase/compat/database";
-import Firedux from "firedux";
+import FirebaseMirror from "../firebaseMirror";
 import { combineReducers } from "redux";
 import { webcastsById, specialWebcastIds } from "./webcastsById";
 import visibility from "./visibility";
@@ -16,12 +16,12 @@ const firebaseApp = firebase.initializeApp({
   databaseURL: "https://tbatv-prod-hrd.firebaseio.com",
 });
 const ref = firebaseApp.database().ref();
-export const firedux = new Firedux({
+export const firebaseMirror = new FirebaseMirror({
   ref,
 });
 
 const gamedayReducer = combineReducers({
-  firedux: firedux.reducer(),
+  firebaseMirror: firebaseMirror.reducer(),
   webcastsById,
   specialWebcastIds,
   visibility,

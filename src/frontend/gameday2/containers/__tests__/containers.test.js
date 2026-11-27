@@ -52,7 +52,7 @@ const webcast = {
 };
 
 const state = {
-  firedux: {
+  firebaseMirror: {
     data: {
       e: { "2024casj": { m: { qm1: { c: "qm", s: 1, m: 1, r: -1, b: -1 } } } },
       le: { "2024casj": { mk: "qm1" } },

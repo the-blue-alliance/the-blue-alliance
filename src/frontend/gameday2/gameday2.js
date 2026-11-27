@@ -11,7 +11,7 @@ import queryString from "query-string";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { indigo } from "@mui/material/colors";
 import GamedayFrame from "./components/GamedayFrame";
-import gamedayReducer, { firedux } from "./reducers";
+import gamedayReducer, { firebaseMirror } from "./reducers";
 import {
   setWebcastsRaw,
   setLayout,
@@ -36,7 +36,7 @@ const store = createStore(
   gamedayReducer,
   composeEnhancers(applyMiddleware(thunk))
 );
-firedux.dispatch = store.dispatch;
+firebaseMirror.dispatch = store.dispatch;
 
 const muiTheme = createTheme({
   palette: {
@@ -86,7 +86,7 @@ store.subscribe(() => {
     if (!subscribedEvents.has(eventKey)) {
       subscribedEvents.add(eventKey);
 
-      firedux.watch(`e/${eventKey}/m`);
+      firebaseMirror.watch(`e/${eventKey}/m`);
     }
   });
 
@@ -101,8 +101,8 @@ store.subscribe(() => {
     if (!existingEventKeys.has(eventKey)) {
       subscribedEvents.delete(eventKey);
 
-      firedux.ref.child(`e/${eventKey}/m`).off("value");
-      firedux.watching[`e/${eventKey}/m`] = false; // To make firedux.watch work again
+      firebaseMirror.ref.child(`e/${eventKey}/m`).off("value");
+      firebaseMirror.watching[`e/${eventKey}/m`] = false; // So watch() subscribes again
     }
   });
 
@@ -127,12 +127,12 @@ store.subscribe(() => {
   );
   addedLivescores.forEach((eventKey) => {
     lastLivescores.add(eventKey);
-    firedux.watch(`le/${eventKey}`);
+    firebaseMirror.watch(`le/${eventKey}`);
   });
   removedLivescores.forEach((eventKey) => {
     lastLivescores.delete(eventKey);
-    firedux.ref.child(`le/${eventKey}`).off("value");
-    firedux.watching[`le/${eventKey}`] = false; // To make firedux.watch work again
+    firebaseMirror.ref.child(`le/${eventKey}`).off("value");
+    firebaseMirror.watching[`le/${eventKey}`] = false; // So watch() subscribes again
   });
 });
 
@@ -151,7 +151,7 @@ let specialWebcasts = webcastData.special_webcasts;
 let ongoingEventsWithWebcasts = [];
 
 // Subscribe to updates to special webcasts
-firedux.ref.child("special_webcasts").on("value", (snapshot) => {
+firebaseMirror.ref.child("special_webcasts").on("value", (snapshot) => {
   specialWebcasts = snapshot.val();
 
   const webcasts = {
@@ -163,7 +163,7 @@ firedux.ref.child("special_webcasts").on("value", (snapshot) => {
 
 // Subscribe to live events for webcasts
 let isLoad = true;
-firedux.ref.child("live_events").on("value", (snapshot) => {
+firebaseMirror.ref.child("live_events").on("value", (snapshot) => {
   ongoingEventsWithWebcasts = [];
   const liveEvents = snapshot.val();
   if (liveEvents != null) {

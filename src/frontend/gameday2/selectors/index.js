@@ -66,13 +66,13 @@ export const getChatsInDisplayOrder = createSelector([getChats], (chats) => {
   return displayOrderChats.sort((a, b) => a.name.localeCompare(b.name));
 });
 
-export const getFireduxData = (state) => state.firedux.data;
+export const getFirebaseMirrorData = (state) => state.firebaseMirror.data;
 
 export const getEventKey = (state, props) => props.webcast.key;
 
 export const getEventMatches = createSelector(
-  [getFireduxData, getEventKey],
-  (fireduxData, eventKey) => {
+  [getFirebaseMirrorData, getEventKey],
+  (mirrorData, eventKey) => {
     const compLevelsPlayOrder = {
       qm: 1,
       ef: 2,
@@ -95,13 +95,13 @@ export const getEventMatches = createSelector(
 
     const matches = [];
     if (
-      fireduxData &&
-      fireduxData.e &&
-      fireduxData.e[eventKey] &&
-      fireduxData.e[eventKey].m
+      mirrorData &&
+      mirrorData.e &&
+      mirrorData.e[eventKey] &&
+      mirrorData.e[eventKey].m
     ) {
-      Object.keys(fireduxData.e[eventKey].m).forEach((shortKey) => {
-        const match = Object.assign({}, fireduxData.e[eventKey].m[shortKey]);
+      Object.keys(mirrorData.e[eventKey].m).forEach((shortKey) => {
+        const match = Object.assign({}, mirrorData.e[eventKey].m[shortKey]);
         match.key = `${eventKey}_${shortKey}`;
         match.shortKey = shortKey;
         matches.push(match);
@@ -116,8 +116,8 @@ export const getEventMatches = createSelector(
 );
 
 export const getTickerMatches = createSelector(
-  [getFireduxData, getEventMatches],
-  (fireduxData, matches) => {
+  [getFirebaseMirrorData, getEventMatches],
+  (mirrorData, matches) => {
     let lastMatch = null;
     let selectedMatches = [];
     matches.forEach((match) => {
@@ -139,10 +139,10 @@ export const getTickerMatches = createSelector(
 );
 
 export const getCurrentMatchState = createSelector(
-  [getFireduxData, getEventKey],
-  (fireduxData, eventKey) => {
-    if (fireduxData && fireduxData.le && fireduxData.le[eventKey]) {
-      return fireduxData.le[eventKey];
+  [getFirebaseMirrorData, getEventKey],
+  (mirrorData, eventKey) => {
+    if (mirrorData && mirrorData.le && mirrorData.le[eventKey]) {
+      return mirrorData.le[eventKey];
     }
     return null;
   }
