@@ -24,13 +24,56 @@ env:
   VITE_FIREBASE_MEASUREMENT_ID: ${{ vars.VITE_FIREBASE_MEASUREMENT_ID }}
 
 jobs:
+  # This workflow file always comes from main (pull_request_target), so test the PR merged
+  # into main, as the pull_request workflow does. Otherwise an old branch runs main's CI
+  # setup against its own stale config. The payload's merge_commit_sha can lag a push, so
+  # wait until GitHub's test merge commit has the current head as its second parent. A
+  # conflicting PR has no merge commit and is tested at its head.
+  pwa-ref:
+    name: "[pwa] Resolve commit to test"
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      sha: ${{ steps.resolve.outputs.sha }}
+    steps:
+      - id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          sha="$HEAD_SHA"
+          for _ in $(seq 1 12); do
+            if info=$(gh api "repos/$REPO/pulls/$PR" --jq '"\(.mergeable) \(.merge_commit_sha)"'); then
+              read -r mergeable merge <<< "$info"
+              if [ "$mergeable" = "false" ]; then
+                echo "PR conflicts with its base; testing the head commit."
+                break
+              fi
+              if [ "$mergeable" = "true" ] && [ -n "$merge" ] && [ "$merge" != "null" ]; then
+                parent=$(gh api "repos/$REPO/commits/$merge" --jq '.parents[1].sha' || true)
+                if [ "$parent" = "$HEAD_SHA" ]; then
+                  sha="$merge"
+                  break
+                fi
+              fi
+            fi
+            sleep 5
+          done
+          echo "Testing $sha"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
   pwa-lint:
+    needs: pwa-ref
     name: "[pwa] Format & Lint"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ needs.pwa-ref.outputs.sha }}
           allow-unsafe-pr-checkout: true
 
       - name: Check toolchain version consistency
@@ -52,12 +95,13 @@ jobs:
         run: pnpm --dir pwa run lint
 
   pwa-type:
+    needs: pwa-ref
     name: "[pwa] Type Check"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ needs.pwa-ref.outputs.sha }}
           allow-unsafe-pr-checkout: true
 
       - name: Set up PWA toolchain
@@ -73,12 +117,13 @@ jobs:
         run: pnpm --dir pwa run typecheck
 
   pwa-test:
+    needs: pwa-ref
     name: "[pwa] Test"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ needs.pwa-ref.outputs.sha }}
           allow-unsafe-pr-checkout: true
 
       - name: Set up PWA toolchain
@@ -101,12 +146,13 @@ jobs:
           flags: pwa
 
   pwa-build:
+    needs: pwa-ref
     name: "[pwa] Build"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ needs.pwa-ref.outputs.sha }}
           allow-unsafe-pr-checkout: true
 
       - name: Set up PWA toolchain
@@ -122,12 +168,13 @@ jobs:
         run: pnpm --dir pwa run build
 
   check-pwa-api:
+    needs: pwa-ref
     name: "[pwa] Check API regeneration"
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ needs.pwa-ref.outputs.sha }}
           allow-unsafe-pr-checkout: true
 
       - name: Set up PWA toolchain
@@ -156,6 +203,7 @@ jobs:
           fi
 
   pwa-playwright:
+    needs: pwa-ref
     name: "[pwa] Playwright Tests"
     strategy:
       fail-fast: false
@@ -166,7 +214,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ needs.pwa-ref.outputs.sha }}
           allow-unsafe-pr-checkout: true
 
       - name: Set up PWA toolchain
