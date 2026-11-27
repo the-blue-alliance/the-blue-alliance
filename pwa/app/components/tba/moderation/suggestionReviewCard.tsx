@@ -1344,7 +1344,7 @@ export function SuggestionReviewCard(
                 ? 'border-green-700 bg-green-700 text-white hover:bg-green-800'
                 : `border-green-600/60 bg-green-50 text-green-800
                   hover:bg-green-200 hover:text-green-900 dark:bg-green-950
-                  dark:text-green-300 hover:dark:bg-green-900`,
+                  dark:text-green-300 dark:hover:bg-green-900`,
             )}
             onClick={() =>
               onDecisionChange(decision === 'accept' ? undefined : 'accept')
@@ -1360,7 +1360,7 @@ export function SuggestionReviewCard(
                 ? 'border-red-700 bg-red-700 text-white hover:bg-red-800'
                 : `border-red-600/60 bg-red-50 text-red-800 hover:bg-red-200
                   hover:text-red-900 dark:bg-red-950 dark:text-red-300
-                  hover:dark:bg-red-900`,
+                  dark:hover:bg-red-900`,
             )}
             onClick={() =>
               onDecisionChange(decision === 'reject' ? undefined : 'reject')

@@ -114,7 +114,7 @@ function NavigationMenuLink({
         hover:text-accent-foreground focus-visible:ring-[3px]
         focus-visible:ring-ring/50 focus-visible:outline-1
         data-active:bg-accent/50 data-active:text-accent-foreground
-        hover:data-active:bg-accent focus:data-active:bg-accent
+        data-active:hover:bg-accent data-active:focus:bg-accent
         [&_svg:not([class*='size-'])]:size-4
         [&_svg:not([class*='text-'])]:text-muted-foreground`,
         className,

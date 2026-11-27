@@ -43,7 +43,9 @@ export default defineConfig({
     'app/api/colors/',
     'pnpm-lock.yaml',
   ],
-  rules: {},
+  rules: {
+    'jsx-a11y/prefer-tag-over-role': 'off',
+  },
   overrides: [
     {
       files: ALL_TS_FILES,
