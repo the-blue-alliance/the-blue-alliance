@@ -18,6 +18,8 @@ from typing import (
     TypeVar,
 )
 
+from pyre_extensions import none_throws
+
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
@@ -39,6 +41,10 @@ def per_robot_points(
         float(points.get(breakdown.get(field_template.format(robot)), 0))
         for robot in (1, 2, 3)
     ]
+
+
+def alliance_breakdown(match: Match, color: AllianceColor) -> Dict[str, Any]:
+    return none_throws(match.score_breakdown)[color]
 
 
 def safe_div(numerator: float, denominator: float) -> float:
