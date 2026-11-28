@@ -505,6 +505,24 @@ def test_score_breakdown_2026_keys() -> None:
     assert parsed[0]["score_breakdown_json"] is not None
 
 
+def test_score_breakdown_2026_penalties_accepted() -> None:
+    # FRC API sends a per-alliance penalties string in 2026 breakdowns
+    data = [
+        make_match(
+            {
+                "score_breakdown": {
+                    "red": {"penalties": "G206", "totalPoints": 100},
+                    "blue": {"penalties": "None", "totalPoints": 90},
+                }
+            }
+        )
+    ]
+    parsed = JSONMatchesParser.parse(json.dumps(data), 2026)
+    breakdown = json.loads(none_throws(parsed[0]["score_breakdown_json"]))
+    assert breakdown["red"]["penalties"] == "G206"
+    assert breakdown["blue"]["penalties"] == "None"
+
+
 def test_score_breakdown_2025_key_rejected_in_2026() -> None:
     # algaePoints is a 2025 key, not valid for 2026
     data = [
