@@ -4106,14 +4106,7 @@
       "column": 44,
       "path": "src/backend/common/helpers/match_time_prediction_helper.py",
       "name": "unsupported-operation",
-      "concise_description": "`-` is not supported between `None` and `datetime`",
-      "severity": "error"
-    },
-    {
-      "column": 44,
-      "path": "src/backend/common/helpers/match_time_prediction_helper.py",
-      "name": "unsupported-operation",
-      "concise_description": "`-` is not supported between `None` and `None`",
+      "concise_description": "`-` is not supported between `datetime` and `None`",
       "severity": "error"
     },
     {
@@ -4306,13 +4299,6 @@
       "severity": "error"
     },
     {
-      "column": 37,
-      "path": "src/backend/common/helpers/tbans_helper.py",
-      "name": "missing-attribute",
-      "concise_description": "Class `timezone` has no class attribute `utc`",
-      "severity": "error"
-    },
-    {
       "column": 13,
       "path": "src/backend/common/helpers/team_helper.py",
       "name": "unsupported-operation",
@@ -4450,13 +4436,6 @@
       "path": "src/backend/common/helpers/tests/webcast_helper_test.py",
       "name": "bad-argument-type",
       "concise_description": "Unpacked keyword argument `str` is not assignable to parameter `concurrent_viewers` with type `int | None` in function `backend.common.datafeeds.parsers.youtube.youtube_video_details_parser.ParsedVideoDetails.__init__`",
-      "severity": "error"
-    },
-    {
-      "column": 47,
-      "path": "src/backend/common/helpers/trusted_api_logger.py",
-      "name": "missing-attribute",
-      "concise_description": "Class `timezone` has no class attribute `utc`",
       "severity": "error"
     },
     {
@@ -4747,13 +4726,6 @@
       "severity": "error"
     },
     {
-      "column": 51,
-      "path": "src/backend/common/tests/decorator_test.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `float` is not assignable to parameter `seconds` with type `int` in function `datetime.timedelta.__new__`",
-      "severity": "error"
-    },
-    {
       "column": 5,
       "path": "src/backend/common/tests/decorator_test.py",
       "name": "missing-attribute",
@@ -5027,20 +4999,6 @@
       "severity": "error"
     },
     {
-      "column": 34,
-      "path": "src/backend/web/context_processors.py",
-      "name": "missing-attribute",
-      "concise_description": "Class `timezone` has no class attribute `utc`",
-      "severity": "error"
-    },
-    {
-      "column": 21,
-      "path": "src/backend/web/context_processors.py",
-      "name": "missing-attribute",
-      "concise_description": "Class `timezone` has no class attribute `utc`",
-      "severity": "error"
-    },
-    {
       "column": 13,
       "path": "src/backend/web/handlers/account.py",
       "name": "missing-attribute",
@@ -5052,6 +5010,13 @@
       "path": "src/backend/web/handlers/admin/api_auth.py",
       "name": "bad-argument-type",
       "concise_description": "Argument `Generator[str | None]` is not assignable to parameter `iterable` with type `Iterable[str]` in function `list.extend`",
+      "severity": "error"
+    },
+    {
+      "column": 21,
+      "path": "src/backend/web/handlers/admin/api_auth.py",
+      "name": "unsupported-operation",
+      "concise_description": "`>` is not supported between `None` and `datetime`",
       "severity": "error"
     },
     {
@@ -5100,7 +5065,7 @@
       "column": 31,
       "path": "src/backend/web/handlers/admin/suggestions_seed.py",
       "name": "bad-argument-type",
-      "concise_description": "Argument `dict[str, bool | int | str] | dict[str, int | str | Unknown]` is not assignable to parameter `contents` with type `SuggestionDict` in function `backend.common.models.suggestion.Suggestion.contents`",
+      "concise_description": "Argument `dict[str, bool | int | str] | dict[str, int | str]` is not assignable to parameter `contents` with type `SuggestionDict` in function `backend.common.models.suggestion.Suggestion.contents`",
       "severity": "error"
     },
     {
@@ -5108,6 +5073,13 @@
       "path": "src/backend/web/handlers/admin/users.py",
       "name": "unsupported-operation",
       "concise_description": "Unary `-` is not supported on `datetime`",
+      "severity": "error"
+    },
+    {
+      "column": 13,
+      "path": "src/backend/web/handlers/ajax.py",
+      "name": "unsupported-operation",
+      "concise_description": "`>=` is not supported between `None` and `datetime`",
       "severity": "error"
     },
     {
@@ -5510,13 +5482,6 @@
       "severity": "error"
     },
     {
-      "column": 26,
-      "path": "src/backend/web/jinja2_filters.py",
-      "name": "missing-attribute",
-      "concise_description": "Class `timezone` has no class attribute `utc`",
-      "severity": "error"
-    },
-    {
       "column": 37,
       "path": "src/backend/web/local/tests/test_match_suggestions.py",
       "name": "unsupported-operation",
@@ -5619,13 +5584,6 @@
       "path": "src/backend/web/tests/cached_public_csrf_test.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `NoneType` has no attribute `get_source`",
-      "severity": "error"
-    },
-    {
-      "column": 34,
-      "path": "src/backend/web/tests/context_processors_test.py",
-      "name": "missing-attribute",
-      "concise_description": "Class `timezone` has no class attribute `utc`",
       "severity": "error"
     }
   ]

@@ -172,7 +172,7 @@ class Span:
     def dict(self) -> Dict[str, Any]:
         """Format as a dictionary of the correct shape for sending to the Cloud
         Trace REST API as a JSON object"""
-        span_dict = {
+        span_dict: Dict[str, Any] = {
             "kind": "SPAN_KIND_UNSPECIFIED",
             "name": self._name,
             "parentSpanId": self._parent_span_id,

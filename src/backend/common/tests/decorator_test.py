@@ -86,7 +86,7 @@ def test_cached_public_turbo_mode(app: Flask) -> None:
     TurboMode.put(
         TurboCfg(
             regex=r".*turbo.*",
-            valid_until=datetime.datetime(2020, 1, 2).timestamp(),
+            valid_until=int(datetime.datetime(2020, 1, 2).timestamp()),
             cache_length=61,
         )
     )
@@ -104,7 +104,7 @@ def test_cached_public_turbo_mode_expired(app: Flask) -> None:
     TurboMode.put(
         TurboCfg(
             regex=r".*turbo.*",
-            valid_until=datetime.datetime(2020, 1, 2).timestamp(),
+            valid_until=int(datetime.datetime(2020, 1, 2).timestamp()),
             cache_length=61,
         )
     )
