@@ -1253,17 +1253,17 @@ export type EventDistrictPoints = {
  */
 export type EventInsights = {
   /**
-   * Inights for the qualification round of an event
+   * Insights for the qualification round of an event, or null if the event has no played qualification matches (for example, a Championship or District Championship finals event, or an event that has not started).
    */
   qual?: {
     [key: string]: unknown;
-  };
+  } | null;
   /**
-   * Insights for the playoff round of an event
+   * Insights for the playoff round of an event, or null if the event has no played playoff matches.
    */
   playoff?: {
     [key: string]: unknown;
-  };
+  } | null;
 };
 
 /**
