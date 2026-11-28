@@ -184,7 +184,6 @@ def purge_orphaned_cached_query_results(
     """
     classifier = OrphanClassifier(all_query_classes())
     query = CachedQueryResult.query()
-    # pyre-ignore[16]: pyre stubs don't list ndb.Cursor, but it exists at runtime
     start_cursor = ndb.Cursor(urlsafe=cursor) if cursor else None
 
     counts: Counter[str] = Counter()

@@ -17,7 +17,7 @@ from backend.common.game_specific.seasons.game_specifics_2026 import GameSpecifi
 
 def test_cannot_instantiate_abstract_root() -> None:
     with pytest.raises(TypeError):
-        SeasonGameConfig()  # pyre-ignore[45]
+        SeasonGameConfig()
 
 
 @pytest.mark.parametrize(

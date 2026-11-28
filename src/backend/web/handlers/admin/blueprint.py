@@ -168,9 +168,8 @@ def admin_home() -> str:
 
     memcache_stats = MemcacheClient.get().get_stats() or {"hits": 0, "misses": 0}
 
-    # Negation for descending order is valid NDB syntax, but Pyre doesn't understand it
     # https://docs.cloud.google.com/appengine/docs/standard/services/ndb/queries?tab=python#order
-    users = Account.query().order(-Account.created).fetch(5)  # pyre-ignore[16]
+    users = Account.query().order(-Account.created).fetch(5)
 
     commit_sha, commit_shortlog = Environment.commit_info()
 

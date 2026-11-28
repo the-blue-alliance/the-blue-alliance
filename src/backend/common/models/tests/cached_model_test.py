@@ -163,9 +163,7 @@ def test_validation_skipped_without_properties_attr(caplog) -> None:
     assert not hasattr(obj, "_properties")
 
     with caplog.at_level(logging.ERROR):
-        # pyre-ignore[6]: exercising the guard against non-ndb objects
         assert CachedModel._validate_required_properties(obj) is False
-        # pyre-ignore[6]: exercising the guard against non-ndb objects
         assert CachedModel._pre_put_hook(obj) is None
 
     assert len(caplog.records) == 0

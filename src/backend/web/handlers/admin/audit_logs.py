@@ -40,10 +40,9 @@ def audit_logs() -> str:
     if lookup_key_raw and target_key is None:
         error = "Unable to parse datastore key. Use urlsafe key or Kind:id format."
     elif target_key is not None:
-        # Negation for descending order is valid NDB syntax, but Pyre doesn't understand it
         logs = (
             AuditLogEntry.query(AuditLogEntry.target_key == target_key)
-            .order(-AuditLogEntry.time)  # pyre-ignore[16]
+            .order(-AuditLogEntry.time)
             .fetch(200)
         )
         account_keys = list({log.account for log in logs if log.account is not None})

@@ -461,12 +461,10 @@ class FMSAPIMatchDetailsParser(
             }
 
             if api_coopertition := match.get("coopertition"):
-                breakdown["coopertition"] = api_coopertition  # pyre-ignore[6]
+                breakdown["coopertition"] = api_coopertition
 
             if api_coopertition_points := match.get("coopertitionPoints"):
-                breakdown["coopertition_points"] = (  # pyre-ignore[6]
-                    api_coopertition_points  # pyre-ignore[6]
-                )
+                breakdown["coopertition_points"] = api_coopertition_points
 
             game_data = None
             if self.year == 2018:
@@ -494,7 +492,7 @@ class FMSAPIMatchDetailsParser(
                     "ensembleBonusOnStageRobotsThreshold",
                 ]:
                     for color in ALLIANCE_COLORS:
-                        breakdown[color][key] = match_data_2024[key]  # pyre-ignore[26]
+                        breakdown[color][key] = match_data_2024[key]
 
             api_alliances = cast(
                 List[Any], match.get("Alliances") or match.get("alliances") or []

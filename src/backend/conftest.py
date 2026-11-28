@@ -39,7 +39,7 @@ def _clear_request_contexts() -> None:
 def drain_gae_rpc_thread_pool(
     request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
 ) -> Generator:
-    max_concurrent = apiproxy_rpc._MAX_CONCURRENT_API_CALLS  # pyre-ignore[16]
+    max_concurrent = apiproxy_rpc._MAX_CONCURRENT_API_CALLS
     thread_pool = futures.ThreadPoolExecutor(
         max_concurrent, thread_name_prefix=f"ApiProxyThreadPool:{request.node.name}"
     )
@@ -115,11 +115,11 @@ def ndb_stub(
 
     # monkeypatch the ndb library to work with freezegun
     fake_datetime = getattr(freezegun_api, "FakeDatetime")
-    v = getattr(datastore_types, "_VALIDATE_PROPERTY_VALUES", {})  # pyre-ignore[16]
+    v = getattr(datastore_types, "_VALIDATE_PROPERTY_VALUES", {})
     v[fake_datetime] = datastore_types.ValidatePropertyNothing
     monkeypatch.setattr(datastore_types, "_VALIDATE_PROPERTY_VALUES", v)
 
-    p = getattr(datastore_types, "_PACK_PROPERTY_VALUES", {})  # pyre-ignore[16]
+    p = getattr(datastore_types, "_PACK_PROPERTY_VALUES", {})
     p[fake_datetime] = datastore_types.PackDatetime
     monkeypatch.setattr(datastore_types, "_PACK_PROPERTY_VALUES", p)
 

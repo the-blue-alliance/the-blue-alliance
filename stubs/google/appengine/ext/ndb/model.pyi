@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, Optional, TypeVar, Type, Union
+from typing import Any, Optional, Self, Union
 
 from google.appengine.api import datastore_errors
 from google.appengine.datastore import datastore_rpc
@@ -82,6 +82,7 @@ class _BaseValue(_NotEqualMixin):
     def __hash__(self): ...
 
 class Property(ModelAttribute):
+    def __new__(cls, *args: Any, **kwargs: Any) -> Any: ...
     def __init__(self, name: Any | None = ..., indexed: Any | None = ..., repeated: Any | None = ..., required: Any | None = ..., default: Any | None = ..., choices: Any | None = ..., validator: Any | None = ..., verbose_name: Any | None = ..., write_empty_list: Any | None = ...) -> None: ...
     def __eq__(self, value): ...
     def __ne__(self, value): ...
@@ -152,8 +153,6 @@ class ComputedProperty(GenericProperty):
 class MetaModel(type):
     def __init__(cls, name, bases, classdict) -> None: ...
 
-BoundModel = TypeVar("BoundModel", bound="Model")
-
 class Model:
     key: Key
     def __init__(*args, **kwds) -> None: ...
@@ -177,19 +176,19 @@ class Model:
         ...
 
     @classmethod
-    def get_by_id(cls: Type[BoundModel], id: Union[int, str], **kwargs) -> Optional[BoundModel]:
+    def get_by_id(cls, id: Union[int, str], **kwargs) -> Optional[Self]:
         ...
 
     @classmethod
-    def get_by_id_async(cls: Type[BoundModel], id: Union[int, str], **kwargs) -> Future[Optional[BoundModel]]:
+    def get_by_id_async(cls, id: Union[int, str], **kwargs) -> Future[Optional[Self]]:
         ...
 
     @classmethod
-    def get_or_insert(cls: Type[BoundModel], name: str, **kwargs) -> BoundModel:
+    def get_or_insert(cls, name: str, **kwargs) -> Self:
         ...
 
     @classmethod
-    def get_or_insert_async(cls: Type[BoundModel], name: str, **kwargs) -> Future[BoundModel]:
+    def get_or_insert_async(cls, name: str, **kwargs) -> Future[Self]:
         ...
 
     allocate_ids: Any

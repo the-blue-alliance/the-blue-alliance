@@ -64,7 +64,7 @@ class _NotificationMode(enum.Flag):
 
     FCM = enum.auto()
     WEBHOOK = enum.auto()
-    ALL = FCM | WEBHOOK  # pyre-ignore[8]
+    ALL = FCM | WEBHOOK
 
 
 _firebase_app_instance = None
@@ -558,9 +558,7 @@ class TBANSHelper:
         if match is None:
             return
 
-        now = datetime.datetime.now(datetime.timezone.utc).replace(  # pyre-ignore[16]
-            tzinfo=None
-        )
+        now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
 
         task_name = f"{match_key}_match_upcoming"
 

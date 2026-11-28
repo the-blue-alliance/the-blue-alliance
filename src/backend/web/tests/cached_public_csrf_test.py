@@ -128,7 +128,7 @@ def _cached_public_renders() -> Iterator[RenderedTemplate]:
 
 def _template_source(template: str) -> str:
     try:
-        source, _, _ = _jinja_env.loader.get_source(_jinja_env, template)  # pyre-ignore
+        source, _, _ = _jinja_env.loader.get_source(_jinja_env, template)
     except TemplateNotFound:
         raise AssertionError(f"Template {template} not found under {TEMPLATES_ROOT}")
     return source
