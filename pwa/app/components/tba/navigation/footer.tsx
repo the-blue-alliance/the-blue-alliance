@@ -5,7 +5,7 @@ import { Temporal } from 'temporal-polyfill';
 
 import GithubIcon from '~icons/simple-icons/github';
 
-import andymarkLogo from '~/images/images/andymark-logo.png';
+import { FooterSponsorCredit } from '~/components/tba/navigation/sponsorCredits';
 import { useIsHydrated } from '~/lib/hooks';
 
 type InternalLink = {
@@ -116,28 +116,13 @@ export const Footer = () => {
           </div>
         </div>
         <div
-          className="relative isolate flex justify-between gap-0.5 border-t
-            border-neutral-600/10 py-5 text-sm max-md:flex-col md:items-center"
+          className="relative isolate flex flex-col gap-2 border-t
+            border-neutral-600/10 py-5 text-sm"
         >
-          <span>
-            Thanks to our platinum sponsor
-            <a
-              href="https://www.andymark.com/"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <img
-                src={andymarkLogo}
-                alt="AndyMark"
-                width={450}
-                height={81}
-                className="ml-2 inline h-4 w-auto"
-              />
-            </a>
-          </span>
+          <FooterSponsorCredit />
 
           <p className="text-xs text-neutral-600 dark:text-neutral-400">
-            Data provided by the{' '}
+            Data from{' '}
             <a
               href="https://frc-events.firstinspires.org/services/API"
               target="_blank"
@@ -146,7 +131,7 @@ export const Footer = () => {
             >
               <i>FIRST</i>® Events API
             </a>
-            {renderTime && <>. Generated on {renderTime}</>}. Commit:{' '}
+            {renderTime && <>. Generated {renderTime}</>}. Commit:{' '}
             <a
               href={`https://github.com/the-blue-alliance/the-blue-alliance/commit/${commitHash}`}
               target="_blank"
