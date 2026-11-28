@@ -37,7 +37,7 @@
 {% block main_javascript %}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/5.10.2/video.min.js" integrity="sha384-KFpFgK7N3zOtW8qDOGbYBNIy3K75KE4y3vHwGrWsBOK/t5Nt8RO/VtWDtZW/AG31" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/3.0.2/videojs-contrib-hls.min.js" integrity="sha384-oNj30/FEFP65UP9Z1t+qFAXiQq7qvxeeVN8bLMnte5AAtOBzVhKwlSHDNlEItpo2" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="py3_javascript/gameday2.min.js"></script>
+  <script type="text/javascript" src="{{ static_asset_url("javascript/gameday2.min.js") }}"></script>
 {% endblock %}
 
 {% block ganalytics_timer %}
