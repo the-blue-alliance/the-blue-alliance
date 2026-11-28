@@ -212,4 +212,4 @@ def test_regional_rankings_includes_adjustments(ndb_stub, api_client: Client) ->
         "/api/v3/regional_advancement/2025/rankings",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
-    assert resp.json[0]["adjustments"] == 1
+    assert resp.get_json()[0]["adjustments"] == 1

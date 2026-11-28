@@ -167,7 +167,7 @@ def test_malformed_match_id(ndb_stub, api_client: Client) -> None:
         data=request_body,
     )
     assert response.status_code == 400, response.data
-    assert response.json["Error"] == "Invalid match IDs provided: ['zzz']"
+    assert response.get_json()["Error"] == "Invalid match IDs provided: ['zzz']"
 
     # make sure the valid match is unchnaged
     assert set(none_throws(Match.get_by_id("2014casj_qm1")).youtube_videos) == {
@@ -262,7 +262,7 @@ def test_delete_malformed_match_id(ndb_stub, api_client: Client) -> None:
         data=request_body,
     )
     assert response.status_code == 400, response.data
-    assert response.json["Error"] == "Invalid match IDs provided: ['zzz']"
+    assert response.get_json()["Error"] == "Invalid match IDs provided: ['zzz']"
 
     # make sure the valid match is unchanged
     assert none_throws(Match.get_by_id("2014casj_sf1m1")).youtube_videos == []

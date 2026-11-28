@@ -130,7 +130,7 @@ def test_upload_qual_rankings_success(
             )
 
     assert resp.status_code == 200
-    assert "Success" in resp.json
+    assert "Success" in resp.get_json()
     mock_write.assert_called_once()
 
 
@@ -161,7 +161,7 @@ def test_upload_missing_file(
     )
 
     assert resp.status_code == 401
-    assert "Expected file upload not found" in resp.json["Error"]
+    assert "Expected file upload not found" in resp.get_json()["Error"]
 
 
 @freeze_time("2019-06-01")
@@ -203,7 +203,7 @@ def test_upload_invalid_excel_file(
     )
 
     assert resp.status_code == 400
-    assert "not a valid Excel file" in resp.json["Error"]
+    assert "not a valid Excel file" in resp.get_json()["Error"]
 
 
 @freeze_time("2019-06-01")
@@ -245,7 +245,7 @@ def test_upload_wrong_permission(
     )
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")
@@ -288,7 +288,7 @@ def test_upload_mismatched_digest(
     )
 
     assert resp.status_code == 401
-    assert "File digest does not match" in resp.json["Error"]
+    assert "File digest does not match" in resp.get_json()["Error"]
 
 
 @freeze_time("2019-06-01")
@@ -424,7 +424,7 @@ def test_upload_not_authenticated(ndb_stub, api_client: Client) -> None:
     )
 
     assert resp.status_code == 401
-    assert "Error" in resp.json
+    assert "Error" in resp.get_json()
 
 
 @freeze_time("2019-06-01")

@@ -62,8 +62,8 @@ def test_insights_year_returns_global(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    assert resp.json[0]["district_abbreviation"] is None
+    assert len(resp.get_json()) == 1
+    assert resp.get_json()[0]["district_abbreviation"] is None
 
 
 def test_insights_year_excludes_district(ndb_stub, api_client: Client) -> None:
@@ -76,8 +76,8 @@ def test_insights_year_excludes_district(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    assert resp.json[0]["district_abbreviation"] is None
+    assert len(resp.get_json()) == 1
+    assert resp.get_json()[0]["district_abbreviation"] is None
 
 
 def test_insights_year_filter(ndb_stub, api_client: Client) -> None:
@@ -90,8 +90,8 @@ def test_insights_year_filter(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    assert resp.json[0]["year"] == 2024
+    assert len(resp.get_json()) == 1
+    assert resp.get_json()[0]["year"] == 2024
 
 
 def test_insights_year_requires_auth(api_client: Client) -> None:
@@ -114,8 +114,8 @@ def test_insights_year_category_filters(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    assert resp.json[0]["category"] == InsightCategory.LEADERBOARD
+    assert len(resp.get_json()) == 1
+    assert resp.get_json()[0]["category"] == InsightCategory.LEADERBOARD
 
 
 def test_insights_year_category_excludes_district(ndb_stub, api_client: Client) -> None:
@@ -133,8 +133,8 @@ def test_insights_year_category_excludes_district(ndb_stub, api_client: Client) 
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    assert resp.json[0]["district_abbreviation"] is None
+    assert len(resp.get_json()) == 1
+    assert resp.get_json()[0]["district_abbreviation"] is None
 
 
 def test_insights_year_category_invalid_returns_404(
@@ -192,8 +192,8 @@ def test_insights_year_district_returns_only_that_district(
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    assert resp.json[0]["district_abbreviation"] == "ne"
+    assert len(resp.get_json()) == 1
+    assert resp.get_json()[0]["district_abbreviation"] == "ne"
 
 
 def test_insights_year_district_no_match_empty(ndb_stub, api_client: Client) -> None:
@@ -238,8 +238,8 @@ def test_insights_year_district_literal_does_not_collide(
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    assert resp.json[0]["district_abbreviation"] == "ne"
+    assert len(resp.get_json()) == 1
+    assert resp.get_json()[0]["district_abbreviation"] == "ne"
 
 
 # ---------------------------------------------------------------------------
@@ -286,8 +286,8 @@ def test_insights_year_category_district_filters_both(
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    result = resp.json[0]
+    assert len(resp.get_json()) == 1
+    result = resp.get_json()[0]
     assert result["category"] == InsightCategory.LEADERBOARD
     assert result["district_abbreviation"] == "ne"
 
@@ -323,9 +323,9 @@ def test_insights_year_category_game_stats(ndb_stub, api_client: Client) -> None
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    assert resp.json[0]["category"] == InsightCategory.GAME_STATS
-    assert resp.json[0]["name"] == "game_stats"
+    assert len(resp.get_json()) == 1
+    assert resp.get_json()[0]["category"] == InsightCategory.GAME_STATS
+    assert resp.get_json()[0]["name"] == "game_stats"
 
 
 def test_insights_year_category_clubs(ndb_stub, api_client: Client) -> None:
@@ -343,9 +343,9 @@ def test_insights_year_category_clubs(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
-    assert len(resp.json) == 1
-    assert resp.json[0]["category"] == InsightCategory.CLUBS
-    assert resp.json[0]["name"] == "hall_of_fame"
+    assert len(resp.get_json()) == 1
+    assert resp.get_json()[0]["category"] == InsightCategory.CLUBS
+    assert resp.get_json()[0]["name"] == "hall_of_fame"
 
 
 def test_insights_v2_models_query_response_passthrough(

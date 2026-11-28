@@ -45,7 +45,7 @@ def test_validate_etag_records_and_short_circuits_304(
         "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp1.status_code == 200
-    assert resp1.json["key"] == "frc254"
+    assert resp1.get_json()["key"] == "frc254"
     etag = resp1.headers.get("ETag")
     assert etag is not None
 
@@ -109,7 +109,7 @@ def test_delete_cache_multi_invalidates_etag_304(
         headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
     )
     assert resp3.status_code == 200
-    assert resp3.json["nickname"] == "Updated Poofs"
+    assert resp3.get_json()["nickname"] == "Updated Poofs"
     new_etag = resp3.headers.get("ETag")
     assert new_etag != etag
 
@@ -178,7 +178,7 @@ def test_validate_etag_multi_query_endpoint(
         headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
     )
     assert resp3.status_code == 200
-    assert resp3.json["awards"][0]["name"] == "Finalist"
+    assert resp3.get_json()["awards"][0]["name"] == "Finalist"
 
 
 def test_scoped_etag_deps_prevent_cross_endpoint_collision(
@@ -243,7 +243,7 @@ def test_scoped_etag_deps_prevent_cross_endpoint_collision(
         headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag_254},
     )
     assert resp_254_updated.status_code == 200
-    assert len(resp_254_updated.json) == 1
+    assert len(resp_254_updated.get_json()) == 1
 
     # 4. frc9999 request with the same empty-list ETag must STILL return 304!
     resp_9999_fresh = api_client.get(
@@ -367,7 +367,7 @@ def test_event_alliances_etag_invalidated_on_event_team_update(
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp1.status_code == 200
-    assert resp1.json[0]["status"]["status"] == "playing"
+    assert resp1.get_json()[0]["status"]["status"] == "playing"
     etag = resp1.headers.get("ETag")
     assert etag is not None
 
@@ -394,7 +394,7 @@ def test_event_alliances_etag_invalidated_on_event_team_update(
         headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
     )
     assert resp3.status_code == 200
-    assert resp3.json[0]["status"]["status"] == "won"
+    assert resp3.get_json()[0]["status"]["status"] == "won"
     assert resp3.headers.get("ETag") != etag
 
 
@@ -494,7 +494,7 @@ def test_search_index_etag_invalidated_on_new_team_page(
     assert resp1.status_code == 200
     etag = resp1.headers.get("ETag")
     assert etag is not None
-    assert len(resp1.json["teams"]) == 1
+    assert len(resp1.get_json()["teams"]) == 1
 
     # Should 304 with unchanged ETag
     resp2 = api_client.get(
@@ -514,7 +514,7 @@ def test_search_index_etag_invalidated_on_new_team_page(
         headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
     )
     assert resp3.status_code == 200
-    assert len(resp3.json["teams"]) == 2
+    assert len(resp3.get_json()["teams"]) == 2
     assert resp3.headers.get("ETag") != etag
 
 
@@ -539,7 +539,7 @@ def test_team_list_all_etag_invalidated_on_new_team_page(
     assert resp1.status_code == 200
     etag = resp1.headers.get("ETag")
     assert etag is not None
-    assert len(resp1.json) == 1
+    assert len(resp1.get_json()) == 1
 
     # Should 304 with unchanged ETag
     resp2 = api_client.get(
@@ -559,7 +559,7 @@ def test_team_list_all_etag_invalidated_on_new_team_page(
         headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
     )
     assert resp3.status_code == 200
-    assert len(resp3.json) == 2
+    assert len(resp3.get_json()) == 2
     assert resp3.headers.get("ETag") != etag
 
 
@@ -1219,7 +1219,7 @@ def test_validate_etag_save_dependencies_exception_is_swallowed(
         "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
-    assert resp.json["key"] == "frc254"
+    assert resp.get_json()["key"] == "frc254"
     assert resp.headers.get("ETag") is not None
     mock_save.assert_called_once()
     # Nothing was recorded, so the ETag can't be validated on a later request
