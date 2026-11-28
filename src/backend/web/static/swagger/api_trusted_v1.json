@@ -3,8 +3,8 @@
   "info": {
     "title": "The Blue Alliance Trusted APIv1",
     "description": "# Overview\nImport FIRST Robotics Competition Data to The Blue Alliance. The API is accessed through POST requests made to the endpoints described below. To simplify the removal of incorrect data, most endpoints must be called with the full dataset. For example, there is no endpoint to add a single award-- only to update all awards. It must be called with all awards, and the ones that are no longer present will be deleted. **The exceptions are the matches, match videos, and webcasts endpoints**, which have separate endpoints to add and to delete individual items. The **event media endpoint** only allows the addition (and not the removal) of videos.\n# Authentication\nThe X-TBA-Auth-Id and X-TBA-Auth-Sig must be included as request headers in all requests. Request an auth ID and secret for your event at https://www.thebluealliance.com/request/apiwrite.\n\n*X-TBA-Auth-Id*: your auth ID\n\n*X-TBA-Auth-Sig*: `md5_hexdigest(auth_secret + request_path + request_body)`, where `request_path` is the full path starting with `/api/trusted/v1` and `request_body` is the exact body sent (empty for GET requests)\n\nFor example, an X-TBA-Auth-Sig may look like `md5_hexdigest(ExqeZK3Gbo9v95YnqmsiADzESo9HNgyhIOYSMyRpqJqYv13EazNRaDIPPJuOXrQp/api/trusted/v1/event/2014casj/matches/delete[\"qm1\"])`\n\nWhich, after hashing, becomes: `ca5c3e5c1b0e7132e4af13f805eca0be`",
-    "version": "3.2.0",
-    "x-changes": "3.2.0: Bring the spec in line with the server. Rename EventInfo `first_code` to `first_event_code`, which is the field the server reads; `first_code` was silently ignored. Type Match `score_breakdown` as a red/blue object instead of a string. Require both X-TBA-Auth-Id and X-TBA-Auth-Sig instead of either. Document the /event/{eventKey}/matches/delete_all and /event/{eventKey}/zebra_motionworks/add endpoints and the ZebraMotionWorks and ZebraTeam schemas. GET /event/{eventKey}/info returns the new EventInfoResponse schema, with `sync_disabled_flags` and full webcast objects. Document 400/401/404 causes and the Success and Error response bodies, and the `keys_deleted` response of /matches/delete. Tighten request schemas to match server validation (nullable fields, webcast type enum, `pm` comp level, required ranking fields, `qual_average`). Rename the match video and event media add operations to addMatchVideos and addEventMedia. Fix stale overview and authentication text."
+    "version": "3.3.0",
+    "x-changes": "3.3.0: Add `direct_link` to the webcast type enum, matching the server's WebcastType (a link to a stream page TBA can't embed). 3.2.0: Bring the spec in line with the server. Rename EventInfo `first_code` to `first_event_code`, which is the field the server reads; `first_code` was silently ignored. Type Match `score_breakdown` as a red/blue object instead of a string. Require both X-TBA-Auth-Id and X-TBA-Auth-Sig instead of either. Document the /event/{eventKey}/matches/delete_all and /event/{eventKey}/zebra_motionworks/add endpoints and the ZebraMotionWorks and ZebraTeam schemas. GET /event/{eventKey}/info returns the new EventInfoResponse schema, with `sync_disabled_flags` and full webcast objects. Document 400/401/404 causes and the Success and Error response bodies, and the `keys_deleted` response of /matches/delete. Tighten request schemas to match server validation (nullable fields, webcast type enum, `pm` comp level, required ranking fields, `qual_average`). Rename the match video and event media add operations to addMatchVideos and addEventMedia. Fix stale overview and authentication text."
   },
   "security": [
     {
@@ -908,7 +908,8 @@
                     "livestream",
                     "html5",
                     "dacast",
-                    "stemtv"
+                    "stemtv",
+                    "direct_link"
                   ],
                   "description": "Type of webcast. Required if url is not provided",
                   "example": "youtube"
@@ -1000,7 +1001,8 @@
                     "livestream",
                     "html5",
                     "dacast",
-                    "stemtv"
+                    "stemtv",
+                    "direct_link"
                   ]
                 },
                 "channel": {
@@ -1213,7 +1215,8 @@
               "livestream",
               "html5",
               "dacast",
-              "stemtv"
+              "stemtv",
+              "direct_link"
             ]
           },
           "channel": {
