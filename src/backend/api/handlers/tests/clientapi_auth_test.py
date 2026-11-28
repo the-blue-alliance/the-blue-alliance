@@ -1,18 +1,18 @@
 from unittest.mock import patch
 
-from werkzeug.test import Client
+from flask.testing import FlaskClient
 
 from backend.api.client_api_auth_helper import ClientApiAuthHelper
 from backend.common import auth
 
 
-def test_no_headers(api_client: Client) -> None:
+def test_no_headers(api_client: FlaskClient) -> None:
     with api_client.application.test_request_context(headers=None):
         user = ClientApiAuthHelper.get_current_user()
         assert user is None
 
 
-def test_malformed_header(api_client: Client) -> None:
+def test_malformed_header(api_client: FlaskClient) -> None:
     with api_client.application.test_request_context(
         headers={"Authorization": "badly_formatted"}
     ):
@@ -20,7 +20,7 @@ def test_malformed_header(api_client: Client) -> None:
         assert user is None
 
 
-def test_valid_header(api_client: Client) -> None:
+def test_valid_header(api_client: FlaskClient) -> None:
     with (
         api_client.application.test_request_context(
             headers={"Authorization": "Bearer abc123"}
@@ -33,7 +33,7 @@ def test_valid_header(api_client: Client) -> None:
         assert user._session_claims == {"uid": "abc123", "email": "test@tba.com"}
 
 
-def test_valid_header_no_email(api_client: Client) -> None:
+def test_valid_header_no_email(api_client: FlaskClient) -> None:
     with (
         api_client.application.test_request_context(
             headers={"Authorization": "Bearer abc123"}
@@ -45,7 +45,7 @@ def test_valid_header_no_email(api_client: Client) -> None:
         assert user is None
 
 
-def test_invalid_header(api_client: Client) -> None:
+def test_invalid_header(api_client: FlaskClient) -> None:
     with (
         api_client.application.test_request_context(
             headers={"Authorization": "Bearer abc123"}
